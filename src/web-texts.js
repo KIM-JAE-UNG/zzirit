@@ -1,0 +1,21 @@
+/* ===== Web build only: texts that differ from the Claude artifact version ===== */
+Object.assign(T, {
+  mode_local_note: ['지금은 로그인 서버에 연결하지 못해서 기록이 이 기기에만 저장돼요. 잠시 후 새로고침해 보세요.', "Can't reach the sign-in server right now, so records stay on this device. Try refreshing in a moment.", 'ログインサーバーに接続できないため、記録はこの端末にのみ保存されます。しばらくして再読み込みしてください。', '暂时无法连接登录服务器，记录只保存在本机。请稍后刷新。'],
+  mode_explain: ['{app_eun} 기록을 서버에 저장해요. 처음 들어오면 이 브라우저에 계정이 자동으로 만들어져요. 브라우저 데이터를 지우면 그 계정으로 다시 들어올 수 없으니 주의해 주세요.', '{app} saves your records on our server. An account is created for this browser automatically. If you clear browser data you cannot get back into it.', '{app}は記録をサーバーに保存します。初回アクセス時にこのブラウザ用のアカウントが自動作成されます。ブラウザのデータを消すと戻れないのでご注意ください。', '{app}会把记录保存在服务器上。首次访问时会自动为此浏览器创建账号。清除浏览器数据后将无法找回该账号。'],
+  ai_need_images: ['AI 어종 판별을 준비 중이에요. 지금은 직접 어종을 고를 수 있어요.', 'AI identification is being set up. For now you can choose the species yourself.', 'AI判定は準備中です。今は手動で選べます。', 'AI识别正在准备中，目前可手动选择鱼种。'],
+  ai_need_claude: ['AI 기능을 준비 중이에요. 곧 열려요.', 'AI features are being set up. Coming soon.', 'AI機能は準備中です。まもなく公開します。', 'AI功能正在准备中，即将开放。'],
+  past_needs_ai: ['과거 조과는 AI 검열이 꼭 필요해요. AI 판별이 열리면 등록할 수 있어요.', 'Past catches require AI screening. You can register them once AI identification is live.', '過去の釣果はAI審査が必須です。AI判定の公開後に登録できます。', '以往渔获必须经AI审核，AI识别开放后即可登记。'],
+  ai_err_granted: ['AI를 쓰려면 로그인이 필요해요. 새로고침 후 다시 시도해 주세요.', 'AI needs a signed-in session. Refresh and try again.', 'AIの利用にはログインが必要です。再読み込みして再試行してください。', '使用AI需要登录，请刷新后重试。'],
+  faq_beta_a: ['지금은 베타 기간이에요. 누구나 기록을 올리고 랭킹에 참가할 수 있어요. AI 검사를 통과하지 못한 조과는 운영자가 확인한 뒤 점수에 반영돼요.', "We're in beta. Anyone can post catches and join the rankings. Catches that don't pass the AI check count once the operator reviews them.", 'ただいまベータ期間中です。誰でも記録を投稿してランキングに参加できます。AI審査を通らなかった釣果は運営者の確認後に反映されます。', '目前处于测试期。任何人都可以上传记录参加排行，未通过AI审核的渔获经运营者确认后计分。'],
+  fr_local_note: ['지금은 기록이 이 기기에만 저장되는 상태라 친구 신청을 보내거나 받을 수 없어요. 새로고침해서 로그인되면 쓸 수 있어요.', "Records are on this device only right now, so friend requests can't be sent or received. Refresh to sign in.", '現在は端末内保存のため、フレンド申請を送受信できません。再読み込みしてログインすると使えます。', '当前记录仅保存在本机，无法收发好友申请。刷新登录后即可使用。'],
+  fr_need_shared: ['친구 기능은 로그인된 상태에서 쓸 수 있어요', 'Friends need a signed-in session', 'フレンド機能はログイン中に使えます', '登录后才能使用好友功能'],
+  toast_local_mode: ['서버에 저장하지 못해서 이 기기에 저장했어요', "Couldn't save to the server, so it's saved on this device", 'サーバーに保存できなかったため、この端末に保存しました', '无法保存到服务器，已保存在本机'],
+  fr_invite_msg_web: ['{app}에서 같이 조과 겨뤄요! 친구 코드: {code} ({nick})\n{link}', 'Compete with me on {app}! Friend code: {code} ({nick})\n{link}', '{app}で一緒に釣果を競おう！フレンドコード：{code}（{nick}）\n{link}', '来{app}和我比拼渔获吧！好友码：{code}（{nick}）\n{link}'],
+  claim_title: ['관리자 인증', 'Admin sign-in', '管理者認証', '管理员认证'],
+  claim_sub: ['운영자 관리자 코드를 넣어 주세요. 이 브라우저가 관리자로 등록돼요.', 'Enter the operator admin code. This browser becomes an admin.', '運営者の管理者コードを入力してください。このブラウザが管理者として登録されます。', '请输入运营者的管理员代码，此浏览器将注册为管理员。'],
+  claim_ph: ['관리자 코드', 'Admin code', '管理者コード', '管理员代码'],
+  claim_go: ['인증하기', 'Verify', '認証する', '验证'],
+  claim_ok: ['관리자로 등록됐어요', 'You are now an admin', '管理者として登録されました', '已注册为管理员'],
+  claim_bad: ['코드가 맞지 않아요', 'That code is not right', 'コードが正しくありません', '代码不正确'],
+  claim_need_login: ['아직 로그인되지 않았어요. 새로고침 후 다시 시도해 주세요.', 'Not signed in yet. Refresh and try again.', 'まだログインしていません。再読み込みして再試行してください。', '尚未登录，请刷新后重试。']
+});

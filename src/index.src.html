@@ -1,0 +1,130 @@
+<title>__APP_KO__ __APP_EN__</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="__APP_KO__ __APP_EN__ — 사진 한 장으로 어종을 찾고, 전 세계 낚시꾼과 겨루는 낚시 리그">
+<!--__WEB_META__-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+<style>
+/*__CSS__*/
+</style>
+<div class="app">
+  <aside class="rail">
+    <a class="brand" href="#home" aria-label="__APP_KO__ __APP_EN__">
+      <svg class="logo" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="19" fill="#0F3A52"/><path d="M7 27c4.3-2 8.7-2 13 0s8.7 2 13 0" stroke="#5CE1FF" stroke-width="1.6" fill="none" opacity=".65"/><path d="M10 31.5c3.3-1.5 6.7-1.5 10 0s6.7 1.5 10 0" stroke="#5CE1FF" stroke-width="1.4" fill="none" opacity=".35"/><g transform="rotate(16 20 18)"><line x1="20" y1="1.5" x2="20" y2="6" stroke="#E9EFF2" stroke-width="1.3"/><rect x="17" y="5.5" width="6" height="22.5" rx="3" fill="#E9EFF2"/><path d="M17 8.5a3 3 0 0 1 6 0V15h-6z" fill="#FF5A1F"/><path d="M17 21h6v4a3 3 0 0 1-6 0z" fill="#0B2230"/></g></svg>
+      <span><span class="wm">__APP_KO__</span><br><span class="wm-en">__APP_EN__</span></span>
+    </a>
+    <nav class="nav" aria-label="Main">
+      <a href="#home" data-route="home"><svg class="ic" aria-hidden="true"><use href="#i-home"/></svg><span data-t="nav_home"></span></a>
+      <a href="#scan" data-route="scan"><svg class="ic" aria-hidden="true"><use href="#i-scan"/></svg><span data-t="nav_scan"></span></a>
+      <a href="#map" data-route="map"><svg class="ic" aria-hidden="true"><use href="#i-map"/></svg><span data-t="nav_map"></span></a>
+      <a href="#rank" data-route="rank"><svg class="ic" aria-hidden="true"><use href="#i-trophy"/></svg><span data-t="nav_rank"></span></a>
+      <a href="#friends" data-route="friends"><svg class="ic" aria-hidden="true"><use href="#i-users"/></svg><span data-t="nav_friends"></span><i class="badge num" data-frbadge hidden></i></a>
+      <a href="#sea" data-route="sea"><svg class="ic" aria-hidden="true"><use href="#i-sea"/></svg><span data-t="nav_sea"></span></a>
+      <div class="nav-sep"></div>
+      <a href="#dex" data-route="dex"><svg class="ic" aria-hidden="true"><use href="#i-book"/></svg><span data-t="nav_dex"></span></a>
+      <a href="#tackle" data-route="tackle"><svg class="ic" aria-hidden="true"><use href="#i-lure"/></svg><span data-t="nav_tackle"></span></a>
+      <a href="#log" data-route="log"><svg class="ic" aria-hidden="true"><use href="#i-log"/></svg><span data-t="nav_log"></span></a>
+      <a href="#help" data-route="help"><svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg><span data-t="nav_help"></span></a>
+      <a href="#prefs" data-route="prefs"><svg class="ic" aria-hidden="true"><use href="#i-gear"/></svg><span data-t="nav_prefs"></span></a>
+      <a href="#admin" data-route="admin" class="nav-admin" hidden><svg class="ic" aria-hidden="true"><use href="#i-shield"/></svg><span data-t="nav_admin"></span></a>
+    </nav>
+    <div class="rail-foot">
+      <span class="mode-pill" id="mode-pill" hidden></span>
+      <button class="donate-mini" data-act="donate"><svg class="ic" aria-hidden="true"><use href="#i-heart"/></svg><span><span data-t="donate_btn"></span><small data-t="donate_mini_sub"></small></span></button>
+      <div class="rail-ctl">
+        <select id="lang-sel" aria-label="Language"><option value="ko">한국어</option><option value="en">English</option><option value="ja">日本語</option><option value="zh">中文</option></select>
+        <button id="theme-btn" data-act="theme-cycle" data-tt="theme"></button>
+      </div>
+      <a class="me-chip" id="me-chip" href="#sea"></a>
+    </div>
+  </aside>
+  <header class="topbar">
+    <a class="brand" href="#home" aria-label="__APP_KO__ __APP_EN__">
+      <svg class="logo" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="19" fill="#0F3A52"/><path d="M7 27c4.3-2 8.7-2 13 0s8.7 2 13 0" stroke="#5CE1FF" stroke-width="1.6" fill="none" opacity=".65"/><g transform="rotate(16 20 18)"><line x1="20" y1="1.5" x2="20" y2="6" stroke="#E9EFF2" stroke-width="1.3"/><rect x="17" y="5.5" width="6" height="22.5" rx="3" fill="#E9EFF2"/><path d="M17 8.5a3 3 0 0 1 6 0V15h-6z" fill="#FF5A1F"/><path d="M17 21h6v4a3 3 0 0 1-6 0z" fill="#0B2230"/></g></svg>
+      <span class="wm">__APP_KO__</span><span class="wm-en">__APP_EN__</span>
+    </a>
+    <span class="grow"></span>
+    <select id="lang-sel-m" aria-label="Language"><option value="ko">한국어</option><option value="en">English</option><option value="ja">日本語</option><option value="zh">中文</option></select>
+    <a class="icon-btn" href="#friends" id="fr-mini" aria-label="Friends"><svg class="ic" aria-hidden="true"><use href="#i-users"/></svg><i class="badge num" data-frbadge hidden></i></a>
+    <a class="icon-btn" href="#sea" id="me-mini" data-tt="nav_sea"></a>
+    <button class="icon-btn" data-act="more" data-tt="more"><svg class="ic" aria-hidden="true"><use href="#i-menu"/></svg></button>
+  </header>
+  <main id="main">
+    <section class="view" id="v-home" hidden></section>
+    <section class="view" id="v-scan" hidden></section>
+    <section class="view" id="v-map" hidden></section>
+    <section class="view" id="v-rank" hidden></section>
+    <section class="view" id="v-friends" hidden></section>
+    <section class="view" id="v-sea" hidden></section>
+    <section class="view" id="v-dex" hidden></section>
+    <section class="view" id="v-tackle" hidden></section>
+    <section class="view" id="v-log" hidden></section>
+    <section class="view" id="v-help" hidden></section>
+    <section class="view" id="v-prefs" hidden></section>
+    <section class="view" id="v-admin" hidden></section>
+  </main>
+  <nav class="tabbar" aria-label="Tabs">
+    <a href="#home" data-route="home"><svg class="ic" aria-hidden="true"><use href="#i-home"/></svg><span data-t="tab_home"></span></a>
+    <a href="#map" data-route="map"><svg class="ic" aria-hidden="true"><use href="#i-map"/></svg><span data-t="tab_map"></span></a>
+    <a href="#scan" data-route="scan" class="tab-fab"><span class="fab"><svg class="ic" aria-hidden="true"><use href="#i-camera"/></svg></span><span data-t="tab_scan"></span></a>
+    <a href="#rank" data-route="rank"><svg class="ic" aria-hidden="true"><use href="#i-trophy"/></svg><span data-t="tab_rank"></span></a>
+    <a href="#sea" data-route="sea"><svg class="ic" aria-hidden="true"><use href="#i-sea"/></svg><span data-t="tab_sea"></span></a>
+  </nav>
+</div>
+<div id="modal-root"></div>
+<div id="toast-root" aria-live="polite"></div>
+<svg width="0" height="0" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v8.5a1.5 1.5 0 0 1-1.5 1.5H15v-6H9v6H4.5A1.5 1.5 0 0 1 3 19.5z"/></symbol>
+  <symbol id="i-scan" viewBox="0 0 24 24"><path d="M4 8V5.5A1.5 1.5 0 0 1 5.5 4H8M16 4h2.5A1.5 1.5 0 0 1 20 5.5V8M20 16v2.5a1.5 1.5 0 0 1-1.5 1.5H16M8 20H5.5A1.5 1.5 0 0 1 4 18.5V16"/><path d="M7 12c2.2-2.6 5.2-3 8-1l2.2-1.6v5.2L15 13c-2.8 2-5.8 1.6-8-1z"/></symbol>
+  <symbol id="i-map" viewBox="0 0 24 24"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14"/></symbol>
+  <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M8 4h8v5a4 4 0 0 1-8 0zM8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8 21h8M10 17h4v4h-4z"/></symbol>
+  <symbol id="i-sea" viewBox="0 0 24 24"><path d="M2 8c2 0 2-2 4-2s2 2 4 2 2-2 4-2 2 2 4 2 2-2 4-2M2 13c2 0 2-2 4-2s2 2 4 2 2-2 4-2 2 2 4 2 2-2 4-2M2 18c2 0 2-2 4-2s2 2 4 2 2-2 4-2 2 2 4 2 2-2 4-2"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5zM4 20.5v-15M20 18v3H6.5M8 7.5h8M8 11h5"/></symbol>
+  <symbol id="i-lure" viewBox="0 0 24 24"><path d="M3 10c3.2-4 9.4-5 14-2-2 4.2-8.6 6.2-14 2z"/><path d="M17 8l3.5-1.5M8 13v3.5a3 3 0 0 0 6 0V15"/><circle cx="13.5" cy="8.6" r=".9"/></symbol>
+  <symbol id="i-log" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4h13A1.5 1.5 0 0 1 20 5.5v9a1.5 1.5 0 0 1-1.5 1.5H10l-5 4v-4.2A1.5 1.5 0 0 1 4 14.5z"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.2a4.3 4.3 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z"/></symbol>
+  <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/></symbol>
+  <symbol id="i-camera" viewBox="0 0 24 24"><path d="M4 8.5h3.2L9 6h6l1.8 2.5H20v11H4z"/><circle cx="12" cy="13.5" r="3.6"/></symbol>
+  <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+  <symbol id="i-warn" viewBox="0 0 24 24"><path d="M12 3.5l9.5 16.5h-19z"/><path d="M12 10v4.5M12 17.2h.01"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.8h.01"/></symbol>
+  <symbol id="i-skull" viewBox="0 0 24 24"><path d="M12 3a7 7 0 0 0-7 7c0 2.6 1.3 4.1 2 5v3h10v-3c.7-.9 2-2.4 2-5a7 7 0 0 0-7-7z"/><path d="M9.2 11.2h.01M14.8 11.2h.01M10 18v2.5M14 18v2.5M11 14.6l1-1.2 1 1.2"/></symbol>
+  <symbol id="i-spike" viewBox="0 0 24 24"><path d="M3 19c5-1 8-6 9-14l2 5 2-3 1 4.5 2-2 1 5.5C15 18 9 19 3 19z"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M19.5 14.5A8 8 0 1 1 9.5 4.5a6.5 6.5 0 0 0 10 10z"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/></symbol>
+  <symbol id="i-contrast" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8.5" y="8.5" width="11.5" height="11.5" rx="2"/><path d="M15.5 8.5V5.5A1.5 1.5 0 0 0 14 4H5.5A1.5 1.5 0 0 0 4 5.5V14a1.5 1.5 0 0 0 1.5 1.5h3"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="M4 12l16-8-6 16-2.5-6z"/><path d="M11.5 14L20 4"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="9.5" rx="2"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3.5l2.6 5.5 6 .8-4.4 4.1 1.1 5.9L12 17l-5.3 2.8 1.1-5.9L3.4 9.8l6-.8z"/></symbol>
+  <symbol id="i-fish" viewBox="0 0 24 24"><path d="M3 12c3.2-4.2 9.4-5 13.5-1L20 8.2v7.6L16.5 13C12.4 17 6.2 16.2 3 12z"/><path d="M13.5 11h.01"/></symbol>
+  <symbol id="i-layers" viewBox="0 0 24 24"><path d="M12 3.5l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/></symbol>
+  <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3.2 3.2 3.2 14.8 0 18M12 3c-3.2 3.2-3.2 14.8 0 18"/></symbol>
+  <symbol id="i-sparkle" viewBox="0 0 24 24"><path d="M12 3l2 6.2L20 11l-6 1.8L12 19l-2-6.2L4 11l6-1.8z"/><path d="M19 3v3M17.5 4.5h3"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9.5 7V4.5h5V7M6 7l1 13h10l1-13"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/></symbol>
+  <symbol id="i-stop" viewBox="0 0 24 24"><rect x="6.5" y="6.5" width="11" height="11" rx="2"/></symbol>
+  <symbol id="i-dot" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="currentColor"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.2 2"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20.5c1.5-4 4.5-6 8-6s6.5 2 8 6"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8.5" r="3.5"/><path d="M2.5 20c1-3.6 3.6-5.5 6.5-5.5s5.5 1.9 6.5 5.5"/><path d="M15.5 5.3a3.5 3.5 0 0 1 0 6.4M17.6 14.9c2 .7 3.3 2.4 3.9 5.1"/></symbol>
+  <symbol id="i-user-plus" viewBox="0 0 24 24"><circle cx="10" cy="8" r="4"/><path d="M2.5 20.5c1.5-4 4.4-6 7.5-6 1.6 0 3 .5 4.3 1.4M18.5 13.5v6M15.5 16.5h6"/></symbol>
+  <symbol id="i-user-check" viewBox="0 0 24 24"><circle cx="10" cy="8" r="4"/><path d="M2.5 20.5c1.5-4 4.4-6 7.5-6 1.6 0 3 .5 4.3 1.4M15 17.5l2 2 4-4.5"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></symbol>
+</svg>
+<!--__WEB_HEAD__-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script>
+/*__JS__*/
+</script>

@@ -1,0 +1,7 @@
+# local test helpers
+_test*.html
+_leaflet_test.js
+__pycache__/
+.env
+.env.*
+supabase/.temp/
