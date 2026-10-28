@@ -189,11 +189,11 @@ const store = (() => {
         sub(db.collection('labels').limit(1000), snap => { const m = new Map(); for (const d of snap.docs) if (d.exists) m.set(d.id, d.data()); S.labels = m; S.dataVer++; rerenderSoon(); });
         sub(db.collection('board').limit(1000), snap => {
           const m = new Map(); for (const d of snap.docs) if (d.exists) m.set(d.id, d.data());
-          S.board = m; S.dataVer++;
+          S.board = m; S.boardLoaded = true; S.dataVer++;
           if (S.uid && m.has(S.uid) && S.mode === 'shared') S.myBoard = JSON.parse(JSON.stringify(m.get(S.uid)));
           rerenderSoon();
         });
-        sub(db.collection('teams').limit(1000), snap => { const m = new Map(); for (const d of snap.docs) if (d.exists) m.set(d.id, d.data()); S.teams = m; S.dataVer++; rerenderSoon(); });
+        sub(db.collection('teams').limit(1000), snap => { const m = new Map(); for (const d of snap.docs) if (d.exists) m.set(d.id, d.data()); S.teams = m; S.teamsLoaded = true; S.dataVer++; rerenderSoon(); });
         if (window.APP_RT === 'web') sub(db.collection('news').limit(200), snap => { S.news = snap.docs.filter(d => d.exists).map(d => Object.assign({ id: d.id }, d.data())); S.newsVer = (S.newsVer || 0) + 1; rerenderSoon(); });
         if (window.APP_RT === 'web') {
           // the reviewer's notes on my catches (the server only sends mine; the operator gets all), indexed by catch id

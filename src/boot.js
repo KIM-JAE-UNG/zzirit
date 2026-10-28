@@ -26,6 +26,9 @@ function updateShell() {
   const fb = $('#fr-mini'); if (fb) fb.setAttribute('aria-label', t('nav_friends') + (nIn ? ` (${nIn})` : ''));
   const mode = $('#mode-pill');
   if (mode) { mode.hidden = !S.ready || S.mode === 'shared'; mode.textContent = t('mode_pill_' + S.mode); mode.title = t(S.mode === 'local' ? 'mode_local_note' : 'mode_offline_note'); }
+  // log out next to my name (website, once there is a login ID or a linked device)
+  const out = $('#me-out'); if (out) out.hidden = !(idSupported() && S.me && S.me.nick && (S.loginId || (window.APP_AUTH && window.APP_AUTH.link && window.APP_AUTH.link.linked())));
+  notiBadge();
 }
 function setTheme(x) {
   S.theme = x; lsSet('theme', x);
@@ -83,6 +86,7 @@ function rerender() {
   show(S.route);
 }
 const rerenderSoon = debounce(() => {
+  try { notiScan(); badgeCheck(); } catch (e) { console.warn(e); }
   const vid = viewOf(S.route);
   if (vid === 'map') { VIEWS.map.onData(); updateShell(); return; }
   if (LIVE_VIEWS.has(vid)) rerender(); else updateShell();
@@ -123,6 +127,9 @@ document.addEventListener('click', e => {
     if (a === 'donate') openDonate();
     else if (a === 'onboard') openOnboarding();
     else if (a === 'auth') openAuth('join');
+    else if (a === 'noti') openNoti();
+    else if (a === 'logout') openLogout();
+    else if (a === 'install') openInstall();
     else if (a === 'more') openMore();
     else if (a === 'lens') openLens();
     else if (a === 'scan-stop') { if (S.scan && S.scan.ctl) S.scan.ctl.abort(); S.scan.phase = 'idle'; renderScanWork(); }
@@ -133,6 +140,7 @@ document.addEventListener('click', e => {
     else if (a === 'preview-off') { S.preview = null; rerender(); }
     else if (a === 'rec-off') { S.recDismiss = true; rerender(); }
     else if (a === 'idtip-off') { lsSet('idTipOff', 1); rerender(); }
+    else if (a === 'insttip-off') { lsSet('instTipOff', 1); rerender(); }
     else if (a === 'notice-x') { const n = noticeOf(); if (n) lsSet('noticeX', n.id); const bar = act.closest('.notice-bar'); if (bar) bar.remove(); }
     else if (a === 'theme-cycle') setTheme(S.theme === 'system' ? 'dark' : S.theme === 'dark' ? 'light' : 'system');
     return;
@@ -205,4 +213,6 @@ matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', () => { 
   store.init().then(() => { updateStatic(); updateShell(); if (S.route === 'admin' && !S.isOwner) location.hash = 'home'; setTimeout(maybeWhatsNew, 2500); setTimeout(maybeWelcome, 1800); });
   const idle = window.requestIdleCallback || (f => setTimeout(f, 1200));
   idle(() => { GEO.loadEnv(); });
+  // the website can be installed as an app and opened without a connection (sw.js: pages always come fresh from the network first)
+  if (window.APP_RT === 'web' && location.protocol === 'https:' && 'serviceWorker' in navigator) idle(() => { navigator.serviceWorker.register('sw.js').catch(() => { }); });
 })();

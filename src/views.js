@@ -82,7 +82,8 @@ VIEWS.home = {
         </div>
       </section>
 
-      ${idTipHTML()}
+      ${wxCardHTML()}
+      ${idTipHTML() || instTipHTML()}
       ${newsCardHTML()}
 
       <section class="tourney">
@@ -149,6 +150,7 @@ VIEWS.home = {
       </section>
     </div>`;
     hydratePhotos(el);
+    wxHydrate(el);
   }
 };
 /* Catch photos in lists load when they come near the screen (the drawn fish shows until then) */
@@ -826,12 +828,12 @@ VIEWS.sea = {
     $('#sea-rec', el).innerHTML = fresh.length && !S.recDismiss && !S.preview ? `<div class="rec card new"><img src="${this.itemThumb(fresh[0])}" alt="" width="96" height="60"><div><p class="eyebrow">${t('unlock_eyebrow', { n: myLevel() })}</p><p>${t('unlock_line', { name: esc(fresh.map(id => dict(SHOPI[id].n)).slice(0, 3).join(', ')) })}</p></div><div class="rec-btns"><button class="btn btn-primary btn-sm" data-toggle="${fresh[0]}">${t('use_item')}</button><button class="btn btn-ghost btn-xs" data-act="rec-off" aria-label="${esc(t('close'))}">${icon('close')}</button></div></div>`
       : theirLook ? `<div class="rec card"><img src="${this.itemThumb(theirLook)}" alt="" width="96" height="60"><div><p class="eyebrow no-up">${t('fr_tryon_eyebrow', { nick: esc(a.nick) })}</p><p>${t('fr_tryon_line', { name: esc(dict(SHOPI[theirLook].n)) })}</p></div><div class="rec-btns"><button class="btn btn-line btn-sm" data-tryon="${theirLook}">${icon('eye')}${t('fr_tryon')}</button></div></div>` : '';
     S.seaTab = S.seaTab || 'shop';
-    const tabs = mine ? ['shop', 'catches', 'dex'] : ['catches', 'dex'];
+    const tabs = mine ? ['shop', 'catches', 'dex', 'badges'] : ['catches', 'dex', 'badges'];
     if (!tabs.includes(S.seaTab)) S.seaTab = tabs[0];
     $('#sea-body', el).innerHTML = `
       ${fish.length ? '' : `<p class="note">${icon('fish')} ${t(mine ? 'sea_nofish' : 'sea_nofish_other')}</p>`}
       <div class="tabs" role="tablist">${tabs.map(k => `<button role="tab" aria-selected="${S.seaTab === k}" data-seatab="${k}">${t('seatab_' + k)}</button>`).join('')}</div>
-      <div class="tab-body">${S.seaTab === 'shop' ? this.shopHTML() : S.seaTab === 'catches' ? this.catchesHTML(cs, uid) : this.dexHTML(cs)}</div>`;
+      <div class="tab-body">${S.seaTab === 'shop' ? this.shopHTML() : S.seaTab === 'catches' ? this.catchesHTML(cs, uid) : S.seaTab === 'badges' ? badgesHTML(a, uid || myId()) : this.dexHTML(cs)}</div>`;
     hydratePhotos(el);
     if (mine && S.seaTab === 'shop' && S.me && myLevel() > (S.me.lvSeen || 1) && !S._lvSeenT) { S._lvSeenT = setTimeout(() => { S._lvSeenT = null; if (S.me) { S.me.lvSeen = myLevel(); store.saveMe(); } }, 4000); }
   },
@@ -1129,6 +1131,7 @@ VIEWS.prefs = {
           <div class="field"><span>${t('theme')}</span><div class="seg seg-sm">${['system', 'light', 'dark'].map(x => `<button aria-pressed="${S.theme === x}" data-themeset="${x}">${t('theme_' + x)}</button>`).join('')}</div></div>
           <div class="field"><span>${t('units')}</span><div class="seg seg-sm">${['cm', 'in'].map(x => `<button aria-pressed="${S.unit === x}" data-unit="${x}">${x === 'cm' ? 'cm · kg' : 'in · lb'}</button>`).join('')}</div></div>
         </div>
+        ${installOn() ? `<div class="inst-row"><div><b>${t('inst_btn')}</b><p class="muted small">${t('inst_row_sub')}</p></div><button class="btn btn-line btn-sm" data-act="install">${icon('download')}${t('inst_btn')}</button></div>` : ''}
       </section>
       <section class="card"><h2 class="h3">${t('prefs_privacy')}</h2><p>${t('privacy_text')}</p>
         ${S.me && S.me.nick ? `<label class="switch"><input type="checkbox" id="pf-froff" ${S.me.frOff ? '' : 'checked'}><span class="sw"></span><span>${t('fr_off_pref')}</span></label><p class="hint">${t('fr_off_pref_hint')}</p>` : ''}
@@ -1138,7 +1141,7 @@ VIEWS.prefs = {
         <p class="hint">${t('mode_explain')}</p>
         ${window.APP_RT === 'web' && !S.isOwner ? `<p class="hint"><a href="#claim">${icon('shield')} ${t('claim_title')}</a></p>` : ''}
       </section>
-      <section class="card credits"><h2 class="h3">${t('credits_title')}</h2><p class="small">${t('credits_text')}</p></section>
+      <section class="card credits"><h2 class="h3">${t('credits_title')}</h2><p class="small">${t('credits_text')}</p>${wxOn() ? `<p class="small">${t('credits_wx')} · <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo.com</a> (CC BY 4.0)</p>` : ''}</section>
     </div>`;
     const fo = $('#pf-froff', el);
     if (fo) fo.onchange = async () => { S.me.frOff = !fo.checked; await store.saveMe(); toast(t('saved')); };
@@ -1181,6 +1184,7 @@ VIEWS.admin = {
       <section class="card ad-notice"><h2 class="h3">${icon('megaphone')}${t('ad_notice')}</h2><p class="hint">${t('ad_notice_hint')}</p>
         <div class="field"><textarea id="ad-notice" rows="3" maxlength="400" placeholder="${esc(t('ad_notice_ph'))}">${esc((noticeOf() || {}).t || '')}</textarea></div>
         <div class="actions"><button class="btn btn-primary" id="ad-notice-go">${icon('megaphone')}${t('ad_notice_go')}</button>${noticeOf() ? `<button class="btn btn-ghost" id="ad-notice-off">${t('ad_notice_off')}</button>` : ''}</div>
+        ${window.APP_RT === 'web' ? `<label class="switch ad-wx"><input type="checkbox" id="ad-wx" ${cfg.wxOff ? '' : 'checked'}><span class="sw"></span><span>${t('ad_wx')}</span></label><p class="hint">${t('ad_wx_hint')}</p>` : ''}
       </section>
       <section class="card"><h2 class="h3">${icon('heart')}${t('ad_pay')}</h2>
         <div class="row2">
@@ -1225,6 +1229,8 @@ VIEWS.admin = {
       if (await store.saveAdmin('config', Object.assign({}, S.admin.config || {}, { notice: { id: rid(8), t: v, ts: nowMs() } }))) toast(t('ad_notice_done'));
       rerender();
     };
+    const wxSw = $('#ad-wx', el);
+    if (wxSw) wxSw.onchange = async () => { if (await store.saveAdmin('config', Object.assign({}, S.admin.config || {}, { wxOff: !wxSw.checked }))) toast(t('saved')); };
     const nOff = $('#ad-notice-off', el);
     if (nOff) nOff.onclick = async () => {
       const cur = Object.assign({}, S.admin.config || {}); delete cur.notice;
@@ -1277,11 +1283,18 @@ function openMore() {
   if (window.APP_RT !== 'web') items.splice(3, 1);
   if (S.isOwner) items.push(['admin', 'shield']);
   const nIn = frLists().inc.length;
-  const acct = idSupported() && !S.idOff ? (S.loginId ? `<a href="#prefs" class="more-acct">${S.me && S.me.nick ? avatar(S.me, 30) : icon('user')}<span><b>${esc((S.me && S.me.nick) || '')}</b><span class="muted small mono">${esc(S.loginId)}</span></span></a>`
+  // the account first: who is signed in, with a way to sign out (only when there is a way back in: a login ID or a linked device)
+  const linked = !!(window.APP_AUTH && window.APP_AUTH.link && window.APP_AUTH.link.linked());
+  const inAcct = !!(S.me && S.me.nick) && (!!S.loginId || linked);
+  const acct = idSupported() && !S.idOff ? (inAcct
+    ? `<div class="more-acct"><a href="#prefs" class="more-acct-main">${avatar(S.me, 30)}<span><b>${esc(S.me.nick)}</b><span class="muted small${S.loginId ? ' mono' : ''}">${esc(S.loginId || t('more_linked'))}</span></span></a><button class="more-out" data-act="logout">${icon('logout')}<span>${t('lo_title')}</span></button></div>`
     : `<button class="more-acct" data-act="auth">${icon('user')}<span><b>${t(S.me && S.me.nick ? 'more_acct_keep' : 'more_acct_join')}</b><span class="muted small">${t(S.me && S.me.nick ? 'more_acct_keep_sub' : 'more_acct_join_sub')}</span></span></button>`) : '';
-  const w = openModal(`<nav class="more"><h2 class="sr">${t('more')}</h2>${acct}${items.map(([r, ic]) => `<a href="#${r}" class="more-item">${icon(ic)}<span>${t('nav_' + r)}</span>${r === 'friends' && nIn ? `<i class="badge num">${nIn}</i>` : ''}</a>`).join('')}<button class="more-item heart" data-act="donate">${icon('heart')}<span>${t('donate_btn')}</span></button></nav>`, { sheet: true, label: t('more') });
+  const inst = installOn() ? `<button class="more-item" data-act="install">${icon('download')}<span>${t('inst_btn')}</span></button>` : '';
+  const w = openModal(`<nav class="more"><h2 class="sr">${t('more')}</h2>${acct}${items.map(([r, ic]) => `<a href="#${r}" class="more-item">${icon(ic)}<span>${t('nav_' + r)}</span>${r === 'friends' && nIn ? `<i class="badge num">${nIn}</i>` : ''}</a>`).join('')}${inst}<button class="more-item heart" data-act="donate">${icon('heart')}<span>${t('donate_btn')}</span></button></nav>`, { sheet: true, label: t('more') });
   w.addEventListener('click', e => {
     if (e.target.closest('[data-act="auth"]')) { closeModal(w); openAuth('join'); return; }
+    if (e.target.closest('[data-act="logout"]')) { closeModal(w); openLogout(); return; }
+    if (e.target.closest('[data-act="install"]')) { closeModal(w); openInstall(); return; }
     if (e.target.closest('a,.heart')) closeModal(w);
   });
 }

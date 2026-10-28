@@ -1138,6 +1138,73 @@ h1 .beta-chip { font-size: 13px; margin-left: 4px; vertical-align: 6px; }
   .ad-users li { flex-wrap: wrap; }
   .ad-acts { width: 100%; justify-content: flex-start; padding-left: 44px; }
 }
+/* log out next to my name (rail), the bell, the account box in the menu */
+.me-line { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.me-line .me-chip { flex: 1; }
+.me-out { flex: none; display: grid; place-items: center; width: 36px; height: 36px; border-radius: 10px; border: 1px solid rgba(255,255,255,.08); background: var(--rail-2); color: var(--rail-dim); cursor: pointer; }
+.me-out:hover, .me-out:focus-visible { color: var(--rail-ink); }
+.rail-ctl .noti-btn { position: relative; display: inline-grid; place-items: center; padding: 7px 9px; }
+.rail-ctl .noti-btn .badge { position: absolute; top: -6px; right: -6px; box-shadow: 0 0 0 2px var(--rail); }
+div.more-acct { cursor: default; padding: 8px 8px 8px 14px; }
+div.more-acct:hover { filter: none; }
+.more-acct-main { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; color: inherit; }
+.more-acct-main:hover { text-decoration: none; }
+.more-acct-main b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.more-out { flex: none; display: flex; flex-direction: column; align-items: center; gap: 2px; border: 0; border-radius: 10px; padding: 8px 10px; background: var(--surface); color: var(--ink-2); font-size: 12px; font-weight: 600; cursor: pointer; }
+.more-out .ic { width: 20px; height: 20px; }
+.logout h2, .noti h2, .install h2 { display: flex; align-items: center; gap: 8px; }
+.note.warn { background: var(--warn-soft); color: var(--ink); }
+.note.warn .ic { color: var(--warn); }
+/* notifications */
+.nt-list { list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-direction: column; gap: 2px; max-height: min(62vh, 560px); overflow-y: auto; }
+.nt-item { display: flex; align-items: flex-start; gap: 12px; width: 100%; text-align: left; border: 0; border-radius: 12px; padding: 10px; background: none; color: inherit; cursor: pointer; }
+.nt-item:hover { background: var(--surface-2); }
+.nt-item.unread { background: color-mix(in srgb, var(--sea-soft) 75%, transparent); }
+.nt-ic { flex: none; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: var(--surface-2); color: var(--sea); }
+.nt-item.unread .nt-ic { background: var(--surface); }
+.k-like .nt-ic, .k-paid .nt-ic { color: var(--heart); }
+.k-rok .nt-ic, .k-facc .nt-ic { color: var(--ok); }
+.k-rno .nt-ic { color: var(--poison); }
+.k-rhold .nt-ic, .k-badge .nt-ic { color: var(--gold); }
+.k-notice .nt-ic { color: var(--accent); }
+.nt-txt { display: flex; flex-direction: column; gap: 2px; min-width: 0; font-size: 14px; line-height: 1.45; overflow-wrap: anywhere; }
+.nt-main { display: block; }
+.nt-q { display: block; margin-top: 2px; color: var(--ink-2); font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* sea weather */
+.wx-card .h3 { display: flex; align-items: center; gap: 8px; }
+.wx-card .h3 .ic { color: var(--sea); }
+#wx-at { border: 1px solid var(--line); background: var(--surface); border-radius: 9px; padding: 6px 10px; font-size: 13.5px; max-width: 220px; }
+.wx-line { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; min-height: 30px; font-size: 14px; color: var(--ink-2); }
+.wx-it { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+.wx-it b { color: var(--ink); font-size: 15px; }
+.wx-it .ic { color: var(--ink-3); }
+.wx-go { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 99px; font-size: 13px; font-weight: 700; white-space: nowrap; }
+.wx-good { background: var(--ok-soft); color: var(--ok); }
+.wx-care { background: var(--warn-soft); color: var(--warn); }
+.wx-bad { background: var(--poison-soft); color: var(--poison); }
+.wx-src { margin: 10px 0 0; }
+.wx-src a { color: inherit; text-decoration: underline; }
+.wx-mini { margin: 12px 0 4px; padding: 12px 14px; border-radius: var(--r-s); background: var(--surface-2); }
+.wx-mini .lbl { display: flex; align-items: center; gap: 6px; margin: 0 0 8px; }
+/* achievements */
+.bdg-head p { margin: 0 0 12px; }
+.bdg-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.bdg { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 14px 10px 12px; text-align: center; border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); }
+.bdg-ic { display: grid; place-items: center; width: 44px; height: 44px; margin-bottom: 4px; border-radius: 50%; background: var(--surface-2); color: var(--ink-3); }
+.bdg-ic .ic { width: 22px; height: 22px; }
+.bdg b { font-size: 14.5px; }
+.bdg .muted.small { line-height: 1.35; }
+.bdg.got { border-color: color-mix(in srgb, var(--gold) 55%, var(--line)); background: linear-gradient(180deg, color-mix(in srgb, var(--gold) 12%, var(--surface)), var(--surface) 70%); }
+.bdg.got .bdg-ic { background: color-mix(in srgb, var(--gold) 24%, var(--surface)); color: var(--gold); }
+.bdg .chip { margin-top: 6px; }
+.bdg-bar { display: block; width: 100%; height: 6px; margin-top: 8px; border-radius: 99px; background: var(--line-2); overflow: hidden; }
+.bdg-bar i { display: block; height: 100%; border-radius: 99px; background: var(--sea); }
+@media (max-width: 520px) { .bdg-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+/* install as an app */
+.inst-steps { margin: 12px 0 4px; padding-left: 22px; display: flex; flex-direction: column; gap: 8px; font-size: 14.5px; }
+.inst-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--line-2); }
+.inst-row p { margin: 2px 0 0; }
+.inst-tip > .ic { color: var(--sea); }
 
 </style>
 <div class="app">
@@ -1172,8 +1239,9 @@ h1 .beta-chip { font-size: 13px; margin-left: 4px; vertical-align: 6px; }
       <div class="rail-ctl">
         <select id="lang-sel" aria-label="Language"><option value="ko">한국어</option><option value="en">English</option><option value="ja">日本語</option><option value="zh">中文</option></select>
         <button id="theme-btn" data-act="theme-cycle" data-tt="theme"></button>
+        <button class="noti-btn" data-act="noti" data-tt="noti_title" hidden><svg class="ic" aria-hidden="true"><use href="#i-bell"/></svg><i class="badge num" data-notibadge hidden></i></button>
       </div>
-      <a class="me-chip" id="me-chip" href="#sea"></a>
+      <div class="me-line"><a class="me-chip" id="me-chip" href="#sea"></a><button class="me-out" id="me-out" data-act="logout" data-tt="id_logout" hidden><svg class="ic" aria-hidden="true"><use href="#i-logout"/></svg></button></div>
     </div>
   </aside>
   <header class="topbar">
@@ -1183,6 +1251,7 @@ h1 .beta-chip { font-size: 13px; margin-left: 4px; vertical-align: 6px; }
     </a>
     <span class="grow"></span>
     <select id="lang-sel-m" aria-label="Language"><option value="ko">한국어</option><option value="en">English</option><option value="ja">日本語</option><option value="zh">中文</option></select>
+    <button class="icon-btn noti-btn" data-act="noti" data-tt="noti_title" hidden><svg class="ic" aria-hidden="true"><use href="#i-bell"/></svg><i class="badge num" data-notibadge hidden></i></button>
     <a class="icon-btn" href="#friends" id="fr-mini" aria-label="Friends"><svg class="ic" aria-hidden="true"><use href="#i-users"/></svg><i class="badge num" data-frbadge hidden></i></a>
     <a class="icon-btn" href="#sea" id="me-mini" data-tt="nav_sea"></a>
     <button class="icon-btn" data-act="more" data-tt="more"><svg class="ic" aria-hidden="true"><use href="#i-menu"/></svg></button>
@@ -1269,7 +1338,7 @@ h1 .beta-chip { font-size: 13px; margin-left: 4px; vertical-align: 6px; }
   <symbol id="i-lens" viewBox="0 0 24 24"><path d="M4 9V6.5A2.5 2.5 0 0 1 6.5 4H9M15 4h2.5A2.5 2.5 0 0 1 20 6.5V9M4 15v2.5A2.5 2.5 0 0 0 6.5 20H9"/><circle cx="12" cy="12" r="3.5"/><circle cx="18" cy="18" r="1.6" fill="currentColor"/></symbol>
   <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3.3-3.3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0L5 13.3a4 4 0 0 0 5.7 5.7l1-1"/></symbol>
   <symbol id="i-qr" viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><path d="M14 14h2v2h-2zM18 14h2M14 18h2M18 18h2v2h-2z"/></symbol>
-  <symbol id="i-megaphone" viewBox="0 0 24 24"><path d="M4 10.2v3.6a1 1 0 0 0 1 1h2.6L14 19V5L7.6 9.2H5a1 1 0 0 0-1 1z"/><path d="M17.5 9a4 4 0 0 1 0 6"/><path d="M7.8 15l1.1 4.3"/></symbol><symbol id="i-share" viewBox="0 0 24 24"><path d="M12 15V3.5M7.5 8L12 3.5 16.5 8"/><path d="M5 12v6.5A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5V12"/></symbol>
+  <symbol id="i-megaphone" viewBox="0 0 24 24"><path d="M4 10.2v3.6a1 1 0 0 0 1 1h2.6L14 19V5L7.6 9.2H5a1 1 0 0 0-1 1z"/><path d="M17.5 9a4 4 0 0 1 0 6"/><path d="M7.8 15l1.1 4.3"/></symbol><symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 2H4.5z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></symbol><symbol id="i-logout" viewBox="0 0 24 24"><path d="M14 4.5H6.5a1 1 0 0 0-1 1v13a1 1 0 0 0 1 1H14"/><path d="M11 12h9M16.5 8.5 20 12l-3.5 3.5"/></symbol><symbol id="i-cloud" viewBox="0 0 24 24"><path d="M7 18.5h10a4 4 0 0 0 .5-7.97A5.5 5.5 0 0 0 7 9.5a4.5 4.5 0 0 0 0 9z"/></symbol><symbol id="i-wind" viewBox="0 0 24 24"><path d="M3 9h11a3 3 0 1 0-3-3M3 13h15a3 3 0 1 1-3 3M3 17h7"/></symbol><symbol id="i-wave" viewBox="0 0 24 24"><path d="M2.5 15c2 0 2-1.5 4-1.5s2 1.5 4 1.5 2-1.5 4-1.5 2 1.5 4 1.5 2-1.5 3-1.5M2.5 19c2 0 2-1.5 4-1.5s2 1.5 4 1.5 2-1.5 4-1.5 2 1.5 4 1.5 2-1.5 3-1.5M7 10.5c0-3 2.5-5.5 5.5-5.5 2 0 3.5 1 4.5 2.5"/></symbol><symbol id="i-medal" viewBox="0 0 24 24"><circle cx="12" cy="14.5" r="5.5"/><path d="M8.5 9.5 6 3.5h4l2 4 2-4h4l-2.5 6"/><path d="m12 12 .9 1.8 2 .3-1.45 1.4.35 2-1.8-.95-1.8.95.35-2-1.45-1.4 2-.3z"/></symbol><symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3.5V15M7.5 10.5 12 15l4.5-4.5"/><path d="M5 17.5v1.5A1.5 1.5 0 0 0 6.5 20.5h11a1.5 1.5 0 0 0 1.5-1.5v-1.5"/></symbol><symbol id="i-share" viewBox="0 0 24 24"><path d="M12 15V3.5M7.5 8L12 3.5 16.5 8"/><path d="M5 12v6.5A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5V12"/></symbol>
 </svg>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
@@ -2087,6 +2156,114 @@ Object.assign(T, {
   ptk_breakwater: ['방파제', 'Breakwater', '堤防', '防波堤'], ptk_rocks: ['갯바위', 'Rocks', '磯', '矶钓礁石'], ptk_beach: ['해변·백사장', 'Beach', '砂浜', '海滩'],
   ptk_boat: ['선상', 'Boat', '船', '船钓'], ptk_river: ['강·하천', 'River', '川', '河流'], ptk_lake: ['저수지·호수', 'Lake', '湖・ため池', '湖泊水库'], ptk_other: ['기타', 'Other', 'その他', '其他'],
   tg_points: ['낚시 포인트', 'Fishing spots', '釣りポイント', '钓点'],
+
+  /* log out (2026-10-29) */
+  lo_title: ['로그아웃', 'Sign out', 'ログアウト', '退出登录'],
+  lo_sub_id: ['{name} 아이디에서 로그아웃해요. 같은 아이디와 비밀번호로 언제든 다시 들어올 수 있어요.', 'You’ll sign out of {name}. Sign back in any time with the same ID and password.', '{name} からログアウトします。同じIDとパスワードでいつでも戻れます。', '将退出 {name}。随时可用同一ID和密码重新登录。'],
+  lo_sub_linked: ['이 기기를 계정에서 빼요. 기록은 계정에 그대로 남고, 연결된 다른 기기에서 연결 코드를 만들면 다시 들어올 수 있어요.', 'This device leaves the account. Your records stay in the account; make a link code on your other device to come back.', 'この端末をアカウントから外します。記録はアカウントに残り、連携中の別の端末で連携コードを作ると戻れます。', '此设备将退出账号。记录保留在账号中，在已连接的其他设备上生成连接码即可回来。'],
+  lo_keep: ['조과·캐릭터·친구·게시글은 서버의 계정에 그대로 남아요. 이 브라우저에 남은 사본만 지워요.', 'Catches, character, friends and posts stay in your account on the server. Only the copy in this browser is cleared.', '釣果・キャラ・友だち・投稿はサーバーのアカウントに残ります。このブラウザのコピーだけを消します。', '渔获、角色、好友和帖子都保留在服务器账号中，只清除本浏览器里的副本。'],
+  lo_no_id: ['아직 아이디가 없어서 지금 로그아웃하면 이 계정으로 돌아올 방법이 없어요. 먼저 아이디를 만들어 주세요.', 'You have no login ID yet, so signing out now would leave no way back to this account. Create an ID first.', 'まだIDがないため、今ログアウトするとこのアカウントに戻る方法がありません。先にIDを作ってください。', '你还没有登录ID，现在退出将无法回到此账号。请先创建ID。'],
+  lo_other_id: ['다른 아이디로 로그인', 'Sign in with another ID', '別のIDでログイン', '用其他ID登录'],
+  more_linked: ['다른 기기와 연결된 계정', 'Account shared with another device', '別の端末と連携中', '与其他设备共用的账号'],
+
+  /* notifications */
+  noti_title: ['알림', 'Notifications', 'お知らせ', '通知'],
+  noti_empty: ['아직 알림이 없어요. 댓글·좋아요·친구 요청·검토 결과가 여기에 모여요.', 'Nothing yet. Replies, likes, friend requests and review results gather here.', 'まだお知らせはありません。コメント・いいね・友だち申請・審査結果がここに集まります。', '暂无通知。评论、点赞、好友请求和审核结果会汇集在这里。'],
+  noti_hint: ['알림은 앱을 열었을 때 이 기기에서 확인해요. 서버에 따로 저장하지 않아요.', 'Notifications are worked out on this device when you open the app; nothing extra is stored on the server.', 'お知らせはアプリを開いたときにこの端末で確認します。サーバーには別に保存しません。', '通知在打开应用时由本设备生成，不会额外保存在服务器上。'],
+  nt_cmt: ['<b>{who}</b>님이 내 글 「{title}」에 댓글을 남겼어요', '<b>{who}</b> replied to your post “{title}”', '<b>{who}</b>さんが投稿「{title}」にコメントしました', '<b>{who}</b> 评论了你的帖子「{title}」'],
+  nt_cmt2: ['<b>{who}</b>님도 「{title}」에 댓글을 남겼어요', '<b>{who}</b> also replied on “{title}”', '<b>{who}</b>さんも「{title}」にコメントしました', '<b>{who}</b> 也评论了「{title}」'],
+  nt_like: ['내 글 「{title}」에 좋아요가 {n}개 늘었어요', '{n} more like(s) on your post “{title}”', '投稿「{title}」のいいねが{n}件増えました', '你的帖子「{title}」新增{n}个赞'],
+  nt_freq: ['<b>{who}</b>님이 친구 요청을 보냈어요', '<b>{who}</b> sent you a friend request', '<b>{who}</b>さんから友だち申請が届きました', '<b>{who}</b> 向你发送了好友请求'],
+  nt_facc: ['<b>{who}</b>님과 친구가 됐어요', 'You and <b>{who}</b> are now friends', '<b>{who}</b>さんと友だちになりました', '你和 <b>{who}</b> 成为了好友'],
+  nt_rok: ['{fish} 조과가 확인됐어요. 랭킹에 들어가요!', 'Your {fish} catch was confirmed and counts in the rankings!', '{fish}の釣果が確認され、ランキングに入ります!', '你的{fish}渔获已确认，计入排行！'],
+  nt_rno: ['{fish} 조과는 확인되지 않았어요', 'Your {fish} catch could not be confirmed', '{fish}の釣果は確認されませんでした', '你的{fish}渔获未通过确认'],
+  nt_rlog: ['{fish} 조과는 기록으로만 남아요 (랭킹 제외)', 'Your {fish} catch stays as a log only (not ranked)', '{fish}の釣果は記録のみ残ります(ランキング対象外)', '你的{fish}渔获仅作记录保留（不计排行）'],
+  nt_rhold: ['{fish} 조과는 운영자가 한 번 더 볼게요', 'The operator will take another look at your {fish} catch', '{fish}の釣果は運営者がもう一度確認します', '运营者将再次查看你的{fish}渔获'],
+  nt_tjoin: ['<b>{who}</b>님이 우리 팀에 가입을 신청했어요', '<b>{who}</b> asked to join your team', '<b>{who}</b>さんがチームに参加を申請しました', '<b>{who}</b> 申请加入你的战队'],
+  nt_badge: ['새 업적: <b>{name}</b>', 'New achievement: <b>{name}</b>', '新しい実績: <b>{name}</b>', '新成就：<b>{name}</b>'],
+  nt_paid: ['{item} 입금이 확인됐어요. 고마워요!', 'Your payment for {item} is confirmed. Thank you!', '{item}の入金を確認しました。ありがとうございます!', '{item}的付款已确认，谢谢！'],
+
+  /* sea weather (Open-Meteo) */
+  wx_title: ['바다 날씨', 'Sea weather', '海の天気', '海况天气'],
+  wx_where: ['날씨를 볼 곳', 'Place for the weather', '天気を見る場所', '查看天气的地点'],
+  wx_here: ['지금 이곳 날씨', 'Weather here now', '今ここの天気', '此处当前天气'],
+  wx_note: ['참고용 예보예요. 나가기 전에 기상청 특보를 꼭 확인하세요', 'A forecast for reference only. Check official marine warnings before you go', '参考用の予報です。出かける前に公式の気象警報を必ず確認してください', '仅供参考。出发前请务必查看官方海上预警'],
+  wx_fail: ['날씨를 불러오지 못했어요. 잠시 후 다시 볼게요', 'Couldn’t load the weather. It will try again shortly', '天気を読み込めませんでした。少し後にもう一度試します', '无法加载天气，稍后会再试'],
+  wx_gust: ['돌풍 {v}', 'gusts {v}', '突風 {v}', '阵风 {v}'],
+  wx_period: ['주기 {v}초', 'period {v}s', '周期{v}秒', '周期{v}秒'],
+  wx_sst: ['수온', 'Water', '水温', '水温'],
+  wx_rain: ['비 올 확률', 'Rain', '降水確率', '降水概率'],
+  wxs_clear: ['맑음', 'Clear', '晴れ', '晴'], wxs_partly: ['구름 조금', 'Partly cloudy', '晴れ時々曇り', '少云'], wxs_cloudy: ['흐림', 'Overcast', '曇り', '阴'],
+  wxs_fog: ['안개', 'Fog', '霧', '雾'], wxs_drizzle: ['이슬비', 'Drizzle', '霧雨', '毛毛雨'], wxs_rain: ['비', 'Rain', '雨', '雨'],
+  wxs_snow: ['눈', 'Snow', '雪', '雪'], wxs_shower: ['소나기', 'Showers', 'にわか雨', '阵雨'], wxs_storm: ['뇌우', 'Thunderstorm', '雷雨', '雷暴'],
+  wd_n: ['북풍', 'N', '北の風', '北风'], wd_ne: ['북동풍', 'NE', '北東の風', '东北风'], wd_e: ['동풍', 'E', '東の風', '东风'], wd_se: ['남동풍', 'SE', '南東の風', '东南风'],
+  wd_s: ['남풍', 'S', '南の風', '南风'], wd_sw: ['남서풍', 'SW', '南西の風', '西南风'], wd_w: ['서풍', 'W', '西の風', '西风'], wd_nw: ['북서풍', 'NW', '北西の風', '西北风'],
+  wxgo_good: ['바람·파도 잔잔', 'Calm wind & waves', '風・波は穏やか', '风浪平稳'],
+  wxgo_care: ['바람·파도 주의', 'Mind the wind & waves', '風・波に注意', '注意风浪'],
+  wxgo_bad: ['바람·파도 강함', 'Strong wind & waves', '風・波が強い', '风浪较大'],
+
+  /* achievements */
+  seatab_badges: ['업적', 'Badges', '実績', '成就'],
+  bdg_count: ['업적 {n} / {all}개 달성', '{n} of {all} achievements', '実績 {n} / {all} 達成', '已达成成就 {n} / {all}'],
+  bdg_done: ['달성', 'Done', '達成', '已达成'],
+  bdg_new: ['새 업적을 달성했어요: {name}', 'New achievement: {name}', '新しい実績を達成: {name}', '达成新成就：{name}'],
+  bdg_first: ['첫 조과', 'First catch', '初釣果', '首次渔获'], bdg_first_d: ['확인된 조과 1마리', '1 confirmed catch', '確認済みの釣果1匹', '1条已确认渔获'],
+  bdg_n10: ['열 마리', 'Ten fish', '10匹', '十条鱼'], bdg_n10_d: ['확인된 조과 10마리', '10 confirmed catches', '確認済みの釣果10匹', '10条已确认渔获'],
+  bdg_n50: ['쉰 마리', 'Fifty fish', '50匹', '五十条鱼'], bdg_n50_d: ['확인된 조과 50마리', '50 confirmed catches', '確認済みの釣果50匹', '50条已确认渔获'],
+  bdg_sp5: ['어종 수집가', 'Collector', '魚種コレクター', '鱼种收藏家'], bdg_sp5_d: ['서로 다른 어종 5종', '5 different species', '異なる魚種5種', '5种不同的鱼'],
+  bdg_sp15: ['도감 채우기', 'Guide filler', '図鑑うめ', '图鉴填充者'], bdg_sp15_d: ['서로 다른 어종 15종', '15 different species', '異なる魚種15種', '15种不同的鱼'],
+  bdg_sp30: ['바다 박사', 'Sea scholar', '海の博士', '海洋博士'], bdg_sp30_d: ['서로 다른 어종 30종', '30 different species', '異なる魚種30種', '30种不同的鱼'],
+  bdg_rel1: ['첫 방생', 'First release', '初リリース', '首次放流'], bdg_rel1_d: ['잡은 물고기 1마리 방생', 'Release 1 fish', '釣った魚を1匹リリース', '放流1条鱼'],
+  bdg_rel10: ['바다 지킴이', 'Sea guardian', '海の守り人', '海洋守护者'], bdg_rel10_d: ['10마리 방생', 'Release 10 fish', '10匹リリース', '放流10条鱼'],
+  bdg_big50: ['손맛', 'Solid pull', 'いい引き', '好手感'], bdg_big50_d: ['50cm 넘는 물고기 1마리', 'One fish of 50 cm or more', '50cm以上を1匹', '一条50厘米以上的鱼'],
+  bdg_big80: ['대물', 'Monster', '大物', '大物'], bdg_big80_d: ['80cm 넘는 물고기 1마리', 'One fish of 80 cm or more', '80cm以上を1匹', '一条80厘米以上的鱼'],
+  bdg_trophy: ['기록급', 'Trophy', '記録級', '纪录级'], bdg_trophy_d: ['그 어종 보통 크기의 1.5배 이상', '1.5× the usual size of its species', 'その魚種の標準サイズの1.5倍以上', '达到该鱼种常见尺寸的1.5倍'],
+  bdg_night: ['밤낚시', 'Night owl', '夜釣り', '夜钓'], bdg_night_d: ['밤 8시~새벽 4시에 잡은 조과', 'A catch between 8 pm and 4 am', '夜8時〜朝4時の釣果', '晚8点至凌晨4点的渔获'],
+  bdg_dawn: ['새벽 출조', 'Early bird', '朝マヅメ', '清晨出钓'], bdg_dawn_d: ['새벽 4시~7시에 잡은 조과', 'A catch between 4 and 7 am', '朝4時〜7時の釣果', '凌晨4点至7点的渔获'],
+  bdg_feat: ['이달의 어종', 'Fish of the month', '今月の魚', '本月鱼种'], bdg_feat_d: ['이달의 어종(점수 2배)을 그달에 잡기', 'Catch a fish of the month (double points) in its month', '今月の魚(ポイント2倍)をその月に釣る', '在当月钓到本月鱼种（双倍积分）'],
+  bdg_both: ['바다와 민물', 'Sea & fresh water', '海と淡水', '海水与淡水'], bdg_both_d: ['바다 어종과 민물 어종 모두', 'Both a sea and a freshwater species', '海の魚と淡水魚の両方', '海水鱼和淡水鱼都钓到'],
+  bdg_days5: ['꾸준한 낚시꾼', 'Regular', '常連', '常客'], bdg_days5_d: ['서로 다른 5일에 조과', 'Catches on 5 different days', '異なる5日間で釣果', '在5个不同的日子有渔获'],
+  bdg_pts1k: ['천 점', '1,000 points', '1,000点', '千分'], bdg_pts1k_d: ['확인된 조과로 1,000점', '1,000 points from confirmed catches', '確認済みの釣果で1,000点', '已确认渔获累计1000分'],
+  bdg_friends3: ['낚시 친구', 'Fishing buddies', '釣り仲間', '钓友'], bdg_friends3_d: ['친구 3명', '3 friends', '友だち3人', '3位好友'],
+  bdg_posts3: ['이야기꾼', 'Storyteller', '語り手', '故事王'], bdg_posts3_d: ['게시판에 글 3개', '3 posts on the board', '掲示板に3件投稿', '在论坛发3帖'],
+  bdg_spot1: ['나만의 포인트', 'My spot', 'マイポイント', '我的钓点'], bdg_spot1_d: ['낚시 포인트 1곳 저장', 'Save 1 fishing spot', '釣りポイントを1か所保存', '保存1个钓点'],
+
+  /* install as an app */
+  inst_btn: ['앱으로 설치', 'Install app', 'アプリとして追加', '安装应用'],
+  inst_title: ['홈 화면에 {app} 추가', 'Add {app} to your home screen', 'ホーム画面に{app}を追加', '将{app}添加到主屏幕'],
+  inst_sub: ['설치하면 앱처럼 바로 열리고 화면도 넓게 써요. 앱 마켓에서 따로 받을 필요는 없어요.', 'Installed, it opens like an app with more room on screen. No app store needed.', '追加するとアプリのようにすぐ開き、画面も広く使えます。アプリストアは不要です。', '安装后可像应用一样直接打开，屏幕也更宽敞。无需应用商店。'],
+  inst_ios1: ['공유 버튼(네모에 위쪽 화살표)을 눌러요. Safari는 화면 아래, 아이패드와 Chrome은 위쪽에 있어요', 'Tap the Share button (a square with an arrow). In Safari it’s at the bottom; on iPad and in Chrome it’s at the top', '共有ボタン(四角に上向き矢印)をタップ。Safariは画面下、iPadとChromeは上にあります', '点击分享按钮（方框加向上箭头）。Safari在底部，iPad和Chrome在顶部'],
+  inst_ios2: ['목록에서 ‘홈 화면에 추가’를 골라요', 'Choose “Add to Home Screen”', '「ホーム画面に追加」を選ぶ', '选择“添加到主屏幕”'],
+  inst_ios3: ['오른쪽 위 ‘추가’를 누르면 끝이에요', 'Tap “Add” in the top-right corner', '右上の「追加」をタップして完了', '点击右上角“添加”即可'],
+  inst_other1: ['브라우저 메뉴(⋮ 또는 ≡)를 열어요', 'Open the browser menu (⋮ or ≡)', 'ブラウザのメニュー(⋮ または ≡)を開く', '打开浏览器菜单（⋮ 或 ≡）'],
+  inst_other2: ['‘앱 설치’ 또는 ‘홈 화면에 추가’를 골라요', 'Choose “Install app” or “Add to Home screen”', '「アプリをインストール」または「ホーム画面に追加」を選ぶ', '选择“安装应用”或“添加到主屏幕”'],
+  inst_inapp1: ['지금은 카카오톡 같은 앱 안의 브라우저라서 여기서는 설치할 수 없어요', 'This is a browser inside another app (like KakaoTalk), which can’t install apps', 'カカオトークなどのアプリ内ブラウザなので、ここでは追加できません', '这是应用内浏览器（如KakaoTalk），无法在此安装'],
+  inst_inapp2: ['‘다른 브라우저로 열기’를 누른 뒤(Chrome·Safari) 거기서 설치해 주세요', 'Open the page in your browser (Chrome or Safari) and install it there', '「他のブラウザで開く」(Chrome・Safari)を押し、そこで追加してください', '用浏览器（Chrome或Safari）打开后再安装'],
+  inst_open_ext: ['다른 브라우저로 열기', 'Open in browser', '他のブラウザで開く', '用浏览器打开'],
+  inst_copy_link: ['주소 복사', 'Copy link', 'リンクをコピー', '复制链接'],
+  inst_id_first: ['아이폰·아이패드에서는 설치한 앱이 Safari와 저장 공간을 따로 써요. 먼저 아이디를 만들어 두면 앱에서 같은 계정으로 로그인할 수 있어요.', 'On iPhone and iPad the installed app keeps its own storage, apart from Safari. Create a login ID first so you can sign in to the same account in the app.', 'iPhone・iPadでは追加したアプリがSafariと別の保存領域を使います。先にIDを作っておけば、アプリで同じアカウントにログインできます。', '在iPhone和iPad上，安装的应用与Safari分开存储。请先创建登录ID，以便在应用中登录同一账号。'],
+  inst_id_first_other: ['다른 브라우저는 저장 공간이 따로예요. 먼저 아이디를 만들어 두면 거기서도 같은 계정으로 로그인할 수 있어요.', 'Another browser keeps its own storage. Create a login ID first so you can sign in to the same account there.', '別のブラウザは保存領域が別です。先にIDを作っておけば、そこでも同じアカウントにログインできます。', '其他浏览器单独存储。请先创建登录ID，以便在那里登录同一账号。'],
+  inst_id_have: ['설치한 앱을 처음 열면 아이디 {name}(으)로 로그인해 주세요. 기록이 그대로 이어져요.', 'When you first open the installed app, sign in with your ID {name}. Everything carries over.', '追加したアプリを初めて開いたら、ID {name} でログインしてください。記録はそのまま引き継がれます。', '首次打开安装的应用时，请用ID {name} 登录，记录会完整保留。'],
+  inst_id_have_other: ['다른 브라우저에서 열면 아이디 {name}(으)로 로그인해 주세요. 기록이 그대로 이어져요.', 'In the other browser, sign in with your ID {name}. Everything carries over.', '別のブラウザで開いたら、ID {name} でログインしてください。記録はそのまま引き継がれます。', '在其他浏览器中打开后，请用ID {name} 登录，记录会完整保留。'],
+  inst_done: ['설치했어요. 홈 화면에서 {app}을 열어 보세요', 'Installed. Open {app} from your home screen', '追加しました。ホーム画面から{app}を開いてください', '已安装，请从主屏幕打开{app}'],
+  inst_tip_title: ['홈 화면에 추가하면 앱처럼 써요', 'Add it to your home screen', 'ホーム画面に追加してアプリのように', '添加到主屏幕，像应用一样使用'],
+  inst_tip_sub: ['한 번에 열리고, 화면도 더 넓어요.', 'Opens in one tap, with more room on screen.', 'ワンタップで開き、画面も広くなります。', '一键打开，屏幕更宽敞。'],
+  inst_row_sub: ['홈 화면이나 바탕화면에서 앱처럼 열어요', 'Open it like an app from your home screen or desktop', 'ホーム画面やデスクトップからアプリのように開けます', '从主屏幕或桌面像应用一样打开'],
+
+  credits_wx: ['바다 날씨 데이터', 'Sea weather data', '海の天気データ', '海况天气数据'],
+  ad_wx: ['바다 날씨 보여 주기', 'Show sea weather', '海の天気を表示', '显示海况天气'],
+  ad_wx_hint: ['Open-Meteo 무료 이용(비상업)으로 받아요. 끄면 홈과 낚시 포인트에서 바로 사라져요.', 'Comes from Open-Meteo’s free (non-commercial) service. Switching it off removes it from home and fishing spots right away.', 'Open-Meteoの無料(非商用)サービスから取得します。オフにするとホームと釣りポイントからすぐ消えます。', '来自Open-Meteo免费（非商业）服务。关闭后会立即从首页和钓点中消失。'],
+  /* what's new: 2026-10-29 */
+  wn_noti_h: ['알림', 'Notifications', 'お知らせ', '通知'],
+  wn_noti_p: ['내 글의 댓글·좋아요, 친구 요청, 조과 검토 결과를 종 모양 버튼에서 한눈에 봐요.', 'Replies and likes on your posts, friend requests and review results, all under the bell.', '投稿へのコメント・いいね、友だち申請、釣果の審査結果をベルのボタンでまとめて確認できます。', '帖子评论和点赞、好友请求、渔获审核结果，都在铃铛按钮里一目了然。'],
+  wn_wx_h: ['바다 날씨', 'Sea weather', '海の天気', '海况天气'],
+  wn_wx_p: ['홈과 낚시 포인트에서 바람·파도·수온·비 확률을 보여드려요.', 'Wind, waves, water temperature and chance of rain on the home screen and for your fishing spots.', 'ホームと釣りポイントで風・波・水温・降水確率を表示します。', '在首页和钓点查看风、浪、水温和降水概率。'],
+  wn_bdg_h: ['업적', 'Achievements', '実績', '成就'],
+  wn_bdg_p: ['나의 바다의 ‘업적’ 탭에서 20가지 목표를 하나씩 모아 보세요.', 'Collect 20 goals in the new “Badges” tab of My Sea.', 'マイシーの「実績」タブで20の目標を集めましょう。', '在“我的海”的“成就”标签中收集20个目标。'],
+  wn_inst_h: ['앱으로 설치', 'Install as an app', 'アプリとして追加', '安装为应用'],
+  wn_inst_p: ['설정이나 더보기 메뉴의 ‘앱으로 설치’로 홈 화면에 추가할 수 있어요.', 'Add it to your home screen with “Install app” in Settings or the menu.', '設定やメニューの「アプリとして追加」でホーム画面に追加できます。', '通过设置或菜单中的“安装应用”添加到主屏幕。'],
+  wn_out_h: ['로그아웃', 'Sign out', 'ログアウト', '退出登录'],
+  wn_out_p: ['설정의 계정 카드, 이름 옆 버튼, 더보기 메뉴에서 로그아웃할 수 있어요.', 'Sign out from the account card in Settings, the button next to your name, or the menu.', '設定のアカウントカード、名前の横のボタン、メニューからログアウトできます。', '可在设置中的账号卡片、名字旁的按钮或菜单中退出登录。'],
 });
 
 /* ===== Tackle dictionaries: [ko, en, ja, zh] ===== */
@@ -4358,11 +4535,11 @@ const store = (() => {
         sub(db.collection('labels').limit(1000), snap => { const m = new Map(); for (const d of snap.docs) if (d.exists) m.set(d.id, d.data()); S.labels = m; S.dataVer++; rerenderSoon(); });
         sub(db.collection('board').limit(1000), snap => {
           const m = new Map(); for (const d of snap.docs) if (d.exists) m.set(d.id, d.data());
-          S.board = m; S.dataVer++;
+          S.board = m; S.boardLoaded = true; S.dataVer++;
           if (S.uid && m.has(S.uid) && S.mode === 'shared') S.myBoard = JSON.parse(JSON.stringify(m.get(S.uid)));
           rerenderSoon();
         });
-        sub(db.collection('teams').limit(1000), snap => { const m = new Map(); for (const d of snap.docs) if (d.exists) m.set(d.id, d.data()); S.teams = m; S.dataVer++; rerenderSoon(); });
+        sub(db.collection('teams').limit(1000), snap => { const m = new Map(); for (const d of snap.docs) if (d.exists) m.set(d.id, d.data()); S.teams = m; S.teamsLoaded = true; S.dataVer++; rerenderSoon(); });
         if (window.APP_RT === 'web') sub(db.collection('news').limit(200), snap => { S.news = snap.docs.filter(d => d.exists).map(d => Object.assign({ id: d.id }, d.data())); S.newsVer = (S.newsVer || 0) + 1; rerenderSoon(); });
         if (window.APP_RT === 'web') {
           // the reviewer's notes on my catches (the server only sends mine; the operator gets all), indexed by catch id
@@ -5319,7 +5496,9 @@ function maybeWelcome(tries = 0) {
     if ((S.me && S.me.nick) || lsGet('welcomed', 0)) { lsSet('welcomed', 1); return; }
     if ($('.modal-wrap.in')) { setTimeout(() => maybeWelcome(tries + 1), 3000); return; }
     lsSet('welcomed', 1);
-    if (idSupported() && !S.idOff) openAuth('join'); else openOnboarding();
+    // after logging out, and on the first open of an installed app (iPhone keeps it apart from Safari), people are coming back
+    const tab = lsGet('authTab', standalone() ? 'login' : 'join') === 'login' ? 'login' : 'join'; lsSet('authTab', null);
+    if (idSupported() && !S.idOff) openAuth(tab); else openOnboarding();
   });
 }
 function myPoints() { return myCatches().filter(c => eligible(c, myId())).reduce((a, c) => a + (c.sc || 0), 0); }
@@ -5590,14 +5769,37 @@ function openIdPassword() {
     }
   });
 }
-async function idLogout(btn) {
+/* ===== Log out (website). With a login ID the person can come back any time; a device joined with a link code
+   just leaves the account (the records stay there). Without either there would be no way back, so we stop and help. ===== */
+async function idLogout() { return openLogout(); }
+async function openLogout() {
   if (!idSupported()) return;
   const id = await myLoginId(true); const linked = !!(window.APP_AUTH.link && window.APP_AUTH.link.linked());
-  if (!id && !linked) { toast(t('id_logout_need'), 'info', 6000); return; }
-  if (btn && !armed(btn, t('id_logout_confirm'))) return;
-  try { await window.APP_AUTH.ids.logout(); } catch (e) { }
-  for (const k of ['me', 'labels', 'orders', 'suggest', 'photos', 'payok']) lsSet(k, null);
-  toast(t('id_logged_out')); setTimeout(() => { location.hash = 'home'; location.reload(); }, 700);
+  if (!id && !linked) {
+    const w = openModal(`<div class="logout">
+      <h2>${icon('logout')} ${t('lo_title')}</h2>
+      <p class="acct-state warn">${icon('warn')} ${t('lo_no_id')}</p>
+      <div class="actions"><button class="btn btn-primary" id="lo-id">${icon('user')}${t('id_create')}</button><button class="btn btn-line" id="lo-login">${t('lo_other_id')}</button><button class="btn btn-ghost" data-close>${t('cancel')}</button></div>
+    </div>`, { label: t('lo_title') });
+    $('#lo-id', w).onclick = () => { closeModal(w); openAuth('join'); };
+    $('#lo-login', w).onclick = () => { closeModal(w); openAuth('login'); };
+    return;
+  }
+  const w = openModal(`<div class="logout">
+    <h2>${icon('logout')} ${t('lo_title')}</h2>
+    ${acctSumHTML()}
+    <p>${id ? t('lo_sub_id', { name: `<b class="mono">${esc(id)}</b>` }) : t('lo_sub_linked')}</p>
+    <p class="muted small">${icon('shield')} ${t('lo_keep')}</p>
+    <div class="actions"><button class="btn btn-primary lo-go" id="lo-go">${icon('logout')}${t('id_logout')}</button><button class="btn btn-ghost" data-close>${t('cancel')}</button></div>
+  </div>`, { label: t('lo_title') });
+  $('#lo-go', w).onclick = async () => {
+    $('#lo-go', w).disabled = true;
+    try { await window.APP_AUTH.ids.logout(); } catch (e) { }
+    for (const k of ['me', 'labels', 'orders', 'suggest', 'photos', 'payok', 'welcomed', 'noti', 'notiSeen', 'notiInit', 'notiState', 'badges']) lsSet(k, null);
+    lsSet('authTab', 'login'); // after reloading, the login dialog opens (to sign in again or with another ID)
+    closeModal(w); toast(t('id_logged_out'));
+    setTimeout(() => { location.hash = 'home'; location.reload(); }, 700);
+  };
 }
 function acctSumHTML() {
   if (!S.me || !S.me.nick) return '';
@@ -5962,8 +6164,13 @@ function openShareCard(blob, name, text) {
 }
 
 /* ===== What's new: shown once after a big update (website only; needs the matching server update) ===== */
-const WHATS_NEW = '2026-10-28', WN_TS = Date.parse('2026-10-28T14:00:00Z'); // people who joined after this never saw the old records
+const WHATS_NEW = '2026-10-29', WN_TS = Date.parse('2026-10-29T03:00:00Z'); // people who joined after this have nothing to catch up on
 const BOOT_AT = Date.now();
+/* what each update brought, newest last; people see what came after the last one they saw (at most 6 lines) */
+const WN_ITEMS = [
+  ['2026-10-28', 'user', 'wn_id'], ['2026-10-28', 'shield', 'wn_review'], ['2026-10-28', 'heart', 'wn_pay'], ['2026-10-28', 'share', 'wn_share'],
+  ['2026-10-29', 'bell', 'wn_noti'], ['2026-10-29', 'wave', 'wn_wx'], ['2026-10-29', 'medal', 'wn_bdg'], ['2026-10-29', 'download', 'wn_inst'], ['2026-10-29', 'logout', 'wn_out']
+];
 function maybeWhatsNew(tries = 0) {
   if (window.APP_RT !== 'web' || lsGet('wn', '') === WHATS_NEW || tries > 6) return;
   if (!S.ready || $('.modal-wrap.in')) { setTimeout(() => maybeWhatsNew(tries + 1), 4000); return; }
@@ -5972,11 +6179,17 @@ function maybeWhatsNew(tries = 0) {
   myLoginId().then(id => {
     if (S.idOff || lsGet('wn', '') === WHATS_NEW) return; // the server update isn't in yet: try again next visit
     if ($('.modal-wrap.in')) { setTimeout(() => maybeWhatsNew(tries + 1), 4000); return; }
-    lsSet('wn', WHATS_NEW); openWhatsNew(id);
+    const seen = lsGet('wn', '') || ''; lsSet('wn', WHATS_NEW); openWhatsNew(id, seen);
   });
 }
-function openWhatsNew(id) {
-  const items = [['refresh', 'wn_reset'], ['shield', 'wn_review'], ['user', 'wn_id'], ['heart', 'wn_pay'], ['share', 'wn_share']];
+function openWhatsNew(id, seen = '') {
+  // the newest update first (in the listed order); the login-ID line leads for people who still have no ID
+  const pick = WN_ITEMS.filter(x => x[0] > seen && x[2] !== 'wn_id');
+  const vers = [...new Set(pick.map(x => x[0]))].sort().reverse();
+  const all = vers.flatMap(v => pick.filter(x => x[0] === v));
+  if (!id && idSupported()) all.unshift(WN_ITEMS.find(x => x[2] === 'wn_id'));
+  const items = all.slice(0, 6).map(x => [x[1], x[2]]);
+  if (!items.length) return;
   const w = openModal(`<div class="wn">
     <p class="eyebrow">${t('wn_eyebrow')}</p>
     <h2>${t('wn_title')}</h2>
@@ -5985,6 +6198,52 @@ function openWhatsNew(id) {
   </div>`, { label: t('wn_title') });
   $('#wn-ok', w).onclick = () => closeModal(w);
   const b = $('#wn-id', w); if (b) b.onclick = () => { closeModal(w); openIdCreate(); };
+}
+
+/* ===== Install as an app (website). Chrome, Edge and Samsung Internet offer a one-tap install; iPhone and iPad
+   need Safari's Share → Add to Home Screen; in-app browsers (KakaoTalk, Instagram…) can't install at all.
+   Nothing to show once the site already runs as an installed app. ===== */
+let installEvt = null;
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvt = e; try { if (S.route === 'home') rerenderSoon(); } catch (err) { } });
+window.addEventListener('appinstalled', () => { installEvt = null; lsSet('instTipOff', 1); toast(t('inst_done'), 'ok', 6000); try { if (S.route === 'home') rerenderSoon(); } catch (err) { } });
+function standalone() { try { return matchMedia('(display-mode: standalone)').matches || matchMedia('(display-mode: fullscreen)').matches || navigator.standalone === true; } catch (e) { return false; } }
+function installOn() { return window.APP_RT === 'web' && !standalone(); }
+function iosDevice() { return /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); }
+function inAppBrowser() { return /KAKAOTALK|NAVER\(inapp|Instagram|FBAN|FBAV|FB_IAB|Line\/|DaumApps|everytimeApp|BAND\//i.test(navigator.userAgent); }
+async function openInstall() {
+  if (!installOn()) return;
+  if (installEvt) {
+    const e = installEvt; installEvt = null;
+    try { await e.prompt(); const r = await e.userChoice; if (r && r.outcome === 'accepted') lsSet('instTipOff', 1); } catch (err) { }
+    updateShell(); rerenderSoon(); return;
+  }
+  const ios = iosDevice(), inApp = inAppBrowser();
+  const steps = inApp ? ['inst_inapp1', 'inst_inapp2'] : ios ? ['inst_ios1', 'inst_ios2', 'inst_ios3'] : ['inst_other1', 'inst_other2'];
+  // the installed app on iPhone, and any other browser, keep storage of their own: the way back in is the login ID
+  const apart = (ios || inApp) && idSupported() && !S.idOff && !!(S.me && S.me.nick);
+  const id = apart ? await myLoginId() : null;
+  const url = SITE_URL || (location.origin + location.pathname);
+  const w = openModal(`<div class="install">
+    <h2>${icon('download')} ${t('inst_title')}</h2>
+    <p class="lede">${t('inst_sub')}</p>
+    <ol class="inst-steps">${steps.map(k => `<li>${t(k)}</li>`).join('')}</ol>
+    ${apart ? (id ? `<p class="note ok">${icon('check')} ${t(inApp ? 'inst_id_have_other' : 'inst_id_have', { name: `<b class="mono">${esc(id)}</b>` })}</p>`
+      : `<p class="note warn">${icon('warn')} ${t(inApp ? 'inst_id_first_other' : 'inst_id_first')}</p>`) : ''}
+    <div class="actions">
+      ${apart && !id ? `<button class="btn btn-primary" id="inst-id">${icon('user')}${t('id_create')}</button>` : ''}
+      ${inApp && /KAKAOTALK/i.test(navigator.userAgent) ? `<a class="btn btn-line" href="kakaotalk://web/openExternal?url=${encodeURIComponent(url)}">${t('inst_open_ext')}</a>` : ''}
+      ${inApp ? `<button class="btn btn-line" data-copy="${esc(url)}">${icon('copy')}${t('inst_copy_link')}</button>` : ''}
+      <button class="btn btn-ghost" data-close>${t('close')}</button>
+    </div>
+  </div>`, { label: t('inst_title') });
+  const b = $('#inst-id', w); if (b) b.onclick = () => { closeModal(w); openIdCreate(); };
+}
+/* Home tip on phones: once someone has a profile, suggest adding the app to the home screen (until dismissed) */
+function instTipHTML() {
+  if (!installOn() || !touchDevice() || lsGet('instTipOff', 0) || !S.me || !S.me.nick || !myCatches().length) return '';
+  if (idSupported() && S.loginId === undefined) return ''; // the login-ID tip may still come first
+  if (!installEvt && !iosDevice() && !inAppBrowser()) return ''; // this browser has its own install button, or none at all
+  return `<section class="card id-tip inst-tip">${icon('download')}<div><b>${t('inst_tip_title')}</b><p class="muted small">${t('inst_tip_sub')}</p></div><div class="rec-btns"><button class="btn btn-primary btn-sm" data-act="install">${t('inst_btn')}</button><button class="btn btn-ghost btn-xs" data-act="insttip-off" aria-label="${esc(t('close'))}">${icon('close')}</button></div></section>`;
 }
 
 /* ===== Views ===== */
@@ -6071,7 +6330,8 @@ VIEWS.home = {
         </div>
       </section>
 
-      ${idTipHTML()}
+      ${wxCardHTML()}
+      ${idTipHTML() || instTipHTML()}
       ${newsCardHTML()}
 
       <section class="tourney">
@@ -6138,6 +6398,7 @@ VIEWS.home = {
       </section>
     </div>`;
     hydratePhotos(el);
+    wxHydrate(el);
   }
 };
 /* Catch photos in lists load when they come near the screen (the drawn fish shows until then) */
@@ -6815,12 +7076,12 @@ VIEWS.sea = {
     $('#sea-rec', el).innerHTML = fresh.length && !S.recDismiss && !S.preview ? `<div class="rec card new"><img src="${this.itemThumb(fresh[0])}" alt="" width="96" height="60"><div><p class="eyebrow">${t('unlock_eyebrow', { n: myLevel() })}</p><p>${t('unlock_line', { name: esc(fresh.map(id => dict(SHOPI[id].n)).slice(0, 3).join(', ')) })}</p></div><div class="rec-btns"><button class="btn btn-primary btn-sm" data-toggle="${fresh[0]}">${t('use_item')}</button><button class="btn btn-ghost btn-xs" data-act="rec-off" aria-label="${esc(t('close'))}">${icon('close')}</button></div></div>`
       : theirLook ? `<div class="rec card"><img src="${this.itemThumb(theirLook)}" alt="" width="96" height="60"><div><p class="eyebrow no-up">${t('fr_tryon_eyebrow', { nick: esc(a.nick) })}</p><p>${t('fr_tryon_line', { name: esc(dict(SHOPI[theirLook].n)) })}</p></div><div class="rec-btns"><button class="btn btn-line btn-sm" data-tryon="${theirLook}">${icon('eye')}${t('fr_tryon')}</button></div></div>` : '';
     S.seaTab = S.seaTab || 'shop';
-    const tabs = mine ? ['shop', 'catches', 'dex'] : ['catches', 'dex'];
+    const tabs = mine ? ['shop', 'catches', 'dex', 'badges'] : ['catches', 'dex', 'badges'];
     if (!tabs.includes(S.seaTab)) S.seaTab = tabs[0];
     $('#sea-body', el).innerHTML = `
       ${fish.length ? '' : `<p class="note">${icon('fish')} ${t(mine ? 'sea_nofish' : 'sea_nofish_other')}</p>`}
       <div class="tabs" role="tablist">${tabs.map(k => `<button role="tab" aria-selected="${S.seaTab === k}" data-seatab="${k}">${t('seatab_' + k)}</button>`).join('')}</div>
-      <div class="tab-body">${S.seaTab === 'shop' ? this.shopHTML() : S.seaTab === 'catches' ? this.catchesHTML(cs, uid) : this.dexHTML(cs)}</div>`;
+      <div class="tab-body">${S.seaTab === 'shop' ? this.shopHTML() : S.seaTab === 'catches' ? this.catchesHTML(cs, uid) : S.seaTab === 'badges' ? badgesHTML(a, uid || myId()) : this.dexHTML(cs)}</div>`;
     hydratePhotos(el);
     if (mine && S.seaTab === 'shop' && S.me && myLevel() > (S.me.lvSeen || 1) && !S._lvSeenT) { S._lvSeenT = setTimeout(() => { S._lvSeenT = null; if (S.me) { S.me.lvSeen = myLevel(); store.saveMe(); } }, 4000); }
   },
@@ -7118,6 +7379,7 @@ VIEWS.prefs = {
           <div class="field"><span>${t('theme')}</span><div class="seg seg-sm">${['system', 'light', 'dark'].map(x => `<button aria-pressed="${S.theme === x}" data-themeset="${x}">${t('theme_' + x)}</button>`).join('')}</div></div>
           <div class="field"><span>${t('units')}</span><div class="seg seg-sm">${['cm', 'in'].map(x => `<button aria-pressed="${S.unit === x}" data-unit="${x}">${x === 'cm' ? 'cm · kg' : 'in · lb'}</button>`).join('')}</div></div>
         </div>
+        ${installOn() ? `<div class="inst-row"><div><b>${t('inst_btn')}</b><p class="muted small">${t('inst_row_sub')}</p></div><button class="btn btn-line btn-sm" data-act="install">${icon('download')}${t('inst_btn')}</button></div>` : ''}
       </section>
       <section class="card"><h2 class="h3">${t('prefs_privacy')}</h2><p>${t('privacy_text')}</p>
         ${S.me && S.me.nick ? `<label class="switch"><input type="checkbox" id="pf-froff" ${S.me.frOff ? '' : 'checked'}><span class="sw"></span><span>${t('fr_off_pref')}</span></label><p class="hint">${t('fr_off_pref_hint')}</p>` : ''}
@@ -7127,7 +7389,7 @@ VIEWS.prefs = {
         <p class="hint">${t('mode_explain')}</p>
         ${window.APP_RT === 'web' && !S.isOwner ? `<p class="hint"><a href="#claim">${icon('shield')} ${t('claim_title')}</a></p>` : ''}
       </section>
-      <section class="card credits"><h2 class="h3">${t('credits_title')}</h2><p class="small">${t('credits_text')}</p></section>
+      <section class="card credits"><h2 class="h3">${t('credits_title')}</h2><p class="small">${t('credits_text')}</p>${wxOn() ? `<p class="small">${t('credits_wx')} · <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo.com</a> (CC BY 4.0)</p>` : ''}</section>
     </div>`;
     const fo = $('#pf-froff', el);
     if (fo) fo.onchange = async () => { S.me.frOff = !fo.checked; await store.saveMe(); toast(t('saved')); };
@@ -7170,6 +7432,7 @@ VIEWS.admin = {
       <section class="card ad-notice"><h2 class="h3">${icon('megaphone')}${t('ad_notice')}</h2><p class="hint">${t('ad_notice_hint')}</p>
         <div class="field"><textarea id="ad-notice" rows="3" maxlength="400" placeholder="${esc(t('ad_notice_ph'))}">${esc((noticeOf() || {}).t || '')}</textarea></div>
         <div class="actions"><button class="btn btn-primary" id="ad-notice-go">${icon('megaphone')}${t('ad_notice_go')}</button>${noticeOf() ? `<button class="btn btn-ghost" id="ad-notice-off">${t('ad_notice_off')}</button>` : ''}</div>
+        ${window.APP_RT === 'web' ? `<label class="switch ad-wx"><input type="checkbox" id="ad-wx" ${cfg.wxOff ? '' : 'checked'}><span class="sw"></span><span>${t('ad_wx')}</span></label><p class="hint">${t('ad_wx_hint')}</p>` : ''}
       </section>
       <section class="card"><h2 class="h3">${icon('heart')}${t('ad_pay')}</h2>
         <div class="row2">
@@ -7214,6 +7477,8 @@ VIEWS.admin = {
       if (await store.saveAdmin('config', Object.assign({}, S.admin.config || {}, { notice: { id: rid(8), t: v, ts: nowMs() } }))) toast(t('ad_notice_done'));
       rerender();
     };
+    const wxSw = $('#ad-wx', el);
+    if (wxSw) wxSw.onchange = async () => { if (await store.saveAdmin('config', Object.assign({}, S.admin.config || {}, { wxOff: !wxSw.checked }))) toast(t('saved')); };
     const nOff = $('#ad-notice-off', el);
     if (nOff) nOff.onclick = async () => {
       const cur = Object.assign({}, S.admin.config || {}); delete cur.notice;
@@ -7266,11 +7531,18 @@ function openMore() {
   if (window.APP_RT !== 'web') items.splice(3, 1);
   if (S.isOwner) items.push(['admin', 'shield']);
   const nIn = frLists().inc.length;
-  const acct = idSupported() && !S.idOff ? (S.loginId ? `<a href="#prefs" class="more-acct">${S.me && S.me.nick ? avatar(S.me, 30) : icon('user')}<span><b>${esc((S.me && S.me.nick) || '')}</b><span class="muted small mono">${esc(S.loginId)}</span></span></a>`
+  // the account first: who is signed in, with a way to sign out (only when there is a way back in: a login ID or a linked device)
+  const linked = !!(window.APP_AUTH && window.APP_AUTH.link && window.APP_AUTH.link.linked());
+  const inAcct = !!(S.me && S.me.nick) && (!!S.loginId || linked);
+  const acct = idSupported() && !S.idOff ? (inAcct
+    ? `<div class="more-acct"><a href="#prefs" class="more-acct-main">${avatar(S.me, 30)}<span><b>${esc(S.me.nick)}</b><span class="muted small${S.loginId ? ' mono' : ''}">${esc(S.loginId || t('more_linked'))}</span></span></a><button class="more-out" data-act="logout">${icon('logout')}<span>${t('lo_title')}</span></button></div>`
     : `<button class="more-acct" data-act="auth">${icon('user')}<span><b>${t(S.me && S.me.nick ? 'more_acct_keep' : 'more_acct_join')}</b><span class="muted small">${t(S.me && S.me.nick ? 'more_acct_keep_sub' : 'more_acct_join_sub')}</span></span></button>`) : '';
-  const w = openModal(`<nav class="more"><h2 class="sr">${t('more')}</h2>${acct}${items.map(([r, ic]) => `<a href="#${r}" class="more-item">${icon(ic)}<span>${t('nav_' + r)}</span>${r === 'friends' && nIn ? `<i class="badge num">${nIn}</i>` : ''}</a>`).join('')}<button class="more-item heart" data-act="donate">${icon('heart')}<span>${t('donate_btn')}</span></button></nav>`, { sheet: true, label: t('more') });
+  const inst = installOn() ? `<button class="more-item" data-act="install">${icon('download')}<span>${t('inst_btn')}</span></button>` : '';
+  const w = openModal(`<nav class="more"><h2 class="sr">${t('more')}</h2>${acct}${items.map(([r, ic]) => `<a href="#${r}" class="more-item">${icon(ic)}<span>${t('nav_' + r)}</span>${r === 'friends' && nIn ? `<i class="badge num">${nIn}</i>` : ''}</a>`).join('')}${inst}<button class="more-item heart" data-act="donate">${icon('heart')}<span>${t('donate_btn')}</span></button></nav>`, { sheet: true, label: t('more') });
   w.addEventListener('click', e => {
     if (e.target.closest('[data-act="auth"]')) { closeModal(w); openAuth('join'); return; }
+    if (e.target.closest('[data-act="logout"]')) { closeModal(w); openLogout(); return; }
+    if (e.target.closest('[data-act="install"]')) { closeModal(w); openInstall(); return; }
     if (e.target.closest('a,.heart')) closeModal(w);
   });
 }
@@ -8117,12 +8389,14 @@ function openPoint(id) {
       ${owner ? `<div><dt>${t('pt_by')}</dt><dd><button class="link" data-seauid="${esc(p._owner)}">${flag(owner.cc)} ${esc(owner.nick)}</button></dd></div>` : ''}
     </dl>
     ${p.memo ? `<blockquote class="memo">${esc(p.memo)}</blockquote>` : ''}
+    ${wxOn() && p.lat != null ? `<div class="wx-mini"><p class="lbl">${icon('wave')} ${t('wx_here')}</p><div class="wx-line" id="pt-wx"><span class="muted small">${t('thinking')}</span></div><p class="hint wx-src">${t('wx_note')} · Open-Meteo.com</p></div>` : ''}
     <div class="actions">
       ${p.lat != null ? `<button class="btn btn-line btn-sm" id="pt-map">${icon('map')}${t('pt_on_map')}</button>` : ''}
       ${mine ? `<button class="btn btn-line btn-sm" id="pt-edit">${t('bd_edit')}</button><button class="btn btn-ghost btn-sm" id="pt-del">${icon('trash')}${t('delete')}</button>` : ''}
       ${S.isOwner && !mine ? `<button class="btn btn-ghost btn-sm" id="pt-hide">${t(p.hidden ? 'bd_unhide' : 'bd_hide')}</button>` : ''}
     </div>
   </article>`, { label: p.name || t('nav_points') });
+  const px = $('#pt-wx', w); if (px) wxFetch(p.lat, p.lon).then(d => { if (px.isConnected) px.innerHTML = d ? wxLine(d) : `<span class="muted small">${t('wx_fail')}</span>`; });
   const mp = $('#pt-map', w); if (mp) mp.onclick = () => { closeModal(w); S.mapFocus = [p.lon, p.lat, 12]; location.hash = 'map'; };
   const ed = $('#pt-edit', w); if (ed) ed.onclick = () => { closeModal(w); openPointEdit(id); };
   const dl = $('#pt-del', w); if (dl) dl.onclick = async () => { if (!armed(dl, t('delete_confirm'))) return; await store.deletePoint(id); closeModal(w); toast(t('deleted')); rerender(); };
@@ -8183,6 +8457,287 @@ document.addEventListener('click', e => {
   const tb = e.target.closest('[data-pttab]'); if (tb) { S.ptTab = tb.dataset.pttab; rerender(); }
 });
 
+/* ===== Notifications (알림): replies and likes on my posts, friend requests, review results, team requests,
+   operator notices, confirmed payments. Worked out on this device from what the app already loads; nothing extra is
+   stored on the server. The first scan only records what is already there, so nobody gets a flood of old news. ===== */
+const NOTI_MAX = 80;
+function notiOn() { return S.mode === 'shared' && !!(S.me && S.me.nick); }
+function notiList() { const l = lsGet('noti', []); return Array.isArray(l) ? l : []; }
+/* new = arrived on this device after the list was last opened (data can arrive late, so not the event's own time) */
+const notiNew = (x, seen) => !x.old && (x.at || x.t) > seen;
+function notiUnread() { const seen = lsGet('notiSeen', 0) || 0; return notiList().filter(x => notiNew(x, seen)).length; }
+/* everything the notifications look at has arrived (so the first look doesn't miss what was already there) */
+function notiReady() { return S.anglersLoaded && S.adminLoaded && S.boardLoaded && S.teamsLoaded && S.ordersLoaded && (window.APP_RT !== 'web' || S.pointsLoaded); }
+function notiScan() {
+  if (!notiOn() || !notiReady()) return;
+  const list = notiList(); const have = new Set(list.map(x => x.id));
+  const first = !lsGet('notiInit', 0); // the first time: remember what is there, as already read
+  const st = lsGet('notiState', {}) || {}; let changed = false;
+  const add = (id, k, t, data) => {
+    if (have.has(id)) return; have.add(id); changed = true;
+    list.push(Object.assign({ id, k, t: Math.min(t || nowMs(), nowMs()), at: nowMs() }, first ? { old: 1 } : {}, data));
+  };
+  const me = myId();
+  // replies and likes on my posts; replies to posts I commented on
+  const bd = boardIndex();
+  for (const p of bd.posts.values()) {
+    if (p.uid === me) {
+      for (const c of p.cmts) if (c.uid !== me && !c.hidden) add('c:' + c.key, 'cmt', c.ts, { post: p.key, who: c.uid, title: String(p.title || '').slice(0, 40), body: String(c.body || '').slice(0, 60) });
+      const n = p.likes.size, was = (st.likes || {})[p.key] || 0;
+      if (n > was) { if (was || !first) add('l:' + p.key + ':' + n, 'like', nowMs(), { post: p.key, n: n - was, title: String(p.title || '').slice(0, 40) }); }
+      (st.likes = st.likes || {})[p.key] = n;
+    } else if (p.cmts.some(c => c.uid === me)) {
+      const mineAt = Math.max(...p.cmts.filter(c => c.uid === me).map(c => c.ts || 0));
+      for (const c of p.cmts) if (c.uid !== me && !c.hidden && (c.ts || 0) > mineAt) add('c:' + c.key, 'cmt2', c.ts, { post: p.key, who: c.uid, title: String(p.title || '').slice(0, 40), body: String(c.body || '').slice(0, 60) });
+    }
+  }
+  // friend requests and accepted requests
+  const L = frLists();
+  for (const r of L.inc) add('f:' + r.uid + ':' + r.ts, 'freq', r.ts, { who: r.uid });
+  const frNow = new Set(L.friends.map(x => x.uid)); const frWas = new Set(st.fr || []);
+  for (const r of L.friends) if (!frWas.has(r.uid) && st.fr) add('fa:' + r.uid, 'facc', r.ts, { who: r.uid });
+  st.fr = [...frNow];
+  // review results for my catches (the AI reviewer or the operator)
+  for (const c of myCatches()) {
+    if (c.st !== 'review') continue;
+    const s2 = catchState(me, c); if (s2 === 'review') continue;
+    const n = reviewNote(me, c);
+    add('r:' + c.id + ':' + s2, s2 === 'ok' ? 'rok' : s2 === 'no' ? (logOnly(me, c) ? 'rlog' : 'rno') : 'rhold', (n && n.at) || nowMs(), { cid: c.id, sp: c.sp, len: c.len, why: n ? reviewReason(n) : '' });
+  }
+  // people asking to join my team (I lead it)
+  const tm = teamIndex().teams.get(me);
+  if (tm) for (const uid of tm.pending) add('tj:' + uid, 'tjoin', nowMs(), { who: uid });
+  // operator notice
+  const nt = noticeOf(); if (nt) add('n:' + nt.id, 'notice', nt.ts || nowMs(), { body: nt.t.slice(0, 80) });
+  // payments the operator confirmed
+  const g = grantsOf(me);
+  for (const o of S.myOrders) if (g[o.id] === 'ok') add('p:' + o.id, 'paid', nowMs(), { ref: o.kind === 'item' ? o.ref : 'donate' });
+  if (first) { lsSet('notiInit', 1); changed = true; }
+  lsSet('notiState', st);
+  if (changed) { list.sort((a, b) => a.t - b.t); lsSet('noti', list.slice(-NOTI_MAX)); }
+  notiBadge();
+}
+function notiBadge() {
+  const on = notiOn(); const n = on ? notiUnread() : 0;
+  $$('.noti-btn').forEach(b => { b.hidden = !on; b.setAttribute('aria-label', t('noti_title') + (n ? ` (${n})` : '')); });
+  $$('[data-notibadge]').forEach(x => { x.hidden = !n; x.textContent = n > 9 ? '9+' : String(n); });
+  const fm = $('#fr-mini'); if (fm) fm.hidden = on; // friend requests show up in the notifications
+}
+function notiText(x) {
+  const who = x.who ? esc((anglerOf(x.who) || {}).nick || '?') : '';
+  const fish = x.sp ? `${esc(nameOf(x.sp))} ${lenFmt(x.len)}` : '';
+  switch (x.k) {
+    case 'cmt': return t('nt_cmt', { who, title: esc(x.title) }) + (x.body ? `<span class="nt-q">${esc(x.body)}</span>` : '');
+    case 'cmt2': return t('nt_cmt2', { who, title: esc(x.title) }) + (x.body ? `<span class="nt-q">${esc(x.body)}</span>` : '');
+    case 'like': return t('nt_like', { n: x.n, title: esc(x.title) });
+    case 'freq': return t('nt_freq', { who });
+    case 'facc': return t('nt_facc', { who });
+    case 'rok': return t('nt_rok', { fish });
+    case 'rno': return t('nt_rno', { fish }) + (x.why ? `<span class="nt-q">${esc(x.why)}</span>` : '');
+    case 'rlog': return t('nt_rlog', { fish });
+    case 'rhold': return t('nt_rhold', { fish });
+    case 'tjoin': return t('nt_tjoin', { who });
+    case 'notice': return `<b>${t('notice_label')}</b> ${esc(x.body)}`;
+    case 'badge': return t('nt_badge', { name: t('bdg_' + x.badge) });
+    case 'paid': return t('nt_paid', { item: x.ref === 'donate' ? t('donate_btn') : esc(dict((SHOPI[x.ref] || {}).n) || x.ref) });
+    default: return '';
+  }
+}
+const NT_ICON = { cmt: 'chat', cmt2: 'chat', like: 'heart', freq: 'user-plus', facc: 'user-check', rok: 'check', rno: 'x', rlog: 'log', rhold: 'clock', tjoin: 'flag', notice: 'megaphone', paid: 'heart', badge: 'medal' };
+function openNoti() {
+  notiScan();
+  const seen = lsGet('notiSeen', 0) || 0;
+  const list = notiList().slice().sort((a, b) => b.t - a.t).filter(x => notiText(x));
+  const w = openModal(`<div class="noti">
+    <h2>${icon('bell')} ${t('noti_title')}</h2>
+    ${list.length ? `<ul class="nt-list">${list.map(x => `<li><button class="nt-item k-${esc(x.k)}${notiNew(x, seen) ? ' unread' : ''}" data-nt="${esc(x.id)}"><span class="nt-ic">${icon(NT_ICON[x.k] || 'bell')}</span><span class="nt-txt"><span class="nt-main">${notiText(x)}</span><span class="muted small">${ago(x.t)}</span></span></button></li>`).join('')}</ul>`
+      : `<div class="empty"><p class="muted">${t('noti_empty')}</p></div>`}
+    <p class="hint">${t('noti_hint')}</p>
+  </div>`, { label: t('noti_title') });
+  lsSet('notiSeen', nowMs()); notiBadge();
+  w.addEventListener('click', e => {
+    const b = e.target.closest('[data-nt]'); if (!b) return;
+    const x = list.find(y => y.id === b.dataset.nt); if (!x) return;
+    closeModal(w);
+    if (x.post) openPost(x.post);
+    else if (x.cid) openCatch(myId(), x.cid);
+    else if (x.k === 'freq' || x.k === 'facc') location.hash = 'friends';
+    else if (x.k === 'tjoin') location.hash = 'teams';
+    else if (x.k === 'notice') location.hash = 'home';
+    else if (x.k === 'paid') location.hash = 'sea';
+    else if (x.k === 'badge') { S.seaTab = 'badges'; S.viewUid = null; location.hash = 'sea'; }
+  });
+}
+
+/* ===== Sea weather (바다 날씨): wind, waves, water temperature and rain for a fishing area, with a rough
+   "good to go?" read. Data from Open-Meteo (free for non-commercial use; © Open-Meteo.com and the weather services it
+   draws on). Website only. Asked straight from this browser with the area's coordinates or a saved fishing point —
+   never the exact spot of a catch. Kept for 30 minutes so the page doesn't ask again on every visit. ===== */
+const WX_TTL = 30 * 60000;
+function wxOn() { return window.APP_RT === 'web' && !(S.admin.config && S.admin.config.wxOff); } // the operator can switch it off
+const wxKey = (lat, lon) => lat.toFixed(2) + ',' + lon.toFixed(2);
+const wxMem = new Map();
+function wxCached(lat, lon) { const hit = (lsGet('wx', {}) || {})[wxKey(lat, lon)]; return hit && nowMs() - hit.at < WX_TTL ? hit.d : null; }
+async function wxFetch(lat, lon) {
+  const key = wxKey(lat, lon);
+  if (wxMem.has(key)) return wxMem.get(key);
+  const cache = lsGet('wx', {}) || {}; const hit = cache[key];
+  if (hit && nowMs() - hit.at < WX_TTL) return hit.d;
+  const p = (async () => {
+    const q = `latitude=${lat.toFixed(3)}&longitude=${lon.toFixed(3)}&timezone=auto`;
+    const get = u => fetch(u).then(r => (r.ok ? r.json() : null)).catch(() => null);
+    const [f, m] = await Promise.all([
+      get(`https://api.open-meteo.com/v1/forecast?${q}&current=temperature_2m,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m&hourly=precipitation_probability&forecast_days=2&wind_speed_unit=ms`),
+      get(`https://marine-api.open-meteo.com/v1/marine?${q}&current=wave_height,wave_direction,wave_period,sea_surface_temperature&forecast_days=1`)
+    ]);
+    wxMem.delete(key);
+    if (!f && !m) return null;
+    const cur = (f && f.current) || {}, mc = (m && m.current) || {};
+    // the highest chance of rain over the next 12 hours (times come in the area's local time)
+    let rain = null;
+    if (f && f.hourly && Array.isArray(f.hourly.time) && Array.isArray(f.hourly.precipitation_probability)) {
+      const off = (f.utc_offset_seconds || 0) * 1000, now = Date.now();
+      f.hourly.time.forEach((tm, i) => { const at = Date.parse(tm + 'Z') - off; const v = f.hourly.precipitation_probability[i]; if (at >= now - 3600e3 && at <= now + 12 * 3600e3 && typeof v === 'number') rain = Math.max(rain ?? 0, v); });
+    }
+    const num = v => (typeof v === 'number' && isFinite(v) ? v : null);
+    const d = { t: num(cur.temperature_2m), code: num(cur.weather_code), wind: num(cur.wind_speed_10m), gust: num(cur.wind_gusts_10m), wdir: num(cur.wind_direction_10m), wave: num(mc.wave_height), wper: num(mc.wave_period), sst: num(mc.sea_surface_temperature), rain, at: nowMs() };
+    const c2 = lsGet('wx', {}) || {}; c2[key] = { at: nowMs(), d };
+    const keys = Object.keys(c2); if (keys.length > 12) for (const k of keys.slice(0, keys.length - 12)) delete c2[k];
+    lsSet('wx', c2);
+    return d;
+  })();
+  wxMem.set(key, p);
+  return p;
+}
+/* wind and waves decide most trips; this is only a rough read, not a safety call */
+function wxGo(d) {
+  const w = d.wind ?? 0, g = d.gust ?? w, h = d.wave;
+  if (w >= 12 || g >= 17 || (h != null && h >= 2.5)) return 'bad';
+  if (w >= 8 || g >= 12 || (h != null && h >= 1.5) || (d.code != null && d.code >= 95)) return 'care';
+  return 'good';
+}
+function wxSky(code) {
+  if (code == null) return '';
+  const k = code === 0 ? 'clear' : code <= 2 ? 'partly' : code === 3 ? 'cloudy' : code <= 48 ? 'fog' : code <= 57 ? 'drizzle' : code <= 67 ? 'rain' : code <= 77 ? 'snow' : code <= 82 ? 'shower' : code <= 86 ? 'snow' : 'storm';
+  return t('wxs_' + k);
+}
+function windDir(deg) { if (deg == null) return ''; const i = Math.round(((deg % 360) + 360) % 360 / 45) % 8; return t('wd_' + ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'][i]); }
+const wxF1 = v => (v == null ? '—' : (Math.round(v * 10) / 10).toFixed(1));
+function wxLine(d) {
+  const go = wxGo(d);
+  return `<span class="wx-go wx-${go}">${icon(go === 'good' ? 'check' : 'warn')}${t('wxgo_' + go)}</span>
+    <span class="wx-it">${icon('cloud')}<b>${d.t == null ? '—' : Math.round(d.t) + '°'}</b> ${esc(wxSky(d.code))}</span>
+    <span class="wx-it">${icon('wind')}<b>${wxF1(d.wind)}</b>m/s ${esc(windDir(d.wdir))}${d.gust != null ? ` <span class="muted">${t('wx_gust', { v: wxF1(d.gust) })}</span>` : ''}</span>
+    <span class="wx-it">${icon('wave')}<b>${d.wave == null ? '—' : wxF1(d.wave)}</b>${d.wave == null ? '' : 'm'}${d.wper != null ? ` <span class="muted">${t('wx_period', { v: Math.round(d.wper) })}</span>` : ''}</span>
+    ${d.sst != null ? `<span class="wx-it">${t('wx_sst')} <b>${wxF1(d.sst)}°</b></span>` : ''}
+    ${d.rain != null ? `<span class="wx-it">${t('wx_rain')} <b>${Math.round(d.rain)}%</b></span>` : ''}`;
+}
+/* the places one can pick: the home sea and my saved fishing points */
+function wxPlaces() {
+  const h = GEO.HOME[homeRegion()] || [128, 35];
+  const out = [{ id: 'home', name: regionName(homeRegion()), lat: h[1], lon: h[0] }];
+  if (typeof ptLists === 'function') for (const p of ptLists().mine.slice(0, 20)) if (p.lat != null) out.push({ id: p.id, name: p.name, lat: p.lat, lon: p.lon });
+  return out;
+}
+function wxCardHTML() {
+  if (!wxOn()) return '';
+  const places = wxPlaces(); const sel = places.find(x => x.id === lsGet('wxAt', 'home')) || places[0];
+  return `<section class="card wx-card" id="wx-card" data-lat="${sel.lat}" data-lon="${sel.lon}">
+    <div class="sec-head tight"><h2 class="h3">${icon('wave')}${t('wx_title')}</h2>
+      ${places.length > 1 ? `<select id="wx-at" aria-label="${esc(t('wx_where'))}">${places.map(x => `<option value="${esc(x.id)}" ${x.id === sel.id ? 'selected' : ''}>${esc(x.name)}</option>`).join('')}</select>` : `<span class="muted small">${esc(sel.name)}</span>`}
+    </div>
+    <div class="wx-line" id="wx-line">${(() => { const d = wxCached(sel.lat, sel.lon); return d ? wxLine(d) : `<span class="muted small">${t('thinking')}</span>`; })()}</div>
+    <p class="hint wx-src">${t('wx_note')} · <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo.com</a></p>
+  </section>`;
+}
+function wxHydrate(root) {
+  const card = $('#wx-card', root); if (!card) return;
+  const lat = +card.dataset.lat, lon = +card.dataset.lon; const line = $('#wx-line', card);
+  wxFetch(lat, lon).then(d => { if (!line.isConnected) return; line.innerHTML = d ? wxLine(d) : `<span class="muted small">${t('wx_fail')}</span>`; });
+  const sel = $('#wx-at', card);
+  if (sel) sel.onchange = () => { lsSet('wxAt', sel.value); const p = wxPlaces().find(x => x.id === sel.value); if (!p) return; card.dataset.lat = p.lat; card.dataset.lon = p.lon; line.innerHTML = `<span class="muted small">${t('thinking')}</span>`; wxHydrate(root); };
+}
+
+/* ===== Achievements (업적): small goals that come from confirmed catches and taking part (friends, posts, points).
+   Only catches the AI or the operator confirmed count, so they can't be faked with made-up entries. ===== */
+const BADGES = [
+  { id: 'first', ic: 'fish', need: s => [s.n, 1] },
+  { id: 'n10', ic: 'fish', need: s => [s.n, 10] },
+  { id: 'n50', ic: 'fish', need: s => [s.n, 50] },
+  { id: 'sp5', ic: 'book', need: s => [s.species, 5] },
+  { id: 'sp15', ic: 'book', need: s => [s.species, 15] },
+  { id: 'sp30', ic: 'book', need: s => [s.species, 30] },
+  { id: 'rel1', ic: 'heart', need: s => [s.rel, 1] },
+  { id: 'rel10', ic: 'heart', need: s => [s.rel, 10] },
+  { id: 'big50', ic: 'trophy', need: s => [s.maxLen, 50] },
+  { id: 'big80', ic: 'trophy', need: s => [s.maxLen, 80] },
+  { id: 'trophy', ic: 'sparkle', need: s => [s.trophy, 1] },
+  { id: 'night', ic: 'moon', need: s => [s.night, 1] },
+  { id: 'dawn', ic: 'sun', need: s => [s.dawn, 1] },
+  { id: 'feat', ic: 'star', need: s => [s.feat, 1] },
+  { id: 'both', ic: 'globe', need: s => [(s.sea ? 1 : 0) + (s.fresh ? 1 : 0), 2] },
+  { id: 'days5', ic: 'clock', need: s => [s.days, 5] },
+  { id: 'pts1k', ic: 'medal', need: s => [s.pts, 1000] },
+  { id: 'friends3', ic: 'users', need: s => [s.friends, 3] },
+  { id: 'posts3', ic: 'board', need: s => [s.posts, 3] },
+  { id: 'spot1', ic: 'pin', need: s => [s.points, 1] }
+];
+const featMemo = new Map(); // month → that month's featured species (an achievement stays once earned)
+function featuredIn(ts) { const d = new Date(ts); const k = monthKey(d); if (!featMemo.has(k)) featMemo.set(k, featuredSpecies(d)); return featMemo.get(k); }
+function badgeStats(a, uid) {
+  const cs = ((a && a.catches) || []).filter(c => eligible(c, uid));
+  const s = { n: cs.length, species: 0, rel: 0, maxLen: 0, trophy: 0, night: 0, dawn: 0, feat: 0, sea: false, fresh: false, days: 0, pts: 0, friends: 0, posts: 0, points: 0 };
+  const sp = new Set(), days = new Set();
+  for (const c of cs) {
+    if (SPI[c.sp]) sp.add(c.sp);
+    if (c.rel) s.rel++;
+    s.maxLen = Math.max(s.maxLen, c.len || 0);
+    const k = SPI[c.sp]; if (k && c.len >= k.L * 1.5) s.trophy++;
+    const h = new Date(c.ts).getHours(); if (h >= 20 || h < 4) s.night++; else if (h >= 4 && h < 7) s.dawn++;
+    if (!c.past && featuredIn(c.ts).includes(c.sp)) s.feat++;
+    if (k ? k.w === 'F' : c.sea === false) s.fresh = true; else s.sea = true;
+    days.add(new Date(c.ts).toDateString());
+    s.pts += c.sc || 0;
+  }
+  s.species = sp.size; s.days = days.size;
+  if (uid === myId()) {
+    s.friends = frLists().friends.length;
+    s.posts = [...boardIndex().posts.values()].filter(p => p.uid === uid).length;
+    s.points = typeof ptLists === 'function' ? ptLists().mine.length : 0;
+  } else {
+    s.friends = typeof friendIdsOf === 'function' ? friendIdsOf(uid).length : 0;
+    s.posts = [...boardIndex().posts.values()].filter(p => p.uid === uid).length;
+  }
+  return s;
+}
+function badgesOf(a, uid) {
+  const s = badgeStats(a, uid);
+  const mine = uid === myId(); // someone else's saved points are private, so that one only shows on my own page
+  return BADGES.filter(b => mine || b.id !== 'spot1').map(b => { const [v, goal] = b.need(s); return Object.assign({}, b, { v: Math.min(v, goal), goal, got: v >= goal }); });
+}
+function badgesHTML(a, uid) {
+  const list = badgesOf(a, uid); const got = list.filter(b => b.got).length;
+  return `<div class="bdg-head"><p class="muted">${t('bdg_count', { n: got, all: list.length })}</p></div>
+  <ul class="bdg-grid">${list.map(b => `<li class="bdg${b.got ? ' got' : ''}" title="${esc(t('bdg_' + b.id + '_d'))}">
+    <span class="bdg-ic">${icon(b.ic)}</span><b>${t('bdg_' + b.id)}</b><span class="muted small">${t('bdg_' + b.id + '_d')}</span>
+    ${b.got ? `<span class="chip chip-ok">${icon('check')}${t('bdg_done')}</span>` : `<span class="bdg-bar" aria-label="${b.v}/${b.goal}"><i style="width:${Math.round(b.v / b.goal * 100)}%"></i></span><span class="muted small num">${fmtN(Math.floor(b.v))} / ${fmtN(b.goal)}</span>`}
+  </li>`).join('')}</ul>`;
+}
+/* a new achievement: say so once (and keep it in the notifications) */
+function badgeCheck() {
+  if (!S.me || !S.me.nick || S.mode !== 'shared' || !notiReady()) return;
+  const now = badgesOf(S.me, myId()).filter(b => b.got).map(b => b.id);
+  const was = lsGet('badges', null);
+  lsSet('badges', now);
+  if (!Array.isArray(was)) return; // first look: just remember
+  const fresh = now.filter(id => !was.includes(id));
+  if (!fresh.length) return;
+  toast(t('bdg_new', { name: fresh.map(id => t('bdg_' + id)).join(', ') }), 'ok', 6000);
+  const list = notiList(); const have = new Set(list.map(x => x.id));
+  for (const id of fresh) if (!have.has('b:' + id)) list.push({ id: 'b:' + id, k: 'badge', t: nowMs(), badge: id });
+  lsSet('noti', list.slice(-NOTI_MAX)); notiBadge();
+}
+
 /* ===== Router, global events, boot ===== */
 const QR_PATH = 'M0 0h7v1h-7zM8 0h2v1h-2zM11 0h3v1h-3zM17 0h1v1h-1zM21 0h2v1h-2zM26 0h7v1h-7zM0 1h1v1h-1zM6 1h1v1h-1zM8 1h7v1h-7zM16 1h1v1h-1zM18 1h2v1h-2zM21 1h2v1h-2zM26 1h1v1h-1zM32 1h1v1h-1zM0 2h1v1h-1zM2 2h3v1h-3zM6 2h1v1h-1zM8 2h3v1h-3zM13 2h2v1h-2zM16 2h1v1h-1zM20 2h2v1h-2zM24 2h1v1h-1zM26 2h1v1h-1zM28 2h3v1h-3zM32 2h1v1h-1zM0 3h1v1h-1zM2 3h3v1h-3zM6 3h1v1h-1zM9 3h1v1h-1zM11 3h1v1h-1zM14 3h1v1h-1zM16 3h4v1h-4zM21 3h2v1h-2zM24 3h1v1h-1zM26 3h1v1h-1zM28 3h3v1h-3zM32 3h1v1h-1zM0 4h1v1h-1zM2 4h3v1h-3zM6 4h1v1h-1zM8 4h3v1h-3zM13 4h1v1h-1zM15 4h4v1h-4zM22 4h1v1h-1zM26 4h1v1h-1zM28 4h3v1h-3zM32 4h1v1h-1zM0 5h1v1h-1zM6 5h1v1h-1zM12 5h1v1h-1zM15 5h3v1h-3zM20 5h5v1h-5zM26 5h1v1h-1zM32 5h1v1h-1zM0 6h7v1h-7zM8 6h1v1h-1zM10 6h1v1h-1zM12 6h1v1h-1zM14 6h1v1h-1zM16 6h1v1h-1zM18 6h1v1h-1zM20 6h1v1h-1zM22 6h1v1h-1zM24 6h1v1h-1zM26 6h7v1h-7zM9 7h1v1h-1zM12 7h2v1h-2zM15 7h2v1h-2zM18 7h3v1h-3zM22 7h2v1h-2zM0 8h1v1h-1zM3 8h6v1h-6zM11 8h4v1h-4zM17 8h1v1h-1zM19 8h1v1h-1zM23 8h3v1h-3zM28 8h1v1h-1zM30 8h3v1h-3zM0 9h1v1h-1zM2 9h2v1h-2zM7 9h1v1h-1zM9 9h1v1h-1zM13 9h2v1h-2zM17 9h4v1h-4zM22 9h2v1h-2zM28 9h3v1h-3zM0 10h4v1h-4zM5 10h4v1h-4zM10 10h1v1h-1zM12 10h2v1h-2zM15 10h3v1h-3zM21 10h1v1h-1zM23 10h1v1h-1zM28 10h5v1h-5zM1 11h1v1h-1zM5 11h1v1h-1zM7 11h1v1h-1zM9 11h1v1h-1zM12 11h2v1h-2zM16 11h2v1h-2zM20 11h1v1h-1zM22 11h1v1h-1zM24 11h2v1h-2zM27 11h1v1h-1zM30 11h3v1h-3zM1 12h1v1h-1zM3 12h2v1h-2zM6 12h1v1h-1zM9 12h3v1h-3zM13 12h1v1h-1zM15 12h1v1h-1zM17 12h2v1h-2zM20 12h2v1h-2zM24 12h1v1h-1zM26 12h2v1h-2zM31 12h2v1h-2zM1 13h2v1h-2zM7 13h3v1h-3zM13 13h2v1h-2zM18 13h1v1h-1zM22 13h6v1h-6zM0 14h3v1h-3zM4 14h3v1h-3zM10 14h1v1h-1zM12 14h1v1h-1zM15 14h1v1h-1zM18 14h5v1h-5zM24 14h1v1h-1zM26 14h1v1h-1zM28 14h2v1h-2zM1 15h1v1h-1zM3 15h1v1h-1zM7 15h1v1h-1zM11 15h2v1h-2zM16 15h1v1h-1zM19 15h1v1h-1zM23 15h3v1h-3zM27 15h4v1h-4zM32 15h1v1h-1zM0 16h1v1h-1zM6 16h3v1h-3zM13 16h1v1h-1zM15 16h2v1h-2zM20 16h1v1h-1zM22 16h7v1h-7zM30 16h1v1h-1zM1 17h2v1h-2zM4 17h1v1h-1zM9 17h1v1h-1zM12 17h1v1h-1zM14 17h9v1h-9zM25 17h2v1h-2zM28 17h1v1h-1zM30 17h1v1h-1zM32 17h1v1h-1zM0 18h1v1h-1zM3 18h1v1h-1zM5 18h2v1h-2zM8 18h1v1h-1zM10 18h1v1h-1zM15 18h5v1h-5zM21 18h4v1h-4zM27 18h1v1h-1zM29 18h2v1h-2zM32 18h1v1h-1zM0 19h1v1h-1zM3 19h3v1h-3zM8 19h1v1h-1zM12 19h1v1h-1zM18 19h1v1h-1zM22 19h2v1h-2zM26 19h1v1h-1zM28 19h5v1h-5zM3 20h1v1h-1zM6 20h2v1h-2zM10 20h1v1h-1zM12 20h1v1h-1zM14 20h3v1h-3zM18 20h1v1h-1zM20 20h2v1h-2zM23 20h1v1h-1zM28 20h2v1h-2zM0 21h2v1h-2zM4 21h2v1h-2zM8 21h3v1h-3zM17 21h2v1h-2zM21 21h3v1h-3zM25 21h1v1h-1zM27 21h2v1h-2zM30 21h1v1h-1zM0 22h1v1h-1zM3 22h5v1h-5zM11 22h2v1h-2zM14 22h1v1h-1zM17 22h1v1h-1zM22 22h2v1h-2zM26 22h1v1h-1zM28 22h5v1h-5zM0 23h1v1h-1zM2 23h3v1h-3zM7 23h1v1h-1zM12 23h1v1h-1zM14 23h2v1h-2zM17 23h4v1h-4zM23 23h3v1h-3zM28 23h1v1h-1zM30 23h1v1h-1zM32 23h1v1h-1zM0 24h2v1h-2zM4 24h4v1h-4zM10 24h2v1h-2zM13 24h1v1h-1zM20 24h1v1h-1zM22 24h1v1h-1zM24 24h6v1h-6zM32 24h1v1h-1zM8 25h1v1h-1zM10 25h9v1h-9zM21 25h1v1h-1zM24 25h1v1h-1zM28 25h1v1h-1zM30 25h1v1h-1zM32 25h1v1h-1zM0 26h7v1h-7zM8 26h1v1h-1zM11 26h1v1h-1zM15 26h1v1h-1zM17 26h1v1h-1zM19 26h3v1h-3zM23 26h2v1h-2zM26 26h1v1h-1zM28 26h1v1h-1zM30 26h1v1h-1zM0 27h1v1h-1zM6 27h1v1h-1zM8 27h1v1h-1zM14 27h2v1h-2zM17 27h4v1h-4zM24 27h1v1h-1zM28 27h3v1h-3zM0 28h1v1h-1zM2 28h3v1h-3zM6 28h1v1h-1zM8 28h1v1h-1zM12 28h3v1h-3zM16 28h2v1h-2zM20 28h9v1h-9zM32 28h1v1h-1zM0 29h1v1h-1zM2 29h3v1h-3zM6 29h1v1h-1zM8 29h2v1h-2zM16 29h1v1h-1zM18 29h1v1h-1zM20 29h4v1h-4zM25 29h1v1h-1zM27 29h1v1h-1zM30 29h3v1h-3zM0 30h1v1h-1zM2 30h3v1h-3zM6 30h1v1h-1zM11 30h1v1h-1zM13 30h1v1h-1zM15 30h1v1h-1zM18 30h3v1h-3zM23 30h2v1h-2zM27 30h3v1h-3zM31 30h2v1h-2zM0 31h1v1h-1zM6 31h1v1h-1zM10 31h1v1h-1zM12 31h3v1h-3zM25 31h1v1h-1zM27 31h6v1h-6zM0 32h7v1h-7zM8 32h1v1h-1zM10 32h1v1h-1zM15 32h4v1h-4zM23 32h2v1h-2zM27 32h2v1h-2z';
 const ROUTES = ['home', 'scan', 'past', 'map', 'rank', 'friends', 'board', 'teams', 'points', 'sea', 'char', 'dex', 'tackle', 'log', 'help', 'about', 'prefs', 'admin'];
@@ -8211,6 +8766,9 @@ function updateShell() {
   const fb = $('#fr-mini'); if (fb) fb.setAttribute('aria-label', t('nav_friends') + (nIn ? ` (${nIn})` : ''));
   const mode = $('#mode-pill');
   if (mode) { mode.hidden = !S.ready || S.mode === 'shared'; mode.textContent = t('mode_pill_' + S.mode); mode.title = t(S.mode === 'local' ? 'mode_local_note' : 'mode_offline_note'); }
+  // log out next to my name (website, once there is a login ID or a linked device)
+  const out = $('#me-out'); if (out) out.hidden = !(idSupported() && S.me && S.me.nick && (S.loginId || (window.APP_AUTH && window.APP_AUTH.link && window.APP_AUTH.link.linked())));
+  notiBadge();
 }
 function setTheme(x) {
   S.theme = x; lsSet('theme', x);
@@ -8268,6 +8826,7 @@ function rerender() {
   show(S.route);
 }
 const rerenderSoon = debounce(() => {
+  try { notiScan(); badgeCheck(); } catch (e) { console.warn(e); }
   const vid = viewOf(S.route);
   if (vid === 'map') { VIEWS.map.onData(); updateShell(); return; }
   if (LIVE_VIEWS.has(vid)) rerender(); else updateShell();
@@ -8308,6 +8867,9 @@ document.addEventListener('click', e => {
     if (a === 'donate') openDonate();
     else if (a === 'onboard') openOnboarding();
     else if (a === 'auth') openAuth('join');
+    else if (a === 'noti') openNoti();
+    else if (a === 'logout') openLogout();
+    else if (a === 'install') openInstall();
     else if (a === 'more') openMore();
     else if (a === 'lens') openLens();
     else if (a === 'scan-stop') { if (S.scan && S.scan.ctl) S.scan.ctl.abort(); S.scan.phase = 'idle'; renderScanWork(); }
@@ -8318,6 +8880,7 @@ document.addEventListener('click', e => {
     else if (a === 'preview-off') { S.preview = null; rerender(); }
     else if (a === 'rec-off') { S.recDismiss = true; rerender(); }
     else if (a === 'idtip-off') { lsSet('idTipOff', 1); rerender(); }
+    else if (a === 'insttip-off') { lsSet('instTipOff', 1); rerender(); }
     else if (a === 'notice-x') { const n = noticeOf(); if (n) lsSet('noticeX', n.id); const bar = act.closest('.notice-bar'); if (bar) bar.remove(); }
     else if (a === 'theme-cycle') setTheme(S.theme === 'system' ? 'dark' : S.theme === 'dark' ? 'light' : 'system');
     return;
@@ -8390,6 +8953,8 @@ matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', () => { 
   store.init().then(() => { updateStatic(); updateShell(); if (S.route === 'admin' && !S.isOwner) location.hash = 'home'; setTimeout(maybeWhatsNew, 2500); setTimeout(maybeWelcome, 1800); });
   const idle = window.requestIdleCallback || (f => setTimeout(f, 1200));
   idle(() => { GEO.loadEnv(); });
+  // the website can be installed as an app and opened without a connection (sw.js: pages always come fresh from the network first)
+  if (window.APP_RT === 'web' && location.protocol === 'https:' && 'serviceWorker' in navigator) idle(() => { navigator.serviceWorker.register('sw.js').catch(() => { }); });
 })();
 
 </script>

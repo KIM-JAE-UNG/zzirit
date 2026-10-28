@@ -45,6 +45,14 @@ const logs = []; const fails = []; const ok = (c, m) => { logs.push((c ? '✓ ' 
     const pm = await p.$('[data-pm="kakao"]'); ok(!!pm, 'artifact: pay modal with KakaoPay');
     await go('home', 1200); ok(!!(await p.$('.news-card')), 'artifact: buzz card'); ok(!(await p.$('[data-newstab="world"]')), 'artifact: no world tab');
     await p.screenshot({ path: OUT + 'home.png', fullPage: true });
+    ok(!(await p.$('#wx-card')) && !(await p.$('.inst-tip')), 'artifact: no website-only weather card or install tip');
+    ok(await p.$eval('#me-out', n => n.hidden), 'artifact: no log-out button (the Claude account is the sign-in)');
+    await p.evaluate(() => document.querySelectorAll('.modal-wrap').forEach(w => closeModal(w))); await p.waitForTimeout(400); // the pay window from above
+    await go('sea', 1200); await p.click('[data-seatab="badges"]'); await p.waitForTimeout(500);
+    ok(await p.$$eval('.bdg.got', ns => ns.some(n => /첫 조과/.test(n.textContent))), 'artifact: achievements tab works');
+    await p.click('.rail-ctl .noti-btn'); await p.waitForTimeout(500);
+    ok(!!(await p.$('.noti')), 'artifact: notifications open');
+    await p.evaluate(() => document.querySelectorAll('.modal-wrap').forEach(w => closeModal(w))); await p.waitForTimeout(500);
     await go('prefs', 800); ok(await p.$eval('#v-prefs', n => /Claude/.test(n.textContent)), 'artifact: link note mentions Claude account');
     await go('admin', 1000); await p.screenshot({ path: OUT + 'admin.png', fullPage: true });
     for (const r of ['rank', 'friends', 'dex', 'tackle', 'log', 'help', 'about', 'map']) { await go(r, r === 'map' ? 2500 : 700); }

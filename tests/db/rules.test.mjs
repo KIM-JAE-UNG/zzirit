@@ -72,6 +72,7 @@ r = await q(`select (select count(*)::int from public.labels) l, (select count(*
 check(r.rows[0].l === 0 && r.rows[0].s === 0 && r.rows[0].t === 0, 'labels, spots, tickets cleared');
 check(r.rows[0].o === 0, 'all orders removed (nobody paid)');
 check(JSON.stringify(await get('admin_docs', 'verdicts')) === '{}' && JSON.stringify(await get('admin_docs', 'grants')) === '{}', 'decisions cleared');
+r = await get('admin_docs', 'config'); check(r && r.notice && /^rs\d{8}$/.test(r.notice.id) && /초기화했어요/.test(r.notice.t) && r.notice.t.length <= 400 && r.notice.ts > 0, 'a notice about the reset is posted once it has really run');
 r = await q(`select count(*)::int n from auth.users where id = $1`, [T]); check(r.rows[0].n === 0, 'test account removed');
 r = await q(`select coalesce(sum(n), 0)::int n from public.ai_usage`); check(r.rows[0].n === 0, 'test usage removed');
 r = await q(`select (select count(*)::int from public.board) b`); check(r.rows[0].b === 1, 'posts kept');

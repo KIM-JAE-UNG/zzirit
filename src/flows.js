@@ -405,7 +405,9 @@ function maybeWelcome(tries = 0) {
     if ((S.me && S.me.nick) || lsGet('welcomed', 0)) { lsSet('welcomed', 1); return; }
     if ($('.modal-wrap.in')) { setTimeout(() => maybeWelcome(tries + 1), 3000); return; }
     lsSet('welcomed', 1);
-    if (idSupported() && !S.idOff) openAuth('join'); else openOnboarding();
+    // after logging out, and on the first open of an installed app (iPhone keeps it apart from Safari), people are coming back
+    const tab = lsGet('authTab', standalone() ? 'login' : 'join') === 'login' ? 'login' : 'join'; lsSet('authTab', null);
+    if (idSupported() && !S.idOff) openAuth(tab); else openOnboarding();
   });
 }
 function myPoints() { return myCatches().filter(c => eligible(c, myId())).reduce((a, c) => a + (c.sc || 0), 0); }
@@ -676,14 +678,37 @@ function openIdPassword() {
     }
   });
 }
-async function idLogout(btn) {
+/* ===== Log out (website). With a login ID the person can come back any time; a device joined with a link code
+   just leaves the account (the records stay there). Without either there would be no way back, so we stop and help. ===== */
+async function idLogout() { return openLogout(); }
+async function openLogout() {
   if (!idSupported()) return;
   const id = await myLoginId(true); const linked = !!(window.APP_AUTH.link && window.APP_AUTH.link.linked());
-  if (!id && !linked) { toast(t('id_logout_need'), 'info', 6000); return; }
-  if (btn && !armed(btn, t('id_logout_confirm'))) return;
-  try { await window.APP_AUTH.ids.logout(); } catch (e) { }
-  for (const k of ['me', 'labels', 'orders', 'suggest', 'photos', 'payok']) lsSet(k, null);
-  toast(t('id_logged_out')); setTimeout(() => { location.hash = 'home'; location.reload(); }, 700);
+  if (!id && !linked) {
+    const w = openModal(`<div class="logout">
+      <h2>${icon('logout')} ${t('lo_title')}</h2>
+      <p class="acct-state warn">${icon('warn')} ${t('lo_no_id')}</p>
+      <div class="actions"><button class="btn btn-primary" id="lo-id">${icon('user')}${t('id_create')}</button><button class="btn btn-line" id="lo-login">${t('lo_other_id')}</button><button class="btn btn-ghost" data-close>${t('cancel')}</button></div>
+    </div>`, { label: t('lo_title') });
+    $('#lo-id', w).onclick = () => { closeModal(w); openAuth('join'); };
+    $('#lo-login', w).onclick = () => { closeModal(w); openAuth('login'); };
+    return;
+  }
+  const w = openModal(`<div class="logout">
+    <h2>${icon('logout')} ${t('lo_title')}</h2>
+    ${acctSumHTML()}
+    <p>${id ? t('lo_sub_id', { name: `<b class="mono">${esc(id)}</b>` }) : t('lo_sub_linked')}</p>
+    <p class="muted small">${icon('shield')} ${t('lo_keep')}</p>
+    <div class="actions"><button class="btn btn-primary lo-go" id="lo-go">${icon('logout')}${t('id_logout')}</button><button class="btn btn-ghost" data-close>${t('cancel')}</button></div>
+  </div>`, { label: t('lo_title') });
+  $('#lo-go', w).onclick = async () => {
+    $('#lo-go', w).disabled = true;
+    try { await window.APP_AUTH.ids.logout(); } catch (e) { }
+    for (const k of ['me', 'labels', 'orders', 'suggest', 'photos', 'payok', 'welcomed', 'noti', 'notiSeen', 'notiInit', 'notiState', 'badges']) lsSet(k, null);
+    lsSet('authTab', 'login'); // after reloading, the login dialog opens (to sign in again or with another ID)
+    closeModal(w); toast(t('id_logged_out'));
+    setTimeout(() => { location.hash = 'home'; location.reload(); }, 700);
+  };
 }
 function acctSumHTML() {
   if (!S.me || !S.me.nick) return '';
@@ -1048,8 +1073,13 @@ function openShareCard(blob, name, text) {
 }
 
 /* ===== What's new: shown once after a big update (website only; needs the matching server update) ===== */
-const WHATS_NEW = '2026-10-28', WN_TS = Date.parse('2026-10-28T14:00:00Z'); // people who joined after this never saw the old records
+const WHATS_NEW = '2026-10-29', WN_TS = Date.parse('2026-10-29T03:00:00Z'); // people who joined after this have nothing to catch up on
 const BOOT_AT = Date.now();
+/* what each update brought, newest last; people see what came after the last one they saw (at most 6 lines) */
+const WN_ITEMS = [
+  ['2026-10-28', 'user', 'wn_id'], ['2026-10-28', 'shield', 'wn_review'], ['2026-10-28', 'heart', 'wn_pay'], ['2026-10-28', 'share', 'wn_share'],
+  ['2026-10-29', 'bell', 'wn_noti'], ['2026-10-29', 'wave', 'wn_wx'], ['2026-10-29', 'medal', 'wn_bdg'], ['2026-10-29', 'download', 'wn_inst'], ['2026-10-29', 'logout', 'wn_out']
+];
 function maybeWhatsNew(tries = 0) {
   if (window.APP_RT !== 'web' || lsGet('wn', '') === WHATS_NEW || tries > 6) return;
   if (!S.ready || $('.modal-wrap.in')) { setTimeout(() => maybeWhatsNew(tries + 1), 4000); return; }
@@ -1058,11 +1088,17 @@ function maybeWhatsNew(tries = 0) {
   myLoginId().then(id => {
     if (S.idOff || lsGet('wn', '') === WHATS_NEW) return; // the server update isn't in yet: try again next visit
     if ($('.modal-wrap.in')) { setTimeout(() => maybeWhatsNew(tries + 1), 4000); return; }
-    lsSet('wn', WHATS_NEW); openWhatsNew(id);
+    const seen = lsGet('wn', '') || ''; lsSet('wn', WHATS_NEW); openWhatsNew(id, seen);
   });
 }
-function openWhatsNew(id) {
-  const items = [['refresh', 'wn_reset'], ['shield', 'wn_review'], ['user', 'wn_id'], ['heart', 'wn_pay'], ['share', 'wn_share']];
+function openWhatsNew(id, seen = '') {
+  // the newest update first (in the listed order); the login-ID line leads for people who still have no ID
+  const pick = WN_ITEMS.filter(x => x[0] > seen && x[2] !== 'wn_id');
+  const vers = [...new Set(pick.map(x => x[0]))].sort().reverse();
+  const all = vers.flatMap(v => pick.filter(x => x[0] === v));
+  if (!id && idSupported()) all.unshift(WN_ITEMS.find(x => x[2] === 'wn_id'));
+  const items = all.slice(0, 6).map(x => [x[1], x[2]]);
+  if (!items.length) return;
   const w = openModal(`<div class="wn">
     <p class="eyebrow">${t('wn_eyebrow')}</p>
     <h2>${t('wn_title')}</h2>
@@ -1071,4 +1107,50 @@ function openWhatsNew(id) {
   </div>`, { label: t('wn_title') });
   $('#wn-ok', w).onclick = () => closeModal(w);
   const b = $('#wn-id', w); if (b) b.onclick = () => { closeModal(w); openIdCreate(); };
+}
+
+/* ===== Install as an app (website). Chrome, Edge and Samsung Internet offer a one-tap install; iPhone and iPad
+   need Safari's Share → Add to Home Screen; in-app browsers (KakaoTalk, Instagram…) can't install at all.
+   Nothing to show once the site already runs as an installed app. ===== */
+let installEvt = null;
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvt = e; try { if (S.route === 'home') rerenderSoon(); } catch (err) { } });
+window.addEventListener('appinstalled', () => { installEvt = null; lsSet('instTipOff', 1); toast(t('inst_done'), 'ok', 6000); try { if (S.route === 'home') rerenderSoon(); } catch (err) { } });
+function standalone() { try { return matchMedia('(display-mode: standalone)').matches || matchMedia('(display-mode: fullscreen)').matches || navigator.standalone === true; } catch (e) { return false; } }
+function installOn() { return window.APP_RT === 'web' && !standalone(); }
+function iosDevice() { return /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); }
+function inAppBrowser() { return /KAKAOTALK|NAVER\(inapp|Instagram|FBAN|FBAV|FB_IAB|Line\/|DaumApps|everytimeApp|BAND\//i.test(navigator.userAgent); }
+async function openInstall() {
+  if (!installOn()) return;
+  if (installEvt) {
+    const e = installEvt; installEvt = null;
+    try { await e.prompt(); const r = await e.userChoice; if (r && r.outcome === 'accepted') lsSet('instTipOff', 1); } catch (err) { }
+    updateShell(); rerenderSoon(); return;
+  }
+  const ios = iosDevice(), inApp = inAppBrowser();
+  const steps = inApp ? ['inst_inapp1', 'inst_inapp2'] : ios ? ['inst_ios1', 'inst_ios2', 'inst_ios3'] : ['inst_other1', 'inst_other2'];
+  // the installed app on iPhone, and any other browser, keep storage of their own: the way back in is the login ID
+  const apart = (ios || inApp) && idSupported() && !S.idOff && !!(S.me && S.me.nick);
+  const id = apart ? await myLoginId() : null;
+  const url = SITE_URL || (location.origin + location.pathname);
+  const w = openModal(`<div class="install">
+    <h2>${icon('download')} ${t('inst_title')}</h2>
+    <p class="lede">${t('inst_sub')}</p>
+    <ol class="inst-steps">${steps.map(k => `<li>${t(k)}</li>`).join('')}</ol>
+    ${apart ? (id ? `<p class="note ok">${icon('check')} ${t(inApp ? 'inst_id_have_other' : 'inst_id_have', { name: `<b class="mono">${esc(id)}</b>` })}</p>`
+      : `<p class="note warn">${icon('warn')} ${t(inApp ? 'inst_id_first_other' : 'inst_id_first')}</p>`) : ''}
+    <div class="actions">
+      ${apart && !id ? `<button class="btn btn-primary" id="inst-id">${icon('user')}${t('id_create')}</button>` : ''}
+      ${inApp && /KAKAOTALK/i.test(navigator.userAgent) ? `<a class="btn btn-line" href="kakaotalk://web/openExternal?url=${encodeURIComponent(url)}">${t('inst_open_ext')}</a>` : ''}
+      ${inApp ? `<button class="btn btn-line" data-copy="${esc(url)}">${icon('copy')}${t('inst_copy_link')}</button>` : ''}
+      <button class="btn btn-ghost" data-close>${t('close')}</button>
+    </div>
+  </div>`, { label: t('inst_title') });
+  const b = $('#inst-id', w); if (b) b.onclick = () => { closeModal(w); openIdCreate(); };
+}
+/* Home tip on phones: once someone has a profile, suggest adding the app to the home screen (until dismissed) */
+function instTipHTML() {
+  if (!installOn() || !touchDevice() || lsGet('instTipOff', 0) || !S.me || !S.me.nick || !myCatches().length) return '';
+  if (idSupported() && S.loginId === undefined) return ''; // the login-ID tip may still come first
+  if (!installEvt && !iosDevice() && !inAppBrowser()) return ''; // this browser has its own install button, or none at all
+  return `<section class="card id-tip inst-tip">${icon('download')}<div><b>${t('inst_tip_title')}</b><p class="muted small">${t('inst_tip_sub')}</p></div><div class="rec-btns"><button class="btn btn-primary btn-sm" data-act="install">${t('inst_btn')}</button><button class="btn btn-ghost btn-xs" data-act="insttip-off" aria-label="${esc(t('close'))}">${icon('close')}</button></div></section>`;
 }

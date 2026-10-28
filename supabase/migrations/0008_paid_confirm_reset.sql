@@ -252,3 +252,14 @@ do $$ begin
 end $$;
 -- acct() is only needed by signed-in policies
 revoke execute on function public.acct() from anon;
+
+-- 5. Tell everyone (home screen bar, pinned on the board, in notifications). The app itself never claims a reset;
+--    this notice appears only once the reset has really run.
+insert into public.admin_docs (id, data) values ('config', '{}'::jsonb) on conflict (id) do nothing;
+update public.admin_docs
+   set data = data || jsonb_build_object('notice', jsonb_build_object(
+         'id', 'rs' || to_char(now() at time zone 'Asia/Seoul', 'MMDDHH24MI'),
+         't', to_char(now() at time zone 'Asia/Seoul', 'FMMM"월" FMDD"일"')
+              || '에 장난 기록과 결제 오류를 정리하려고 모든 조과·꾸미기·주문을 초기화했어요. 계정·닉네임·아이디·친구·팀·캐릭터·프로필 사진·게시글·낚시 포인트는 그대로예요.',
+         'ts', (extract(epoch from now()) * 1000)::bigint))
+ where id = 'config';

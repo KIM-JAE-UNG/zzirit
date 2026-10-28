@@ -60,12 +60,14 @@ function openPoint(id) {
       ${owner ? `<div><dt>${t('pt_by')}</dt><dd><button class="link" data-seauid="${esc(p._owner)}">${flag(owner.cc)} ${esc(owner.nick)}</button></dd></div>` : ''}
     </dl>
     ${p.memo ? `<blockquote class="memo">${esc(p.memo)}</blockquote>` : ''}
+    ${wxOn() && p.lat != null ? `<div class="wx-mini"><p class="lbl">${icon('wave')} ${t('wx_here')}</p><div class="wx-line" id="pt-wx"><span class="muted small">${t('thinking')}</span></div><p class="hint wx-src">${t('wx_note')} · Open-Meteo.com</p></div>` : ''}
     <div class="actions">
       ${p.lat != null ? `<button class="btn btn-line btn-sm" id="pt-map">${icon('map')}${t('pt_on_map')}</button>` : ''}
       ${mine ? `<button class="btn btn-line btn-sm" id="pt-edit">${t('bd_edit')}</button><button class="btn btn-ghost btn-sm" id="pt-del">${icon('trash')}${t('delete')}</button>` : ''}
       ${S.isOwner && !mine ? `<button class="btn btn-ghost btn-sm" id="pt-hide">${t(p.hidden ? 'bd_unhide' : 'bd_hide')}</button>` : ''}
     </div>
   </article>`, { label: p.name || t('nav_points') });
+  const px = $('#pt-wx', w); if (px) wxFetch(p.lat, p.lon).then(d => { if (px.isConnected) px.innerHTML = d ? wxLine(d) : `<span class="muted small">${t('wx_fail')}</span>`; });
   const mp = $('#pt-map', w); if (mp) mp.onclick = () => { closeModal(w); S.mapFocus = [p.lon, p.lat, 12]; location.hash = 'map'; };
   const ed = $('#pt-edit', w); if (ed) ed.onclick = () => { closeModal(w); openPointEdit(id); };
   const dl = $('#pt-del', w); if (dl) dl.onclick = async () => { if (!armed(dl, t('delete_confirm'))) return; await store.deletePoint(id); closeModal(w); toast(t('deleted')); rerender(); };

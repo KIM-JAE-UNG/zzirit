@@ -12,6 +12,11 @@ const logs = []; const fails = [];
 const ok = (c, m) => { logs.push((c ? '✓ ' : '✗ ') + m); if (!c) fails.push(m); };
 let AIMODE = 'fish';
 const AI_FISH = { fish_visible: true, candidates: [{ id: 'kurodai', p: .81 }, { id: 'mejina', p: .1 }], other_en: '', other_sci: '', length_cm: 41, screening: { real_photo: .94, screenshot: 0, ai_generated: .02, stock_or_web: .03, market_or_aquarium: .03, edited: .04 }, verdict: 'pass', reasons: ['실제 촬영 사진'], features: '검은 배지느러미' };
+// Open-Meteo: calm weather near Busan (times in the area's local time, like the real service)
+let WXN = 0;
+const wxHours = () => { const out = []; const t0 = Date.now() + 9 * 3600e3; for (let i = -2; i < 30; i++) out.push(new Date(t0 + i * 3600e3).toISOString().slice(0, 13) + ':00'); return out; };
+const WX_F = () => ({ utc_offset_seconds: 32400, current: { temperature_2m: 17.3, weather_code: 1, wind_speed_10m: 4.2, wind_direction_10m: 315, wind_gusts_10m: 7.5 }, hourly: { time: wxHours(), precipitation_probability: wxHours().map((x, i) => (i === 6 ? 40 : 10)) } });
+const WX_M = { utc_offset_seconds: 32400, current: { wave_height: 0.6, wave_direction: 200, wave_period: 5.4, sea_surface_temperature: 18.6 } };
 const AI_NOFISH = { fish_visible: false, candidates: [], other_en: '', other_sci: '', length_cm: null, screening: { real_photo: .9 }, verdict: 'reject', reasons: ['물고기가 없음'], features: '' };
 (async () => {
   const b = await chromium.launch();
@@ -24,6 +29,8 @@ const AI_NOFISH = { fish_visible: false, candidates: [], other_en: '', other_sci
     await ctx.route('https://cdn.jsdelivr.net/npm/qrcode-generator**', r => r.fulfill({ contentType: 'text/javascript', body: QRLIB }));
     await ctx.route('https://cdnjs.cloudflare.com/**', r => r.fulfill({ contentType: 'text/javascript', body: LEAF }));
     await ctx.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort());
+    await ctx.route('https://api.open-meteo.com/**', r => { WXN++; r.fulfill({ contentType: 'application/json', body: JSON.stringify(WX_F()) }); });
+    await ctx.route('https://marine-api.open-meteo.com/**', r => { WXN++; r.fulfill({ contentType: 'application/json', body: JSON.stringify(WX_M) }); });
     await ctx.route('https://tnvzckfssjocgtmlxkii.supabase.co/functions/v1/review', async r => { const j = await (await fetch('http://127.0.0.1:8768/__fn/review', { method: 'POST' })).json(); r.fulfill({ contentType: 'application/json', body: JSON.stringify(j) }); });
     await ctx.route('https://tnvzckfssjocgtmlxkii.supabase.co/functions/v1/news', async r => { const j = await (await fetch('http://127.0.0.1:8768/__fn/news', { method: 'POST' })).json(); r.fulfill({ contentType: 'application/json', body: JSON.stringify(j) }); });
     await ctx.route('https://tnvzckfssjocgtmlxkii.supabase.co/functions/v1/ai', async r => {
@@ -142,8 +149,25 @@ const AI_NOFISH = { fish_visible: false, candidates: [], other_en: '', other_sci
   await A.waitForTimeout(1500);
   const pk = aId + '|' + d.T.board[aId].data.posts[0].id;
   ok(await A.evaluate(k => { const p = boardIndex().posts.get(k); return p && p.likes.size === 1 && p.cmts.length === 1 && p.reps === 1; }, pk), 'A sees like, comment, report');
+  // notifications: the reply and the like
+  ok(await A.evaluate(() => notiUnread()) >= 2, 'A is notified of the reply and the like: ' + await A.evaluate(() => notiUnread()));
+  ok(await A.$eval('.rail-ctl .noti-btn [data-notibadge]', n => !n.hidden && +n.textContent >= 2), 'the bell shows how many are new');
+  ok(!(await B.$eval('.rail-ctl .noti-btn [data-notibadge]', n => !n.hidden)), 'nothing new for B, who did the replying');
+  await A.click('.rail-ctl .noti-btn'); await A.waitForTimeout(600);
+  ok(await A.$$eval('.nt-item', ns => ns.some(n => /여수바다/.test(n.textContent) && /댓글/.test(n.textContent) && /어디 포인트/.test(n.textContent))), 'the list says who replied, and what');
+  ok(await A.$$eval('.nt-item', ns => ns.some(n => /좋아요/.test(n.textContent))), 'the like is listed');
+  await shot(A, 'b04b_noti');
+  await A.click('.nt-item.k-cmt'); await A.waitForTimeout(800);
+  ok(!!(await A.$('#pl-like')), 'a notification opens the post');
+  await closeModals(A);
+  ok(await A.evaluate(() => notiUnread()) === 0 && await A.$eval('.rail-ctl .noti-btn [data-notibadge]', n => n.hidden), 'opened notifications count as read');
   await go(A, 'home', 1200); await shot(A, 'b05_home', true);
   ok((await A.$$('.home-board .hb-item')).length === 1, 'home shows hot post');
+  ok(await A.$eval('#wx-card .wx-go', n => /잔잔/.test(n.textContent)).catch(() => false), 'home shows the sea weather with a rough read');
+  ok(await A.$eval('#wx-line', n => /4\.2/.test(n.textContent) && /북서풍/.test(n.textContent) && /0\.6/.test(n.textContent) && /18\.6/.test(n.textContent) && /40%/.test(n.textContent)), 'wind, direction, waves, water temperature and rain shown');
+  ok(await A.$eval('#wx-card a[href="https://open-meteo.com/"]', n => !!n).catch(() => false), 'the weather credits Open-Meteo');
+  const wxn1 = WXN; await go(A, 'board', 600); await go(A, 'home', 900);
+  ok(WXN === wxn1 && await A.$eval('#wx-line', n => /4\.2/.test(n.textContent)), `the weather is kept for a while instead of asked again (${wxn1} → ${WXN})`);
 
   /* ---------- teams ---------- */
   await go(A, 'teams', 900); await shot(A, 't01_teams_none');
@@ -160,6 +184,11 @@ const AI_NOFISH = { fish_visible: false, candidates: [], other_en: '', other_sci
   /* ---------- decorate: locked item, premium purchase, cancel ---------- */
   await go(A, 'sea', 1500); await shot(A, 'd01_sea');
   ok(await A.evaluate(() => !!S.scene && !!S.scene.charImg), 'scene has the character');
+  await A.click('[data-seatab="badges"]'); await A.waitForTimeout(600);
+  ok(await A.$$eval('.bdg.got', ns => ns.some(n => /첫 조과/.test(n.textContent))), 'achievements: the first confirmed catch is earned');
+  ok(await A.$$eval('.bdg.got', ns => !ns.some(n => /열 마리/.test(n.textContent))) && await A.$$eval('.bdg:not(.got) .bdg-bar', ns => ns.length >= 10), 'goals not reached yet show progress instead');
+  ok(await A.$$eval('.bdg', ns => ns.length) === 20, 'all 20 achievements listed on my own page');
+  await shot(A, 'd00_badges', true);
   await A.click('[data-seatab="shop"]'); await A.waitForTimeout(800);
   await shot(A, 'd02_decorate', true);
   const lockedTheme = await A.evaluate(() => SHOP.find(s => s.lv && s.lv > myLevel()).id);
@@ -240,6 +269,11 @@ const AI_NOFISH = { fish_visible: false, candidates: [], other_en: '', other_sci
   await go(D, 'prefs', 1000); await shot(D, 'm07_prefs', true);
   ok(await D.evaluate(() => document.documentElement.scrollWidth - innerWidth) <= 0, 'phone: no horizontal overflow');
   await D.click('[data-act="more"]'); await D.waitForTimeout(500); await shot(D, 'm08_more');
+  ok(await D.$eval('.more .more-acct', n => /busan_ann/.test(n.textContent)) && !!(await D.$('.more .more-out')), 'phone menu: the account with a log-out button');
+  ok(!!(await D.$('.more [data-act="install"]')), 'phone menu: install as an app');
+  await D.click('.more [data-act="install"]'); await D.waitForTimeout(600);
+  ok(await D.$$eval('.install .inst-steps li', ns => ns.length) === 2, 'install explains the browser menu when there is no one-tap install');
+  await closeModals(D);
   await closeModals(D); await go(D, 'about', 1200); await shot(D, 'm09_about', true);
   ok(await D.evaluate(() => document.documentElement.scrollWidth - innerWidth) <= 0, 'phone: brand page fits the screen');
 
@@ -288,6 +322,14 @@ const AI_NOFISH = { fish_visible: false, candidates: [], other_en: '', other_sci
   await go(A, 'admin', 1000); await A.fill('#ad-notice', '새 공지: 주말 이벤트!'); await A.click('#ad-notice-go'); await A.waitForTimeout(1500);
   await go(B, 'home', 1500);
   ok(await B.$eval('.notice-bar', n => /주말/.test(n.textContent)).catch(() => false), 'a new notice shows again');
+  // the operator can switch the sea weather off (and on again) without an update
+  await go(A, 'admin', 1000); await A.click('label.switch:has(#ad-wx)'); await A.waitForTimeout(1500);
+  d = await dump(); ok(d.T.admin_docs.config.data.wxOff === true && /주말/.test(d.T.admin_docs.config.data.notice.t), 'operator switched the weather off (notice kept)');
+  await go(B, 'board', 400); await go(B, 'home', 1200);
+  ok(!(await B.$('#wx-card')), 'the weather card disappears for everyone');
+  await go(A, 'admin', 1000); await A.click('label.switch:has(#ad-wx)'); await A.waitForTimeout(1500);
+  await go(B, 'board', 400); await go(B, 'home', 1200);
+  ok(!!(await B.$('#wx-card')), 'and comes back when switched on');
   // share card (computer: picture with a save button)
   await go(A, 'log', 1200);
   await A.click('.catch-card'); await A.waitForTimeout(800);
@@ -348,6 +390,8 @@ const AI_NOFISH = { fish_visible: false, candidates: [], other_en: '', other_sci
   await W.waitForTimeout(600); await W.reload(); await W.waitForTimeout(5500);
   ok(!!(await W.$('.wn')), 'an earlier member sees what changed');
   ok(!!(await W.$('#wn-id')), 'update notes offer to create a login ID');
+  ok(await W.$eval('.wn', n => /알림/.test(n.textContent) && /바다 날씨/.test(n.textContent) && /업적/.test(n.textContent) && /로그아웃/.test(n.textContent)), 'update notes list the new features');
+  ok(await W.$eval('.wn', n => !/초기화/.test(n.textContent)), 'update notes do not claim a reset that the server has not done');
   await shot(W, 'q04_whatsnew');
   await W.click('#wn-ok'); await W.waitForTimeout(400); await W.reload(); await W.waitForTimeout(5000);
   ok(!(await W.$('.wn')), 'update notes show only once');
@@ -398,9 +442,25 @@ const AI_NOFISH = { fish_visible: false, candidates: [], other_en: '', other_sci
   // a dropped sign-in (a server hiccup during a token refresh) comes back instead of a new empty account
   await N.evaluate(() => { localStorage.removeItem('eosin.auth'); }); await N.reload(); await N.waitForTimeout(3200);
   ok(await N.evaluate(id => S.uid === id && !!S.me && S.me.nick === '새회원', nId), 'a dropped session is restored from the saved copy');
-  // logging out really logs out
-  await go(N, 'prefs', 1200); await N.click('#id-card [data-id="logout"]'); await N.waitForTimeout(300); await N.click('#id-card [data-id="logout"]'); await N.waitForTimeout(3000);
+  // logging out: a button next to the name (and on the account card); afterwards the login dialog is waiting
+  await go(N, 'prefs', 1200);
+  ok(await N.$eval('#me-out', n => !n.hidden), 'a log-out button sits next to the name');
+  await N.click('#id-card [data-id="logout"]'); await N.waitForTimeout(500);
+  ok(await N.$eval('.logout', n => /new_member/.test(n.textContent)), 'the log-out dialog names the ID to come back with');
+  await closeModals(N);
+  await N.click('#me-out'); await N.waitForTimeout(500);
+  await shot(N, 'r02b_logout');
+  await N.click('#lo-go'); await N.waitForTimeout(5200);
   ok(await N.evaluate(id => S.uid !== id && !(S.me && S.me.nick), nId), 'logout starts fresh (the saved copy is not reused)');
+  ok(await N.$eval('.auth [data-atab="login"]', n => n.getAttribute('aria-pressed') === 'true').catch(() => false), 'after logging out the login dialog is waiting');
+  ok(await N.$eval('#me-out', n => n.hidden), 'no log-out button while signed out');
+  await N.fill('#idl-name', 'new_member'); await N.fill('#idl-pass', 'pw1234'); await N.click('#idl-go'); await N.waitForTimeout(3800);
+  ok(await N.evaluate(id => S.uid === id && !!S.me && S.me.nick === '새회원', nId), 'logging back in with the ID brings the same account');
+  // without an ID there would be no way back: stopped, with a way to make one
+  ok(await B.$eval('#me-out', n => n.hidden), 'no log-out button for someone without an ID');
+  await B.evaluate(() => openLogout()); await B.waitForTimeout(600);
+  ok(!!(await B.$('.logout #lo-id')) && !(await B.$('#lo-go')), 'without an ID, logging out is stopped with a way to make one');
+  await closeModals(B);
 
   // operator: IDs in the user list, a recovery code, deleting
   await go(A, 'admin', 1500); await A.evaluate(() => { S.adm.at = 0; adminLoad(); }); await A.waitForTimeout(1000);
@@ -449,8 +509,9 @@ const AI_NOFISH = { fish_visible: false, candidates: [], other_en: '', other_sci
   await go(B, 'points', 1300); await B.click('[data-pttab="shared"]'); await B.waitForTimeout(600);
   ok(await B.$$eval('.pt-card', ns => ns.length === 1 && /광안리/.test(ns[0].textContent)), 'others see the shared point');
   ok(!(await B.evaluate(() => [...S.points.values()].some(p => p.name === '다대포 방파제 끝'))), 'a private point never reaches others');
-  await B.click('.pt-card'); await B.waitForTimeout(500);
+  await B.click('.pt-card'); await B.waitForTimeout(900);
   ok(!!(await B.$('.pt-detail')) && !(await B.$('#pt-edit')) && !(await B.$('#pt-del')), 'others can read it but not edit or delete it');
+  ok(await B.$eval('#pt-wx .wx-go', n => !!n).catch(() => false), 'a fishing point shows the weather there');
   await shot(B, 'r05_point_detail');
   await closeModals(B);
   await go(B, 'map', 2600);
@@ -466,6 +527,54 @@ const AI_NOFISH = { fish_visible: false, candidates: [], other_en: '', other_sci
   await go(N2, 'points', 1200); await N2.click('.pt-card'); await N2.waitForTimeout(500);
   await N2.click('#pt-del'); await N2.waitForTimeout(200); await N2.click('#pt-del'); await N2.waitForTimeout(1500);
   d = await dump(); ok(Object.values(d.T.points).filter(x => x.owner === nId).length === 1, 'the owner deletes a point');
+  // achievements on someone else's page: their private spots don't count, so that one is left out
+  await B.evaluate(id => openSeaOf(id), aId); await B.waitForTimeout(1500);
+  await B.click('[data-seatab="badges"]'); await B.waitForTimeout(600);
+  ok(await B.$$eval('.bdg', ns => ns.length === 19 && !ns.some(n => /나만의 포인트/.test(n.textContent)) && ns.some(n => n.classList.contains('got'))), 'someone else\'s achievements (19, earned ones marked)');
+  await B.evaluate(() => { S.viewUid = null; }); await go(B, 'home', 600);
+
+  /* ---------- 2026-10-29b: install as an app (iPhone, KakaoTalk), working offline ---------- */
+  const IOS = 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1';
+  const I = await mk('I', { ctx: { userAgent: IOS, viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true } });
+  await I.evaluate(() => lsSet('wn', WHATS_NEW));
+  await onboard(I, '아이폰낚시');
+  await I.evaluate(async () => { S.me.catches.push({ id: 'ip1', sp: 'mejina', len: 30, ts: Date.now() - 7200e3, at: Date.now(), st: 'review', tr: 50 }); await store.saveMe(); });
+  await go(I, 'home', 1200);
+  ok(!!(await I.$('.id-tip')) && !(await I.$('.inst-tip')), 'iPhone home: the login-ID tip comes first');
+  await I.click('[data-act="idtip-off"]'); await I.waitForTimeout(600);
+  ok(!!(await I.$('.inst-tip')), 'then a tip to add the app to the home screen');
+  await shot(I, 'z01_ios_tip');
+  await I.click('.inst-tip [data-act="install"]'); await I.waitForTimeout(800);
+  ok(await I.$$eval('.install .inst-steps li', ns => ns.length) === 3 && await I.$eval('.install', n => /홈 화면에 추가/.test(n.textContent)), 'iPhone: Share → Add to Home Screen steps');
+  ok(!!(await I.$('.install .note.warn')) && !!(await I.$('#inst-id')), 'iPhone without an ID: told the app keeps its own storage, offered an ID first');
+  await shot(I, 'z02_ios_install');
+  await closeModals(I);
+  await I.evaluate(() => { lsSet('instTipOff', 1); rerender(); }); await I.waitForTimeout(400);
+  ok(!(await I.$('.inst-tip')), 'the install tip can be put away');
+  const K = await mk('K', { ctx: { userAgent: 'Mozilla/5.0 (Linux; Android 14; SM-S921N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Mobile Safari/537.36 KAKAOTALK 10.8.5', viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true } });
+  await K.evaluate(() => openInstall()); await K.waitForTimeout(700);
+  ok(!!(await K.$('.install a[href^="kakaotalk://web/openExternal?url="]')) && !!(await K.$('.install [data-copy]')), 'KakaoTalk: open in another browser, or copy the link');
+  await shot(K, 'z03_kakao_install');
+  // the service worker: the page still opens with no connection; anything else gets a friendly offline page
+  const SWc = await b.newContext({ viewport: { width: 1280, height: 800 } });
+  await SWc.addInitScript(() => { try { localStorage.setItem('eosin.welcomed', '1'); } catch (e) { } });
+  await SWc.route('https://cdn.jsdelivr.net/npm/@supabase/**', r => r.fulfill({ contentType: 'text/javascript', body: FAKE }));
+  await SWc.route('https://cdn.jsdelivr.net/npm/qrcode-generator**', r => r.fulfill({ contentType: 'text/javascript', body: QRLIB }));
+  await SWc.route('https://cdnjs.cloudflare.com/**', r => r.fulfill({ contentType: 'text/javascript', body: LEAF }));
+  await SWc.route(/fonts\.(googleapis|gstatic)\.com|open-meteo\.com|supabase\.co\/functions/, r => r.abort());
+  const SWp = await SWc.newPage();
+  await SWp.goto(BASE.replace('index.html', '') + '#home'); await SWp.waitForTimeout(1500);
+  const reg = await SWp.evaluate(async () => { await navigator.serviceWorker.register('sw.js'); const r = await navigator.serviceWorker.ready; return !!r.active; });
+  await SWp.reload(); await SWp.waitForTimeout(1500);
+  const ctl = await SWp.evaluate(() => !!navigator.serviceWorker.controller);
+  ok(reg && ctl, 'service worker installs and takes over the page');
+  ok(await SWp.evaluate(async () => !!(await caches.match(new URL('./', location.href).href))), 'a copy of the page is kept for offline use');
+  await SWc.setOffline(true);
+  await SWp.reload().catch(() => null); await SWp.waitForTimeout(1500);
+  ok(await SWp.evaluate(() => !!document.querySelector('#main') && /찌릿|ZZIRIT/.test(document.title)).catch(() => false), 'offline: the app page still opens');
+  await SWp.goto(BASE.replace('index.html', 'nowhere.html')).catch(() => null); await SWp.waitForTimeout(800);
+  ok(await SWp.evaluate(() => /인터넷 연결이 없어요/.test(document.body.textContent)).catch(() => false), 'offline: other addresses get a friendly offline page');
+  await SWc.setOffline(false); await SWc.close();
   // dark mode + english
   const E = await mk('E', { ctx: { colorScheme: 'dark', locale: 'en-US' } });
   await E.evaluate(() => { setLang('en'); rerender(); }); await onboard(E, 'Reeler');
