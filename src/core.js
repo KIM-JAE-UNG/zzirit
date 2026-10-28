@@ -146,10 +146,10 @@ const store = (() => {
         });
         sub(db.collection('teams').limit(1000), snap => { const m = new Map(); for (const d of snap.docs) if (d.exists) m.set(d.id, d.data()); S.teams = m; S.dataVer++; rerenderSoon(); });
         if (window.APP_RT === 'web') sub(db.collection('news').limit(200), snap => { S.news = snap.docs.filter(d => d.exists).map(d => Object.assign({ id: d.id }, d.data())); S.newsVer = (S.newsVer || 0) + 1; rerenderSoon(); });
-        sub(db.collection('admin'), snap => { for (const d of snap.docs) if (d.exists) S.admin[d.id] = d.data(); S.adminLoaded = true; S.dataVer++; maybeCleanLooks(); rerenderSoon(); });
+        sub(db.collection('admin'), snap => { for (const d of snap.docs) if (d.exists) S.admin[d.id] = d.data(); S.adminLoaded = true; S.dataVer++; maybeCleanLooks(); payNotify(); rerenderSoon(); });
         if (S.uid && S.writable !== false) {
           S.mode = 'shared';
-          sub(db.doc('orders/' + S.uid), d => { if (d.exists) S.myOrders = (d.data().items || []).slice(); S.ordersLoaded = true; maybeCleanLooks(); rerenderSoon(); });
+          sub(db.doc('orders/' + S.uid), d => { S.myOrders = d.exists ? (d.data().items || []).slice() : []; S.ordersLoaded = true; maybeCleanLooks(); payNotify(); rerenderSoon(); });
           sub(db.doc('suggest/' + S.uid), d => { if (d.exists) S.mySuggest = (d.data().items || []).slice(); });
           // first-time: migrate a local profile into the shared store
           setTimeout(async () => {
@@ -216,6 +216,11 @@ const store = (() => {
       S.teams.delete(S.uid); S.dataVer++;
       try { await S.db.doc('teams/' + S.uid).delete(); return true; } catch (e) { console.warn(e); toast(t('toast_write_fail'), 'warn'); return false; }
     },
+    // Claude page: the operator removes what the shared store holds for someone (the website does this on the server)
+    async adminDeleteDocs(uid) {
+      if (!S.db || !S.isOwner) throw new Error('not_admin');
+      for (const p of ['anglers', 'labels', 'orders', 'suggest', 'board', 'teams']) { try { await S.db.doc(p + '/' + uid).delete(); } catch (e) { console.warn(e); } }
+    },
     async saveAdmin(docId, data) {
       S.admin[docId] = data;
       if (S.db && S.isOwner) { try { await S.db.doc('admin/' + docId).set(data); return true; } catch (e) { console.warn(e); toast(t('toast_write_fail'), 'warn'); } }
@@ -241,6 +246,22 @@ function allAnglers() {
   return m;
 }
 function verdict(uid, cid) { return (S.admin.verdicts && S.admin.verdicts[uid] && S.admin.verdicts[uid][cid]) || null; }
+/* What people see for a catch: a decision (the operator's, or the automatic reviewer's) wins over the saved status.
+   'hold' = the reviewer could not tell, so the operator looks at it. */
+function catchState(uid, c) { const v = verdict(uid, c.id); return v === 'ok' || v === 'no' || v === 'hold' ? v : c.st; }
+/* The automatic reviewer's note for a catch: { v, code, text, m, at } (code is translated, text is the AI's own words in Korean) */
+function reviewNote(uid, c) {
+  const r = S.admin.autorev && S.admin.autorev[uid] && S.admin.autorev[uid][c.id]; if (!r) return null;
+  const s = String(r.why || ''); const i = s.indexOf('|');
+  return { v: r.v, code: i >= 0 ? s.slice(0, i) : s, text: i >= 0 ? s.slice(i + 1) : '', m: r.m, at: r.at };
+}
+function reviewReason(n) {
+  if (!n) return '';
+  const x = n.text && /^(species|size)$/.test(n.code) ? ` (${n.text})` : '';
+  const base = t('rv_' + n.code, { x }); const known = base !== 'rv_' + n.code;
+  const extra = n.text && !/^(species|size|record)$/.test(n.code) && S.li === 0 ? ` · ${n.text}` : '';
+  return (known ? base : n.text) + extra;
+}
 function eligible(c, uid) {
   const v = verdict(uid, c.id);
   if (v === 'no') return false;
@@ -273,25 +294,53 @@ function daysUntilClosed(sp, date = new Date()) {
   return null;
 }
 function grantsOf(uid) { return (S.admin.grants && S.admin.grants[uid]) || {}; }
-/* Premium items count as soon as the buyer says they sent the money; the operator can cancel later ('no'). */
-function paidFor(id) { const g = grantsOf(myId()); return S.myOrders.some(o => o.kind === 'item' && o.ref === id && g[o.id] !== 'no'); }
+/* Paid looks count only after the operator has found the money in KakaoPay and confirmed the order ('ok').
+   "I sent it" just records the order with its memo code. The server keeps the same rule for everyone's saved looks.
+   `own` lists looks the operator carried over from earlier purchases (only the server can change it). */
+const grantState = g => (g === 'ok' || g === 'no' ? g : 'wait');
+function carried(a, id) { return !!(a && Array.isArray(a.own) && a.own.includes(id)); }
+function paidFor(id) {
+  if (carried(S.me, id)) return true;
+  const g = grantsOf(myId());
+  return S.myOrders.some(o => o.kind === 'item' && g[o.id] === 'ok' && (o.ref === id || (id === 'pr_gold' && o.ref === 'fl_gold')));
+}
 function owned(itemId) {
   const it = SHOPI[itemId]; if (!it) return false;
   if (it.top) return trophyEarned();
   if (it.pr) return paidFor(itemId);
   if (it.in) return paidFor(it.in);
-  return myLevel() >= (it.lv || 1);
+  return myLevel() >= (it.lv || 1) || carried(S.me, itemId);
 }
-function orderState(o) { return grantsOf(myId())[o.id] || 'auto'; }
-function supporter() { const g = grantsOf(myId()); return S.myOrders.some(o => o.kind === 'donate' && g[o.id] !== 'no'); }
+function orderState(o) { return grantState(grantsOf(myId())[o.id]); }
+function pendingOrders(kind, ref) { return S.myOrders.filter(o => orderState(o) === 'wait' && (!kind || o.kind === kind) && (!ref || o.ref === ref)); }
+function supporter() { const g = grantsOf(myId()); return S.myOrders.some(o => o.kind === 'donate' && g[o.id] === 'ok'); }
+/* What a sea or avatar may show. Mine: what I own. Someone else's: level looks up to their level (or carried over);
+   premium looks as the server kept them (it drops unconfirmed ones on every save). */
+function lookOk(a, uid, id) {
+  const it = SHOPI[id]; if (!it) return false;
+  if (a === S.me || (uid && uid === myId())) return owned(id);
+  if (it.top || it.pr || it.in) return true;
+  return lvInfo(a, uid).L >= (it.lv || 1) || carried(a, id);
+}
+function decorOf(a, uid) {
+  const d = Object.assign(DEFAULT_DECOR(), (a && a.decor) || {});
+  const ok = id => lookOk(a, uid, id);
+  return { theme: d.theme && ok(d.theme) ? d.theme : 'th_dawn', items: (Array.isArray(d.items) ? d.items : []).filter(ok), fx: (Array.isArray(d.fx) ? d.fx : []).filter(ok) };
+}
+function flairOf(a, uid) {
+  const f = (a && a.flair) || {}; if (!f.gold && !f.frame) return {};
+  uid = uid || avatarUid(a);
+  return { gold: !!f.gold && lookOk(a, uid, 'fl_gold'), frame: !!f.frame && lookOk(a, uid, 'fl_wave') };
+}
 
-/* Levels: experience comes from catches (cosmetic only, never from payments). Rejected catches give nothing. */
+/* Levels: experience comes from confirmed catches only (AI-checked, or approved by the operator).
+   Cosmetic only, never from payments; catches still waiting for review give nothing until approved. */
 const LV_TITLES = [[1, 'lvt_1'], [3, 'lvt_2'], [5, 'lvt_3'], [8, 'lvt_4'], [12, 'lvt_5'], [16, 'lvt_6'], [20, 'lvt_7']];
 const lvNeed = L => 25 * (L - 1) * L;
 function xpOf(a, uid) {
   let xp = 0; const sp = new Set();
   for (const c of (a && a.catches) || []) {
-    if (c.st === 'no' || verdict(uid, c.id) === 'no') continue;
+    if (!eligible(c, uid)) continue;
     xp += 20 + Math.min(30, Math.round((c.sc || 0) / 5)) + (c.rel ? 10 : 0);
     if (SPI[c.sp]) sp.add(c.sp);
   }

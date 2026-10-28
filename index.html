@@ -7,9 +7,9 @@
 <title>찌릿 ZZIRIT</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="description" content="찌릿 ZZIRIT — 사진 한 장으로 어종을 찾고, 전 세계 낚시꾼과 겨루는 낚시 리그">
-<meta name="theme-color" content="#0B2230">
+<meta name="theme-color" content="#070C16">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/png" sizes="64x64" href="favicon.png">
 <link rel="apple-touch-icon" href="icon-180.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="찌릿">
@@ -104,7 +104,7 @@ p { margin: 0; }
 .rail { position: fixed; inset: 0 auto 0 0; width: var(--rail-w); background: var(--rail); color: var(--rail-ink); display: flex; flex-direction: column; padding: max(18px, env(safe-area-inset-top, 0px)) 14px max(16px, env(safe-area-inset-bottom, 0px)) max(14px, env(safe-area-inset-left, 0px)); z-index: 40; }
 .brand { display: flex; align-items: center; gap: 10px; color: var(--rail-ink); padding: 4px 8px 18px; }
 .brand:hover { text-decoration: none; }
-.brand .logo { width: 34px; height: 34px; flex: none; }
+.brand .logo { width: 34px; height: 34px; flex: none; display: block; border-radius: 9px; object-fit: cover; background: #070C16; box-shadow: 0 0 0 1px rgba(255,255,255,.07), 0 2px 8px rgba(5,10,20,.22); }
 .wm { font-weight: 700; font-size: 22px; letter-spacing: -.04em; }
 .wm-en { font-family: var(--f-disp); font-weight: 800; font-size: 13px; letter-spacing: .22em; color: var(--rail-dim); margin-top: 3px; }
 .nav { display: flex; flex-direction: column; gap: 2px; overflow-y: auto; flex: 1; }
@@ -184,6 +184,7 @@ p { margin: 0; }
 .chip-cig { background: var(--warn-soft); color: var(--warn); border-color: transparent; }
 .chip-caution { background: var(--surface-2); color: var(--ink-2); }
 .chip-closed { background: var(--poison-soft); color: var(--poison); border-color: transparent; }
+.chip-wait { background: var(--warn-soft); color: var(--warn); border-color: transparent; }
 .chip-season, .chip-ok { background: var(--ok-soft); color: var(--ok); border-color: transparent; }
 .chip-review { background: var(--warn-soft); color: var(--warn); border-color: transparent; }
 .chip-local { background: transparent; border-style: dashed; color: var(--ink-3); }
@@ -1013,13 +1014,74 @@ h1 .beta-chip { font-size: 13px; margin-left: 4px; vertical-align: 6px; }
   .bd-bar .chip-row .chip { flex: none; }
 }
 
+
+/* ===== Brand page ===== */
+.about { display: flex; flex-direction: column; gap: 18px; }
+.ab-hero { display: grid; grid-template-columns: minmax(0, 280px) minmax(0, 1fr); gap: 28px; align-items: center; padding: 26px; border-radius: 22px; color: #EEF3F8;
+  background: radial-gradient(120% 120% at 85% 0%, #17263a 0%, #0a111d 45%, #04070d 100%); box-shadow: 0 18px 40px rgba(4,8,16,.28); }
+.ab-hero .eyebrow { color: #8FB4D9; }
+.ab-hero h1 { color: #fff; font-size: clamp(26px, 4vw, 40px); line-height: 1.15; letter-spacing: -.01em; }
+.ab-hero .lede { color: #C6D3E0; }
+.ab-hero .btn-line { color: #EEF3F8; border-color: rgba(238,243,248,.35); }
+.ab-logo { width: 100%; height: auto; border-radius: 16px; display: block; }
+.ab-sec h2 { margin-bottom: 12px; }
+.ab-name { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.ab-name li { padding: 14px; border-radius: 14px; background: var(--surface-2, rgba(127,127,127,.06)); }
+.ab-word { display: inline-block; font-weight: 800; font-size: 20px; margin-bottom: 6px; color: var(--ink); }
+.ab-name p, .ab-list p { margin: 4px 0 0; color: var(--ink-2, inherit); line-height: 1.6; }
+.ab-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; }
+.ab-list li { display: flex; gap: 12px; align-items: flex-start; }
+.ab-ic { flex: none; width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent); }
+.ab-ic .ic { width: 20px; height: 20px; }
+.ab-logo-grid { display: grid; grid-template-columns: 128px minmax(0, 1fr); gap: 20px; align-items: start; }
+.ab-mark { width: 128px; height: 128px; border-radius: 24px; display: block; box-shadow: 0 10px 24px rgba(4,8,16,.25); }
+.ab-for { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 22px; }
+.ab-close { text-align: center; font-weight: 800; font-size: 20px; margin: 6px 0 0; }
+.ab-made { text-align: center; }
+@media (max-width: 760px) {
+  .ab-hero { grid-template-columns: 1fr; padding: 18px; gap: 16px; text-align: center; }
+  .ab-hero .hero-cta { justify-content: center; }
+  .ab-logo { max-width: 220px; margin: 0 auto; }
+  .ab-name { grid-template-columns: 1fr; }
+  .ab-logo-grid { grid-template-columns: 1fr; justify-items: center; }
+  .ab-for { grid-template-columns: 1fr; }
+}
+
+/* ===== Login ID ===== */
+.id-form .field input { font-size: 16px; }
+.id-card .mono { font-size: 1.05em; }
+.id-tip { display: flex; align-items: center; gap: 14px; }
+.id-tip > .ic { width: 28px; height: 28px; flex: none; color: var(--accent); }
+.id-tip > div:first-of-type { flex: 1; min-width: 0; }
+.id-tip p { margin: 2px 0 0; }
+@media (max-width: 640px) { .id-tip { flex-wrap: wrap; } .id-tip .rec-btns { width: 100%; justify-content: flex-start; } }
+
+/* ===== Review notes, operator lists ===== */
+.rv-note { display: flex; gap: 8px; align-items: flex-start; }
+.rv-note > .ic { flex: none; margin-top: 2px; }
+.rv-why { color: var(--warn); }
+.ad-auto summary { cursor: pointer; font-weight: 600; margin-top: 12px; }
+.ad-autolog { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.ad-autolog li { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 0; border-top: 1px solid var(--line); }
+.ad-users { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.ad-users li { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-top: 1px solid var(--line); }
+.ad-users li .fr-who { flex: 1; min-width: 0; }
+.ad-idreset { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--line); }
+.ad-idreset .field { margin-bottom: 0; }
+
+/* side menu: keep every item on screen on shorter displays */
+@media (min-width: 900px) and (max-height: 980px) { .nav a { padding-top: 7px; padding-bottom: 7px; } .brand { padding-bottom: 12px; } }
+@media (min-width: 900px) and (max-height: 820px) { .nav a { padding-top: 5px; padding-bottom: 5px; font-size: 14px; } .nav-sep { margin: 4px 0; } }
+
+.lv-chip.lv-wait { opacity: .75; }
+
 </style>
 </head>
 <body>
 <div class="app">
   <aside class="rail">
     <a class="brand" href="#home" aria-label="찌릿 ZZIRIT">
-      <svg class="logo" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="19" fill="#0F3A52"/><path d="M7 27c4.3-2 8.7-2 13 0s8.7 2 13 0" stroke="#5CE1FF" stroke-width="1.6" fill="none" opacity=".65"/><path d="M10 31.5c3.3-1.5 6.7-1.5 10 0s6.7 1.5 10 0" stroke="#5CE1FF" stroke-width="1.4" fill="none" opacity=".35"/><g transform="rotate(16 20 18)"><line x1="20" y1="1.5" x2="20" y2="6" stroke="#E9EFF2" stroke-width="1.3"/><rect x="17" y="5.5" width="6" height="22.5" rx="3" fill="#E9EFF2"/><path d="M17 8.5a3 3 0 0 1 6 0V15h-6z" fill="#FF5A1F"/><path d="M17 21h6v4a3 3 0 0 1-6 0z" fill="#0B2230"/></g></svg>
+      <img class="logo" src="data:image/webp;base64,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" alt="" width="34" height="34">
       <span><span class="wm">찌릿</span><span class="beta" data-t="beta"></span><br><span class="wm-en">ZZIRIT</span></span>
     </a>
     <nav class="nav" aria-label="Main">
@@ -1037,6 +1099,7 @@ h1 .beta-chip { font-size: 13px; margin-left: 4px; vertical-align: 6px; }
       <a href="#tackle" data-route="tackle"><svg class="ic" aria-hidden="true"><use href="#i-lure"/></svg><span data-t="nav_tackle"></span></a>
       <a href="#log" data-route="log"><svg class="ic" aria-hidden="true"><use href="#i-log"/></svg><span data-t="nav_log"></span></a>
       <a href="#help" data-route="help"><svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg><span data-t="nav_help"></span></a>
+      <a href="#about" data-route="about"><svg class="ic" aria-hidden="true"><use href="#i-sparkle"/></svg><span data-t="nav_about"></span></a>
       <a href="#prefs" data-route="prefs"><svg class="ic" aria-hidden="true"><use href="#i-gear"/></svg><span data-t="nav_prefs"></span></a>
       <a href="#admin" data-route="admin" class="nav-admin" hidden><svg class="ic" aria-hidden="true"><use href="#i-shield"/></svg><span data-t="nav_admin"></span></a>
     </nav>
@@ -1052,7 +1115,7 @@ h1 .beta-chip { font-size: 13px; margin-left: 4px; vertical-align: 6px; }
   </aside>
   <header class="topbar">
     <a class="brand" href="#home" aria-label="찌릿 ZZIRIT">
-      <svg class="logo" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="19" fill="#0F3A52"/><path d="M7 27c4.3-2 8.7-2 13 0s8.7 2 13 0" stroke="#5CE1FF" stroke-width="1.6" fill="none" opacity=".65"/><g transform="rotate(16 20 18)"><line x1="20" y1="1.5" x2="20" y2="6" stroke="#E9EFF2" stroke-width="1.3"/><rect x="17" y="5.5" width="6" height="22.5" rx="3" fill="#E9EFF2"/><path d="M17 8.5a3 3 0 0 1 6 0V15h-6z" fill="#FF5A1F"/><path d="M17 21h6v4a3 3 0 0 1-6 0z" fill="#0B2230"/></g></svg>
+      <img class="logo" src="data:image/webp;base64,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" alt="" width="34" height="34">
       <span class="wm">찌릿</span><span class="wm-en">ZZIRIT</span>
     </a>
     <span class="grow"></span>
@@ -1075,6 +1138,7 @@ h1 .beta-chip { font-size: 13px; margin-left: 4px; vertical-align: 6px; }
     <section class="view" id="v-tackle" hidden></section>
     <section class="view" id="v-log" hidden></section>
     <section class="view" id="v-help" hidden></section>
+    <section class="view" id="v-about" hidden></section>
     <section class="view" id="v-prefs" hidden></section>
     <section class="view" id="v-admin" hidden></section>
   </main>
@@ -1200,14 +1264,26 @@ h1 .beta-chip { font-size: 13px; margin-left: 4px; vertical-align: 6px; }
     leave: () => rpcOrThrow('link_leave'),
     linked: () => !!(authId && acctId && authId !== acctId)
   };
-  const news = {
-    async refresh() {
-      const tk = await token();
-      const r = await fetch(CFG.url + '/functions/v1/news', { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: CFG.key, Authorization: 'Bearer ' + (tk || CFG.key) }, body: '{}' });
-      return r.ok;
-    }
+  const callFn = async name => {
+    const tk = await token();
+    const r = await fetch(CFG.url + '/functions/v1/' + name, { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: CFG.key, Authorization: 'Bearer ' + (tk || CFG.key) }, body: '{}' });
+    return r.ok;
   };
-  window.APP_AUTH = { sb, session, acct, link, news, error: () => authErr };
+  const news = { refresh: () => callFn('news') };
+  // the automatic reviewer runs on its own every few minutes; a fresh catch just nudges it (it ignores extra nudges)
+  const review = { ping: () => callFn('review').catch(() => false) };
+  // operator only (checked on the server): remove an account with everything it posted
+  const admin = { deleteUser: uid => rpcOrThrow('admin_delete_user', { p_uid: uid }) };
+  // login ID + password: the server keeps only a hash; logging in joins this device to that account
+  const ids = {
+    me: () => rpcOrThrow('id_me'),
+    register: (name, pass) => rpcOrThrow('id_register', { p_name: name, p_pass: pass }),
+    login: (name, pass) => rpcOrThrow('id_login', { p_name: name, p_pass: pass }),
+    password: (o, n) => rpcOrThrow('id_password', { p_old: o, p_new: n }),
+    adminReset: (name, pass) => rpcOrThrow('admin_id_reset', { p_name: name, p_new: pass }),
+    async logout() { try { await sb.auth.signOut({ scope: 'local' }); } catch (e) { } }
+  };
+  window.APP_AUTH = { sb, session, acct, link, news, review, admin, ids, error: () => authErr };
 
   /* ---- document paths → tables ---- */
   function route(path) {
@@ -1940,7 +2016,7 @@ Object.assign(T, {
   /* levels · decorations · premium */
   lvt_1: ['새내기 조사', 'Rookie angler', '新米釣り師', '新手钓客'], lvt_2: ['견습 조사', 'Apprentice', '見習い釣り師', '见习钓手'], lvt_3: ['꾼', 'Angler', '釣り人', '钓手'], lvt_4: ['베테랑', 'Veteran', 'ベテラン', '老手'],
   lvt_5: ['고수', 'Expert', '達人', '高手'], lvt_6: ['명인', 'Master', '名人', '名人'], lvt_7: ['바다의 전설', 'Legend of the sea', '海の伝説', '海之传说'],
-  xp_how: ['물고기를 올릴 때마다 경험치가 쌓여요. 한 마리 20~50 XP, 새 어종 +40, 방생 +10. 레벨이 오르면 캐릭터와 꾸미기가 무료로 열려요.', 'Every catch earns XP: 20–50 per fish, +40 for a new species, +10 for a release. Levels unlock character parts and decorations for free.', '釣果ごとに経験値。1匹20〜50XP、新魚種+40、リリース+10。レベルでキャラとデコが無料で解放。', '每次登记渔获获得经验：每条20–50XP，新鱼种+40，放生+10。升级免费解锁角色和装扮。'],
+  xp_how: ['확인된 조과(AI 확인 또는 운영자 승인)마다 경험치가 쌓여요. 한 마리 20~50 XP, 새 어종 +40, 방생 +10. 검토 중인 조과는 승인되면 반영돼요. 레벨이 오르면 캐릭터와 꾸미기가 무료로 열려요.', 'Every confirmed catch (checked by AI or approved by the operator) earns XP: 20–50 per fish, +40 for a new species, +10 for a release. Catches under review count once approved. Levels unlock character parts and decorations for free.', '確認済みの釣果(AI確認または運営者承認)ごとに経験値。1匹20〜50XP、新魚種+40、リリース+10。審査中の釣果は承認後に反映。レベルでキャラとデコが無料で解放。', '每条已确认的渔获（AI确认或运营者批准）获得经验：每条20–50XP，新鱼种+40，放生+10。审核中的渔获批准后计入。升级免费解锁角色和装扮。'],
   xp_left: ['다음 레벨까지 {n} XP', '{n} XP to next level', '次のレベルまで{n}XP', '距下一级{n}XP'], next_unlock: ['다음 해금: {name} (Lv.{n})', 'Next: {name} (Lv.{n})', '次の解放: {name} (Lv.{n})', '下一个解锁：{name} (Lv.{n})'],
   decor_free_note: ['꾸미기는 전부 레벨로 무료 해금돼요. 아래 프리미엄 2개만 500원이에요.', 'All decorations unlock for free with levels. Only the two premium items below cost ₩500.', 'デコはすべてレベルで無料解放。下のプレミアム2つだけ500ウォンです。', '装扮全部通过等级免费解锁，只有下方两个高级道具每个500韩元。'],
   lv_up: ['레벨 {n} 달성!', 'Level {n}!', 'レベル{n}達成!', '升到{n}级！'], go_decorate: ['꾸미러 가기', 'Decorate', 'デコる', '去装扮'],
@@ -1948,7 +2024,8 @@ Object.assign(T, {
   use_item: ['사용하기', 'Use', '使う', '使用'], in_use: ['사용 중', 'In use', '使用中', '使用中'], lock_lv: ['Lv.{n}에 열려요', 'Unlocks at Lv.{n}', 'Lv.{n}で解放', 'Lv.{n}解锁'],
   premium: ['프리미엄', 'Premium', 'プレミアム', '高级'], premium_title: ['프리미엄 (각 500원)', 'Premium (₩500 each)', 'プレミアム (各500ウォン)', '高级 (每个500韩元)'],
   prem_buy: ['{p}원으로 갖기', 'Get for ₩{p}', '{p}ウォンで入手', '{p}韩元获得'],
-  prem_note: ['프리미엄은 점수·랭킹에 아무 영향이 없는 꾸미기예요. 개발자 응원용이에요.', 'Premium items are cosmetic only and never affect points or rankings—they support the developer.', 'プレミアムは得点・ランキングに影響しない装飾で、開発者応援用です。', '高级道具仅为装饰，不影响积分和排名，用于支持开发者。'],
+  prem_note: ['프리미엄은 점수·랭킹에 아무 영향이 없는 꾸미기예요. 입금이 확인되면 적용돼요(보통 하루 안).', 'Premium items are cosmetic only and never affect points or rankings. They apply once your payment is confirmed (usually within a day).', 'プレミアムは得点・ランキングに影響しない装飾です。入金が確認されると適用されます(通常1日以内)。', '高级道具仅为装饰，不影响积分和排名。确认到账后生效（通常一天内）。'],
+  prem_wait: ['입금 확인 중', 'Waiting for payment check', '入金確認中', '等待确认到账'],
   prem_need: ['프리미엄 아이템이에요', 'This is a premium item', 'プレミアムアイテムです', '这是高级道具'],
   prem_desc_pr_gold: ['황금 낚싯대, 황금 보트, 금빛 닉네임과 프로필 테두리, 황금 반짝이 효과까지 한 번에.', 'Golden rod, golden boat, gold nickname and profile frame, plus a gold sparkle effect.', '黄金の竿、黄金のボート、金の名前とプロフィール枠、金のきらめき効果のセット。', '黄金鱼竿、黄金船、金色昵称和头像框，外加金色闪光特效。'],
   prem_desc_th_palace: ['달빛 아래 바닷속 용궁. 등불이 떠오르고 금빛 물결이 일렁이는 특별한 바다예요.', 'An undersea Dragon Palace under the moon, with rising lanterns and golden shimmer.', '月明かりの下の海底の竜宮城。灯籠が昇り、金色の光が揺れる特別な海。', '月光下的海底龙宫，灯笼升起，金光荡漾。'],
@@ -1957,13 +2034,135 @@ Object.assign(T, {
   pay_step1: ['카카오페이로 보내기', 'Send with KakaoPay', 'カカオペイで送る', '用KakaoPay转账'], pay_step1_pc: ['휴대폰으로 QR을 찍어 보내기', 'Scan the QR with your phone and send', 'スマホでQRを読み取って送る', '用手机扫码转账'],
   pay_step2: ['보냈다면 아래 버튼을 눌러 주세요', 'Sent it? Tap the button below', '送ったら下のボタンを押してください', '转账后请点击下方按钮'],
   pay_done: ['보냈어요', 'I sent it', '送りました', '已转账'], pay_wait: ['카카오페이를 연 뒤에 누를 수 있어요', 'Available after you open KakaoPay', 'カカオペイを開いた後に押せます', '打开KakaoPay后才能点击'],
-  pay_fine2: ['"보냈어요"를 누르면 바로 적용돼요. 입금이 확인되지 않은 주문은 나중에 취소될 수 있어요. 계좌번호는 공개하지 않아요.', 'Tapping "I sent it" applies it right away. Orders whose payment never arrives may be cancelled later. We never show a bank account.', '「送りました」を押すとすぐ適用。入金が確認できない注文は後で取り消されることがあります。口座番号は公開しません。', '点击"已转账"立即生效；未到账的订单之后可能被取消。不公开银行账号。'],
-  pay_applied2: ['적용했어요! 응원 고마워요', 'Applied! Thanks for the support', '適用しました!応援ありがとう', '已生效！感谢支持'],
-  ord_auto: ['적용됨', 'Applied', '適用済み', '已生效'], ord_ok: ['입금 확인됨', 'Payment confirmed', '入金確認済み', '已确认到账'], ord_no: ['취소됨', 'Cancelled', '取消', '已取消'], ord_past_old: ['과거 조과 등록권(종료)', 'Past-catch slot (retired)', '過去釣果の登録枠(終了)', '以往渔获登记次数(已停用)'],
+  pay_fine2: ['입금이 확인되면 적용돼요(보통 하루 안). 메모 칸에 위 코드를 꼭 적어 주세요. 입금하지 않고 "보냈어요"만 누르면 적용되지 않아요. 계좌번호는 공개하지 않아요.', 'It applies once the payment is confirmed (usually within a day). Please put the code above in the memo. Tapping "I sent it" without sending does nothing. We never show a bank account.', '入金が確認されると適用されます(通常1日以内)。メモ欄に上のコードを必ず入れてください。送金せずに「送りました」を押しても適用されません。口座番号は公開しません。', '确认到账后生效（通常一天内）。请务必在备注里填上方的代码。未转账只点"已转账"不会生效。不公开银行账号。'],
+  pay_sent: ['알려 주셔서 고마워요! 운영자가 카카오페이 입금(메모 {code})을 확인하면 바로 적용돼요.', 'Thanks! It applies as soon as the operator finds your KakaoPay payment (memo {code}).', 'ありがとうございます!運営者がカカオペイの入金(メモ {code})を確認するとすぐ適用されます。', '谢谢！运营者确认KakaoPay到账（备注 {code}）后立即生效。'],
+  pay_dup: ['이미 입금 확인을 기다리는 주문이 있어요 (메모 {code}). 확인되면 바로 적용돼요.', 'An order is already waiting for confirmation (memo {code}). It applies as soon as it is confirmed.', '入金確認待ちの注文がすでにあります(メモ {code})。確認されるとすぐ適用されます。', '已有等待确认的订单（备注 {code}），确认后立即生效。'],
+  pay_many: ['확인을 기다리는 주문이 이미 있어요. 운영자가 확인한 뒤에 다시 해 주세요.', 'You already have orders waiting for confirmation. Please try again after they are checked.', '確認待ちの注文がすでにあります。確認後にもう一度お試しください。', '已有等待确认的订单，请确认后再试。'],
+  pay_ok_item: ['입금이 확인됐어요! {name}을(를) 적용했어요.', 'Payment confirmed! {name} is now on.', '入金を確認しました!{name}を適用しました。', '已确认到账！{name}已生效。'],
+  pay_ok_donate: ['후원 입금이 확인됐어요. 정말 고마워요!', 'Your tip arrived. Thank you so much!', '応援の入金を確認しました。本当にありがとう!', '打赏已到账，非常感谢！'],
+  orders_note: ['"보냈어요"를 누른 주문은 운영자가 입금을 확인한 뒤 적용돼요.', 'Orders apply after the operator confirms the payment.', '注文は運営者が入金を確認した後に適用されます。', '订单在运营者确认到账后生效。'],
+  ord_wait: ['입금 확인 중', 'Waiting for confirmation', '入金確認待ち', '等待确认到账'], ord_ok: ['입금 확인됨', 'Payment confirmed', '入金確認済み', '已确认到账'], ord_no: ['취소됨', 'Cancelled', '取消', '已取消'], ord_past_old: ['과거 조과 등록권(종료)', 'Past-catch slot (retired)', '過去釣果の登録枠(終了)', '以往渔获登记次数(已停用)'],
   ad_pending: ['입금 확인 전', 'Not yet confirmed', '入金未確認', '未确认到账'], ad_confirm: ['입금 확인', 'Confirm', '入金確認', '确认到账'], ad_cancel_order: ['취소', 'Cancel', '取消', '取消'], ad_undo: ['되돌리기', 'Undo', '元に戻す', '撤销'],
-  ad_orders_hint: ['구매는 "보냈어요"를 누르는 즉시 적용돼요. 카카오페이 입금 내역과 메모 코드를 맞춰 보고, 들어오지 않은 주문만 취소하세요.', 'Purchases apply when the buyer taps "I sent it". Match the memo codes with your KakaoPay history and cancel only orders that never arrived.', '購入は「送りました」で即適用。カカオペイの入金履歴とメモコードを照合し、未入金の注文だけ取り消してください。', '购买在点击"已转账"后立即生效。核对KakaoPay到账记录与备注码，只取消未到账的订单。'],
+  ad_orders_hint: ['"보냈어요"를 눌러도 입금 확인 전에는 아무것도 적용되지 않아요. 카카오페이 입금 내역에서 메모 코드를 찾아 들어왔으면 "입금 확인", 없으면 "취소"를 눌러 주세요.', 'Nothing applies until you confirm. Find the memo code in your KakaoPay history: confirm it if the money arrived, cancel it if not.', '確認するまで何も適用されません。カカオペイの入金履歴でメモコードを探し、入金があれば「入金確認」、なければ「取消」を押してください。', '确认前不会生效。在KakaoPay到账记录中查找备注码：到账就点"确认到账"，没有就点"取消"。'],
   ad_hide_pic: ['프로필 사진 내리기', 'Remove profile photo', 'プロフィール写真を非表示', '下架头像照片'],
 
+  /* automatic review */
+  st_hold: ['보류 · 운영자 확인 중', 'On hold · operator check', '保留・運営者が確認中', '保留·运营者确认中'],
+  rv_title_no: ['AI 검토: 반려', 'AI review: rejected', 'AI審査: 却下', 'AI审核：驳回'],
+  rv_title_hold: ['AI 검토: 보류', 'AI review: on hold', 'AI審査: 保留', 'AI审核：保留'],
+  rv_waiting: ['AI가 몇 분 안에 자동으로 확인해요. 확실하지 않으면 운영자가 직접 봐요.', 'AI checks it automatically within minutes; if it is unsure, the operator looks at it.', 'AIが数分以内に自動で確認します。判断が難しい場合は運営者が確認します。', 'AI会在几分钟内自动审核，不确定时由运营者亲自查看。'],
+  rv_ok: ['사진과 기록이 맞아요', 'Photo and record match', '写真と記録が一致しています', '照片与记录一致'],
+  rv_no_fish: ['사진에서 물고기를 찾지 못했어요', 'No fish could be found in the photo', '写真から魚が見つかりませんでした', '照片中没有找到鱼'],
+  rv_fake: ['직접 찍은 사진이 아닌 것 같아요 (캡처·AI·인터넷·수산시장 사진)', 'Does not look like your own photo (screenshot, AI, web or fish-market image)', '本人が撮った写真ではないようです(スクショ・AI・ネット・市場の写真)', '看起来不是本人拍摄的照片（截图、AI、网络或鱼市照片）'],
+  rv_species: ['다른 어종으로 보여요{x}', 'Looks like a different species{x}', '別の魚種に見えます{x}', '看起来是其他鱼种{x}'],
+  rv_size: ['사진으로 보이는 크기와 길이가 맞지 않아요{x}', 'The length does not match the fish in the photo{x}', '写真の魚と長さが合いません{x}', '长度与照片中的鱼不符{x}'],
+  rv_record: ['이 어종의 기록 크기를 넘어서 운영자가 직접 확인해요', 'Larger than the species record, so the operator checks it', 'この魚種の記録を超えているため運営者が確認します', '超过该鱼种纪录，由运营者亲自确认'],
+  rv_unclear: ['사진만으로는 확실하지 않아 운영자가 확인해요', 'Not clear from the photo alone; the operator checks it', '写真だけでは判断できないため運営者が確認します', '仅凭照片无法确定，由运营者确认'],
+  rv_no_photo: ['사진이 없어 운영자가 확인해요', 'No photo, so the operator checks it', '写真がないため運営者が確認します', '没有照片，由运营者确认'],
+  rv_ai_late: ['AI 확인이 늦어져 운영자가 확인해요', 'The AI check is delayed, so the operator checks it', 'AI確認が遅れているため運営者が確認します', 'AI审核延迟，由运营者确认'],
+  rv_bad_len: ['길이가 올바르지 않아요', 'The length is not valid', '長さが正しくありません', '长度无效'],
+  rv_future: ['날짜가 미래로 되어 있어요', 'The date is in the future', '日付が未来になっています', '日期在未来'],
+  rv_ai_reject: ['AI가 대회 기록으로 쓰기 어렵다고 판단했어요', 'The AI judged it unsuitable as a competition record', 'AIが大会記録には使えないと判断しました', 'AI判断其不适合作为比赛记录'],
+  reg_err_toobig: ['{name}의 최대 기록은 약 {n}cm예요. 길이를 다시 확인해 주세요.', 'The {name} record is about {n} cm. Please check the length.', '{name}の最大記録は約{n}cmです。長さを確認してください。', '{name}的最大纪录约为{n}cm，请确认长度。'],
+  reg_warn_record: ['이 어종의 기록(약 {n}cm)보다 커요! 운영자가 사진을 확인한 뒤 점수에 반영돼요. 맞으면 한 번 더 눌러 주세요.', 'Bigger than the record (about {n} cm)! The operator checks the photo before it scores. Tap again if it is right.', '記録(約{n}cm)より大きいです!運営者が写真を確認してから加点されます。正しければもう一度押してください。', '比纪录（约{n}cm）还大！运营者确认照片后计分。确认无误请再点一次。'],
+  ad_reviews_auto: ['AI가 자동으로 승인·반려하고, 애매한 것만 여기 남겨요.', 'The AI approves and rejects on its own and leaves only unclear ones here.', 'AIが自動で承認・却下し、判断の難しいものだけここに残します。', 'AI会自动批准或驳回，只把难以判断的留在这里。'],
+  ad_reviews_none: ['확인할 보류 건이 없어요. AI가 모두 처리했어요.', 'Nothing on hold — the AI handled everything.', '保留中の件はありません。AIがすべて処理しました。', '没有保留项，AI已全部处理。'],
+  ad_auto_log: ['AI 자동 검토 기록 ({n})', 'Automatic review log ({n})', 'AI自動審査の記録 ({n})', 'AI自动审核记录 ({n})'],
+
+  /* operator: accounts */
+  ad_users_title: ['사용자 관리', 'Users', 'ユーザー管理', '用户管理'],
+  ad_users_hint: ['계정을 삭제하면 기록·사진·게시글·팀·아이디가 모두 지워지고 되돌릴 수 없어요.', 'Deleting an account removes its catches, photos, posts, team and login ID for good.', 'アカウントを削除すると記録・写真・投稿・チーム・IDがすべて消え、元に戻せません。', '删除账号会永久删除其渔获、照片、帖子、战队和登录ID。'],
+  ad_del_user: ['계정 삭제', 'Delete account', 'アカウント削除', '删除账号'],
+  ad_del_confirm: ['{nick} 삭제? 한 번 더', 'Delete {nick}? Tap again', '{nick}を削除?もう一度', '删除{nick}？再点一次'],
+  ad_deleted: ['{nick} 계정을 삭제했어요', 'Deleted {nick}', '{nick}を削除しました', '已删除{nick}'],
+  ad_del_fail: ['삭제하지 못했어요', 'Could not delete', '削除できませんでした', '删除失败'],
+  ad_del_admin: ['운영자 계정은 삭제할 수 없어요', 'An operator account cannot be deleted', '運営者アカウントは削除できません', '无法删除运营者账号'],
+  ad_you: ['나', 'You', '自分', '我'],
+  ad_id_reset: ['아이디 비밀번호 초기화', 'Reset a login password', 'IDのパスワード再設定', '重置登录密码'],
+  ad_id_reset_pw: ['새 비밀번호 (6자 이상)', 'New password (6+ characters)', '新しいパスワード(6文字以上)', '新密码（6位以上）'],
+  ad_id_reset_go: ['초기화', 'Reset', '再設定', '重置'],
+  ad_id_reset_hint: ['본인인지 확인한 뒤(카카오톡 문의) 임시 비밀번호를 정해 알려 주세요.', 'After confirming who they are (KakaoTalk), set a temporary password and tell them.', '本人確認(カカオトーク)の後、仮パスワードを設定して伝えてください。', '确认本人后（KakaoTalk），设置临时密码并告知对方。'],
+  ad_id_reset_ok: ['{name} 비밀번호를 바꿨어요', 'Password for {name} changed', '{name}のパスワードを変更しました', '已更改{name}的密码'],
+
+  /* login ID */
+  id_title: ['내 아이디', 'My login ID', 'マイID', '我的登录ID'],
+  id_card_sub: ['아이디를 만들면 휴대폰을 바꾸거나 PC에서도 아이디·비밀번호로 바로 이어서 할 수 있어요. 이메일은 필요 없어요.', 'With a login ID you can pick up on a new phone or a computer with just your ID and password. No email needed.', 'IDを作れば、機種変更やPCでもIDとパスワードだけで続けられます。メールは不要です。', '创建登录ID后，换手机或在电脑上用ID和密码即可继续。无需邮箱。'],
+  id_signed_in: ['{name} 아이디로 로그인돼 있어요', 'Signed in as {name}', '{name}でログイン中', '已用{name}登录'],
+  id_signed_in_sub: ['다른 기기에서 이 아이디로 로그인하면 기록이 그대로 이어져요.', 'Sign in with this ID on another device and your records follow.', '他の端末でこのIDでログインすると記録がそのまま引き継がれます。', '在其他设备用此ID登录，记录会自动同步。'],
+  id_create: ['아이디 만들기', 'Create a login ID', 'IDを作る', '创建登录ID'],
+  id_create_sub: ['지금 기록이 그대로 이 아이디에 저장돼요.', 'Your current records are kept under this ID.', '今の記録がそのままこのIDに保存されます。', '当前记录将保存在此ID下。'],
+  id_create_go: ['만들기', 'Create', '作成', '创建'],
+  id_name: ['아이디', 'Login ID', 'ID', '登录ID'],
+  id_name_hint: ['영문 소문자·숫자·밑줄(_) 3~20자', '3–20 lowercase letters, numbers or _', '英小文字・数字・_ で3〜20文字', '3–20位小写字母、数字或_'],
+  id_pass: ['비밀번호', 'Password', 'パスワード', '密码'],
+  id_pass_hint: ['6자 이상', 'At least 6 characters', '6文字以上', '至少6位'],
+  id_pass2: ['비밀번호 확인', 'Repeat password', 'パスワード(確認)', '确认密码'],
+  id_forgot: ['비밀번호를 잊으면 카카오톡(고객센터)으로 문의해 주세요. 이메일 찾기는 없어요.', 'Forgot your password? Ask through KakaoTalk (Help). There is no email recovery.', 'パスワードを忘れたらカカオトーク(サポート)でお問い合わせください。メールでの再設定はありません。', '忘记密码请通过KakaoTalk（客服）联系。没有邮箱找回。'],
+  id_created: ['아이디 {name}이(가) 만들어졌어요', 'Login ID {name} created', 'ID {name} を作成しました', '已创建登录ID {name}'],
+  id_login: ['아이디로 로그인', 'Sign in with ID', 'IDでログイン', '用ID登录'],
+  id_login_sub: ['다른 기기에서 만든 아이디로 로그인하면 그 계정의 기록을 이어서 써요.', 'Sign in with an ID you made on another device to continue that account here.', '他の端末で作ったIDでログインすると、そのアカウントの記録を続けて使えます。', '用在其他设备创建的ID登录，即可在此继续该账号。'],
+  id_login_go: ['로그인', 'Sign in', 'ログイン', '登录'],
+  id_login_ok: ['{name} 아이디로 로그인했어요', 'Signed in as {name}', '{name}でログインしました', '已用{name}登录'],
+  id_have: ['이미 아이디가 있어요', 'I already have an ID', 'IDを持っています', '我已有ID'],
+  id_change_pw: ['비밀번호 바꾸기', 'Change password', 'パスワード変更', '修改密码'],
+  id_old_pw: ['지금 비밀번호', 'Current password', '現在のパスワード', '当前密码'],
+  id_new_pw: ['새 비밀번호', 'New password', '新しいパスワード', '新密码'],
+  id_pw_changed: ['비밀번호를 바꿨어요', 'Password changed', 'パスワードを変更しました', '密码已修改'],
+  id_logout: ['이 기기에서 로그아웃', 'Sign out on this device', 'この端末でログアウト', '在此设备退出'],
+  id_logout_confirm: ['로그아웃? 한 번 더', 'Sign out? Tap again', 'ログアウト?もう一度', '退出？再点一次'],
+  id_logged_out: ['로그아웃했어요', 'Signed out', 'ログアウトしました', '已退出'],
+  id_logout_need: ['아이디가 없으면 로그아웃할 때 기록을 잃어요. 먼저 아이디를 만들어 주세요.', 'Without a login ID you would lose your records by signing out. Create an ID first.', 'IDがないとログアウトで記録を失います。先にIDを作ってください。', '没有登录ID时退出会丢失记录，请先创建ID。'],
+  id_tip_title: ['아이디를 만들어 기록을 지키세요', 'Keep your records with a login ID', 'IDを作って記録を守りましょう', '创建登录ID，保护你的记录'],
+  id_tip_sub: ['휴대폰을 바꾸거나 PC에서도 아이디·비밀번호로 바로 이어서 할 수 있어요.', 'Pick up on a new phone or a computer with just your ID and password.', '機種変更やPCでもIDとパスワードですぐ続けられます。', '换手机或用电脑时，用ID和密码即可继续。'],
+  id_err_name: ['아이디는 영문 소문자·숫자·밑줄 3~20자로 만들어 주세요', 'Use 3–20 lowercase letters, numbers or _', 'IDは英小文字・数字・_ の3〜20文字にしてください', 'ID需为3–20位小写字母、数字或_'],
+  id_err_pass: ['비밀번호는 6자 이상이에요', 'Passwords need at least 6 characters', 'パスワードは6文字以上です', '密码至少6位'],
+  id_err_taken: ['이미 있는 아이디예요', 'That ID is taken', 'そのIDは使われています', '该ID已被使用'],
+  id_err_wrong: ['아이디 또는 비밀번호가 맞지 않아요', 'Wrong ID or password', 'IDまたはパスワードが違います', 'ID或密码错误'],
+  id_err_slow: ['시도가 너무 많아요. 잠시 후 다시 해 주세요', 'Too many tries. Please wait a little', '試行回数が多すぎます。少し待ってください', '尝试次数过多，请稍后再试'],
+  id_err_has_id: ['이 기기는 이미 다른 아이디로 로그인돼 있어요. 로그아웃한 뒤 다시 해 주세요', 'This device is signed in to another ID. Sign out first', 'この端末は別のIDでログイン中です。ログアウトしてからお試しください', '此设备已登录其他ID，请先退出'],
+  id_err_leader: ['팀장인 기기는 먼저 팀을 해체해 주세요', 'Disband your team first (team leaders can not switch accounts)', 'チームリーダーは先にチームを解散してください', '队长请先解散战队'],
+  id_err_no_id: ['아이디가 없어요', 'No such ID', 'IDがありません', '没有该ID'],
+  id_err_mismatch: ['비밀번호 확인이 달라요', 'The passwords do not match', 'パスワードが一致しません', '两次密码不一致'],
+  id_err_fail: ['잠시 후 다시 해 주세요', 'Please try again shortly', 'しばらくしてからお試しください', '请稍后再试'],
+
+  /* brand page */
+  nav_about: ['찌릿이란?', 'About ZZIRIT', 'ZZIRITとは', '关于ZZIRIT'],
+  about_eyebrow: ['브랜드 이야기', 'Our story', 'ブランドストーリー', '品牌故事'],
+  about_hero_h: ['찌가 찌릿, 손끝이 찌릿.', 'The float twitches. Your fingertips tingle.', 'ウキがピクッ、指先がビリッ。', '浮漂一颤，指尖一麻。'],
+  about_hero_p: ['찌릿은 물고기가 입질하는 그 한순간의 짜릿함을, 사라지지 않는 기록으로 남기는 낚시 리그예요.', 'ZZIRIT is a fishing league that turns the jolt of a bite into a record that lasts.', 'ZZIRITは、魚が食いつくあの一瞬のときめきを、消えない記録に残す釣りリーグです。', 'ZZIRIT是一个把咬钩那一瞬间的悸动变成永久记录的钓鱼联赛。'],
+  about_name_h: ['이름의 뜻', 'What the name means', '名前の意味', '名字的含义'],
+  about_name_1_t: ['찌', 'Jji — the float', 'チ(ウキ)', '찌（浮漂）'],
+  about_name_1_d: ['물 위에서 입질을 알려 주는 낚시찌. 낚시꾼이 가장 오래 바라보는 곳이에요.', 'The float that tells you a fish is biting — the spot an angler watches longest.', '水面で当たりを知らせるウキ。釣り人がいちばん長く見つめる場所です。', '在水面上提示咬钩的浮漂，是钓手注视最久的地方。'],
+  about_name_2_t: ['찌릿', 'Jjirit — the jolt', 'チリッ(ビリッ)', '찌릿（一麻）'],
+  about_name_2_d: ['찌가 쑥 들어가는 순간 손끝과 가슴을 스치는 전율. 그 순간을 부르는 우리말이에요.', 'The shiver that runs through your hands and chest the moment the float dips — the Korean word for that feeling.', 'ウキがスッと沈む瞬間、指先と胸を走るしびれ。その瞬間を表す韓国語です。', '浮漂猛地沉下时掠过指尖和胸口的战栗——韩语里就这样形容那一刻。'],
+  about_name_3_t: ['ZZIRIT', 'ZZIRIT', 'ZZIRIT', 'ZZIRIT'],
+  about_name_3_d: ['그 소리를 세계 어디서든 읽을 수 있게 옮긴 이름이에요. 한국에서 시작해 전 세계 낚시꾼과 겨뤄요.', 'That sound, spelled so anyone in the world can say it. Born in Korea, competing with anglers everywhere.', 'その響きを世界中で読めるようにした名前。韓国から始まり、世界の釣り人と競います。', '把这个声音写成全世界都能读的名字。始于韩国，与全球钓手同场竞技。'],
+  about_logo_h: ['로고에 담은 뜻', 'The logo', 'ロゴに込めた意味', '标志的含义'],
+  about_logo_1_t: ['물고기이자 파도', 'A fish that is also a wave', '魚であり、波', '是鱼，也是浪'],
+  about_logo_1_d: ['한 번에 그은 은빛 곡선이 물고기의 몸이 되고, 그대로 파도가 돼요. 아래 푸른 띠는 물고기를 품은 바다예요.', 'One silver stroke draws the body of a fish and becomes a wave; the blue band beneath is the sea that holds it.', '一筆の銀色の曲線が魚の体になり、そのまま波になります。下の青い帯は魚を抱く海です。', '一笔银色曲线既是鱼身又化作浪花，下方的蓝色是怀抱鱼儿的大海。'],
+  about_logo_2_t: ['줄 끝의 빛', 'The spark at the tip', '糸の先の光', '线尖的光'],
+  about_logo_2_d: ['물고기에게서 뻗은 낚싯줄이 위로 휘어 낚싯대 끝에 닿아요. 그 끝에서 반짝이는 빛이 바로 \'찌릿\'의 순간이에요.', 'The line from the fish arcs up to the rod tip, and the light flashing there is the ZZIRIT moment.', '魚から伸びた糸が弧を描いて竿先に届きます。そこで光るきらめきこそ「チリッ」の瞬間です。', '从鱼身延伸的钓线弯向竿梢，那里闪烁的光就是"찌릿"的瞬间。'],
+  about_logo_3_t: ['은빛 · 파랑 · 새벽 남색', 'Silver, blue, dawn navy', '銀・青・夜明けの紺', '银色·蓝色·黎明藏青'],
+  about_logo_3_d: ['은빛은 갓 잡은 물고기의 반짝임, 파랑은 바다, 깊은 남색은 첫 캐스팅 전 새벽 바다의 색이에요.', 'Silver for the flash of a fresh catch, blue for the sea, deep navy for the water at dawn before the first cast.', '銀は釣りたての魚の輝き、青は海、深い紺は最初のキャスト前の夜明けの海の色です。', '银色是刚钓上的鱼的闪光，蓝色是大海，深藏青是第一次抛竿前黎明的海。'],
+  about_for_h: ['무엇을 위한 브랜드인가요?', 'What ZZIRIT is for', '何のためのブランド?', '品牌为何而生'],
+  about_for_1_t: ['남는 기록', 'Records that stay', '残る記録', '留下的记录'],
+  about_for_1_d: ['사진 한 장이면 어종과 크기가 남고, 나만의 바다와 도감이 자라요.', 'One photo keeps the species and size, and your own sea and field guide grow with it.', '写真1枚で魚種とサイズが残り、自分の海と図鑑が育ちます。', '一张照片记下鱼种和尺寸，你的海和图鉴随之成长。'],
+  about_for_2_t: ['공정한 겨루기', 'A fair league', '公正な競い合い', '公平的比赛'],
+  about_for_2_d: ['AI와 운영자가 함께 확인해 진짜 조과만 점수가 돼요. 결제는 점수에 아무 영향이 없어요.', 'AI and the operator check together, so only real catches score. Payments never affect points.', 'AIと運営者が一緒に確認し、本物の釣果だけが得点になります。課金は得点に影響しません。', 'AI与运营者共同审核，只有真实渔获才计分。付费不影响积分。'],
+  about_for_3_t: ['안전한 낚시', 'Safe fishing', '安全な釣り', '安全垂钓'],
+  about_for_3_d: ['독이 있는 어종, 금어기와 금지체장을 바로 알려 줘요.', 'It warns about venomous species, closed seasons and minimum sizes right away.', '毒のある魚種、禁漁期、制限サイズをすぐに知らせます。', '即时提示有毒鱼种、禁渔期和最小尺寸。'],
+  about_for_4_t: ['바다를 위해', 'For the sea', '海のために', '为了大海'],
+  about_for_4_d: ['방생하면 보너스, 작은 물고기는 놓아주자고 알려 줘요. 정확한 낚시 자리는 나만 봐요.', 'Releases earn a bonus and small fish get a reminder to go back. Your exact spots stay private.', 'リリースでボーナス、小さな魚は逃がそうと知らせます。正確な釣り場は自分だけが見られます。', '放生有奖励，小鱼会提醒放回。精确钓点只有自己可见。'],
+  about_for_5_t: ['함께하는 즐거움', 'Better together', '一緒に楽しむ', '一起更快乐'],
+  about_for_5_d: ['친구와 팀, 게시판, 매일 낚시 소식으로 낚시가 끝나도 이야기가 이어져요.', 'Friends, teams, a board and daily fishing news keep the story going after the trip.', '友達、チーム、掲示板、毎日の釣りニュースで、釣りの後も話が続きます。', '好友、战队、论坛和每日钓鱼新闻，让故事在垂钓后继续。'],
+  about_close: ['오늘도 찌릿한 하루 되세요.', 'May your day be full of bites.', '今日も「チリッ」な一日を。', '祝你今天也"찌릿"连连。'],
+  about_made: ['1인 개발 · 문의와 제안은 고객센터(카카오톡)로 보내 주세요.', 'Made by one developer — send questions and ideas through Help (KakaoTalk).', '個人開発です。お問い合わせ・ご提案はサポート(カカオトーク)へ。', '个人开发 · 咨询和建议请通过客服（KakaoTalk）发送。'],
+
+  faq_review_q: ['조과 검토는 어떻게 하나요?', 'How are catches checked?', '釣果の審査はどうやるの?', '渔获如何审核？'],
+  faq_review_a: ['AI가 사진을 보고 바로 확인해요. 확인이 더 필요한 조과는 몇 분 안에 AI가 자동으로 다시 보고, 말이 안 되는 기록(예: 기록보다 훨씬 큰 길이, 물고기가 없는 사진)은 반려해요. 애매한 것만 \'보류\'로 남겨 운영자가 직접 확인해요. 반려 이유는 내 조과에서 볼 수 있어요.', 'The AI checks each photo right away. Catches that need more checking are looked at again automatically within minutes: impossible records (a length far past the record, no fish in the photo) are rejected, and only unclear ones are put on hold for the operator. You can see the reason in your catch.', 'AIが写真をすぐに確認します。追加確認が必要な釣果は数分以内にAIが自動で再確認し、あり得ない記録(記録を大きく超える長さ、魚が写っていない写真など)は却下します。判断が難しいものだけ「保留」にして運営者が確認します。却下理由は自分の釣果で見られます。', 'AI会立即查看照片。需要进一步审核的渔获会在几分钟内由AI自动复核：不可能的记录（远超纪录的长度、照片中没有鱼）会被驳回，只有难以判断的才"保留"给运营者亲自确认。驳回原因可在我的渔获中查看。'],
+  faq_account_q: ['다른 기기에서도 쓸 수 있나요?', 'Can I use it on another device?', '他の端末でも使える?', '能在其他设备上使用吗？'],
+  faq_account_a: ['설정에서 아이디를 만들면 어느 휴대폰·PC에서든 아이디와 비밀번호로 로그인해 이어서 쓸 수 있어요. 이메일은 필요 없어요. 비밀번호를 잊으면 카카오톡(고객센터)으로 문의해 주세요. 코드나 QR로 기기를 바로 잇는 방법도 있어요.', 'Create a login ID in Settings and sign in on any phone or computer with your ID and password—no email needed. Forgot the password? Ask through KakaoTalk (Help). You can also link a device with a code or QR.', '設定でIDを作れば、どのスマホ・PCでもIDとパスワードでログインして続けられます。メールは不要です。パスワードを忘れたらカカオトーク(サポート)へ。コードやQRで端末をつなぐ方法もあります。', '在设置中创建登录ID后，可在任何手机或电脑上用ID和密码登录继续使用，无需邮箱。忘记密码请通过KakaoTalk（客服）联系。也可以用代码或二维码直接连接设备。'],
+  xp_after_review: ['확인되면 XP 지급', 'XP once checked', '確認後にXP', '审核后获得XP'],
   /* character · profile picture */
   ch_title: ['내 캐릭터', 'My character', 'マイキャラ', '我的角色'],
   ch_sub: ['나만의 낚시꾼을 만들어 보세요. 나의 바다에서 낚싯대를 드리우고, 프로필 사진으로도 쓸 수 있어요.', 'Create your own angler. They fish in My Sea and can be your profile picture.', '自分だけの釣り人を作ろう。マイシーで竿を出し、プロフィール画像にもできます。', '打造专属钓手，会在我的海中垂钓，也可用作头像。'],
@@ -2017,21 +2216,21 @@ Object.assign(T, {
   past_sub: ['예전에 잡은 물고기도 무료로 기록할 수 있어요. 원본 사진 정보·중복 여부를 확인하고, AI 판별이 없으면 운영자가 확인해요.', 'Log fish you caught before, for free. We check the original photo data and duplicates; without AI the operator checks it.', '以前釣った魚も無料で記録できます。元画像の情報と重複を確認し、AI判定がない場合は運営者が確認します。', '以往的渔获也可免费登记。会检查原图信息与重复，没有AI识别时由运营者审核。'],
   scan_sub: ['사진을 올리면 AI가 어종을 판별하고, 독성·금어기까지 바로 알려줘요. 틀리면 알려주세요. 그만큼 똑똑해져요.', 'Upload a photo: AI names the species and flags toxins and closed seasons. If it is wrong, tell it—the model learns.', '写真を送るとAIが魚種を判定し、毒性や禁漁期まで知らせます。間違っていたら教えてください。', '上传照片，AI识别鱼种并提示毒性与禁渔期。认错了就告诉它。'],
   faq_past_q: ['예전 조과도 올릴 수 있나요?', 'Can I add past catches?', '過去の釣果も登録できる?', '能登记以往渔获吗？'],
-  faq_past_a: ['네, 무료로 몇 번이든 올릴 수 있어요. 원본 촬영 정보와 중복 여부를 확인하고, AI가 꺼져 있거나 의심스러운 사진은 운영자가 확인한 뒤 점수에 반영해요.', 'Yes—free and unlimited. We check the original capture data and duplicates; when AI is off or a photo looks suspicious, the operator reviews it before it scores.', 'はい、無料で何回でも登録できます。元の撮影情報と重複を確認し、AIがオフか怪しい写真は運営者が確認してから加点します。', '可以，免费且不限次数。会核对原始拍摄信息和重复情况；AI未开启或照片可疑时，由运营者审核后计分。'],
+  faq_past_a: ['네, 무료로 몇 번이든 올릴 수 있어요. 원본 촬영 정보와 중복 여부를 확인하고, 검토가 필요한 사진은 AI가 자동으로 다시 확인해요. 애매한 것만 운영자가 직접 확인해요.', 'Yes—free and unlimited. We check the original capture data and duplicates; photos that need a check are re-checked automatically by AI, and only unclear ones go to the operator.', 'はい、無料で何回でも登録できます。元の撮影情報と重複を確認し、確認が必要な写真はAIが自動で再確認します。判断が難しいものだけ運営者が確認します。', '可以，免费且不限次数。会核对原始拍摄信息和重复情况；需要审核的照片由AI自动复核，只有难以判断的才交给运营者。'],
   faq_pay_q: ['돈을 내야 하는 게 있나요?', 'Is anything paid?', '有料のものはある?', '有需要付费的吗？'],
-  faq_pay_a: ['과거 조과 등록, 꾸미기, 캐릭터는 전부 무료예요(꾸미기는 레벨로 해금). 돈이 드는 건 프리미엄 꾸미기 2개(각 {p}원)와 개발자 후원 500원뿐이고, 점수·랭킹에는 영향이 없어요. 카카오페이로 보내고 "보냈어요"를 누르면 바로 적용돼요. 계좌번호는 공개하지 않아요.', 'Past catches, decorations and characters are all free (decorations unlock with levels). Only two premium decorations (₩{p} each) and an optional ₩500 tip cost money, and they never affect points or rankings. Send with KakaoPay and tap "I sent it" to apply right away. We never show a bank account.', '過去の釣果登録・デコ・キャラはすべて無料(デコはレベルで解放)。有料はプレミアムデコ2つ(各{p}ウォン)と開発者への応援500ウォンだけで、得点・ランキングには影響しません。カカオペイで送って「送りました」を押すとすぐ適用。口座番号は公開しません。', '以往渔获登记、装扮、角色全部免费（装扮靠等级解锁）。付费的只有两个高级装扮（每个{p}韩元）和500韩元打赏，且不影响积分和排名。用KakaoPay转账后点击"已转账"即刻生效，不公开银行账号。']
+  faq_pay_a: ['과거 조과 등록, 꾸미기, 캐릭터는 전부 무료예요(꾸미기는 레벨로 해금). 돈이 드는 건 프리미엄 꾸미기 2개(각 {p}원)와 개발자 후원 500원뿐이고, 점수·랭킹에는 영향이 없어요. 카카오페이로 보내고 "보냈어요"를 누르면, 운영자가 입금을 확인한 뒤 적용돼요(보통 하루 안). 계좌번호는 공개하지 않아요.', 'Past catches, decorations and characters are all free (decorations unlock with levels). Only two premium decorations (₩{p} each) and an optional ₩500 tip cost money, and they never affect points or rankings. Send with KakaoPay and tap "I sent it"; it applies once the operator confirms the payment (usually within a day). We never show a bank account.', '過去の釣果登録・デコ・キャラはすべて無料(デコはレベルで解放)。有料はプレミアムデコ2つ(各{p}ウォン)と開発者への応援500ウォンだけで、得点・ランキングには影響しません。カカオペイで送って「送りました」を押すと、運営者が入金を確認した後に適用(通常1日以内)。口座番号は公開しません。', '以往渔获登记、装扮、角色全部免费（装扮靠等级解锁）。付费的只有两个高级装扮（每个{p}韩元）和500韩元打赏，且不影响积分和排名。用KakaoPay转账后点击"已转账"，运营者确认到账后生效（通常一天内）。不公开银行账号。']
 });
 
 /* ===== Web build only: texts that differ from the Claude artifact version ===== */
 Object.assign(T, {
-  privacy_text: ['정확한 낚시 위치는 나에게만 보이고 공개 통계는 약 25km 격자로만 집계돼요. 사진은 360px 미리보기로 줄여 저장하고, 원본 사진의 위치 정보는 저장하지 않아요. AI 판별을 쓰면 사진이 Google Gemini(무료 등급)로 전송되고, 무료 등급에서는 구글이 서비스 개선에 쓸 수 있어요.', 'Exact spots are visible only to you; public stats use ~25 km cells. Photos are stored as 360 px previews and the original GPS data is not kept. AI identification sends the photo to Google Gemini (free tier), where Google may use it to improve its services.', '正確な釣り場は自分だけに表示、公開統計は約25km格子。写真は360pxのプレビューで保存し、元画像の位置情報は保存しません。AI判定では写真がGoogle Gemini(無料枠)に送られ、サービス改善に使われる場合があります。', '精确钓点仅自己可见，公开统计按约25公里网格。照片以360像素预览保存，不保留原图定位信息。AI识别会把照片发送到Google Gemini（免费层），谷歌可能用于改进服务。'],
+  privacy_text: ['정확한 낚시 위치는 나에게만 보이고 공개 통계는 약 25km 격자로만 집계돼요. 사진은 360px 미리보기로 줄여 저장하고, 원본 사진의 위치 정보는 저장하지 않아요. AI 판별과 자동 검토를 쓰면 사진이 Google Gemini(무료 등급)로 전송되고, 무료 등급에서는 구글이 서비스 개선에 쓸 수 있어요. 아이디 비밀번호는 암호화(해시)해서만 보관해요.', 'Exact spots are visible only to you; public stats use ~25 km cells. Photos are stored as 360 px previews and the original GPS data is not kept. AI identification and automatic review send the photo to Google Gemini (free tier), where Google may use it to improve its services. Login passwords are stored only as a secure hash.', '正確な釣り場は自分だけに表示され、公開統計は約25kmの格子単位です。写真は360pxのプレビューに縮小して保存し、元写真の位置情報は保存しません。AI判定と自動審査では写真がGoogle Gemini(無料枠)に送信され、無料枠ではGoogleがサービス改善に使う場合があります。IDのパスワードはハッシュ化してのみ保管します。', '精确钓点仅自己可见，公开统计以约25公里网格汇总。照片以360px预览保存，不保存原图位置信息。使用AI识别和自动审核时，照片会发送到Google Gemini（免费层），Google可能将其用于改进服务。登录密码仅以哈希形式保存。'],
   mode_local_note: ['지금은 로그인 서버에 연결하지 못해서 기록이 이 기기에만 저장돼요. 잠시 후 새로고침해 보세요.', "Can't reach the sign-in server right now, so records stay on this device. Try refreshing in a moment.", 'ログインサーバーに接続できないため、記録はこの端末にのみ保存されます。しばらくして再読み込みしてください。', '暂时无法连接登录服务器，记录只保存在本机。请稍后刷新。'],
-  mode_explain: ['{app_eun} 기록을 서버에 저장해요. 처음 들어오면 이 브라우저에 계정이 자동으로 만들어져요. 휴대폰·PC에서 같이 쓰려면 아래 "PC·휴대폰 연결"로 기기를 이어 주세요. 연결된 기기가 없을 때 브라우저 데이터를 지우면 기록에 다시 들어올 수 없어요.', '{app} saves your records on our server. An account is created for this browser automatically. To use it on your phone and computer, link them under "Link PC and phone" below. If no other device is linked and you clear browser data, you cannot get back in.', '{app}は記録をサーバーに保存します。初回アクセスでこのブラウザ用のアカウントが自動作成されます。スマホとPCで使うには下の「PC・スマホ連携」で端末をつないでください。連携端末がない状態でブラウザのデータを消すと戻れません。', '{app}会把记录保存在服务器上。首次访问时会为此浏览器自动创建账号。若要在手机和电脑上同时使用，请在下方"连接电脑和手机"中连接设备。没有已连接设备时清除浏览器数据将无法找回记录。'],
+  mode_explain: ['{app_eun} 기록을 서버에 저장해요. 처음 들어오면 이 브라우저에 계정이 자동으로 만들어져요. 아이디를 만들어 두면 휴대폰·PC 어디서든 로그인해서 이어 쓸 수 있어요. 아이디 없이 브라우저 데이터를 지우면 기록에 다시 들어올 수 없어요.', '{app} saves your records on our server. An account is created for this browser automatically. Create a login ID to sign in from any phone or computer. Without an ID, clearing browser data means you cannot get back in.', '{app}は記録をサーバーに保存します。初回アクセスでこのブラウザにアカウントが自動作成されます。IDを作れば、スマホ・PCどこからでもログインして続けられます。IDなしでブラウザのデータを消すと記録に戻れません。', '{app}将记录保存在服务器上。首次访问时会自动为此浏览器创建账号。创建登录ID后，可在任何手机或电脑登录继续使用。没有ID时清除浏览器数据将无法找回记录。'],
   ai_need_images: ['AI 어종 판별을 준비 중이에요. 지금은 직접 어종을 고를 수 있어요.', 'AI identification is being set up. For now you can choose the species yourself.', 'AI判定は準備中です。今は手動で選べます。', 'AI识别正在准备中，目前可手动选择鱼种。'],
   ai_need_claude: ['AI 기능을 준비 중이에요. 곧 열려요.', 'AI features are being set up. Coming soon.', 'AI機能は準備中です。まもなく公開します。', 'AI功能正在准备中，即将开放。'],
   past_needs_ai: ['과거 조과는 AI 검열이 꼭 필요해요. AI 판별이 열리면 등록할 수 있어요.', 'Past catches require AI screening. You can register them once AI identification is live.', '過去の釣果はAI審査が必須です。AI判定の公開後に登録できます。', '以往渔获必须经AI审核，AI识别开放后即可登记。'],
   ai_err_granted: ['AI를 쓰려면 로그인이 필요해요. 새로고침 후 다시 시도해 주세요.', 'AI needs a signed-in session. Refresh and try again.', 'AIの利用にはログインが必要です。再読み込みして再試行してください。', '使用AI需要登录，请刷新后重试。'],
-  faq_beta_a: ['지금은 베타 기간이에요. 누구나 기록을 올리고 랭킹에 참가할 수 있어요. AI 검사를 통과하지 못한 조과는 운영자가 확인한 뒤 점수에 반영돼요.', "We're in beta. Anyone can post catches and join the rankings. Catches that don't pass the AI check count once the operator reviews them.", 'ただいまベータ期間中です。誰でも記録を投稿してランキングに参加できます。AI審査を通らなかった釣果は運営者の確認後に反映されます。', '目前处于测试期。任何人都可以上传记录参加排行，未通过AI审核的渔获经运营者确认后计分。'],
+  faq_beta_a: ['지금은 베타 기간이에요. 누구나 기록을 올리고 랭킹에 참가할 수 있어요. 검토가 필요한 조과는 AI가 자동으로 다시 확인하고, 애매한 것만 운영자가 직접 확인해요.', 'We\'re in beta. Anyone can post catches and join the rankings. Catches that need a check are re-checked automatically by AI; only unclear ones go to the operator.', 'ただいまベータ期間中です。誰でも記録を投稿してランキングに参加できます。確認が必要な釣果はAIが自動で再確認し、判断が難しいものだけ運営者が確認します。', '目前处于测试期。任何人都可以上传记录参加排行。需要审核的渔获由AI自动复核，只有难以判断的才交给运营者。'],
   fr_local_note: ['지금은 기록이 이 기기에만 저장되는 상태라 친구 신청을 보내거나 받을 수 없어요. 새로고침해서 로그인되면 쓸 수 있어요.', "Records are on this device only right now, so friend requests can't be sent or received. Refresh to sign in.", '現在は端末内保存のため、フレンド申請を送受信できません。再読み込みしてログインすると使えます。', '当前记录仅保存在本机，无法收发好友申请。刷新登录后即可使用。'],
   fr_need_shared: ['친구 기능은 로그인된 상태에서 쓸 수 있어요', 'Friends need a signed-in session', 'フレンド機能はログイン中に使えます', '登录后才能使用好友功能'],
   toast_local_mode: ['서버에 저장하지 못해서 이 기기에 저장했어요', "Couldn't save to the server, so it's saved on this device", 'サーバーに保存できなかったため、この端末に保存しました', '无法保存到服务器，已保存在本机'],
@@ -4271,10 +4470,10 @@ const store = (() => {
         });
         sub(db.collection('teams').limit(1000), snap => { const m = new Map(); for (const d of snap.docs) if (d.exists) m.set(d.id, d.data()); S.teams = m; S.dataVer++; rerenderSoon(); });
         if (window.APP_RT === 'web') sub(db.collection('news').limit(200), snap => { S.news = snap.docs.filter(d => d.exists).map(d => Object.assign({ id: d.id }, d.data())); S.newsVer = (S.newsVer || 0) + 1; rerenderSoon(); });
-        sub(db.collection('admin'), snap => { for (const d of snap.docs) if (d.exists) S.admin[d.id] = d.data(); S.adminLoaded = true; S.dataVer++; maybeCleanLooks(); rerenderSoon(); });
+        sub(db.collection('admin'), snap => { for (const d of snap.docs) if (d.exists) S.admin[d.id] = d.data(); S.adminLoaded = true; S.dataVer++; maybeCleanLooks(); payNotify(); rerenderSoon(); });
         if (S.uid && S.writable !== false) {
           S.mode = 'shared';
-          sub(db.doc('orders/' + S.uid), d => { if (d.exists) S.myOrders = (d.data().items || []).slice(); S.ordersLoaded = true; maybeCleanLooks(); rerenderSoon(); });
+          sub(db.doc('orders/' + S.uid), d => { S.myOrders = d.exists ? (d.data().items || []).slice() : []; S.ordersLoaded = true; maybeCleanLooks(); payNotify(); rerenderSoon(); });
           sub(db.doc('suggest/' + S.uid), d => { if (d.exists) S.mySuggest = (d.data().items || []).slice(); });
           // first-time: migrate a local profile into the shared store
           setTimeout(async () => {
@@ -4341,6 +4540,11 @@ const store = (() => {
       S.teams.delete(S.uid); S.dataVer++;
       try { await S.db.doc('teams/' + S.uid).delete(); return true; } catch (e) { console.warn(e); toast(t('toast_write_fail'), 'warn'); return false; }
     },
+    // Claude page: the operator removes what the shared store holds for someone (the website does this on the server)
+    async adminDeleteDocs(uid) {
+      if (!S.db || !S.isOwner) throw new Error('not_admin');
+      for (const p of ['anglers', 'labels', 'orders', 'suggest', 'board', 'teams']) { try { await S.db.doc(p + '/' + uid).delete(); } catch (e) { console.warn(e); } }
+    },
     async saveAdmin(docId, data) {
       S.admin[docId] = data;
       if (S.db && S.isOwner) { try { await S.db.doc('admin/' + docId).set(data); return true; } catch (e) { console.warn(e); toast(t('toast_write_fail'), 'warn'); } }
@@ -4366,6 +4570,22 @@ function allAnglers() {
   return m;
 }
 function verdict(uid, cid) { return (S.admin.verdicts && S.admin.verdicts[uid] && S.admin.verdicts[uid][cid]) || null; }
+/* What people see for a catch: a decision (the operator's, or the automatic reviewer's) wins over the saved status.
+   'hold' = the reviewer could not tell, so the operator looks at it. */
+function catchState(uid, c) { const v = verdict(uid, c.id); return v === 'ok' || v === 'no' || v === 'hold' ? v : c.st; }
+/* The automatic reviewer's note for a catch: { v, code, text, m, at } (code is translated, text is the AI's own words in Korean) */
+function reviewNote(uid, c) {
+  const r = S.admin.autorev && S.admin.autorev[uid] && S.admin.autorev[uid][c.id]; if (!r) return null;
+  const s = String(r.why || ''); const i = s.indexOf('|');
+  return { v: r.v, code: i >= 0 ? s.slice(0, i) : s, text: i >= 0 ? s.slice(i + 1) : '', m: r.m, at: r.at };
+}
+function reviewReason(n) {
+  if (!n) return '';
+  const x = n.text && /^(species|size)$/.test(n.code) ? ` (${n.text})` : '';
+  const base = t('rv_' + n.code, { x }); const known = base !== 'rv_' + n.code;
+  const extra = n.text && !/^(species|size|record)$/.test(n.code) && S.li === 0 ? ` · ${n.text}` : '';
+  return (known ? base : n.text) + extra;
+}
 function eligible(c, uid) {
   const v = verdict(uid, c.id);
   if (v === 'no') return false;
@@ -4398,25 +4618,53 @@ function daysUntilClosed(sp, date = new Date()) {
   return null;
 }
 function grantsOf(uid) { return (S.admin.grants && S.admin.grants[uid]) || {}; }
-/* Premium items count as soon as the buyer says they sent the money; the operator can cancel later ('no'). */
-function paidFor(id) { const g = grantsOf(myId()); return S.myOrders.some(o => o.kind === 'item' && o.ref === id && g[o.id] !== 'no'); }
+/* Paid looks count only after the operator has found the money in KakaoPay and confirmed the order ('ok').
+   "I sent it" just records the order with its memo code. The server keeps the same rule for everyone's saved looks.
+   `own` lists looks the operator carried over from earlier purchases (only the server can change it). */
+const grantState = g => (g === 'ok' || g === 'no' ? g : 'wait');
+function carried(a, id) { return !!(a && Array.isArray(a.own) && a.own.includes(id)); }
+function paidFor(id) {
+  if (carried(S.me, id)) return true;
+  const g = grantsOf(myId());
+  return S.myOrders.some(o => o.kind === 'item' && g[o.id] === 'ok' && (o.ref === id || (id === 'pr_gold' && o.ref === 'fl_gold')));
+}
 function owned(itemId) {
   const it = SHOPI[itemId]; if (!it) return false;
   if (it.top) return trophyEarned();
   if (it.pr) return paidFor(itemId);
   if (it.in) return paidFor(it.in);
-  return myLevel() >= (it.lv || 1);
+  return myLevel() >= (it.lv || 1) || carried(S.me, itemId);
 }
-function orderState(o) { return grantsOf(myId())[o.id] || 'auto'; }
-function supporter() { const g = grantsOf(myId()); return S.myOrders.some(o => o.kind === 'donate' && g[o.id] !== 'no'); }
+function orderState(o) { return grantState(grantsOf(myId())[o.id]); }
+function pendingOrders(kind, ref) { return S.myOrders.filter(o => orderState(o) === 'wait' && (!kind || o.kind === kind) && (!ref || o.ref === ref)); }
+function supporter() { const g = grantsOf(myId()); return S.myOrders.some(o => o.kind === 'donate' && g[o.id] === 'ok'); }
+/* What a sea or avatar may show. Mine: what I own. Someone else's: level looks up to their level (or carried over);
+   premium looks as the server kept them (it drops unconfirmed ones on every save). */
+function lookOk(a, uid, id) {
+  const it = SHOPI[id]; if (!it) return false;
+  if (a === S.me || (uid && uid === myId())) return owned(id);
+  if (it.top || it.pr || it.in) return true;
+  return lvInfo(a, uid).L >= (it.lv || 1) || carried(a, id);
+}
+function decorOf(a, uid) {
+  const d = Object.assign(DEFAULT_DECOR(), (a && a.decor) || {});
+  const ok = id => lookOk(a, uid, id);
+  return { theme: d.theme && ok(d.theme) ? d.theme : 'th_dawn', items: (Array.isArray(d.items) ? d.items : []).filter(ok), fx: (Array.isArray(d.fx) ? d.fx : []).filter(ok) };
+}
+function flairOf(a, uid) {
+  const f = (a && a.flair) || {}; if (!f.gold && !f.frame) return {};
+  uid = uid || avatarUid(a);
+  return { gold: !!f.gold && lookOk(a, uid, 'fl_gold'), frame: !!f.frame && lookOk(a, uid, 'fl_wave') };
+}
 
-/* Levels: experience comes from catches (cosmetic only, never from payments). Rejected catches give nothing. */
+/* Levels: experience comes from confirmed catches only (AI-checked, or approved by the operator).
+   Cosmetic only, never from payments; catches still waiting for review give nothing until approved. */
 const LV_TITLES = [[1, 'lvt_1'], [3, 'lvt_2'], [5, 'lvt_3'], [8, 'lvt_4'], [12, 'lvt_5'], [16, 'lvt_6'], [20, 'lvt_7']];
 const lvNeed = L => 25 * (L - 1) * L;
 function xpOf(a, uid) {
   let xp = 0; const sp = new Set();
   for (const c of (a && a.catches) || []) {
-    if (c.st === 'no' || verdict(uid, c.id) === 'no') continue;
+    if (!eligible(c, uid)) continue;
     xp += 20 + Math.min(30, Math.round((c.sc || 0) / 5)) + (c.rel ? 10 : 0);
     if (SPI[c.sp]) sp.add(c.sp);
   }
@@ -4996,8 +5244,9 @@ function openOnboarding(then) {
       <p class="lede">${t('onb_sub')}</p>
       ${profileFormHTML(p)}
       ${S.mode !== 'shared' ? `<p class="note">${icon('info')} ${t(S.mode === 'local' ? 'mode_local_note' : 'mode_offline_note')}</p>` : ''}
-      <div class="actions"><button class="btn btn-primary btn-lg" id="onb-go">${t('onb_go')}</button></div>
+      <div class="actions"><button class="btn btn-primary btn-lg" id="onb-go">${t('onb_go')}</button>${idSupported() ? `<button class="btn btn-ghost" id="onb-login">${icon('user')}${t('id_have')}</button>` : ''}</div>
     </div>`, { label: t('onb_title') });
+  const lg = $('#onb-login', w); if (lg) lg.onclick = () => { closeModal(w); openIdLogin(); };
   const cv = $('#onb-cv', w); if (cv) { const ctx = cv.getContext('2d'); ['kurodai', 'madai', 'aoriika', 'buri'].forEach((id, i) => FD.draw(ctx, SPI[id], 80 + i * 135, 78 + (i % 2) * 10, i === 2 ? 110 : 120, { still: true, flip: i % 2 === 1 })); }
   $('#onb-go', w).onclick = async () => {
     const f = readProfileForm(w);
@@ -5081,21 +5330,48 @@ function openPay({ kind, ref, amt, title, desc, onDone }) {
   done.onclick = async () => {
     if (done.disabled) return;
     done.disabled = true;
+    // records the order with its memo code; nothing is applied until the operator finds the money and confirms it
     const o = { id: rid(10), kind, ref: ref || null, amt, code, m: method, ts: nowMs(), nick: S.me?.nick || '', qty: 1 };
     await store.addOrder(o);
     closeModal(w);
-    toast(t(kind === 'donate' ? 'pay_thanks' : 'pay_applied2'), 'ok', 5200);
+    toast(t('pay_sent', { code }), 'ok', 7000);
     onDone && onDone(o);
     rerender();
   };
 }
+/* At most a few orders may wait for confirmation at once (the server enforces the same), and one per item */
+const PAY_PENDING_MAX = 3;
+function payBlocked(kind, ref) {
+  const same = kind === 'item' ? pendingOrders('item', ref)[0] : null;
+  if (same) { toast(t('pay_dup', { code: same.code }), 'info', 7000); return true; }
+  if (pendingOrders().length >= PAY_PENDING_MAX) { toast(t('pay_many'), 'info', 7000); return true; }
+  return false;
+}
 function openDonate() {
+  if (S.mode === 'shared' && payBlocked('donate')) return;
   openPay({ kind: 'donate', amt: DONATE_AMT, title: t('donate_title'), desc: t('donate_desc') });
 }
 function buyItem(id) {
   const it = SHOPI[id]; if (!it || !it.pr) return;
   if (owned(id)) { applyItem(id); toast(t('applied')); rerender(); return; }
-  ensureProfile(() => openPay({ kind: 'item', ref: id, amt: PREMIUM_PRICE, title: dict(it.n), desc: t('prem_desc_' + id), onDone: () => { applyItem(id); } }));
+  if (S.mode === 'shared' && payBlocked('item', id)) return;
+  ensureProfile(() => openPay({ kind: 'item', ref: id, amt: PREMIUM_PRICE, title: dict(it.n), desc: t('prem_desc_' + id) }));
+}
+/* When the operator confirms one of my orders: put the item on once and say thanks (each order only once per device) */
+function payNotify() {
+  if (S.mode !== 'shared' || !S.me || !S.me.nick || !S.ordersLoaded || !S.adminLoaded) return;
+  let seen; try { seen = new Set(lsGet('payok', [])); } catch (e) { seen = new Set(); }
+  const g = grantsOf(myId()); let changed = false, applied = false;
+  for (const o of S.myOrders) {
+    if (g[o.id] !== 'ok' || seen.has(o.id)) continue;
+    seen.add(o.id); changed = true;
+    if (!o.ts || nowMs() - o.ts > 30 * 864e5) continue;
+    const it = o.kind === 'item' && SHOPI[o.ref];
+    if (it && it.pr) { applyItem(o.ref); applied = true; toast(t('pay_ok_item', { name: dict(it.n) }), 'ok', 7000); }
+    else if (o.kind === 'donate') toast(t('pay_ok_donate'), 'ok', 7000);
+  }
+  if (changed) lsSet('payok', [...seen].slice(-300));
+  if (applied) rerenderSoon();
 }
 function setFlair(id, on) {
   S.me.flair = S.me.flair || {};
@@ -5126,17 +5402,23 @@ function toggleItem(id) {
   else if (it.k === 'set') { applyItem(id); rerender(); return; }
   store.saveMe(); rerender();
 }
-/* Drop looks that are no longer owned (a cancelled order, a level that went down after a rejected catch) */
+/* Drop looks that are no longer owned (an unconfirmed or cancelled order, a level that went down after a rejected catch) */
 function cleanLooks() {
-  if (!S.me || !S.me.decor) return false;
-  const d = S.me.decor; let changed = false;
-  if (d.theme && SHOPI[d.theme] && !owned(d.theme)) { d.theme = 'th_dawn'; changed = true; }
-  const keep = x => !SHOPI[x] || owned(x);
-  const items = (d.items || []).filter(keep), fx = (d.fx || []).filter(keep);
-  if (items.length !== (d.items || []).length || fx.length !== (d.fx || []).length) { d.items = items; d.fx = fx; changed = true; }
+  if (!S.me) return false;
+  let changed = false;
+  if (S.me.decor) {
+    const d = S.me.decor;
+    if (d.theme && SHOPI[d.theme] && !owned(d.theme)) { d.theme = 'th_dawn'; changed = true; }
+    const keep = x => SHOPI[x] && owned(x);
+    const items = (d.items || []).filter(keep), fx = (d.fx || []).filter(keep);
+    if (items.length !== (d.items || []).length || fx.length !== (d.fx || []).length) { d.items = items; d.fx = fx; changed = true; }
+  }
   if (S.me.flair && S.me.flair.gold && !owned('fl_gold')) { S.me.flair.gold = false; changed = true; }
   if (S.me.flair && S.me.flair.frame && !owned('fl_wave')) { S.me.flair.frame = false; changed = true; }
-  if (S.me.char && S.me.char.rd === 'gold' && !paidFor('pr_gold')) { S.me.char.rd = 'carbon'; changed = true; }
+  if (S.me.char) {
+    const fitted = CH.fit(CH.norm(S.me.char), S.me, myId());
+    if (JSON.stringify(fitted) !== JSON.stringify(CH.norm(S.me.char))) { S.me.char = fitted; changed = true; }
+  }
   return changed;
 }
 
@@ -5192,6 +5474,117 @@ async function openLens() {
       const how = $('#ln-how', w); if (how) how.textContent = t('lens_how_paste');
     }
   } catch (e) { /* saving the photo still works */ }
+}
+
+/* ===== Login ID (web build): one ID + password for every device. No email; the server keeps only a hash. ===== */
+function idSupported() { return window.APP_RT === 'web' && !!(window.APP_AUTH && window.APP_AUTH.ids) && !S.idOff; }
+async function myLoginId(force) {
+  if (!idSupported()) return null;
+  if (!force && S.loginId !== undefined) return S.loginId;
+  // if the server can't answer (not set up yet, or offline), hide the ID features instead of showing broken buttons
+  try { S.loginId = (await window.APP_AUTH.ids.me()) || null; } catch (e) { if (S.loginId === undefined) S.loginId = null; S.idOff = true; }
+  return S.loginId;
+}
+function idErr(code) {
+  const k = { bad_name: 'name', bad_pass: 'pass', taken: 'taken', wrong: 'wrong', slow_down: 'slow', slow: 'slow', has_id: 'has_id', team_leader: 'leader', no_id: 'no_id', mismatch: 'mismatch' }[code] || 'fail';
+  return t('id_err_' + k);
+}
+function idFormModal({ id, title, sub, fields, go, note, onSubmit }) {
+  const w = openModal(`<form class="id-form" id="${id}" novalidate><h2>${icon('user')} ${title}</h2>${sub ? `<p class="lede">${sub}</p>` : ''}
+    ${fields.map(f => `<div class="field"><label for="${f.id}">${f.label}</label><input id="${f.id}" ${f.type ? `type="${f.type}"` : ''} autocomplete="${f.ac || 'off'}" autocapitalize="none" spellcheck="false" maxlength="${f.max || 72}" ${f.ph ? `placeholder="${esc(f.ph)}"` : ''}>${f.hint ? `<small class="muted">${f.hint}</small>` : ''}</div>`).join('')}
+    ${note || ''}
+    <p class="err" id="${id}-err" hidden></p>
+    <div class="actions"><button class="btn btn-primary" type="submit" id="${id}-go">${go}</button><button class="btn btn-ghost" type="button" data-close>${t('cancel')}</button></div></form>`, { label: title });
+  const f = $('#' + id, w), err = $('#' + id + '-err', w), btn = $('#' + id + '-go', w);
+  const val = k => $('#' + k, w).value;
+  f.addEventListener('submit', async e => {
+    e.preventDefault(); err.hidden = true; btn.disabled = true;
+    try { await onSubmit(val, w); }
+    catch (x) { btn.disabled = false; err.textContent = idErr(x && x.code); err.hidden = false; }
+  });
+  setTimeout(() => { const first = $('input', w); if (first) first.focus(); }, 60);
+  return w;
+}
+const idCheck = r => { if (!r || r.ok !== true) throw { code: (r && r.err) || 'fail' }; return r; };
+function openIdCreate() {
+  if (!idSupported()) return;
+  idFormModal({
+    id: 'idc', title: t('id_create'), sub: t('id_create_sub'), go: t('id_create_go'),
+    fields: [{ id: 'idc-name', label: t('id_name'), ac: 'username', max: 20, ph: 'zzirit_fisher', hint: t('id_name_hint') }, { id: 'idc-pass', label: t('id_pass'), type: 'password', ac: 'new-password', hint: t('id_pass_hint') }, { id: 'idc-pass2', label: t('id_pass2'), type: 'password', ac: 'new-password' }],
+    note: `<p class="hint">${icon('info')} ${t('id_forgot')}</p>`,
+    async onSubmit(v, w) {
+      const name = v('idc-name').trim().toLowerCase(), p1 = v('idc-pass'), p2 = v('idc-pass2');
+      if (!/^[a-z0-9_]{3,20}$/.test(name)) throw { code: 'bad_name' };
+      if (p1.length < 6) throw { code: 'bad_pass' };
+      if (p1 !== p2) throw { code: 'mismatch' };
+      const r = idCheck(await window.APP_AUTH.ids.register(name, p1));
+      S.loginId = r.name; closeModal(w); toast(t('id_created', { name: r.name }), 'ok', 6000); rerender();
+    }
+  });
+}
+function openIdLogin() {
+  if (!idSupported()) return;
+  const local = myCatches().length;
+  idFormModal({
+    id: 'idl', title: t('id_login'), sub: t('id_login_sub'), go: t('id_login_go'),
+    fields: [{ id: 'idl-name', label: t('id_name'), ac: 'username', max: 20 }, { id: 'idl-pass', label: t('id_pass'), type: 'password', ac: 'current-password' }],
+    note: (local ? `<p class="note">${icon('info')} ${t('link_merge_note', { n: local })}</p>` : '') + `<p class="hint">${t('id_forgot')}</p>`,
+    async onSubmit(v, w) {
+      const name = v('idl-name').trim().toLowerCase(), p = v('idl-pass');
+      if (!name || !p) throw { code: 'wrong' };
+      const r = idCheck(await window.APP_AUTH.ids.login(name, p));
+      for (const k of ['me', 'labels', 'orders', 'suggest', 'photos']) lsSet(k, null);
+      try { localStorage.removeItem('eosin.spots'); } catch (x) { }
+      closeModal(w); toast(t('id_login_ok', { name: r.name || name }), 'ok');
+      setTimeout(() => { location.hash = 'sea'; location.reload(); }, 800);
+    }
+  });
+}
+function openIdPassword() {
+  if (!idSupported()) return;
+  idFormModal({
+    id: 'idp', title: t('id_change_pw'), go: t('save'),
+    fields: [{ id: 'idp-old', label: t('id_old_pw'), type: 'password', ac: 'current-password' }, { id: 'idp-new', label: t('id_new_pw'), type: 'password', ac: 'new-password', hint: t('id_pass_hint') }, { id: 'idp-new2', label: t('id_pass2'), type: 'password', ac: 'new-password' }],
+    async onSubmit(v, w) {
+      const o = v('idp-old'), n1 = v('idp-new'), n2 = v('idp-new2');
+      if (n1.length < 6) throw { code: 'bad_pass' };
+      if (n1 !== n2) throw { code: 'mismatch' };
+      idCheck(await window.APP_AUTH.ids.password(o, n1));
+      closeModal(w); toast(t('id_pw_changed'), 'ok');
+    }
+  });
+}
+async function idLogout(btn) {
+  if (!idSupported()) return;
+  const id = await myLoginId(true); const linked = !!(window.APP_AUTH.link && window.APP_AUTH.link.linked());
+  if (!id && !linked) { toast(t('id_logout_need'), 'info', 6000); return; }
+  if (btn && !armed(btn, t('id_logout_confirm'))) return;
+  try { await window.APP_AUTH.ids.logout(); } catch (e) { }
+  for (const k of ['me', 'labels', 'orders', 'suggest', 'photos', 'payok']) lsSet(k, null);
+  toast(t('id_logged_out')); setTimeout(() => { location.hash = 'home'; location.reload(); }, 700);
+}
+function idCardHTML() {
+  if (S.loginId === undefined) { myLoginId().then(() => { const c = $('#id-card'); if (c) { if (S.idOff) c.remove(); else c.innerHTML = idCardHTML(); } }); return `<h2 class="h3">${icon('user')}${t('id_title')}</h2><p class="muted">${t('thinking')}</p>`; }
+  const linked = !!(window.APP_AUTH.link && window.APP_AUTH.link.linked());
+  return S.loginId
+    ? `<h2 class="h3">${icon('user')}${t('id_title')}</h2><p>${t('id_signed_in', { name: `<b class="mono">${esc(S.loginId)}</b>` })}</p><p class="muted small">${t('id_signed_in_sub')}</p>
+       <div class="actions"><button class="btn btn-line" data-id="password">${t('id_change_pw')}</button><button class="btn btn-ghost" data-id="logout">${t('id_logout')}</button></div>`
+    : `<h2 class="h3">${icon('user')}${t('id_title')}</h2><p class="muted">${t('id_card_sub')}</p>
+       <div class="actions"><button class="btn btn-primary" data-id="create">${t('id_create')}</button><button class="btn btn-line" data-id="login">${t('id_login')}</button>${linked ? `<button class="btn btn-ghost" data-id="logout">${t('id_logout')}</button>` : ''}</div>`;
+}
+
+/* ===== Operator: remove an account (with everything it posted) ===== */
+async function adminDeleteUser(uid, btn) {
+  if (!S.isOwner || !uid || uid === myId()) return;
+  const a = S.anglers.get(uid); const nick = (a && a.nick) || '?';
+  if (btn && !armed(btn, t('ad_del_confirm', { nick }))) return;
+  try {
+    if (window.APP_RT === 'web') { if (!window.APP_AUTH || !window.APP_AUTH.admin) throw new Error('unavailable'); await window.APP_AUTH.admin.deleteUser(uid); }
+    else await store.adminDeleteDocs(uid);
+    S.anglers.delete(uid); S.dataVer++;
+    toast(t('ad_deleted', { nick }), 'ok');
+    if (/^#sea/.test(location.hash) && location.hash.includes(uid)) location.hash = 'admin'; else rerender();
+  } catch (e) { toast(t(/admin/i.test(String(e && e.message)) ? 'ad_del_admin' : 'ad_del_fail'), 'warn'); }
 }
 
 /* ===== PC ↔ phone: one account on several devices (web build) ===== */
@@ -5319,8 +5712,8 @@ async function openCatch(uid, cid) {
   const a = uid === (S.uid || 'local') ? S.me : (allAnglers().get(uid));
   const c = a && (a.catches || []).find(x => x.id === cid); if (!c) return;
   const sp = SPI[c.sp]; const mine = uid === (S.uid || 'local');
-  const v = verdict(uid, c.id);
-  const st = v === 'ok' ? 'ok' : v === 'no' ? 'no' : c.st;
+  const st = catchState(uid, c);
+  const note = (mine || S.isOwner) ? reviewNote(uid, c) : null;
   const showLoc = mine && c.lat != null;
   const w = openModal(`
     <article class="cd">
@@ -5329,6 +5722,7 @@ async function openCatch(uid, cid) {
         <p class="eyebrow">${c.past ? t('past_catch') : t('catch')} · ${fmtDT(c.ts)}</p>
         <h2>${esc(nameOf(c.sp))} <span class="num len">${lenFmt(c.len)}</span></h2>
         <div class="chips">${statusChip(st, c.tr)}${toxChip(sp)}${c.rel ? `<span class="chip chip-ok">${t('released')}</span>` : ''}${isFeaturedCatch(c) ? `<span class="chip chip-feat">${t('x2')}</span>` : ''}</div>
+        ${note && note.v !== 'ok' ? `<p class="note rv-note">${icon('shield')} <span><b>${t(note.v === 'no' ? 'rv_title_no' : 'rv_title_hold')}</b> ${esc(reviewReason(note))}</span></p>` : st === 'review' && mine ? `<p class="note rv-note">${icon('clock')} <span>${t('rv_waiting')}</span></p>` : ''}
         <dl class="kv">
           <div><dt>${t('angler')}</dt><dd>${mine ? `${flag(a.cc)} ${esc(a.nick)}` : `<button class="link" data-seauid="${esc(uid)}">${flag(a.cc)} ${esc(a.nick)}</button>${relation(uid) === 'friend' ? ` <span class="chip chip-ok">${t('fr_is_friend')}</span>` : ''}`}</dd></div>
           <div><dt>${t('score')}</dt><dd class="num">${fmtN(c.sc || 0)} pt</dd></div>
@@ -5392,6 +5786,7 @@ async function friendAction(act, uid, btn) {
 function statusChip(st, tr) {
   if (st === 'ok') return `<span class="chip chip-ok">${icon('check')}${tr >= 70 ? t('st_verified') : t('st_ok')}</span>`;
   if (st === 'review') return `<span class="chip chip-review">${icon('clock')}${t('st_review')}</span>`;
+  if (st === 'hold') return `<span class="chip chip-wait">${icon('clock')}${t('st_hold')}</span>`;
   if (st === 'no') return `<span class="chip chip-closed">${icon('x')}${t('st_rejected')}</span>`;
   if (st === 'local') return `<span class="chip chip-local">${t('st_local')}</span>`;
   return '';
@@ -5509,6 +5904,7 @@ VIEWS.home = {
         </div>
       </section>
 
+      ${idTipHTML()}
       ${newsCardHTML()}
 
       <section class="tourney">
@@ -5709,7 +6105,7 @@ function renderScanWork() {
       <div class="done-art"><img src="${sp ? FD.thumb(sp, 300, 160) : ''}" alt=""></div>
       <h2>${t(c.st === 'ok' ? 'done_title' : 'done_review_title')}</h2>
       <p class="lede">${t(c.st === 'ok' ? 'done_sub' : 'done_review_sub', { name: esc(nameOf(c.sp)), len: lenFmt(c.len) })}</p>
-      <div class="done-score"><span class="num">+${fmtN(c.sc || 0)}</span><span>pt</span>${statusChip(c.st, c.tr)}<span class="lv-chip">+${fmtN(sc.xpGain || 0)} XP</span></div>
+      <div class="done-score"><span class="num">+${fmtN(c.sc || 0)}</span><span>pt</span>${statusChip(c.st, c.tr)}${c.st === 'ok' ? `<span class="lv-chip">+${fmtN(sc.xpGain || 0)} XP</span>` : `<span class="lv-chip lv-wait">${t('xp_after_review')}</span>`}</div>
       ${sc.lvUp ? `<div class="lvup">${icon('star')}<div><b>${t('lv_up', { n: sc.lvUp })}</b>${sc.unlocks && sc.unlocks.length ? `<p class="small">${t('unlock_line', { name: esc(sc.unlocks.map(id => dict(SHOPI[id].n)).slice(0, 4).join(', ')) })}</p>` : ''}</div><a class="btn btn-light btn-sm" href="#sea">${t('go_decorate')}</a></div>` : ''}
       ${trustHTML(sc.trust)}
       <div class="actions"><button class="btn btn-primary" data-act="scan-reset">${icon('camera')}${t('scan_another')}</button><a class="btn btn-line" href="#rank">${icon('trophy')}${t('see_rank')}</a><a class="btn btn-line" href="#sea">${icon('sea')}${t('go_my_sea')}</a></div>
@@ -5872,6 +6268,10 @@ function bindRegisterForm() {
     if (!len || len <= 0) { err.textContent = t('reg_err_len'); err.hidden = false; $('#rf-len').focus(); return; }
     const sp = SPI[sc.chosen];
     const dtv = $('#rf-dt').value; const ts = dtv ? new Date(dtv).getTime() : nowMs();
+    // a length far beyond the species record can't be real (the server refuses it too); past the record a person checks it
+    if (sp && len > sp.X * 1.3) { err.textContent = t('reg_err_toobig', { n: Math.round(sp.X), name: spName(sp) }); err.hidden = false; $('#rf-len').focus(); return; }
+    const record = !!(sp && len > sp.X);
+    if (record && f.dataset.warned !== 'rec') { f.dataset.warned = 'rec'; err.textContent = t('reg_warn_record', { n: Math.round(sp.X) }); err.hidden = false; return; }
     if (sp && sp.lg && sp.lg.min && len <= sp.lg.min && !$('#rf-rel').checked) { if (!f.dataset.warned) { f.dataset.warned = '1'; err.textContent = t('reg_warn_small', { n: sp.lg.min }); err.hidden = false; return; } }
     const past = sc.mode === 'past' || (ts < nowMs() - 3 * 86400000);
     $('#rf-go').disabled = true;
@@ -5886,6 +6286,7 @@ function bindRegisterForm() {
     else st = trust.score >= 40 ? 'ok' : 'review';
     const ticket = sc.ai && sc.ai.__ticket; // web build: proof that the server screened this photo
     if (window.APP_RT === 'web' && st === 'ok' && !ticket) st = 'review';
+    if (record && st === 'ok') st = 'review';
     if (st === 'no') { sc.phase = 'reject'; sc.rejectKey = sc.dup ? 'reject_dup' : 'reject_sub'; renderScanWork(); return; }
     const lon = sc.lon, lat = sc.lat;
     const env = lon != null ? GEO.envAt(lon, lat) : null;
@@ -5907,6 +6308,8 @@ function bindRegisterForm() {
     sc.unlocks = sc.lvUp ? SHOP.filter(x => x.lv && x.lv > before.L && x.lv <= after.L).map(x => x.id) : [];
     await store.saveMe();
     await store.savePhoto(c.id, { t: sc.thumb, h: sc.hash });
+    // the automatic reviewer checks it within minutes; nudge it now
+    if (st === 'review' && window.APP_AUTH && window.APP_AUTH.review) window.APP_AUTH.review.ping();
     sc.saved = c; sc.phase = 'done'; renderScanWork();
     toast(t(st === 'ok' ? 'reg_ok_toast' : 'reg_review_toast', { pts: fmtN(c.sc) }), st === 'ok' ? 'ok' : 'info', 4000);
   });
@@ -6185,7 +6588,7 @@ VIEWS.sea = {
     }
     $('#sea-head', el).innerHTML = `
       <div class="sh-left">${mine ? `<a class="sh-av" href="#char" aria-label="${esc(t('ch_title'))}">${avatar(a, 64)}<span class="sh-av-edit">${icon('gear')}</span></a>` : avatar(a, 64)}<div><p class="eyebrow">${t(mine ? 'my_sea' : 'their_sea')} · ${lvChip(a, uid || myId())} ${esc(lvInfo(a, uid || myId()).title)}</p><h1>${nickHTML(a)}${teamTag(uid || myId())} <span class="flagbig">${flag(a.cc)}</span></h1><p class="muted">${esc(ccName(a.cc || 'KR'))} · ${esc(regionName(a.home || 'KS'))} · ${esc(dict(METHOD[a.style]) || '')}${mine && supporter() ? ` · <span class="chip chip-heart">${icon('heart')}${t('supporter')}</span>` : ''}</p>
-        ${mine ? `<p class="sh-fr"><a class="chip chip-tab" href="#char">${icon('user')}${t('ch_edit_btn')}</a><a class="chip chip-tab" href="#friends">${icon('users')}${t('fr_list_n', { n: frLists().friends.length })}${frLists().inc.length ? ` · <b class="acc-txt">${t('fr_new_n', { n: frLists().inc.length })}</b>` : ''}</a></p>` : (S.isOwner && a.pic && !picHidden(uid, a) ? `<p class="sh-fr"><button class="btn btn-ghost btn-xs" data-modav="${esc(uid)}">${t('ad_hide_pic')}</button></p>` : '') + `<div class="sh-acts">${frBtns(uid, relation(uid), { inSea: true })}${(() => { const m = mutualCount(uid); return m ? `<span class="muted small">${t('fr_mutual', { n: m })}</span>` : ''; })()}</div>`}</div></div>
+        ${mine ? `<p class="sh-fr"><a class="chip chip-tab" href="#char">${icon('user')}${t('ch_edit_btn')}</a><a class="chip chip-tab" href="#friends">${icon('users')}${t('fr_list_n', { n: frLists().friends.length })}${frLists().inc.length ? ` · <b class="acc-txt">${t('fr_new_n', { n: frLists().inc.length })}</b>` : ''}</a></p>` : (S.isOwner ? `<p class="sh-fr">${a.pic && !picHidden(uid, a) ? `<button class="btn btn-ghost btn-xs" data-modav="${esc(uid)}">${t('ad_hide_pic')}</button>` : ''}<button class="btn btn-ghost btn-xs" data-deluser="${esc(uid)}">${icon('x')}${t('ad_del_user')}</button></p>` : '') + `<div class="sh-acts">${frBtns(uid, relation(uid), { inSea: true })}${(() => { const m = mutualCount(uid); return m ? `<span class="muted small">${t('fr_mutual', { n: m })}</span>` : ''; })()}</div>`}</div></div>
       <div class="stats4 sh-stats">
         <div><span class="num">${rk[0]}</span><span>${t('scope_KR')}</span></div><div><span class="num">${rk[1]}</span><span>${t('scope_EA')}</span></div><div><span class="num">${rk[2]}</span><span>${t('scope_W')}</span></div>
         <div><span class="num">${best ? lenFmt(best.len) : '—'}</span><span>${best ? esc(nameOf(best.sp)) : t('best_catch')}</span></div>
@@ -6193,13 +6596,14 @@ VIEWS.sea = {
     const fishMap = new Map();
     for (const c of cs.slice().sort((x, y) => (y.len || 0) - (x.len || 0))) if (SPI[c.sp] && !fishMap.has(c.sp)) fishMap.set(c.sp, c);
     const fish = [...fishMap.values()].slice(0, 16).map(c => ({ key: c.id, sp: c.sp, len: c.len, ts: c.ts }));
-    const decor = Object.assign(DEFAULT_DECOR(), a.decor || {});
-    const items = (decor.items || []).filter(x => x !== 'dc_trophy' || (mine ? trophyEarned() : true));
-    S.scene.setState({ theme: (decor.theme || 'th_dawn').replace('th_', ''), decor: items, fx: decor.fx || [], fish, char: charOf(a, uid || myId()), rod: (a.char && a.char.rd) || null, preview: mine && S.preview ? { theme: S.preview.theme, decor: S.preview.decor, fx: S.preview.fx } : null });
+    // only looks this angler may show (their level, confirmed purchases) — saved data alone is not trusted
+    const decor = decorOf(a, uid || myId());
+    const ch = charOf(a, uid || myId());
+    S.scene.setState({ theme: (decor.theme || 'th_dawn').replace('th_', ''), decor: decor.items, fx: decor.fx, fish, char: ch, rod: a.char ? ch.rd : null, preview: mine && S.preview ? { theme: S.preview.theme, decor: S.preview.decor, fx: S.preview.fx } : null });
     const banner = $('#sea-banner', el);
     if (mine && S.preview) {
       const it = SHOPI[S.preview.id]; banner.hidden = false;
-      const act = owned(it.id) ? `<button class="btn btn-primary btn-sm" data-toggle="${it.id}">${t('use_item')}</button>` : it.pr ? `<button class="btn btn-primary btn-sm" data-buy="${it.id}">${t('prem_buy', { p: fmtN(PREMIUM_PRICE) })}</button>` : `<span class="chip chip-local">${icon('lock')}${it.top ? t('earned_top10') : t('lock_lv', { n: it.lv })}</span>`;
+      const act = owned(it.id) ? `<button class="btn btn-primary btn-sm" data-toggle="${it.id}">${t('use_item')}</button>` : it.pr ? (pendingOrders('item', it.id)[0] ? `<span class="chip chip-wait">${icon('clock')}${t('prem_wait')}</span>` : `<button class="btn btn-primary btn-sm" data-buy="${it.id}">${t('prem_buy', { p: fmtN(PREMIUM_PRICE) })}</button>`) : `<span class="chip chip-local">${icon('lock')}${it.top ? t('earned_top10') : t('lock_lv', { n: it.lv })}</span>`;
       banner.innerHTML = `<span>${icon('eye')} ${t('preview_on', { name: esc(dict(it.n)) })}</span>${act}<button class="btn btn-ghost btn-sm" data-act="preview-off">${t('close')}</button>`;
     }
     else banner.hidden = true;
@@ -6265,14 +6669,14 @@ VIEWS.sea = {
         <p class="hint">${t('decor_free_note')}</p>
       </div>
       <h3 class="h4">${icon('star')}${t('premium_title')}</h3>
-      <div class="prem-grid">${prem.map(s => { const own = owned(s.id); return `<div class="prem-item${own ? ' owned' : ''}"><img src="${this.itemThumb(s.id)}" alt="" width="240" height="150" loading="lazy"><div class="pi-txt"><b>${esc(dict(s.n))}</b><p class="muted small">${t('prem_desc_' + s.id)}</p></div><div class="si-btns">${own ? (active(s.id) ? `<span class="chip chip-ok">${t('in_use')}</span>` : `<button class="btn btn-primary btn-sm" data-toggle="${s.id}">${t('use_item')}</button>`) : `<button class="btn btn-ghost btn-sm" data-preview="${s.id}">${icon('eye')}${t('try_on')}</button><button class="btn btn-primary btn-sm" data-buy="${s.id}">${t('prem_buy', { p: fmtN(PREMIUM_PRICE) })}</button>`}</div></div>`; }).join('')}</div>
+      <div class="prem-grid">${prem.map(s => { const own = owned(s.id); const wait = !own && pendingOrders('item', s.id)[0]; return `<div class="prem-item${own ? ' owned' : ''}"><img src="${this.itemThumb(s.id)}" alt="" width="240" height="150" loading="lazy"><div class="pi-txt"><b>${esc(dict(s.n))}</b><p class="muted small">${t('prem_desc_' + s.id)}</p>${wait ? `<p class="small"><span class="chip chip-wait">${icon('clock')}${t('prem_wait')}</span> <span class="mono small">${esc(wait.code)}</span></p>` : ''}</div><div class="si-btns">${own ? (active(s.id) ? `<span class="chip chip-ok">${t('in_use')}</span>` : `<button class="btn btn-primary btn-sm" data-toggle="${s.id}">${t('use_item')}</button>`) : `<button class="btn btn-ghost btn-sm" data-preview="${s.id}">${icon('eye')}${t('try_on')}</button>${wait ? '' : `<button class="btn btn-primary btn-sm" data-buy="${s.id}">${t('prem_buy', { p: fmtN(PREMIUM_PRICE) })}</button>`}`}</div></div>`; }).join('')}</div>
       <p class="hint">${t('prem_note')}</p>
       <div class="chip-row shop-kinds">${['all', ...kinds].map(k => `<button class="chip chip-tab" aria-pressed="${S.shopKind === k}" data-shopkind="${k}">${k === 'all' ? t('shop_all') : t('kind_' + k)}</button>`).join('')}</div>
       ${(S.shopKind === 'all' ? kinds : [S.shopKind]).map(k => `<h3 class="h4">${t('kind_' + k)}</h3><div class="shop-grid">${SHOP.filter(s => s.k === k && !s.pr).map(card).join('')}</div>`).join('')}`;
   },
   catchesHTML(cs, uid) {
     if (!cs.length) return `<div class="empty"><p class="muted">${t('no_catches')}</p>${!uid ? `<a class="btn btn-primary btn-sm" href="#scan">${t('cta_scan')}</a>` : ''}</div>`;
-    return `<div class="catch-grid">${cs.slice().sort((a, b) => b.ts - a.ts).map(c => `<button class="catch-card" data-catch="${uid || S.uid || 'local'}|${c.id}"><span class="cc-ph" data-ph="${uid || S.uid || 'local'}|${c.id}"><img src="${FD.thumb(SPI[c.sp] || SP[0], 200, 110)}" alt=""></span><span class="cc-txt"><b>${esc(nameOf(c.sp))}</b> <span class="num">${lenFmt(c.len)}</span><br><span class="muted small">${fmtDate(c.ts)}${c.past ? ' · ' + t('past_short') : ''}</span></span>${statusChip(verdict(uid || S.uid, c.id) === 'ok' ? 'ok' : verdict(uid || S.uid, c.id) === 'no' ? 'no' : c.st, c.tr)}</button>`).join('')}</div>`;
+    return `<div class="catch-grid">${cs.slice().sort((a, b) => b.ts - a.ts).map(c => `<button class="catch-card" data-catch="${uid || S.uid || 'local'}|${c.id}"><span class="cc-ph" data-ph="${uid || S.uid || 'local'}|${c.id}"><img src="${FD.thumb(SPI[c.sp] || SP[0], 200, 110)}" alt=""></span><span class="cc-txt"><b>${esc(nameOf(c.sp))}</b> <span class="num">${lenFmt(c.len)}</span><br><span class="muted small">${fmtDate(c.ts)}${c.past ? ' · ' + t('past_short') : ''}</span></span>${statusChip(catchState(uid || S.uid || 'local', c), c.tr)}</button>`).join('')}</div>`;
   },
   dexHTML(cs) {
     const got = new Set(cs.map(c => c.sp));
@@ -6389,11 +6793,43 @@ VIEWS.log = {
     <div class="page log">
       <header class="page-head"><h1>${t('log_title')}</h1><p class="lede">${t('log_sub')}</p>
         <div class="hero-cta"><a class="btn btn-primary" href="#scan">${icon('camera')}${t('mode_now')}</a><a class="btn btn-line" href="#past">${icon('clock')}${t('mode_past')}</a></div></header>
-      <div class="stats4 card"><div><span class="num">${fmtN(cs.length)}</span><span>${t('catches')}</span></div><div><span class="num">${fmtN(pts)}</span><span>${t('total_pts')}</span></div><div><span class="num">Lv.${myLevel()}</span><span>${esc(lvInfo(S.me, myId()).title)}</span></div><div><span class="num">${fmtN(cs.filter(c => c.st === 'review').length)}</span><span>${t('st_review')}</span></div></div>
+      <div class="stats4 card"><div><span class="num">${fmtN(cs.length)}</span><span>${t('catches')}</span></div><div><span class="num">${fmtN(pts)}</span><span>${t('total_pts')}</span></div><div><span class="num">Lv.${myLevel()}</span><span>${esc(lvInfo(S.me, myId()).title)}</span></div><div><span class="num">${fmtN(cs.filter(c => { const x = catchState(myId(), c); return x === 'review' || x === 'hold'; }).length)}</span><span>${t('st_review')}</span></div></div>
       ${cs.length ? VIEWS.sea.catchesHTML(cs, null) : `<div class="empty card big"><div class="empty-art"><img src="${FD.thumb(SPI.kurodai, 260, 140)}" alt=""></div><h2>${t('log_empty')}</h2><p class="muted">${t('log_empty_sub')}</p><a class="btn btn-primary" href="#scan">${t('cta_scan')}</a></div>`}
-      ${S.myOrders.length ? `<section class="card"><h2 class="h3">${icon('heart')}${t('orders_title')}</h2><ul class="orders">${S.myOrders.slice().reverse().map(o => `<li><span>${esc(o.kind === 'item' ? dict(SHOPI[o.ref]?.n) || o.ref : o.kind === 'past' ? t('ord_past_old') : t('donate_title'))}</span><span class="num">${fmtN(o.amt)}${t('won')}</span><span class="mono small">${esc(o.code)}</span><span class="chip ${orderState(o) === 'no' ? 'chip-closed' : 'chip-ok'}">${t('ord_' + orderState(o))}</span></li>`).join('')}</ul></section>` : ''}
+      ${S.myOrders.length ? `<section class="card"><h2 class="h3">${icon('heart')}${t('orders_title')}</h2><ul class="orders">${S.myOrders.slice().reverse().map(o => `<li><span>${esc(o.kind === 'item' ? dict(SHOPI[o.ref]?.n) || o.ref : o.kind === 'past' ? t('ord_past_old') : t('donate_title'))}</span><span class="num">${fmtN(o.amt)}${t('won')}</span><span class="mono small">${esc(o.code)}</span><span class="chip ${({ no: 'chip-closed', ok: 'chip-ok', wait: 'chip-wait' })[orderState(o)]}">${t('ord_' + orderState(o))}</span></li>`).join('')}</ul><p class="hint">${t('orders_note')}</p></section>` : ''}
     </div>`;
     hydratePhotos(el);
+  }
+};
+
+/* ---------- ABOUT: what ZZIRIT means and what it is for ---------- */
+const LOGO = { mark: 'data:image/webp;base64,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', full: 'data:image/webp;base64,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' };
+VIEWS.about = {
+  render(el) {
+    const item = (ic, k) => `<li><span class="ab-ic">${icon(ic)}</span><div><b>${t(k + '_t')}</b><p>${t(k + '_d')}</p></div></li>`;
+    el.innerHTML = `
+    <div class="page about">
+      <section class="ab-hero">
+        <img class="ab-logo" src="${LOGO.full}" alt="${esc(APP_NAME[0] + ' ' + APP_NAME[1])}" width="280" height="280">
+        <div class="ab-hero-txt">
+          <p class="eyebrow">${t('about_eyebrow')}</p>
+          <h1>${t('about_hero_h')}</h1>
+          <p class="lede">${t('about_hero_p')}</p>
+          <div class="hero-cta"><a class="btn btn-primary" href="#scan">${icon('scan')}${t('cta_scan')}</a><a class="btn btn-line" href="#help">${icon('chat')}${t('nav_help')}</a></div>
+        </div>
+      </section>
+      <section class="card ab-sec"><h2 class="h3">${t('about_name_h')}</h2>
+        <ol class="ab-name">${['1', '2', '3'].map(n => `<li><span class="ab-word">${t('about_name_' + n + '_t')}</span><p>${t('about_name_' + n + '_d')}</p></li>`).join('')}</ol>
+      </section>
+      <section class="card ab-sec ab-logo-sec"><h2 class="h3">${t('about_logo_h')}</h2>
+        <div class="ab-logo-grid"><img class="ab-mark" src="${LOGO.mark}" alt="" width="128" height="128">
+          <ul class="ab-list">${item('fish', 'about_logo_1')}${item('sparkle', 'about_logo_2')}${item('contrast', 'about_logo_3')}</ul></div>
+      </section>
+      <section class="card ab-sec"><h2 class="h3">${t('about_for_h')}</h2>
+        <ul class="ab-list ab-for">${item('log', 'about_for_1')}${item('shield', 'about_for_2')}${item('warn', 'about_for_3')}${item('sea', 'about_for_4')}${item('users', 'about_for_5')}</ul>
+      </section>
+      <p class="ab-close">${t('about_close')}</p>
+      <p class="hint ab-made">${t('about_made')}</p>
+    </div>`;
   }
 };
 
@@ -6435,7 +6871,7 @@ VIEWS.help = {
       </section>
       <section class="faq">
         <h2 class="h3">${t('faq_title')}</h2>
-        ${['scan', 'train', 'score', 'past', 'fake', 'friends', 'pay', 'spot', 'legal', 'beta'].map(k => `<details class="card"><summary>${t('faq_' + k + '_q')}</summary><p>${t('faq_' + k + '_a', { p: fmtN(PREMIUM_PRICE) })}</p></details>`).join('')}
+        ${['scan', 'train', 'score', 'past', 'fake', 'review', 'friends', ...(window.APP_RT === 'web' ? ['account'] : []), 'pay', 'spot', 'legal', 'beta'].map(k => `<details class="card"><summary>${t('faq_' + k + '_q')}</summary><p>${t('faq_' + k + '_a', { p: fmtN(PREMIUM_PRICE) })}</p></details>`).join('')}
       </section>
     </div>`;
     const compose = () => { const cat = ($('input[name="sg-cat"]:checked', el) || {}).value || 'feature'; const text = $('#sg-text', el).value.trim(); return { cat, text, msg: `[${APP_NAME[0]} ${APP_NAME[1]} · ${t('sgc_' + cat)}]\n${text}\n— ${S.me?.nick || ''} ${S.me?.cc ? '(' + S.me.cc + ')' : ''}` }; };
@@ -6453,6 +6889,14 @@ VIEWS.help = {
   }
 };
 
+/* Home tip: make a login ID so the records follow you to any device (web, after the first catch, until dismissed) */
+function idTipHTML() {
+  if (!idSupported() || S.mode !== 'shared' || !S.me || !S.me.nick || lsGet('idTipOff', 0)) return '';
+  if (S.loginId === undefined) { myLoginId().then(id => { if (!id && $('#v-home') && !$('#v-home').hidden) rerenderSoon(); }); return ''; }
+  if (S.loginId || (window.APP_AUTH.link && window.APP_AUTH.link.linked())) return '';
+  return `<section class="card id-tip">${icon('user')}<div><b>${t('id_tip_title')}</b><p class="muted small">${t('id_tip_sub')}</p></div><div class="rec-btns"><button class="btn btn-primary btn-sm" data-id="create">${t('id_create')}</button><button class="btn btn-ghost btn-sm" data-id="login">${t('id_login')}</button><button class="btn btn-ghost btn-xs" data-act="idtip-off" aria-label="${esc(t('close'))}">${icon('close')}</button></div></section>`;
+}
+
 /* ---------- PREFS ---------- */
 VIEWS.prefs = {
   render(el) {
@@ -6463,6 +6907,7 @@ VIEWS.prefs = {
       <section class="card"><h2 class="h3">${t('prefs_profile')}</h2>
         ${S.me && S.me.nick ? `<a class="pf-char" href="#char">${avatar(S.me, 48)}<span><b>${t('ch_title')}</b><span class="muted small">${t('pf_char_hint')}</span></span>${icon('gear')}</a>` : ''}
         <div id="pf-box">${profileFormHTML(p)}</div><div class="actions"><button class="btn btn-primary" id="pf-save">${t('save')}</button></div></section>
+      ${idSupported() && S.mode === 'shared' ? `<section class="card id-card" id="id-card">${idCardHTML()}</section>` : ''}
       ${linkSupported() ? `<section class="card link-card"><h2 class="h3">${icon('link')}${t('link_title')}</h2><p class="muted">${t('link_sub')}</p>
         ${window.APP_AUTH.link.linked() ? `<p class="note ok">${icon('check')} ${t('link_linked')}</p>` : ''}
         <div class="actions"><button class="btn btn-primary" data-link="make">${icon('qr')}${t('link_make')}</button><button class="btn btn-line" data-link="enter">${t('link_enter')}</button>${window.APP_AUTH.link.linked() ? `<button class="btn btn-ghost" data-link="leave">${t('link_leave')}</button>` : ''}</div>
@@ -6499,17 +6944,24 @@ VIEWS.admin = {
   render(el) {
     if (!S.isOwner) { el.innerHTML = `<div class="page"><div class="empty card big"><h2>${t('admin_only')}</h2></div></div>`; return; }
     const cfg = S.admin.config || {};
-    const orders = []; for (const [uid, d] of S.allOrders) for (const o of (d.items || [])) orders.push({ uid, o, st: (S.admin.grants[uid] || {})[o.id] || 'auto' });
-    orders.sort((a, b) => b.o.ts - a.o.ts);
+    const orders = []; for (const [uid, d] of S.allOrders) for (const o of (d.items || [])) orders.push({ uid, o, st: grantState((S.admin.grants[uid] || {})[o.id]) });
+    orders.sort((a, b) => ((a.st === 'wait') === (b.st === 'wait') ? (b.o.ts || 0) - (a.o.ts || 0) : a.st === 'wait' ? -1 : 1));
     const sugg = []; for (const [uid, d] of S.allSuggest) for (const s of (d.items || [])) sugg.push({ uid, s });
     sugg.sort((a, b) => b.s.ts - a.s.ts);
-    const reviews = []; for (const [uid, a] of S.anglers) for (const c of (a.catches || [])) if (c.st === 'review' && !verdict(uid, c.id)) reviews.push({ uid, a, c });
+    // only what the automatic reviewer left on hold reaches the operator (plus anything it has not managed to look at for an hour)
+    const reviews = []; for (const [uid, a] of S.anglers) for (const c of (a.catches || [])) {
+      const v = verdict(uid, c.id);
+      if (c.st === 'review' && (v === 'hold' || (!v && nowMs() - (c.at || c.ts || 0) > 3600e3))) reviews.push({ uid, a, c, note: reviewNote(uid, c) });
+    }
+    const autoLog = []; for (const [uid, m] of Object.entries(S.admin.autorev || {})) for (const [cid, r] of Object.entries(m || {})) { const a = S.anglers.get(uid); const c = a && (a.catches || []).find(x => x.id === cid); if (c) autoLog.push({ uid, a, c, note: reviewNote(uid, c), at: r.at || 0 }); }
+    autoLog.sort((x, y) => y.at - x.at);
+    const users = [...S.anglers.entries()].filter(([, a]) => a && a.nick).map(([uid, a]) => ({ uid, a, n: (a.catches || []).length, L: lvInfo(a, uid).L })).sort((x, y) => (y.a.joined || 0) - (x.a.joined || 0));
     const nCatch = [...S.anglers.values()].reduce((s, a) => s + (a.catches || []).length, 0);
     const flagged = [...boardIndex().posts.values()].filter(p => p.reps > 0 || p.hidden).sort((x, y) => (x.hidden - y.hidden) || (y.reps - x.reps) || (y.ts - x.ts)).slice(0, 60);
     el.innerHTML = `
     <div class="page admin">
       <header class="page-head"><h1>${t('admin_title')}</h1><p class="lede">${t('admin_sub')}</p></header>
-      <div class="stats4 card"><div><span class="num">${S.anglers.size}</span><span>${t('ad_users')}</span></div><div><span class="num">${nCatch}</span><span>${t('catches')}</span></div><div><span class="num">${learnStats().total}</span><span>${t('learn_n')}</span></div><div><span class="num">${orders.filter(x => x.st === 'auto').length}</span><span>${t('ad_pending')}</span></div></div>
+      <div class="stats4 card"><div><span class="num">${S.anglers.size}</span><span>${t('ad_users')}</span></div><div><span class="num">${nCatch}</span><span>${t('catches')}</span></div><div><span class="num">${learnStats().total}</span><span>${t('learn_n')}</span></div><div><span class="num">${orders.filter(x => x.st === 'wait').length}</span><span>${t('ad_pending')}</span></div></div>
       <section class="card"><h2 class="h3">${icon('heart')}${t('ad_pay')}</h2>
         <div class="row2">
           <div class="field"><label for="ad-toss">${t('ad_toss')}</label><input id="ad-toss" value="${esc(cfg.tossId || '')}" placeholder="toss.me/___"></div>
@@ -6520,10 +6972,15 @@ VIEWS.admin = {
         <div class="actions"><button class="btn btn-primary" id="ad-save">${t('save')}</button></div>
       </section>
       <section class="card"><h2 class="h3">${icon('clock')}${t('ad_orders')}</h2><p class="hint">${t('ad_orders_hint')}</p>
-        ${orders.length ? `<div class="tbl"><table><thead><tr><th>${t('angler')}</th><th>${t('ad_item')}</th><th class="r">${t('ad_amt')}</th><th>${t('pay_memo')}</th><th>${t('ad_when')}</th><th></th></tr></thead><tbody>${orders.map(({ uid, o, st }) => `<tr><td>${esc(o.nick || S.anglers.get(uid)?.nick || '?')}</td><td>${esc(o.kind === 'item' ? dict(SHOPI[o.ref]?.n) || o.ref : o.kind === 'past' ? t('ord_past_old') : t('donate_title'))}</td><td class="r num">${fmtN(o.amt)}</td><td class="mono">${esc(o.code)}</td><td class="small">${fmtDT(o.ts)}</td><td class="nowrap">${st === 'auto' ? `<button class="btn btn-primary btn-xs" data-grant="${uid}|${o.id}|ok">${t('ad_confirm')}</button> <button class="btn btn-ghost btn-xs" data-grant="${uid}|${o.id}|no">${t('ad_cancel_order')}</button>` : `<span class="chip ${st === 'ok' ? 'chip-ok' : 'chip-closed'}">${t('ord_' + st)}</span> <button class="btn btn-ghost btn-xs" data-grant="${uid}|${o.id}|auto">${t('ad_undo')}</button>`}</td></tr>`).join('')}</tbody></table></div>` : `<p class="muted">${t('ad_none')}</p>`}
+        ${orders.length ? `<div class="tbl"><table><thead><tr><th>${t('angler')}</th><th>${t('ad_item')}</th><th class="r">${t('ad_amt')}</th><th>${t('pay_memo')}</th><th>${t('ad_when')}</th><th></th></tr></thead><tbody>${orders.map(({ uid, o, st }) => `<tr><td>${esc(o.nick || S.anglers.get(uid)?.nick || '?')}</td><td>${esc(o.kind === 'item' ? dict(SHOPI[o.ref]?.n) || o.ref : o.kind === 'past' ? t('ord_past_old') : t('donate_title'))}</td><td class="r num">${fmtN(o.amt)}</td><td class="mono">${esc(o.code)}</td><td class="small">${fmtDT(o.ts)}</td><td class="nowrap">${st === 'wait' ? `<button class="btn btn-primary btn-xs" data-grant="${uid}|${o.id}|ok">${t('ad_confirm')}</button> <button class="btn btn-ghost btn-xs" data-grant="${uid}|${o.id}|no">${t('ad_cancel_order')}</button>` : `<span class="chip ${st === 'ok' ? 'chip-ok' : 'chip-closed'}">${t('ord_' + st)}</span> <button class="btn btn-ghost btn-xs" data-grant="${uid}|${o.id}|wait">${t('ad_undo')}</button>`}</td></tr>`).join('')}</tbody></table></div>` : `<p class="muted">${t('ad_none')}</p>`}
       </section>
-      <section class="card"><h2 class="h3">${icon('shield')}${t('ad_reviews')}</h2>
-        ${reviews.length ? `<div class="catch-grid">${reviews.map(({ uid, a, c }) => `<div class="catch-card"><span class="cc-ph" data-ph="${uid}|${c.id}"></span><span class="cc-txt"><b>${esc(nameOf(c.sp))}</b> ${lenFmt(c.len)} · ${esc(a.nick)}<br><span class="muted small">${t('trust')} ${c.tr} · ${fmtDate(c.ts)}${c.past ? ' · ' + t('past_short') : ''}</span></span><span class="nowrap"><button class="btn btn-primary btn-xs" data-verdict="${uid}|${c.id}|ok">${t('approve')}</button> <button class="btn btn-ghost btn-xs" data-verdict="${uid}|${c.id}|no">${t('reject')}</button> <button class="btn btn-ghost btn-xs" data-catch="${uid}|${c.id}">${t('view')}</button></span></div>`).join('')}</div>` : `<p class="muted">${t('ad_none')}</p>`}
+      <section class="card"><h2 class="h3">${icon('shield')}${t('ad_reviews')}</h2><p class="hint">${t('ad_reviews_auto')}</p>
+        ${reviews.length ? `<div class="catch-grid">${reviews.map(({ uid, a, c, note }) => `<div class="catch-card"><span class="cc-ph" data-ph="${uid}|${c.id}"></span><span class="cc-txt"><b>${esc(nameOf(c.sp))}</b> ${lenFmt(c.len)} · ${esc(a.nick)}<br><span class="muted small">${t('trust')} ${c.tr} · ${fmtDate(c.ts)}${c.past ? ' · ' + t('past_short') : ''}</span>${note ? `<br><span class="small rv-why">${icon('shield')} ${esc(reviewReason(note))}</span>` : ''}</span><span class="nowrap"><button class="btn btn-primary btn-xs" data-verdict="${uid}|${c.id}|ok">${t('approve')}</button> <button class="btn btn-ghost btn-xs" data-verdict="${uid}|${c.id}|no">${t('reject')}</button> <button class="btn btn-ghost btn-xs" data-catch="${uid}|${c.id}">${t('view')}</button></span></div>`).join('')}</div>` : `<p class="muted">${t('ad_reviews_none')}</p>`}
+        ${autoLog.length ? `<details class="ad-auto"><summary>${t('ad_auto_log', { n: autoLog.length })}</summary><ul class="ad-autolog">${autoLog.slice(0, 40).map(({ uid, a, c, note }) => `<li><span class="chip ${note.v === 'no' ? 'chip-closed' : note.v === 'ok' ? 'chip-ok' : 'chip-wait'}">${t(note.v === 'no' ? 'st_rejected' : note.v === 'ok' ? 'st_ok' : 'st_hold')}</span><button class="link" data-catch="${uid}|${c.id}">${esc(nameOf(c.sp))} ${lenFmt(c.len)}</button><span class="muted small">${esc(a.nick)} · ${esc(reviewReason(note))}</span>${verdict(uid, c.id) !== 'ok' ? `<button class="btn btn-ghost btn-xs" data-verdict="${uid}|${c.id}|ok">${t('approve')}</button>` : `<button class="btn btn-ghost btn-xs" data-verdict="${uid}|${c.id}|no">${t('reject')}</button>`}</li>`).join('')}</ul></details>` : ''}
+      </section>
+      <section class="card"><h2 class="h3">${icon('users')}${t('ad_users_title')}</h2><p class="hint">${t('ad_users_hint')}</p>
+        ${users.length ? `<ul class="ad-users">${users.slice(0, 300).map(({ uid, a, n, L }) => `<li><button class="fr-who" data-seauid="${esc(uid)}">${avatar(a, 32)}<span class="fr-txt"><span class="fr-name">${nickHTML(a)} <span class="lv-chip">Lv.${L}</span></span><span class="muted small">${t('catches')} ${n} · ${a.joined ? fmtDate(a.joined) : '—'} · <span class="mono">${esc(uid.slice(0, 8))}</span></span></span></button>${uid === myId() ? `<span class="chip">${t('ad_you')}</span>` : `<button class="btn btn-ghost btn-xs" data-deluser="${esc(uid)}">${icon('x')}${t('ad_del_user')}</button>`}</li>`).join('')}</ul>` : `<p class="muted">${t('ad_none')}</p>`}
+        ${window.APP_RT === 'web' ? `<form class="ad-idreset" id="ad-idreset"><p class="lbl">${t('ad_id_reset')}</p><div class="row2"><div class="field"><input id="ad-idr-name" placeholder="${esc(t('id_name'))}" autocomplete="off" autocapitalize="none" spellcheck="false"></div><div class="field"><input id="ad-idr-pass" placeholder="${esc(t('ad_id_reset_pw'))}" autocomplete="off"></div></div><div class="actions"><button class="btn btn-line btn-sm" type="submit">${t('ad_id_reset_go')}</button></div><p class="hint">${t('ad_id_reset_hint')}</p></form>` : ''}
       </section>
       <section class="card"><h2 class="h3">${icon('board')}${t('ad_reports')}</h2>
         ${flagged.length ? `<ul class="ad-reports">${flagged.map(p => `<li class="${p.hidden ? 'is-hidden' : ''}"><button class="link" data-post="${esc(p.key)}"><span class="chip chip-cat cat-${esc(p.cat)}">${t('bdc_' + p.cat)}</span> ${esc(p.title)}</button><span class="muted small">${esc((anglerOf(p.uid) || {}).nick || '?')} · ${ago(p.ts)}</span>${p.reps ? `<span class="chip chip-review">${icon('warn')}${p.reps}</span>` : ''}${p.hidden ? `<span class="chip chip-closed">${t('bd_hidden_chip')}</span>` : ''}<button class="btn btn-ghost btn-xs" data-modhp="${esc(p.key)}">${t(p.hidden ? 'bd_unhide' : 'bd_hide')}</button></li>`).join('')}</ul>` : `<p class="muted">${t('ad_none')}</p>`}
@@ -6540,12 +6997,20 @@ VIEWS.admin = {
       await store.saveAdmin('config', Object.assign({}, cfg, { tossId: toss, kakaoUrl: kakao, kakaoAmt: $('#ad-kamt', el).checked }));
       toast(t('saved'));
     };
+    const idr = $('#ad-idreset', el);
+    if (idr) idr.onsubmit = async e => {
+      e.preventDefault();
+      const name = $('#ad-idr-name', el).value.trim().toLowerCase(), pw = $('#ad-idr-pass', el).value.trim();
+      if (!name || pw.length < 6) { toast(t('id_err_pass'), 'warn'); return; }
+      try { const r = await window.APP_AUTH.ids.adminReset(name, pw); if (!r || r.ok !== true) throw { code: (r && r.err) || 'fail' }; toast(t('ad_id_reset_ok', { name }), 'ok'); idr.reset(); }
+      catch (x) { toast(idErr(x && x.code), 'warn'); }
+    };
   }
 };
 
 /* ---------- More (mobile) ---------- */
 function openMore() {
-  const items = [['friends', 'users'], ['board', 'board'], ['teams', 'flag'], ['char', 'user'], ['dex', 'book'], ['tackle', 'lure'], ['log', 'log'], ['help', 'chat'], ['prefs', 'gear']];
+  const items = [['friends', 'users'], ['board', 'board'], ['teams', 'flag'], ['char', 'user'], ['dex', 'book'], ['tackle', 'lure'], ['log', 'log'], ['help', 'chat'], ['about', 'sparkle'], ['prefs', 'gear']];
   if (S.isOwner) items.push(['admin', 'shield']);
   const nIn = frLists().inc.length;
   const w = openModal(`<nav class="more"><h2 class="sr">${t('more')}</h2>${items.map(([r, ic]) => `<a href="#${r}" class="more-item">${icon(ic)}<span>${t('nav_' + r)}</span>${r === 'friends' && nIn ? `<i class="badge num">${nIn}</i>` : ''}</a>`).join('')}<button class="more-item heart" data-act="donate">${icon('heart')}<span>${t('donate_btn')}</span></button></nav>`, { sheet: true, label: t('more') });
@@ -6569,7 +7034,7 @@ const CH = (() => {
     ht: { none: 1, cap: 1, bucket: 1, beanie: 2, band: 3, straw: 5, visor: 8, captain: 15 },
     ou: { tee: 1, vest: 1, hoodie: 2, rain: 4, life: 6, wet: 10, captain: 15 },
     ac: { none: 1, glasses: 1, bandaid: 1, shades: 3, towel: 5, flower: 7, lamp: 9 },
-    rd: { bamboo: 1, carbon: 2, lure: 6, sea: 11, gold: 'pr_gold' }
+    rd: { bamboo: 1, carbon: 1, lure: 6, sea: 11, gold: 'pr_gold' }
   };
   const ROD = { bamboo: ['#B88A4A', '#8A6232'], carbon: ['#23272E', '#D2412F'], lure: ['#2F6FD0', '#F2F2F2'], sea: ['#F2F2F2', '#2F6FB5'], gold: ['#F5C542', '#B8860B'] };
   const DEF = { v: 1, sk: 1, hs: 'short', hc: 0, ey: 'dot', mo: 'smile', ht: 'cap', htc: '#FF5A1F', ou: 'vest', ouc: '#3E8E5A', ac: 'none', rd: 'carbon', bg: '#CDEBF5' };
@@ -6758,10 +7223,23 @@ const CH = (() => {
   }
   function needOf(part, id) { const n = P[part] && P[part][id]; return typeof n === 'number' ? n : n ? 'pr' : 1; }
   function hairLocked(i) { return myLevel() < HAIRC[i][1]; }
-  return { SKIN, HAIRC, CLOTH, BG, P, ROD, DEF, norm, fromSeed, svg, url, image, locked, needOf, hairLocked };
+  // parts above the angler's level (or an unpaid gold rod) fall back to the default part
+  function fit(c, a, uid) {
+    const mine = a === S.me || (uid && uid === myId());
+    const L = mine ? myLevel() : lvInfo(a, uid).L;
+    const o = Object.assign({}, c);
+    for (const k of ['hs', 'ey', 'mo', 'ht', 'ou', 'ac', 'rd']) {
+      const need = P[k][o[k]];
+      const lockedHere = typeof need === 'number' ? need > L : typeof need === 'string' ? (mine ? !paidFor(need) : false) : false;
+      if (lockedHere) o[k] = DEF[k];
+    }
+    if (HAIRC[o.hc] && HAIRC[o.hc][1] > L) o.hc = 0;
+    return o;
+  }
+  return { SKIN, HAIRC, CLOTH, BG, P, ROD, DEF, norm, fromSeed, svg, url, image, locked, needOf, hairLocked, fit };
 })();
 
-function charOf(a, uid) { return a && a.char ? CH.norm(a.char) : CH.fromSeed(uid || (a && a.nick) || 'x'); }
+function charOf(a, uid) { return a && a.char ? CH.fit(CH.norm(a.char), a, uid || avatarUid(a)) : CH.fromSeed(uid || (a && a.nick) || 'x'); }
 function safeColor(c) { return /^#[0-9a-fA-F]{6}$/.test(String(c)) ? c : '#CDEBF5'; }
 
 /* ---- avatars: character face, uploaded photo, or the first letter ---- */
@@ -6770,7 +7248,7 @@ function picHidden(uid, a) { const m = S.admin.mod && S.admin.mod.av; return !!(
 function avatar(a, size = 36) {
   const nick = (a && a.nick) || '?';
   const uid = avatarUid(a);
-  const fl = (a && a.flair) || {};
+  const fl = flairOf(a, uid);
   const cls = 'avatar' + (fl.gold ? ' gold' : fl.frame ? ' framed' : '');
   const mode = a ? (a.av || 'char') : 'init';
   const letter = esc([...nick][0] || '?');
@@ -6781,7 +7259,7 @@ function avatar(a, size = 36) {
   if (mode !== 'init' && a && (a.char || uid || a.nick)) { const ch = charOf(a, uid); return `<span class="${cls} chr" style="--s:${size}px;--cbg:${safeColor(ch.bg)}" aria-hidden="true"><img src="${CH.url(ch, 'head')}" alt="" loading="lazy"></span>`; }
   return `<span class="${cls}" style="--h:${FD.hashStr(nick) % 360};--s:${size}px" aria-hidden="true">${letter}</span>`;
 }
-function nickHTML(a) { return `<span class="nick${a && a.flair && a.flair.gold ? ' gold' : ''}">${esc((a && a.nick) || '?')}</span>`; }
+function nickHTML(a) { return `<span class="nick${flairOf(a).gold ? ' gold' : ''}">${esc((a && a.nick) || '?')}</span>`; }
 async function loadAvatarPhoto(uid, ts) {
   const key = uid + '/_pic@' + ts;
   if (S.photoCache.has(key)) return S.photoCache.get(key);
@@ -6861,7 +7339,7 @@ VIEWS.char = {
       const am = e.target.closest('[data-avmode]'); if (am) { setAvatarMode(am.dataset.avmode); return; }
     };
     $('#ch-save', el).onclick = async () => {
-      S.me.char = CH.norm(S.chDraft); if (!S.me.av || S.me.av === 'init') S.me.av = 'char';
+      S.me.char = CH.fit(CH.norm(S.chDraft), S.me, myId()); if (!S.me.av || S.me.av === 'init') S.me.av = 'char';
       await store.saveMe(); S.dataVer++; toast(t('ch_saved')); rerender();
     };
     $('#ch-rand', el).onclick = () => {
@@ -7320,7 +7798,7 @@ function newsMaybeRefresh() {
 
 /* ===== Router, global events, boot ===== */
 const QR_PATH = 'M0 0h7v1h-7zM8 0h2v1h-2zM11 0h3v1h-3zM17 0h1v1h-1zM21 0h2v1h-2zM26 0h7v1h-7zM0 1h1v1h-1zM6 1h1v1h-1zM8 1h7v1h-7zM16 1h1v1h-1zM18 1h2v1h-2zM21 1h2v1h-2zM26 1h1v1h-1zM32 1h1v1h-1zM0 2h1v1h-1zM2 2h3v1h-3zM6 2h1v1h-1zM8 2h3v1h-3zM13 2h2v1h-2zM16 2h1v1h-1zM20 2h2v1h-2zM24 2h1v1h-1zM26 2h1v1h-1zM28 2h3v1h-3zM32 2h1v1h-1zM0 3h1v1h-1zM2 3h3v1h-3zM6 3h1v1h-1zM9 3h1v1h-1zM11 3h1v1h-1zM14 3h1v1h-1zM16 3h4v1h-4zM21 3h2v1h-2zM24 3h1v1h-1zM26 3h1v1h-1zM28 3h3v1h-3zM32 3h1v1h-1zM0 4h1v1h-1zM2 4h3v1h-3zM6 4h1v1h-1zM8 4h3v1h-3zM13 4h1v1h-1zM15 4h4v1h-4zM22 4h1v1h-1zM26 4h1v1h-1zM28 4h3v1h-3zM32 4h1v1h-1zM0 5h1v1h-1zM6 5h1v1h-1zM12 5h1v1h-1zM15 5h3v1h-3zM20 5h5v1h-5zM26 5h1v1h-1zM32 5h1v1h-1zM0 6h7v1h-7zM8 6h1v1h-1zM10 6h1v1h-1zM12 6h1v1h-1zM14 6h1v1h-1zM16 6h1v1h-1zM18 6h1v1h-1zM20 6h1v1h-1zM22 6h1v1h-1zM24 6h1v1h-1zM26 6h7v1h-7zM9 7h1v1h-1zM12 7h2v1h-2zM15 7h2v1h-2zM18 7h3v1h-3zM22 7h2v1h-2zM0 8h1v1h-1zM3 8h6v1h-6zM11 8h4v1h-4zM17 8h1v1h-1zM19 8h1v1h-1zM23 8h3v1h-3zM28 8h1v1h-1zM30 8h3v1h-3zM0 9h1v1h-1zM2 9h2v1h-2zM7 9h1v1h-1zM9 9h1v1h-1zM13 9h2v1h-2zM17 9h4v1h-4zM22 9h2v1h-2zM28 9h3v1h-3zM0 10h4v1h-4zM5 10h4v1h-4zM10 10h1v1h-1zM12 10h2v1h-2zM15 10h3v1h-3zM21 10h1v1h-1zM23 10h1v1h-1zM28 10h5v1h-5zM1 11h1v1h-1zM5 11h1v1h-1zM7 11h1v1h-1zM9 11h1v1h-1zM12 11h2v1h-2zM16 11h2v1h-2zM20 11h1v1h-1zM22 11h1v1h-1zM24 11h2v1h-2zM27 11h1v1h-1zM30 11h3v1h-3zM1 12h1v1h-1zM3 12h2v1h-2zM6 12h1v1h-1zM9 12h3v1h-3zM13 12h1v1h-1zM15 12h1v1h-1zM17 12h2v1h-2zM20 12h2v1h-2zM24 12h1v1h-1zM26 12h2v1h-2zM31 12h2v1h-2zM1 13h2v1h-2zM7 13h3v1h-3zM13 13h2v1h-2zM18 13h1v1h-1zM22 13h6v1h-6zM0 14h3v1h-3zM4 14h3v1h-3zM10 14h1v1h-1zM12 14h1v1h-1zM15 14h1v1h-1zM18 14h5v1h-5zM24 14h1v1h-1zM26 14h1v1h-1zM28 14h2v1h-2zM1 15h1v1h-1zM3 15h1v1h-1zM7 15h1v1h-1zM11 15h2v1h-2zM16 15h1v1h-1zM19 15h1v1h-1zM23 15h3v1h-3zM27 15h4v1h-4zM32 15h1v1h-1zM0 16h1v1h-1zM6 16h3v1h-3zM13 16h1v1h-1zM15 16h2v1h-2zM20 16h1v1h-1zM22 16h7v1h-7zM30 16h1v1h-1zM1 17h2v1h-2zM4 17h1v1h-1zM9 17h1v1h-1zM12 17h1v1h-1zM14 17h9v1h-9zM25 17h2v1h-2zM28 17h1v1h-1zM30 17h1v1h-1zM32 17h1v1h-1zM0 18h1v1h-1zM3 18h1v1h-1zM5 18h2v1h-2zM8 18h1v1h-1zM10 18h1v1h-1zM15 18h5v1h-5zM21 18h4v1h-4zM27 18h1v1h-1zM29 18h2v1h-2zM32 18h1v1h-1zM0 19h1v1h-1zM3 19h3v1h-3zM8 19h1v1h-1zM12 19h1v1h-1zM18 19h1v1h-1zM22 19h2v1h-2zM26 19h1v1h-1zM28 19h5v1h-5zM3 20h1v1h-1zM6 20h2v1h-2zM10 20h1v1h-1zM12 20h1v1h-1zM14 20h3v1h-3zM18 20h1v1h-1zM20 20h2v1h-2zM23 20h1v1h-1zM28 20h2v1h-2zM0 21h2v1h-2zM4 21h2v1h-2zM8 21h3v1h-3zM17 21h2v1h-2zM21 21h3v1h-3zM25 21h1v1h-1zM27 21h2v1h-2zM30 21h1v1h-1zM0 22h1v1h-1zM3 22h5v1h-5zM11 22h2v1h-2zM14 22h1v1h-1zM17 22h1v1h-1zM22 22h2v1h-2zM26 22h1v1h-1zM28 22h5v1h-5zM0 23h1v1h-1zM2 23h3v1h-3zM7 23h1v1h-1zM12 23h1v1h-1zM14 23h2v1h-2zM17 23h4v1h-4zM23 23h3v1h-3zM28 23h1v1h-1zM30 23h1v1h-1zM32 23h1v1h-1zM0 24h2v1h-2zM4 24h4v1h-4zM10 24h2v1h-2zM13 24h1v1h-1zM20 24h1v1h-1zM22 24h1v1h-1zM24 24h6v1h-6zM32 24h1v1h-1zM8 25h1v1h-1zM10 25h9v1h-9zM21 25h1v1h-1zM24 25h1v1h-1zM28 25h1v1h-1zM30 25h1v1h-1zM32 25h1v1h-1zM0 26h7v1h-7zM8 26h1v1h-1zM11 26h1v1h-1zM15 26h1v1h-1zM17 26h1v1h-1zM19 26h3v1h-3zM23 26h2v1h-2zM26 26h1v1h-1zM28 26h1v1h-1zM30 26h1v1h-1zM0 27h1v1h-1zM6 27h1v1h-1zM8 27h1v1h-1zM14 27h2v1h-2zM17 27h4v1h-4zM24 27h1v1h-1zM28 27h3v1h-3zM0 28h1v1h-1zM2 28h3v1h-3zM6 28h1v1h-1zM8 28h1v1h-1zM12 28h3v1h-3zM16 28h2v1h-2zM20 28h9v1h-9zM32 28h1v1h-1zM0 29h1v1h-1zM2 29h3v1h-3zM6 29h1v1h-1zM8 29h2v1h-2zM16 29h1v1h-1zM18 29h1v1h-1zM20 29h4v1h-4zM25 29h1v1h-1zM27 29h1v1h-1zM30 29h3v1h-3zM0 30h1v1h-1zM2 30h3v1h-3zM6 30h1v1h-1zM11 30h1v1h-1zM13 30h1v1h-1zM15 30h1v1h-1zM18 30h3v1h-3zM23 30h2v1h-2zM27 30h3v1h-3zM31 30h2v1h-2zM0 31h1v1h-1zM6 31h1v1h-1zM10 31h1v1h-1zM12 31h3v1h-3zM25 31h1v1h-1zM27 31h6v1h-6zM0 32h7v1h-7zM8 32h1v1h-1zM10 32h1v1h-1zM15 32h4v1h-4zM23 32h2v1h-2zM27 32h2v1h-2z';
-const ROUTES = ['home', 'scan', 'past', 'map', 'rank', 'friends', 'board', 'teams', 'sea', 'char', 'dex', 'tackle', 'log', 'help', 'prefs', 'admin'];
+const ROUTES = ['home', 'scan', 'past', 'map', 'rank', 'friends', 'board', 'teams', 'sea', 'char', 'dex', 'tackle', 'log', 'help', 'about', 'prefs', 'admin'];
 const LIVE_VIEWS = new Set(['home', 'rank', 'friends', 'board', 'teams', 'sea', 'dex', 'log', 'admin']);
 const viewOf = r => (r === 'past' ? 'scan' : r);
 
@@ -7446,6 +7924,7 @@ document.addEventListener('click', e => {
     else if (a === 'ask-confirm') openConfirm();
     else if (a === 'preview-off') { S.preview = null; rerender(); }
     else if (a === 'rec-off') { S.recDismiss = true; rerender(); }
+    else if (a === 'idtip-off') { lsSet('idTipOff', 1); rerender(); }
     else if (a === 'theme-cycle') setTheme(S.theme === 'system' ? 'dark' : S.theme === 'dark' ? 'light' : 'system');
     return;
   }
@@ -7461,6 +7940,8 @@ document.addEventListener('click', e => {
   const ma = tgt.closest('[data-modav]'); if (ma) { modToggle('av', ma.dataset.modav).then(rerender); return; }
   const nt = tgt.closest('[data-newstab]'); if (nt) { S.newsTab = nt.dataset.newstab; rerender(); return; }
   const nm = tgt.closest('[data-news="more"]'); if (nm) { openNews(); return; }
+  const idb = tgt.closest('[data-id]'); if (idb) { const k = idb.dataset.id; if (k === 'create') openIdCreate(); else if (k === 'login') openIdLogin(); else if (k === 'password') openIdPassword(); else if (k === 'logout') idLogout(idb); return; }
+  const du = tgt.closest('[data-deluser]'); if (du) { adminDeleteUser(du.dataset.deluser, du); return; }
   const lk = tgt.closest('[data-link]'); if (lk) { const k = lk.dataset.link; if (k === 'make') openLinkMake(); else if (k === 'enter') openLinkEnter(); else if (k === 'leave') linkLeave(lk); return; }
   const bc = tgt.closest('[data-bdcat]'); if (bc) { S.bd = Object.assign(S.bd || {}, { cat: bc.dataset.bdcat }); if (S.route !== 'board') location.hash = 'board'; else VIEWS.board.render($('#v-board')); return; }
   const bs = tgt.closest('[data-bdsort]'); if (bs) { S.bd = Object.assign(S.bd || {}, { sort: bs.dataset.bdsort }); VIEWS.board.render($('#v-board')); return; }

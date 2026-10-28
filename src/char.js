@@ -15,7 +15,7 @@ const CH = (() => {
     ht: { none: 1, cap: 1, bucket: 1, beanie: 2, band: 3, straw: 5, visor: 8, captain: 15 },
     ou: { tee: 1, vest: 1, hoodie: 2, rain: 4, life: 6, wet: 10, captain: 15 },
     ac: { none: 1, glasses: 1, bandaid: 1, shades: 3, towel: 5, flower: 7, lamp: 9 },
-    rd: { bamboo: 1, carbon: 2, lure: 6, sea: 11, gold: 'pr_gold' }
+    rd: { bamboo: 1, carbon: 1, lure: 6, sea: 11, gold: 'pr_gold' }
   };
   const ROD = { bamboo: ['#B88A4A', '#8A6232'], carbon: ['#23272E', '#D2412F'], lure: ['#2F6FD0', '#F2F2F2'], sea: ['#F2F2F2', '#2F6FB5'], gold: ['#F5C542', '#B8860B'] };
   const DEF = { v: 1, sk: 1, hs: 'short', hc: 0, ey: 'dot', mo: 'smile', ht: 'cap', htc: '#FF5A1F', ou: 'vest', ouc: '#3E8E5A', ac: 'none', rd: 'carbon', bg: '#CDEBF5' };
@@ -204,10 +204,23 @@ const CH = (() => {
   }
   function needOf(part, id) { const n = P[part] && P[part][id]; return typeof n === 'number' ? n : n ? 'pr' : 1; }
   function hairLocked(i) { return myLevel() < HAIRC[i][1]; }
-  return { SKIN, HAIRC, CLOTH, BG, P, ROD, DEF, norm, fromSeed, svg, url, image, locked, needOf, hairLocked };
+  // parts above the angler's level (or an unpaid gold rod) fall back to the default part
+  function fit(c, a, uid) {
+    const mine = a === S.me || (uid && uid === myId());
+    const L = mine ? myLevel() : lvInfo(a, uid).L;
+    const o = Object.assign({}, c);
+    for (const k of ['hs', 'ey', 'mo', 'ht', 'ou', 'ac', 'rd']) {
+      const need = P[k][o[k]];
+      const lockedHere = typeof need === 'number' ? need > L : typeof need === 'string' ? (mine ? !paidFor(need) : false) : false;
+      if (lockedHere) o[k] = DEF[k];
+    }
+    if (HAIRC[o.hc] && HAIRC[o.hc][1] > L) o.hc = 0;
+    return o;
+  }
+  return { SKIN, HAIRC, CLOTH, BG, P, ROD, DEF, norm, fromSeed, svg, url, image, locked, needOf, hairLocked, fit };
 })();
 
-function charOf(a, uid) { return a && a.char ? CH.norm(a.char) : CH.fromSeed(uid || (a && a.nick) || 'x'); }
+function charOf(a, uid) { return a && a.char ? CH.fit(CH.norm(a.char), a, uid || avatarUid(a)) : CH.fromSeed(uid || (a && a.nick) || 'x'); }
 function safeColor(c) { return /^#[0-9a-fA-F]{6}$/.test(String(c)) ? c : '#CDEBF5'; }
 
 /* ---- avatars: character face, uploaded photo, or the first letter ---- */
@@ -216,7 +229,7 @@ function picHidden(uid, a) { const m = S.admin.mod && S.admin.mod.av; return !!(
 function avatar(a, size = 36) {
   const nick = (a && a.nick) || '?';
   const uid = avatarUid(a);
-  const fl = (a && a.flair) || {};
+  const fl = flairOf(a, uid);
   const cls = 'avatar' + (fl.gold ? ' gold' : fl.frame ? ' framed' : '');
   const mode = a ? (a.av || 'char') : 'init';
   const letter = esc([...nick][0] || '?');
@@ -227,7 +240,7 @@ function avatar(a, size = 36) {
   if (mode !== 'init' && a && (a.char || uid || a.nick)) { const ch = charOf(a, uid); return `<span class="${cls} chr" style="--s:${size}px;--cbg:${safeColor(ch.bg)}" aria-hidden="true"><img src="${CH.url(ch, 'head')}" alt="" loading="lazy"></span>`; }
   return `<span class="${cls}" style="--h:${FD.hashStr(nick) % 360};--s:${size}px" aria-hidden="true">${letter}</span>`;
 }
-function nickHTML(a) { return `<span class="nick${a && a.flair && a.flair.gold ? ' gold' : ''}">${esc((a && a.nick) || '?')}</span>`; }
+function nickHTML(a) { return `<span class="nick${flairOf(a).gold ? ' gold' : ''}">${esc((a && a.nick) || '?')}</span>`; }
 async function loadAvatarPhoto(uid, ts) {
   const key = uid + '/_pic@' + ts;
   if (S.photoCache.has(key)) return S.photoCache.get(key);
@@ -307,7 +320,7 @@ VIEWS.char = {
       const am = e.target.closest('[data-avmode]'); if (am) { setAvatarMode(am.dataset.avmode); return; }
     };
     $('#ch-save', el).onclick = async () => {
-      S.me.char = CH.norm(S.chDraft); if (!S.me.av || S.me.av === 'init') S.me.av = 'char';
+      S.me.char = CH.fit(CH.norm(S.chDraft), S.me, myId()); if (!S.me.av || S.me.av === 'init') S.me.av = 'char';
       await store.saveMe(); S.dataVer++; toast(t('ch_saved')); rerender();
     };
     $('#ch-rand', el).onclick = () => {

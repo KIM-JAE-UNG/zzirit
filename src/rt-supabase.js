@@ -51,14 +51,26 @@
     leave: () => rpcOrThrow('link_leave'),
     linked: () => !!(authId && acctId && authId !== acctId)
   };
-  const news = {
-    async refresh() {
-      const tk = await token();
-      const r = await fetch(CFG.url + '/functions/v1/news', { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: CFG.key, Authorization: 'Bearer ' + (tk || CFG.key) }, body: '{}' });
-      return r.ok;
-    }
+  const callFn = async name => {
+    const tk = await token();
+    const r = await fetch(CFG.url + '/functions/v1/' + name, { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: CFG.key, Authorization: 'Bearer ' + (tk || CFG.key) }, body: '{}' });
+    return r.ok;
   };
-  window.APP_AUTH = { sb, session, acct, link, news, error: () => authErr };
+  const news = { refresh: () => callFn('news') };
+  // the automatic reviewer runs on its own every few minutes; a fresh catch just nudges it (it ignores extra nudges)
+  const review = { ping: () => callFn('review').catch(() => false) };
+  // operator only (checked on the server): remove an account with everything it posted
+  const admin = { deleteUser: uid => rpcOrThrow('admin_delete_user', { p_uid: uid }) };
+  // login ID + password: the server keeps only a hash; logging in joins this device to that account
+  const ids = {
+    me: () => rpcOrThrow('id_me'),
+    register: (name, pass) => rpcOrThrow('id_register', { p_name: name, p_pass: pass }),
+    login: (name, pass) => rpcOrThrow('id_login', { p_name: name, p_pass: pass }),
+    password: (o, n) => rpcOrThrow('id_password', { p_old: o, p_new: n }),
+    adminReset: (name, pass) => rpcOrThrow('admin_id_reset', { p_name: name, p_new: pass }),
+    async logout() { try { await sb.auth.signOut({ scope: 'local' }); } catch (e) { } }
+  };
+  window.APP_AUTH = { sb, session, acct, link, news, review, admin, ids, error: () => authErr };
 
   /* ---- document paths → tables ---- */
   function route(path) {

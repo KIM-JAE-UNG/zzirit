@@ -268,8 +268,9 @@ function openOnboarding(then) {
       <p class="lede">${t('onb_sub')}</p>
       ${profileFormHTML(p)}
       ${S.mode !== 'shared' ? `<p class="note">${icon('info')} ${t(S.mode === 'local' ? 'mode_local_note' : 'mode_offline_note')}</p>` : ''}
-      <div class="actions"><button class="btn btn-primary btn-lg" id="onb-go">${t('onb_go')}</button></div>
+      <div class="actions"><button class="btn btn-primary btn-lg" id="onb-go">${t('onb_go')}</button>${idSupported() ? `<button class="btn btn-ghost" id="onb-login">${icon('user')}${t('id_have')}</button>` : ''}</div>
     </div>`, { label: t('onb_title') });
+  const lg = $('#onb-login', w); if (lg) lg.onclick = () => { closeModal(w); openIdLogin(); };
   const cv = $('#onb-cv', w); if (cv) { const ctx = cv.getContext('2d'); ['kurodai', 'madai', 'aoriika', 'buri'].forEach((id, i) => FD.draw(ctx, SPI[id], 80 + i * 135, 78 + (i % 2) * 10, i === 2 ? 110 : 120, { still: true, flip: i % 2 === 1 })); }
   $('#onb-go', w).onclick = async () => {
     const f = readProfileForm(w);
@@ -353,21 +354,48 @@ function openPay({ kind, ref, amt, title, desc, onDone }) {
   done.onclick = async () => {
     if (done.disabled) return;
     done.disabled = true;
+    // records the order with its memo code; nothing is applied until the operator finds the money and confirms it
     const o = { id: rid(10), kind, ref: ref || null, amt, code, m: method, ts: nowMs(), nick: S.me?.nick || '', qty: 1 };
     await store.addOrder(o);
     closeModal(w);
-    toast(t(kind === 'donate' ? 'pay_thanks' : 'pay_applied2'), 'ok', 5200);
+    toast(t('pay_sent', { code }), 'ok', 7000);
     onDone && onDone(o);
     rerender();
   };
 }
+/* At most a few orders may wait for confirmation at once (the server enforces the same), and one per item */
+const PAY_PENDING_MAX = 3;
+function payBlocked(kind, ref) {
+  const same = kind === 'item' ? pendingOrders('item', ref)[0] : null;
+  if (same) { toast(t('pay_dup', { code: same.code }), 'info', 7000); return true; }
+  if (pendingOrders().length >= PAY_PENDING_MAX) { toast(t('pay_many'), 'info', 7000); return true; }
+  return false;
+}
 function openDonate() {
+  if (S.mode === 'shared' && payBlocked('donate')) return;
   openPay({ kind: 'donate', amt: DONATE_AMT, title: t('donate_title'), desc: t('donate_desc') });
 }
 function buyItem(id) {
   const it = SHOPI[id]; if (!it || !it.pr) return;
   if (owned(id)) { applyItem(id); toast(t('applied')); rerender(); return; }
-  ensureProfile(() => openPay({ kind: 'item', ref: id, amt: PREMIUM_PRICE, title: dict(it.n), desc: t('prem_desc_' + id), onDone: () => { applyItem(id); } }));
+  if (S.mode === 'shared' && payBlocked('item', id)) return;
+  ensureProfile(() => openPay({ kind: 'item', ref: id, amt: PREMIUM_PRICE, title: dict(it.n), desc: t('prem_desc_' + id) }));
+}
+/* When the operator confirms one of my orders: put the item on once and say thanks (each order only once per device) */
+function payNotify() {
+  if (S.mode !== 'shared' || !S.me || !S.me.nick || !S.ordersLoaded || !S.adminLoaded) return;
+  let seen; try { seen = new Set(lsGet('payok', [])); } catch (e) { seen = new Set(); }
+  const g = grantsOf(myId()); let changed = false, applied = false;
+  for (const o of S.myOrders) {
+    if (g[o.id] !== 'ok' || seen.has(o.id)) continue;
+    seen.add(o.id); changed = true;
+    if (!o.ts || nowMs() - o.ts > 30 * 864e5) continue;
+    const it = o.kind === 'item' && SHOPI[o.ref];
+    if (it && it.pr) { applyItem(o.ref); applied = true; toast(t('pay_ok_item', { name: dict(it.n) }), 'ok', 7000); }
+    else if (o.kind === 'donate') toast(t('pay_ok_donate'), 'ok', 7000);
+  }
+  if (changed) lsSet('payok', [...seen].slice(-300));
+  if (applied) rerenderSoon();
 }
 function setFlair(id, on) {
   S.me.flair = S.me.flair || {};
@@ -398,17 +426,23 @@ function toggleItem(id) {
   else if (it.k === 'set') { applyItem(id); rerender(); return; }
   store.saveMe(); rerender();
 }
-/* Drop looks that are no longer owned (a cancelled order, a level that went down after a rejected catch) */
+/* Drop looks that are no longer owned (an unconfirmed or cancelled order, a level that went down after a rejected catch) */
 function cleanLooks() {
-  if (!S.me || !S.me.decor) return false;
-  const d = S.me.decor; let changed = false;
-  if (d.theme && SHOPI[d.theme] && !owned(d.theme)) { d.theme = 'th_dawn'; changed = true; }
-  const keep = x => !SHOPI[x] || owned(x);
-  const items = (d.items || []).filter(keep), fx = (d.fx || []).filter(keep);
-  if (items.length !== (d.items || []).length || fx.length !== (d.fx || []).length) { d.items = items; d.fx = fx; changed = true; }
+  if (!S.me) return false;
+  let changed = false;
+  if (S.me.decor) {
+    const d = S.me.decor;
+    if (d.theme && SHOPI[d.theme] && !owned(d.theme)) { d.theme = 'th_dawn'; changed = true; }
+    const keep = x => SHOPI[x] && owned(x);
+    const items = (d.items || []).filter(keep), fx = (d.fx || []).filter(keep);
+    if (items.length !== (d.items || []).length || fx.length !== (d.fx || []).length) { d.items = items; d.fx = fx; changed = true; }
+  }
   if (S.me.flair && S.me.flair.gold && !owned('fl_gold')) { S.me.flair.gold = false; changed = true; }
   if (S.me.flair && S.me.flair.frame && !owned('fl_wave')) { S.me.flair.frame = false; changed = true; }
-  if (S.me.char && S.me.char.rd === 'gold' && !paidFor('pr_gold')) { S.me.char.rd = 'carbon'; changed = true; }
+  if (S.me.char) {
+    const fitted = CH.fit(CH.norm(S.me.char), S.me, myId());
+    if (JSON.stringify(fitted) !== JSON.stringify(CH.norm(S.me.char))) { S.me.char = fitted; changed = true; }
+  }
   return changed;
 }
 
@@ -464,6 +498,117 @@ async function openLens() {
       const how = $('#ln-how', w); if (how) how.textContent = t('lens_how_paste');
     }
   } catch (e) { /* saving the photo still works */ }
+}
+
+/* ===== Login ID (web build): one ID + password for every device. No email; the server keeps only a hash. ===== */
+function idSupported() { return window.APP_RT === 'web' && !!(window.APP_AUTH && window.APP_AUTH.ids) && !S.idOff; }
+async function myLoginId(force) {
+  if (!idSupported()) return null;
+  if (!force && S.loginId !== undefined) return S.loginId;
+  // if the server can't answer (not set up yet, or offline), hide the ID features instead of showing broken buttons
+  try { S.loginId = (await window.APP_AUTH.ids.me()) || null; } catch (e) { if (S.loginId === undefined) S.loginId = null; S.idOff = true; }
+  return S.loginId;
+}
+function idErr(code) {
+  const k = { bad_name: 'name', bad_pass: 'pass', taken: 'taken', wrong: 'wrong', slow_down: 'slow', slow: 'slow', has_id: 'has_id', team_leader: 'leader', no_id: 'no_id', mismatch: 'mismatch' }[code] || 'fail';
+  return t('id_err_' + k);
+}
+function idFormModal({ id, title, sub, fields, go, note, onSubmit }) {
+  const w = openModal(`<form class="id-form" id="${id}" novalidate><h2>${icon('user')} ${title}</h2>${sub ? `<p class="lede">${sub}</p>` : ''}
+    ${fields.map(f => `<div class="field"><label for="${f.id}">${f.label}</label><input id="${f.id}" ${f.type ? `type="${f.type}"` : ''} autocomplete="${f.ac || 'off'}" autocapitalize="none" spellcheck="false" maxlength="${f.max || 72}" ${f.ph ? `placeholder="${esc(f.ph)}"` : ''}>${f.hint ? `<small class="muted">${f.hint}</small>` : ''}</div>`).join('')}
+    ${note || ''}
+    <p class="err" id="${id}-err" hidden></p>
+    <div class="actions"><button class="btn btn-primary" type="submit" id="${id}-go">${go}</button><button class="btn btn-ghost" type="button" data-close>${t('cancel')}</button></div></form>`, { label: title });
+  const f = $('#' + id, w), err = $('#' + id + '-err', w), btn = $('#' + id + '-go', w);
+  const val = k => $('#' + k, w).value;
+  f.addEventListener('submit', async e => {
+    e.preventDefault(); err.hidden = true; btn.disabled = true;
+    try { await onSubmit(val, w); }
+    catch (x) { btn.disabled = false; err.textContent = idErr(x && x.code); err.hidden = false; }
+  });
+  setTimeout(() => { const first = $('input', w); if (first) first.focus(); }, 60);
+  return w;
+}
+const idCheck = r => { if (!r || r.ok !== true) throw { code: (r && r.err) || 'fail' }; return r; };
+function openIdCreate() {
+  if (!idSupported()) return;
+  idFormModal({
+    id: 'idc', title: t('id_create'), sub: t('id_create_sub'), go: t('id_create_go'),
+    fields: [{ id: 'idc-name', label: t('id_name'), ac: 'username', max: 20, ph: 'zzirit_fisher', hint: t('id_name_hint') }, { id: 'idc-pass', label: t('id_pass'), type: 'password', ac: 'new-password', hint: t('id_pass_hint') }, { id: 'idc-pass2', label: t('id_pass2'), type: 'password', ac: 'new-password' }],
+    note: `<p class="hint">${icon('info')} ${t('id_forgot')}</p>`,
+    async onSubmit(v, w) {
+      const name = v('idc-name').trim().toLowerCase(), p1 = v('idc-pass'), p2 = v('idc-pass2');
+      if (!/^[a-z0-9_]{3,20}$/.test(name)) throw { code: 'bad_name' };
+      if (p1.length < 6) throw { code: 'bad_pass' };
+      if (p1 !== p2) throw { code: 'mismatch' };
+      const r = idCheck(await window.APP_AUTH.ids.register(name, p1));
+      S.loginId = r.name; closeModal(w); toast(t('id_created', { name: r.name }), 'ok', 6000); rerender();
+    }
+  });
+}
+function openIdLogin() {
+  if (!idSupported()) return;
+  const local = myCatches().length;
+  idFormModal({
+    id: 'idl', title: t('id_login'), sub: t('id_login_sub'), go: t('id_login_go'),
+    fields: [{ id: 'idl-name', label: t('id_name'), ac: 'username', max: 20 }, { id: 'idl-pass', label: t('id_pass'), type: 'password', ac: 'current-password' }],
+    note: (local ? `<p class="note">${icon('info')} ${t('link_merge_note', { n: local })}</p>` : '') + `<p class="hint">${t('id_forgot')}</p>`,
+    async onSubmit(v, w) {
+      const name = v('idl-name').trim().toLowerCase(), p = v('idl-pass');
+      if (!name || !p) throw { code: 'wrong' };
+      const r = idCheck(await window.APP_AUTH.ids.login(name, p));
+      for (const k of ['me', 'labels', 'orders', 'suggest', 'photos']) lsSet(k, null);
+      try { localStorage.removeItem('eosin.spots'); } catch (x) { }
+      closeModal(w); toast(t('id_login_ok', { name: r.name || name }), 'ok');
+      setTimeout(() => { location.hash = 'sea'; location.reload(); }, 800);
+    }
+  });
+}
+function openIdPassword() {
+  if (!idSupported()) return;
+  idFormModal({
+    id: 'idp', title: t('id_change_pw'), go: t('save'),
+    fields: [{ id: 'idp-old', label: t('id_old_pw'), type: 'password', ac: 'current-password' }, { id: 'idp-new', label: t('id_new_pw'), type: 'password', ac: 'new-password', hint: t('id_pass_hint') }, { id: 'idp-new2', label: t('id_pass2'), type: 'password', ac: 'new-password' }],
+    async onSubmit(v, w) {
+      const o = v('idp-old'), n1 = v('idp-new'), n2 = v('idp-new2');
+      if (n1.length < 6) throw { code: 'bad_pass' };
+      if (n1 !== n2) throw { code: 'mismatch' };
+      idCheck(await window.APP_AUTH.ids.password(o, n1));
+      closeModal(w); toast(t('id_pw_changed'), 'ok');
+    }
+  });
+}
+async function idLogout(btn) {
+  if (!idSupported()) return;
+  const id = await myLoginId(true); const linked = !!(window.APP_AUTH.link && window.APP_AUTH.link.linked());
+  if (!id && !linked) { toast(t('id_logout_need'), 'info', 6000); return; }
+  if (btn && !armed(btn, t('id_logout_confirm'))) return;
+  try { await window.APP_AUTH.ids.logout(); } catch (e) { }
+  for (const k of ['me', 'labels', 'orders', 'suggest', 'photos', 'payok']) lsSet(k, null);
+  toast(t('id_logged_out')); setTimeout(() => { location.hash = 'home'; location.reload(); }, 700);
+}
+function idCardHTML() {
+  if (S.loginId === undefined) { myLoginId().then(() => { const c = $('#id-card'); if (c) { if (S.idOff) c.remove(); else c.innerHTML = idCardHTML(); } }); return `<h2 class="h3">${icon('user')}${t('id_title')}</h2><p class="muted">${t('thinking')}</p>`; }
+  const linked = !!(window.APP_AUTH.link && window.APP_AUTH.link.linked());
+  return S.loginId
+    ? `<h2 class="h3">${icon('user')}${t('id_title')}</h2><p>${t('id_signed_in', { name: `<b class="mono">${esc(S.loginId)}</b>` })}</p><p class="muted small">${t('id_signed_in_sub')}</p>
+       <div class="actions"><button class="btn btn-line" data-id="password">${t('id_change_pw')}</button><button class="btn btn-ghost" data-id="logout">${t('id_logout')}</button></div>`
+    : `<h2 class="h3">${icon('user')}${t('id_title')}</h2><p class="muted">${t('id_card_sub')}</p>
+       <div class="actions"><button class="btn btn-primary" data-id="create">${t('id_create')}</button><button class="btn btn-line" data-id="login">${t('id_login')}</button>${linked ? `<button class="btn btn-ghost" data-id="logout">${t('id_logout')}</button>` : ''}</div>`;
+}
+
+/* ===== Operator: remove an account (with everything it posted) ===== */
+async function adminDeleteUser(uid, btn) {
+  if (!S.isOwner || !uid || uid === myId()) return;
+  const a = S.anglers.get(uid); const nick = (a && a.nick) || '?';
+  if (btn && !armed(btn, t('ad_del_confirm', { nick }))) return;
+  try {
+    if (window.APP_RT === 'web') { if (!window.APP_AUTH || !window.APP_AUTH.admin) throw new Error('unavailable'); await window.APP_AUTH.admin.deleteUser(uid); }
+    else await store.adminDeleteDocs(uid);
+    S.anglers.delete(uid); S.dataVer++;
+    toast(t('ad_deleted', { nick }), 'ok');
+    if (/^#sea/.test(location.hash) && location.hash.includes(uid)) location.hash = 'admin'; else rerender();
+  } catch (e) { toast(t(/admin/i.test(String(e && e.message)) ? 'ad_del_admin' : 'ad_del_fail'), 'warn'); }
 }
 
 /* ===== PC ↔ phone: one account on several devices (web build) ===== */
@@ -591,8 +736,8 @@ async function openCatch(uid, cid) {
   const a = uid === (S.uid || 'local') ? S.me : (allAnglers().get(uid));
   const c = a && (a.catches || []).find(x => x.id === cid); if (!c) return;
   const sp = SPI[c.sp]; const mine = uid === (S.uid || 'local');
-  const v = verdict(uid, c.id);
-  const st = v === 'ok' ? 'ok' : v === 'no' ? 'no' : c.st;
+  const st = catchState(uid, c);
+  const note = (mine || S.isOwner) ? reviewNote(uid, c) : null;
   const showLoc = mine && c.lat != null;
   const w = openModal(`
     <article class="cd">
@@ -601,6 +746,7 @@ async function openCatch(uid, cid) {
         <p class="eyebrow">${c.past ? t('past_catch') : t('catch')} · ${fmtDT(c.ts)}</p>
         <h2>${esc(nameOf(c.sp))} <span class="num len">${lenFmt(c.len)}</span></h2>
         <div class="chips">${statusChip(st, c.tr)}${toxChip(sp)}${c.rel ? `<span class="chip chip-ok">${t('released')}</span>` : ''}${isFeaturedCatch(c) ? `<span class="chip chip-feat">${t('x2')}</span>` : ''}</div>
+        ${note && note.v !== 'ok' ? `<p class="note rv-note">${icon('shield')} <span><b>${t(note.v === 'no' ? 'rv_title_no' : 'rv_title_hold')}</b> ${esc(reviewReason(note))}</span></p>` : st === 'review' && mine ? `<p class="note rv-note">${icon('clock')} <span>${t('rv_waiting')}</span></p>` : ''}
         <dl class="kv">
           <div><dt>${t('angler')}</dt><dd>${mine ? `${flag(a.cc)} ${esc(a.nick)}` : `<button class="link" data-seauid="${esc(uid)}">${flag(a.cc)} ${esc(a.nick)}</button>${relation(uid) === 'friend' ? ` <span class="chip chip-ok">${t('fr_is_friend')}</span>` : ''}`}</dd></div>
           <div><dt>${t('score')}</dt><dd class="num">${fmtN(c.sc || 0)} pt</dd></div>
@@ -664,6 +810,7 @@ async function friendAction(act, uid, btn) {
 function statusChip(st, tr) {
   if (st === 'ok') return `<span class="chip chip-ok">${icon('check')}${tr >= 70 ? t('st_verified') : t('st_ok')}</span>`;
   if (st === 'review') return `<span class="chip chip-review">${icon('clock')}${t('st_review')}</span>`;
+  if (st === 'hold') return `<span class="chip chip-wait">${icon('clock')}${t('st_hold')}</span>`;
   if (st === 'no') return `<span class="chip chip-closed">${icon('x')}${t('st_rejected')}</span>`;
   if (st === 'local') return `<span class="chip chip-local">${t('st_local')}</span>`;
   return '';

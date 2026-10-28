@@ -1,6 +1,6 @@
 /* ===== Router, global events, boot ===== */
 const QR_PATH = '__QR_PATH__';
-const ROUTES = ['home', 'scan', 'past', 'map', 'rank', 'friends', 'board', 'teams', 'sea', 'char', 'dex', 'tackle', 'log', 'help', 'prefs', 'admin'];
+const ROUTES = ['home', 'scan', 'past', 'map', 'rank', 'friends', 'board', 'teams', 'sea', 'char', 'dex', 'tackle', 'log', 'help', 'about', 'prefs', 'admin'];
 const LIVE_VIEWS = new Set(['home', 'rank', 'friends', 'board', 'teams', 'sea', 'dex', 'log', 'admin']);
 const viewOf = r => (r === 'past' ? 'scan' : r);
 
@@ -126,6 +126,7 @@ document.addEventListener('click', e => {
     else if (a === 'ask-confirm') openConfirm();
     else if (a === 'preview-off') { S.preview = null; rerender(); }
     else if (a === 'rec-off') { S.recDismiss = true; rerender(); }
+    else if (a === 'idtip-off') { lsSet('idTipOff', 1); rerender(); }
     else if (a === 'theme-cycle') setTheme(S.theme === 'system' ? 'dark' : S.theme === 'dark' ? 'light' : 'system');
     return;
   }
@@ -141,6 +142,8 @@ document.addEventListener('click', e => {
   const ma = tgt.closest('[data-modav]'); if (ma) { modToggle('av', ma.dataset.modav).then(rerender); return; }
   const nt = tgt.closest('[data-newstab]'); if (nt) { S.newsTab = nt.dataset.newstab; rerender(); return; }
   const nm = tgt.closest('[data-news="more"]'); if (nm) { openNews(); return; }
+  const idb = tgt.closest('[data-id]'); if (idb) { const k = idb.dataset.id; if (k === 'create') openIdCreate(); else if (k === 'login') openIdLogin(); else if (k === 'password') openIdPassword(); else if (k === 'logout') idLogout(idb); return; }
+  const du = tgt.closest('[data-deluser]'); if (du) { adminDeleteUser(du.dataset.deluser, du); return; }
   const lk = tgt.closest('[data-link]'); if (lk) { const k = lk.dataset.link; if (k === 'make') openLinkMake(); else if (k === 'enter') openLinkEnter(); else if (k === 'leave') linkLeave(lk); return; }
   const bc = tgt.closest('[data-bdcat]'); if (bc) { S.bd = Object.assign(S.bd || {}, { cat: bc.dataset.bdcat }); if (S.route !== 'board') location.hash = 'board'; else VIEWS.board.render($('#v-board')); return; }
   const bs = tgt.closest('[data-bdsort]'); if (bs) { S.bd = Object.assign(S.bd || {}, { sort: bs.dataset.bdsort }); VIEWS.board.render($('#v-board')); return; }
