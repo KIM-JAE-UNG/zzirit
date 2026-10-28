@@ -202,8 +202,10 @@ create table if not exists private.bak_20261028_photos as table public.photos;
 create table if not exists private.bak_20261028_spots as table public.spots;
 create table if not exists private.bak_20261028_ai_tickets as table public.ai_tickets;
 create table if not exists private.bak_20261028_labels as table public.labels;
+create table if not exists private.bak_20261028_reviews as table public.reviews;
 revoke all on private.bak_20261028_anglers, private.bak_20261028_orders, private.bak_20261028_admin_docs,
-  private.bak_20261028_photos, private.bak_20261028_spots, private.bak_20261028_ai_tickets, private.bak_20261028_labels
+  private.bak_20261028_photos, private.bak_20261028_spots, private.bak_20261028_ai_tickets, private.bak_20261028_labels,
+  private.bak_20261028_reviews
   from public, anon, authenticated;
 
 select set_config('zz.trusted', '1', false);
@@ -230,6 +232,7 @@ delete from public.spots;                         -- exact catch spots
 delete from public.ai_tickets;                    -- AI checks tied to old photos
 delete from public.labels;                        -- species corrections from old catches
 update public.admin_docs set data = '{}'::jsonb where id = 'verdicts';
+delete from public.reviews;                       -- the reviewer's notes about those catches
 
 -- orders: no payment ever reached the operator, so every order and every decision on orders goes
 delete from public.orders;
