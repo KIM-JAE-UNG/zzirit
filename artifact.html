@@ -4829,14 +4829,26 @@ async function openLens() {
     <p class="hint">${icon('info')} ${t('lens_note')}</p>
   </div>`, { label: t('lens_title'), onClose: () => { if (w._url) setTimeout(() => URL.revokeObjectURL(w._url), 2000); } });
   const jpg = await lensBlob('image/jpeg'); if (!jpg || !w.isConnected) return;
-  const url = w._url = URL.createObjectURL(jpg);
-  const s1 = $('#ln-step1', w); if (s1) s1.innerHTML = `<a class="btn btn-line btn-sm" href="${url}" download="zzirit-fish.jpg">${icon('image')}${t('lens_save')}</a>`;
+  const s1 = $('#ln-step1', w);
+  // website: a plain download link. Inside Claude a page cannot download by itself, so it asks through the downloads permission.
+  const web = window.APP_RT === 'web';
+  const dl = web ? null : (window.claude?.use ? await claude.use('downloads').catch(() => null) : null);
+  if (!w.isConnected) return;
+  let saveBtn = '';
+  if (web) { const url = w._url = URL.createObjectURL(jpg); saveBtn = `href="${url}" download="zzirit-fish.jpg"`; }
+  else if (dl) saveBtn = 'href="#" data-lens-save';
+  if (s1) s1.innerHTML = saveBtn ? `<a class="btn btn-line btn-sm" ${saveBtn}>${icon('image')}${t('lens_save')}</a>` : '';
+  if (dl) w.addEventListener('click', e => {
+    if (!e.target.closest('[data-lens-save]')) return;
+    e.preventDefault();
+    dl.save({ filename: 'zzirit-fish.jpg', data: jpg }).catch(err => { if (err && err.code !== 'declined') toast(t('ai_err_generic'), 'warn'); });
+  });
   if (!(navigator.clipboard && window.ClipboardItem)) return;
   try {
     const png = await lensBlob('image/png');
     const copied = await Promise.race([navigator.clipboard.write([new ClipboardItem({ 'image/png': png })]).then(() => true), new Promise(r => setTimeout(() => r(false), 4000))]);
     if (copied && w.isConnected) {
-      if (s1) s1.innerHTML = `<b>${icon('check')} ${t('lens_copied')}</b> <a class="link small" href="${url}" download="zzirit-fish.jpg">${t('lens_save')}</a>`;
+      if (s1) s1.innerHTML = `<b>${icon('check')} ${t('lens_copied')}</b>` + (saveBtn ? ` <a class="link small" ${saveBtn}>${t('lens_save')}</a>` : '');
       const how = $('#ln-how', w); if (how) how.textContent = t('lens_how_paste');
     }
   } catch (e) { /* saving the photo still works */ }
