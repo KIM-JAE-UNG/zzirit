@@ -9,6 +9,7 @@ function rid(n = 8) { const a = 'abcdefghijkmnpqrstuvwxyz23456789'; let s = ''; 
 function debounce(fn, ms) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const nowMs = () => Date.now();
+function tagUid(o, id) { if (o && typeof o === 'object' && id) { try { Object.defineProperty(o, '_uid', { value: id, enumerable: false, configurable: true, writable: true }); } catch (e) { } } return o; }
 function icon(id, cls = '') { return `<svg class="ic ${cls}" aria-hidden="true"><use href="#i-${id}"/></svg>`; }
 
 /* ===== Constants ===== */
@@ -18,34 +19,45 @@ const DEV = { name: '김재웅', kakaoId: 'rlawodnd12', kakaoUrl: 'https://qr.ka
 const EA_CC = ['KR', 'JP', 'CN', 'TW', 'HK', 'MO', 'MN'];
 const COUNTRIES = ['KR', 'JP', 'CN', 'TW', 'HK', 'MO', 'MN', 'US', 'CA', 'MX', 'BR', 'AR', 'CL', 'PE', 'CO', 'GB', 'IE', 'FR', 'DE', 'ES', 'PT', 'IT', 'NL', 'BE', 'CH', 'AT', 'SE', 'NO', 'FI', 'DK', 'IS', 'PL', 'CZ', 'HU', 'GR', 'TR', 'RU', 'UA', 'IL', 'AE', 'SA', 'EG', 'ZA', 'KE', 'MA', 'IN', 'LK', 'BD', 'TH', 'VN', 'MY', 'SG', 'ID', 'PH', 'KH', 'MM', 'AU', 'NZ', 'FJ'];
 const HOMES = ['KW', 'KS', 'KE', 'KJ', 'KF', 'JP', 'JF', 'CN', 'CF', 'TW', 'ST', 'NP', 'NA', 'GM', 'MD', 'AU', 'IO', 'SA', 'FN', 'FE', 'FS', 'FA', 'FO', 'FF'];
-const FREE_PAST = 5, PAST_PRICE = 500, DONATE_AMT = 500;
+const PREMIUM_PRICE = 500, DONATE_AMT = 500;
+/* Decorations. Everything unlocks for free by level (lv). Only two premium items (pr) cost 500 won each;
+   `in` names the premium set an item comes with; `top` is earned by a monthly top-10 finish (Korea). */
 const SHOP = [
-  { id: 'th_dawn', k: 'theme', p: 0, n: ['새벽 방파제', 'Dawn breakwater', '夜明けの堤防', '黎明防波堤'] },
-  { id: 'th_day', k: 'theme', p: 0, n: ['한낮 연안', 'Midday coast', '真昼の沿岸', '正午海岸'] },
-  { id: 'th_sunset', k: 'theme', p: 1000, n: ['노을 등대', 'Sunset lighthouse', '夕焼けの灯台', '晚霞灯塔'] },
-  { id: 'th_night', k: 'theme', p: 1500, n: ['집어등 밤바다', 'Squid-light night', '集魚灯の夜の海', '集鱼灯夜海'] },
-  { id: 'th_reef', k: 'theme', p: 1500, n: ['산호 리프', 'Coral reef', 'サンゴ礁', '珊瑚礁'] },
-  { id: 'th_aurora', k: 'theme', p: 2000, n: ['오로라 피오르', 'Aurora fjord', 'オーロラのフィヨルド', '极光峡湾'] },
-  { id: 'th_sakura', k: 'theme', p: 1000, n: ['벚꽃 포구', 'Cherry-blossom harbor', '桜の漁港', '樱花渔港'] },
-  { id: 'dc_weed', k: 'decor', p: 0, n: ['해초', 'Seaweed', '海藻', '海草'] },
-  { id: 'dc_rock', k: 'decor', p: 0, n: ['바위', 'Rocks', '岩', '礁石'] },
-  { id: 'dc_buoy', k: 'decor', p: 0, n: ['주황 부표', 'Orange buoy', 'オレンジのブイ', '橙色浮标'] },
-  { id: 'dc_tetra', k: 'decor', p: 500, n: ['테트라포드', 'Tetrapods', 'テトラポッド', '消波块'] },
-  { id: 'dc_light', k: 'decor', p: 500, n: ['빨간 등대', 'Red lighthouse', '赤い灯台', '红色灯塔'] },
-  { id: 'dc_floats', k: 'decor', p: 500, n: ['찌 모빌', 'Float mobile', 'ウキのモビール', '浮漂风铃'] },
-  { id: 'dc_boat', k: 'decor', p: 1000, n: ['낚싯배', 'Fishing boat', '釣り船', '钓船'] },
-  { id: 'dc_chest', k: 'decor', p: 500, n: ['보물상자', 'Treasure chest', '宝箱', '宝箱'] },
-  { id: 'dc_anchor', k: 'decor', p: 500, n: ['닻', 'Anchor', '錨', '锚'] },
-  { id: 'dc_jelly', k: 'decor', p: 1000, n: ['빛나는 해파리', 'Glowing jellyfish', '光るクラゲ', '发光水母'] },
-  { id: 'dc_turtle', k: 'decor', p: 1000, n: ['바다거북 친구', 'Sea turtle buddy', 'ウミガメ', '海龟伙伴'] },
-  { id: 'dc_coral', k: 'decor', p: 1000, n: ['산호 정원', 'Coral garden', 'サンゴの庭', '珊瑚花园'] },
-  { id: 'dc_trophy', k: 'decor', p: -1, n: ['금빛 트로피', 'Golden trophy', '金のトロフィー', '金色奖杯'] },
-  { id: 'fx_rays', k: 'fx', p: 500, n: ['햇살 커튼', 'Light rays', '光のカーテン', '光束'] },
-  { id: 'fx_plankton', k: 'fx', p: 1000, n: ['야광 플랑크톤', 'Glowing plankton', '夜光プランクトン', '夜光浮游生物'] },
-  { id: 'fl_gold', k: 'flair', p: 500, n: ['금빛 닉네임', 'Gold nickname', 'ゴールドの名前', '金色昵称'] },
-  { id: 'fl_wave', k: 'flair', p: 1000, n: ['물결 프로필 테두리', 'Wave profile frame', '波のプロフィール枠', '波浪头像框'] },
-  { id: 'bd_starter', k: 'bundle', p: 1500, was: 2000, inc: ['th_sunset', 'dc_light', 'fx_rays'], n: ['노을 스타터 세트', 'Sunset starter set', '夕焼けスターターセット', '晚霞入门套装'] }
+  { id: 'th_dawn', k: 'theme', lv: 1, n: ['새벽 방파제', 'Dawn breakwater', '夜明けの堤防', '黎明防波堤'] },
+  { id: 'th_day', k: 'theme', lv: 1, n: ['한낮 연안', 'Midday coast', '真昼の沿岸', '正午海岸'] },
+  { id: 'th_sunset', k: 'theme', lv: 3, n: ['노을 등대', 'Sunset lighthouse', '夕焼けの灯台', '晚霞灯塔'] },
+  { id: 'th_sakura', k: 'theme', lv: 5, n: ['벚꽃 포구', 'Cherry-blossom harbor', '桜の漁港', '樱花渔港'] },
+  { id: 'th_night', k: 'theme', lv: 7, n: ['집어등 밤바다', 'Squid-light night', '集魚灯の夜の海', '集鱼灯夜海'] },
+  { id: 'th_reef', k: 'theme', lv: 10, n: ['산호 리프', 'Coral reef', 'サンゴ礁', '珊瑚礁'] },
+  { id: 'th_aurora', k: 'theme', lv: 14, n: ['오로라 피오르', 'Aurora fjord', 'オーロラのフィヨルド', '极光峡湾'] },
+  { id: 'th_palace', k: 'theme', pr: 1, n: ['용궁', 'Dragon Palace', '竜宮城', '龙宫'] },
+  { id: 'dc_weed', k: 'decor', lv: 1, n: ['해초', 'Seaweed', '海藻', '海草'] },
+  { id: 'dc_rock', k: 'decor', lv: 1, n: ['바위', 'Rocks', '岩', '礁石'] },
+  { id: 'dc_buoy', k: 'decor', lv: 1, n: ['주황 부표', 'Orange buoy', 'オレンジのブイ', '橙色浮标'] },
+  { id: 'dc_shell', k: 'decor', lv: 2, n: ['조개·불가사리', 'Shells & starfish', '貝とヒトデ', '贝壳和海星'] },
+  { id: 'dc_tetra', k: 'decor', lv: 2, n: ['테트라포드', 'Tetrapods', 'テトラポッド', '消波块'] },
+  { id: 'dc_floats', k: 'decor', lv: 3, n: ['찌 모빌', 'Float mobile', 'ウキのモビール', '浮漂风铃'] },
+  { id: 'dc_anchor', k: 'decor', lv: 4, n: ['닻', 'Anchor', '錨', '锚'] },
+  { id: 'dc_light', k: 'decor', lv: 4, n: ['빨간 등대', 'Red lighthouse', '赤い灯台', '红色灯塔'] },
+  { id: 'dc_chest', k: 'decor', lv: 6, n: ['보물상자', 'Treasure chest', '宝箱', '宝箱'] },
+  { id: 'dc_boat', k: 'decor', lv: 6, n: ['낚싯배', 'Fishing boat', '釣り船', '钓船'] },
+  { id: 'dc_coral', k: 'decor', lv: 8, n: ['산호 정원', 'Coral garden', 'サンゴの庭', '珊瑚花园'] },
+  { id: 'dc_jelly', k: 'decor', lv: 9, n: ['빛나는 해파리', 'Glowing jellyfish', '光るクラゲ', '发光水母'] },
+  { id: 'dc_turtle', k: 'decor', lv: 11, n: ['바다거북 친구', 'Sea turtle buddy', 'ウミガメ', '海龟伙伴'] },
+  { id: 'dc_wreck', k: 'decor', lv: 13, n: ['침몰선', 'Shipwreck', '沈没船', '沉船'] },
+  { id: 'dc_clam', k: 'decor', lv: 16, n: ['진주 대왕조개', 'Giant pearl clam', '真珠の大シャコガイ', '珍珠大砗磲'] },
+  { id: 'dc_trophy', k: 'decor', top: 1, n: ['금빛 트로피', 'Golden trophy', '金のトロフィー', '金色奖杯'] },
+  { id: 'fx_bubbles', k: 'fx', lv: 1, n: ['물방울', 'Bubbles', '泡', '气泡'] },
+  { id: 'fx_rays', k: 'fx', lv: 3, n: ['햇살 커튼', 'Light rays', '光のカーテン', '光束'] },
+  { id: 'fx_plankton', k: 'fx', lv: 8, n: ['야광 플랑크톤', 'Glowing plankton', '夜光プランクトン', '夜光浮游生物'] },
+  { id: 'fx_school', k: 'fx', lv: 12, n: ['정어리 떼', 'Sardine school', 'イワシの群れ', '沙丁鱼群'] },
+  { id: 'fl_wave', k: 'flair', lv: 5, n: ['물결 프로필 테두리', 'Wave profile frame', '波のプロフィール枠', '波浪头像框'] },
+  { id: 'pr_gold', k: 'set', pr: 1, inc: ['fl_gold', 'dc_goldboat', 'fx_sparkle'], n: ['황금 낚시꾼 세트', 'Golden Angler set', '黄金の釣り師セット', '黄金钓手套装'] },
+  { id: 'fl_gold', k: 'flair', in: 'pr_gold', n: ['금빛 닉네임·테두리', 'Gold name & frame', '金の名前と枠', '金色昵称和头像框'] },
+  { id: 'dc_goldboat', k: 'decor', in: 'pr_gold', n: ['황금 보트', 'Golden boat', '黄金のボート', '黄金船'] },
+  { id: 'fx_sparkle', k: 'fx', in: 'pr_gold', n: ['황금 반짝이', 'Gold sparkle', '金のきらめき', '金色闪光'] }
 ];
+const DEFAULT_DECOR = () => ({ theme: 'th_dawn', items: ['dc_weed', 'dc_rock', 'dc_buoy'], fx: ['fx_bubbles'] });
 const SHOPI = Object.fromEntries(SHOP.map(s => [s.id, s]));
 
 /* ===== App state ===== */
@@ -53,8 +65,9 @@ const S = {
   lang: 'ko', li: 0, theme: 'system', unit: 'cm',
   uid: null, isOwner: false, writable: null, mode: 'boot', ready: false,
   db: null, user: null, sample: null, sampleImages: false,
-  me: null, anglers: new Map(), labels: new Map(),
-  admin: { config: {}, grants: {}, verdicts: {} },
+  me: null, anglers: new Map(), labels: new Map(), board: new Map(), teams: new Map(), news: [],
+  myBoard: null,
+  admin: { config: {}, grants: {}, verdicts: {}, mod: {} },
   myOrders: [], myLabels: [], mySuggest: [],
   allOrders: new Map(), allSuggest: new Map(),
   photoCache: new Map(),
@@ -117,17 +130,26 @@ const store = (() => {
       if (db) {
         const sub = (q, fn) => { try { return q.onSnapshot(fn, e => console.warn('snapshot', e)); } catch (e) { console.warn(e); } };
         sub(db.collection('anglers').limit(1000), snap => {
-          const m = new Map(); for (const d of snap.docs) if (d.exists) m.set(d.id, d.data());
+          const m = new Map(); for (const d of snap.docs) if (d.exists) m.set(d.id, tagUid(d.data(), d.id));
           S.anglers = m; S.dataVer++;
-          if (S.uid && m.has(S.uid) && S.mode === 'shared') S.me = JSON.parse(JSON.stringify(m.get(S.uid)));
+          if (S.uid && m.has(S.uid) && S.mode === 'shared') S.me = tagUid(JSON.parse(JSON.stringify(m.get(S.uid))), S.uid);
           try { frNotify(); } catch (e) { console.warn(e); }
+          S.anglersLoaded = true; maybeCleanLooks();
           rerenderSoon();
         });
         sub(db.collection('labels').limit(1000), snap => { const m = new Map(); for (const d of snap.docs) if (d.exists) m.set(d.id, d.data()); S.labels = m; S.dataVer++; rerenderSoon(); });
-        sub(db.collection('admin'), snap => { for (const d of snap.docs) if (d.exists) S.admin[d.id] = d.data(); rerenderSoon(); });
+        sub(db.collection('board').limit(1000), snap => {
+          const m = new Map(); for (const d of snap.docs) if (d.exists) m.set(d.id, d.data());
+          S.board = m; S.dataVer++;
+          if (S.uid && m.has(S.uid) && S.mode === 'shared') S.myBoard = JSON.parse(JSON.stringify(m.get(S.uid)));
+          rerenderSoon();
+        });
+        sub(db.collection('teams').limit(1000), snap => { const m = new Map(); for (const d of snap.docs) if (d.exists) m.set(d.id, d.data()); S.teams = m; S.dataVer++; rerenderSoon(); });
+        if (window.APP_RT === 'web') sub(db.collection('news').limit(200), snap => { S.news = snap.docs.filter(d => d.exists).map(d => Object.assign({ id: d.id }, d.data())); S.newsVer = (S.newsVer || 0) + 1; rerenderSoon(); });
+        sub(db.collection('admin'), snap => { for (const d of snap.docs) if (d.exists) S.admin[d.id] = d.data(); S.adminLoaded = true; S.dataVer++; maybeCleanLooks(); rerenderSoon(); });
         if (S.uid && S.writable !== false) {
           S.mode = 'shared';
-          sub(db.doc('orders/' + S.uid), d => { if (d.exists) S.myOrders = (d.data().items || []).slice(); rerenderSoon(); });
+          sub(db.doc('orders/' + S.uid), d => { if (d.exists) S.myOrders = (d.data().items || []).slice(); S.ordersLoaded = true; maybeCleanLooks(); rerenderSoon(); });
           sub(db.doc('suggest/' + S.uid), d => { if (d.exists) S.mySuggest = (d.data().items || []).slice(); });
           // first-time: migrate a local profile into the shared store
           setTimeout(async () => {
@@ -150,6 +172,7 @@ const store = (() => {
     async saveMe() {
       if (!S.me) return;
       S.me.upd = nowMs();
+      tagUid(S.me, myId());
       lsSet('me', S.me);
       if (S.mode === 'shared') { S.anglers.set(S.uid, JSON.parse(JSON.stringify(S.me))); S.dataVer++; }
       await safeWrite('anglers/' + S.uid, S.me, 'me');
@@ -181,6 +204,18 @@ const store = (() => {
       if (S.mode === 'shared') return safeWrite('suggest/' + S.uid, { items: S.mySuggest }, 'suggest');
       return false;
     },
+    async saveBoard() {
+      if (S.mode !== 'shared' || !S.uid || !S.myBoard) return false;
+      S.myBoard.upd = nowMs();
+      S.board.set(S.uid, JSON.parse(JSON.stringify(S.myBoard))); S.dataVer++;
+      return safeWrite('board/' + S.uid, S.myBoard, null);
+    },
+    async saveTeam(data) {
+      if (S.mode !== 'shared' || !S.uid) return false;
+      if (data) { S.teams.set(S.uid, JSON.parse(JSON.stringify(data))); S.dataVer++; return safeWrite('teams/' + S.uid, data, null); }
+      S.teams.delete(S.uid); S.dataVer++;
+      try { await S.db.doc('teams/' + S.uid).delete(); return true; } catch (e) { console.warn(e); toast(t('toast_write_fail'), 'warn'); return false; }
+    },
     async saveAdmin(docId, data) {
       S.admin[docId] = data;
       if (S.db && S.isOwner) { try { await S.db.doc('admin/' + docId).set(data); return true; } catch (e) { console.warn(e); toast(t('toast_write_fail'), 'warn'); } }
@@ -188,6 +223,13 @@ const store = (() => {
     }
   };
 })();
+
+/* Once purchases, operator decisions and my profile are all in, drop looks I no longer own (cancelled order, lost level) */
+function maybeCleanLooks() {
+  if (S._cleaned || S.mode !== 'shared' || !S.ordersLoaded || !S.adminLoaded || !S.anglersLoaded || !S.me || !S.me.nick) return;
+  S._cleaned = true;
+  setTimeout(() => { try { if (cleanLooks()) store.saveMe(); } catch (e) { console.warn(e); } }, 600);
+}
 
 /* ===== Derived data ===== */
 function spName(sp, li = S.li) { if (!sp) return ''; return sp.n[li] || sp.n[1] || sp.n[0]; }
@@ -230,28 +272,45 @@ function daysUntilClosed(sp, date = new Date()) {
   for (let i = 1; i <= 45; i++) { const d = new Date(date.getTime() + i * 86400000); if (isClosed(sp, d) && !isClosed(sp, new Date(d.getTime() - 86400000))) return i; }
   return null;
 }
+function grantsOf(uid) { return (S.admin.grants && S.admin.grants[uid]) || {}; }
+/* Premium items count as soon as the buyer says they sent the money; the operator can cancel later ('no'). */
+function paidFor(id) { const g = grantsOf(myId()); return S.myOrders.some(o => o.kind === 'item' && o.ref === id && g[o.id] !== 'no'); }
 function owned(itemId) {
   const it = SHOPI[itemId]; if (!it) return false;
-  if (it.p === 0) return true;
-  if (it.p === -1) return trophyEarned();
-  const grants = (S.admin.grants && S.admin.grants[S.uid || 'local']) || {};
-  for (const o of S.myOrders) {
-    if (o.kind !== 'item') continue;
-    const st = grants[o.id];
-    if (st === 'no') continue;
-    if (o.ref === itemId) return true;
-    const b = SHOPI[o.ref]; if (b && b.inc && b.inc.includes(itemId)) return true;
+  if (it.top) return trophyEarned();
+  if (it.pr) return paidFor(itemId);
+  if (it.in) return paidFor(it.in);
+  return myLevel() >= (it.lv || 1);
+}
+function orderState(o) { return grantsOf(myId())[o.id] || 'auto'; }
+function supporter() { const g = grantsOf(myId()); return S.myOrders.some(o => o.kind === 'donate' && g[o.id] !== 'no'); }
+
+/* Levels: experience comes from catches (cosmetic only, never from payments). Rejected catches give nothing. */
+const LV_TITLES = [[1, 'lvt_1'], [3, 'lvt_2'], [5, 'lvt_3'], [8, 'lvt_4'], [12, 'lvt_5'], [16, 'lvt_6'], [20, 'lvt_7']];
+const lvNeed = L => 25 * (L - 1) * L;
+function xpOf(a, uid) {
+  let xp = 0; const sp = new Set();
+  for (const c of (a && a.catches) || []) {
+    if (c.st === 'no' || verdict(uid, c.id) === 'no') continue;
+    xp += 20 + Math.min(30, Math.round((c.sc || 0) / 5)) + (c.rel ? 10 : 0);
+    if (SPI[c.sp]) sp.add(c.sp);
   }
-  return false;
+  return xp + sp.size * 40;
 }
-function orderState(o) { const g = (S.admin.grants && S.admin.grants[S.uid || 'local']) || {}; return g[o.id] || 'pending'; }
-function pastUsed() { return myCatches().filter(c => c.past && c.st !== 'no').length; }
-function pastCredits() {
-  const g = (S.admin.grants && S.admin.grants[S.uid || 'local']) || {};
-  return S.myOrders.filter(o => o.kind === 'past' && g[o.id] !== 'no').reduce((a, o) => a + (o.qty || 1), 0);
+function levelOf(xp) { let L = 1; while (L < 60 && lvNeed(L + 1) <= xp) L++; return L; }
+function lvTitle(L) { let k = LV_TITLES[0][1]; for (const [n, key] of LV_TITLES) if (L >= n) k = key; return t(k); }
+let _lvCache = { v: -1 };
+function lvInfo(a, uid) {
+  if (!a) return { xp: 0, L: 1, cur: 0, next: lvNeed(2), title: lvTitle(1) };
+  const key = uid + ':' + S.dataVer + ':' + ((a.catches || []).length) + ':' + (a.upd || 0);
+  if (_lvCache[key]) return _lvCache[key];
+  const xp = xpOf(a, uid); const L = levelOf(xp);
+  const r = { xp, L, cur: lvNeed(L), next: lvNeed(L + 1), title: lvTitle(L) };
+  if (_lvCache.v !== S.dataVer) _lvCache = { v: S.dataVer };
+  _lvCache[key] = r; return r;
 }
-function pastLeft() { return Math.max(0, FREE_PAST + pastCredits() - pastUsed()); }
-function supporter() { const g = (S.admin.grants && S.admin.grants[S.uid || 'local']) || {}; return S.myOrders.some(o => o.kind === 'donate' && g[o.id] !== 'no'); }
+function myLevel() { return lvInfo(S.me, myId()).L; }
+function lvChip(a, uid) { const i = lvInfo(a, uid); return `<span class="lv-chip" title="${esc(i.title)}">Lv.${i.L}</span>`; }
 
 /* Leaderboard */
 function periodStart(period, now = new Date()) {
@@ -368,6 +427,83 @@ function frSuggest(n = 6) {
   }
   return rows.sort((x, y) => y.s - x.s).slice(0, n);
 }
+/* ===== Board (community) =====
+   Each person keeps their own posts, comments, likes and reports in board/{uid}; the board is the merge of everyone's doc.
+   A post's global key is "authorUid|postId". Operator hides posts/comments through admin/mod. */
+const BD_CATS = ['catch', 'qna', 'tip', 'gear', 'crew', 'free'];
+const BD_MAX = { posts: 200, cmts: 1000, likes: 2000, reps: 200, title: 60, body: 2000, cmt: 500 };
+function myBoardDoc() { if (!S.myBoard) S.myBoard = { v: 1, posts: [], cmts: [], likes: [], reps: [] }; for (const k of ['posts', 'cmts', 'likes', 'reps']) if (!Array.isArray(S.myBoard[k])) S.myBoard[k] = []; return S.myBoard; }
+let _bdCache = { v: -1 };
+function boardIndex() {
+  const mod = S.admin.mod || {}; const hp = mod.hp || {}, hc = mod.hc || {};
+  if (_bdCache.v === S.dataVer && _bdCache.mod === mod) return _bdCache;
+  const posts = new Map();
+  const docs = new Map(S.board);
+  if (S.mode === 'shared' && S.uid && S.myBoard) docs.set(S.uid, S.myBoard);
+  for (const [uid, d] of docs) for (const p of (d && d.posts) || []) {
+    if (!p || !p.id || !p.title) continue;
+    const key = uid + '|' + p.id;
+    posts.set(key, Object.assign({}, p, { key, uid, likes: new Set(), cmts: [], reps: 0, hidden: !!hp[key] }));
+  }
+  for (const [uid, d] of docs) {
+    for (const c of (d && d.cmts) || []) { const p = c && posts.get(c.p); if (p && c.body) { const k = uid + '|' + c.id; p.cmts.push(Object.assign({}, c, { key: k, uid, hidden: !!hc[k] })); } }
+    for (const k of (d && d.likes) || []) { const p = posts.get(k); if (p) p.likes.add(uid); }
+    for (const r of (d && d.reps) || []) { const p = r && posts.get(r.p); if (p) p.reps++; }
+  }
+  for (const p of posts.values()) p.cmts.sort((a, b) => a.ts - b.ts);
+  _bdCache = { v: S.dataVer, mod, posts };
+  return _bdCache;
+}
+function hotScore(p) { const ageH = Math.max(1, (nowMs() - p.ts) / 3600000); return (p.likes.size * 2 + p.cmts.filter(c => !c.hidden).length * 3 + 1) / Math.pow(ageH + 2, 1.2); }
+function boardList({ cat = 'all', sort = 'new', q = '', mineOnly = false } = {}) {
+  const me = myId(); const admin = S.isOwner;
+  let list = [...boardIndex().posts.values()].filter(p => (!p.hidden || admin || p.uid === me) && (cat === 'all' || p.cat === cat) && (!mineOnly || p.uid === me));
+  const ql = q.trim().toLowerCase();
+  if (ql) list = list.filter(p => (p.title + ' ' + p.body + ' ' + (anglerOf(p.uid)?.nick || '')).toLowerCase().includes(ql));
+  if (sort === 'hot') list.sort((a, b) => hotScore(b) - hotScore(a)); else list.sort((a, b) => b.ts - a.ts);
+  return list;
+}
+
+/* ===== Teams =====
+   The leader keeps the team in teams/{leaderUid}. A member says "I'm in team X" in their own angler doc (team: {id, ts});
+   open teams accept anyone not banned, closed teams need the leader to add the member to `members`. */
+const TEAM_MAX = 30;
+const TEAM_EMOJI = ['🎣', '🐟', '🐠', '🦑', '🐙', '🦀', '🐋', '🌊', '⚓', '🔥', '⭐', '🏆'];
+const TEAM_COLORS = ['#FF5A1F', '#0B6E8E', '#13784A', '#7A3FC4', '#C28F22', '#C4223A'];
+function teamOf(uid) {
+  if (!uid) return null;
+  if (S.teams.has(uid)) return { id: uid, t: S.teams.get(uid), leader: true, ok: true };
+  const a = anglerOf(uid); const tid = a && a.team && a.team.id;
+  if (!tid || !S.teams.has(tid)) return null;
+  const tm = S.teams.get(tid);
+  if (tm.ban && tm.ban[uid]) return null;
+  const e = teamIndex().teams.get(tid);
+  const ok = !!(e && e.members.includes(uid));
+  return { id: tid, t: tm, leader: false, ok, pending: !ok };
+}
+let _tmCache = { v: -1 };
+function teamIndex() {
+  if (_tmCache.v === S.dataVer) return _tmCache;
+  const teams = new Map();
+  for (const [tid, tm] of S.teams) if (tm && tm.name) teams.set(tid, { id: tid, t: tm, members: [tid], pending: [], pts: 0 });
+  for (const [uid, a] of allAnglers()) {
+    if (!a || a._local) continue;
+    const tid = a.team && a.team.id; const e = tid && teams.get(tid);
+    if (!e || uid === tid) continue;
+    if (e.t.ban && e.t.ban[uid]) continue;
+    if (e.t.open || (e.t.members && e.t.members[uid])) e.members.push(uid); else e.pending.push(uid);
+  }
+  for (const e of teams.values()) {
+    e.members = e.members.slice(0, TEAM_MAX);
+    e.pts = e.members.reduce((s, uid) => { const a = anglerOf(uid); return s + (a ? monthPts(uid, a) : 0); }, 0);
+  }
+  const ranked = [...teams.values()].sort((x, y) => y.pts - x.pts || x.t.name.localeCompare(y.t.name));
+  let r = 0, prev = null; ranked.forEach((e, i) => { if (e.pts !== prev) r = i + 1; prev = e.pts; e.rank = e.pts > 0 ? r : null; });
+  _tmCache = { v: S.dataVer, teams, ranked };
+  return _tmCache;
+}
+function teamTag(uid) { const m = teamOf(uid); if (!m || !m.ok) return ''; return `<span class="team-tag" style="--tc:${esc(m.t.color || '#0B6E8E')}">${esc(m.t.tag || '')}</span>`; }
+
 /* Toast when a request arrives or someone accepts mine while the app is open */
 function frNotify() {
   if (S.mode !== 'shared' || !S.me || !S.me.nick) return;

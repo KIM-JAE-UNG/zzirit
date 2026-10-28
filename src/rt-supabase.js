@@ -27,18 +27,50 @@
     return sessP;
   }
   async function token() { const { data } = await sb.auth.getSession(); return data && data.session ? data.session.access_token : null; }
-  window.APP_AUTH = { sb, session, error: () => authErr };
+  /* One account can be used on several devices: each device signs in on its own, then a link code ties it to the
+     account that holds the records. acct() is that account's id (the database checks the same mapping). */
+  let acctP = null, authId = null, acctId = null;
+  function acct() {
+    if (!acctP) acctP = (async () => {
+      const s = await session(); if (!s) return null;
+      authId = s.user.id; acctId = authId;
+      try { const { data, error } = await sb.rpc('my_acct'); if (!error && typeof data === 'string' && data) acctId = data; } catch (e) { }
+      return acctId;
+    })();
+    return acctP;
+  }
+  async function rpcOrThrow(name, args) {
+    const s = await session(); if (!s) throw mkErr('not_granted', 'not signed in');
+    const { data, error } = await sb.rpc(name, args || {});
+    if (error) throw mkErr(/slow|rate/i.test(error.message) ? 'slow' : /bad|expired|invalid/i.test(error.message) ? 'bad_code' : /team_leader/i.test(error.message) ? 'team_leader' : 'unavailable', error.message);
+    return data;
+  }
+  const link = {
+    create: () => rpcOrThrow('link_create'),
+    async redeem(code) { const r = await rpcOrThrow('link_redeem', { p_code: code }); if (!r || r.ok !== true) throw mkErr((r && r.err) || 'bad_code', (r && r.err) || 'bad_code'); return r.acct; },
+    leave: () => rpcOrThrow('link_leave'),
+    linked: () => !!(authId && acctId && authId !== acctId)
+  };
+  const news = {
+    async refresh() {
+      const tk = await token();
+      const r = await fetch(CFG.url + '/functions/v1/news', { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: CFG.key, Authorization: 'Bearer ' + (tk || CFG.key) }, body: '{}' });
+      return r.ok;
+    }
+  };
+  window.APP_AUTH = { sb, session, acct, link, news, error: () => authErr };
 
   /* ---- document paths → tables ---- */
   function route(path) {
     const p = String(path).split('/');
     if (p[0] === 'anglers' && p.length === 2) return { t: 'anglers', k: { id: p[1] }, conflict: 'id' };
     if (p[0] === 'anglers' && p[2] === 'photos' && p.length === 4) return { t: 'photos', k: { angler: p[1], cid: p[3] }, conflict: 'angler,cid' };
-    if ((p[0] === 'labels' || p[0] === 'orders' || p[0] === 'suggest') && p.length === 2) return { t: p[0], k: { id: p[1] }, conflict: 'id' };
+    if ((p[0] === 'labels' || p[0] === 'orders' || p[0] === 'suggest' || p[0] === 'board' || p[0] === 'teams') && p.length === 2) return { t: p[0], k: { id: p[1] }, conflict: 'id' };
+    if (p[0] === 'news' && p.length === 2) return { t: 'news', k: { id: p[1] }, conflict: 'id', ro: true };
     if (p[0] === 'admin' && p.length === 2) return { t: 'admin_docs', k: { id: p[1] }, conflict: 'id' };
     return null;
   }
-  const COLL = { anglers: 'anglers', labels: 'labels', orders: 'orders', suggest: 'suggest', admin: 'admin_docs' };
+  const COLL = { anglers: 'anglers', labels: 'labels', orders: 'orders', suggest: 'suggest', admin: 'admin_docs', board: 'board', teams: 'teams', news: 'news' };
   function dbErr(e) {
     const m = (e && (e.message || e.details)) || String(e);
     if (e && e.code === '42501') return mkErr('not_granted', m);
@@ -55,7 +87,7 @@
   function loadSpots() {
     if (!spotsLoaded) spotsLoaded = (async () => {
       const s = await session(); if (!s) return;
-      myId = s.user.id;
+      myId = await acct();
       const { data } = await sb.from('spots').select('cid,lat,lon');
       if (Array.isArray(data)) { for (const r of data) if (r.lat != null) mySpots[r.cid] = [r.lat, r.lon]; saveSpots(); }
     })();
@@ -73,7 +105,7 @@
   }
 
   function snapOf(table, id, row) {
-    let data = row ? clone(row.data) : undefined;
+    let data = row ? (table === 'news' ? { lang: row.lang, title: row.title, link: row.link, source: row.source, pub: row.pub, score: row.score, fetched_at: row.fetched_at } : clone(row.data)) : undefined;
     if (data && table === 'anglers') data = withSpots(id, data);
     return { id, exists: !!row, data: () => clone(data), metadata: { fromCache: false, hasPendingWrites: false } };
   }
@@ -98,7 +130,7 @@
         return snapOf(r.t, id, data);
       },
       async set(d) {
-        if (!r) throw mkErr('invalid_argument', path);
+        if (!r || r.ro) throw mkErr('invalid_argument', path);
         const s = await session(); if (!s) throw mkErr('not_granted', 'not signed in');
         if (r.t === 'anglers') rememberSpots(d);
         const { error } = await sb.from(r.t).upsert(Object.assign({}, r.k, { data: d }), { onConflict: r.conflict });
@@ -197,14 +229,14 @@
   /* ---- who is viewing ---- */
   let adminP = null;
   const userNs = {
-    async id() { const s = await session(); return s ? s.user.id : null; },
+    async id() { const s = await session(); return s ? await acct() : null; },
     async isOwner() {
       if (!adminP) adminP = (async () => { const s = await session(); if (!s) return false; const { data, error } = await sb.rpc('is_admin'); return !error && data === true; })();
       return adminP;
     },
     async canEdit() { return !!(await session()); },
     async can() { return !!(await session()); },
-    async me() { const s = await session(); return { id: s ? s.user.id : '', name: '', avatarUrl: '', color: '#888', email: null, isOwner: await userNs.isOwner(), canEdit: !!s }; },
+    async me() { const s = await session(); return { id: s ? await acct() : '', name: '', avatarUrl: '', color: '#888', email: null, isOwner: await userNs.isOwner(), canEdit: !!s }; },
     async profiles() { return {}; }
   };
 

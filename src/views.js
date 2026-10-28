@@ -28,12 +28,6 @@ function spCard(id, extra = '') {
     <span class="sp-chips">${toxChip(sp)}${isClosed(sp) ? `<span class="chip chip-closed">${t('closed_now')}</span>` : ''}${extra}</span>
   </button>`;
 }
-function avatar(a, size = 36) {
-  const nick = (a && a.nick) || '?'; const h = FD.hashStr(nick) % 360;
-  const frame = a && a.flair && a.flair.frame;
-  return `<span class="avatar${frame ? ' framed' : ''}" style="--h:${h};--s:${size}px" aria-hidden="true">${esc([...nick][0] || '?')}</span>`;
-}
-function nickHTML(a) { return `<span class="nick${a && a.flair && a.flair.gold ? ' gold' : ''}">${esc((a && a.nick) || '?')}</span>`; }
 
 /* ---------- HOME ---------- */
 VIEWS.home = {
@@ -60,6 +54,8 @@ VIEWS.home = {
     feed.sort((x, y) => (y.c.at || y.c.ts) - (x.c.at || x.c.ts));
     const mine = myCatches();
     const rKR = myRank('KR');
+    const hot = boardList({ sort: 'hot' }).filter(p => !p.hidden).slice(0, 4);
+    const myTm = teamOf(myId());
     el.innerHTML = `
     <div class="page home">
       ${FL.inc.length ? `<a class="fr-banner" href="#friends">${icon('users')}<span>${t('fr_home_banner', { n: FL.inc.length })}</span><span class="fr-banner-who">${FL.inc.slice(0, 3).map(r => avatar(r.a, 26)).join('')}</span><b>${t('fr_home_banner_cta')}</b></a>` : ''}
@@ -84,6 +80,8 @@ VIEWS.home = {
           </div>
         </div>
       </section>
+
+      ${newsCardHTML()}
 
       <section class="tourney">
         <div class="tourney-txt">
@@ -118,11 +116,16 @@ VIEWS.home = {
           ${feed.length ? `<ul class="feed">${feed.slice(0, 8).map(({ uid, a, c }) => `
             <li><button class="feed-item" data-catch="${uid}|${c.id}">
               <span class="feed-ph" data-ph="${uid}|${c.id}"><img src="${FD.thumb(SPI[c.sp] || SP[0], 120, 70)}" alt=""></span>
-              <span class="feed-txt"><b>${esc(nameOf(c.sp))}</b> <span class="num">${lenFmt(c.len)}</span><br><span class="muted small">${flag(a.cc)} ${esc(a.nick)} · ${ago(c.at || c.ts)}</span></span>
+              <span class="feed-txt"><b>${esc(nameOf(c.sp))}</b> <span class="num">${lenFmt(c.len)}</span><br><span class="muted small">${flag(a.cc)} ${esc(a.nick)}${teamTag(uid)} · ${ago(c.at || c.ts)}</span></span>
               <span class="num pts">+${fmtN(c.sc || 0)}</span>
             </button></li>`).join('')}</ul>` : S.feedF === 'fr' ? `<div class="empty"><p>${t('feed_fr_empty')}</p><a class="btn btn-line btn-sm" href="#friends">${t('fr_manage')}</a></div>` : `<div class="empty"><p>${t('feed_empty')}</p><a class="btn btn-line btn-sm" href="#scan">${t('feed_empty_cta')}</a></div>`}
         </section>
       </div>
+
+      <section class="card home-board">
+        <div class="sec-head tight"><h2 class="h3">${icon('board')}${t('home_board_title')}</h2><div class="hb-links"><a class="link" href="#teams">${icon('flag')}${myTm && myTm.ok ? esc(myTm.t.name) : t('nav_teams')}</a><a class="link" href="#board">${t('home_board_more')}</a></div></div>
+        ${hot.length ? `<ul class="hb-list">${hot.map(p => { const a = anglerOf(p.uid) || { nick: '?' }; return `<li><button class="hb-item" data-post="${esc(p.key)}"><span class="chip chip-cat cat-${esc(p.cat)}">${t('bdc_' + p.cat)}</span><b class="hb-title">${esc(p.title)}</b><span class="muted small hb-meta">${esc(a.nick)} · ${icon('heart')}${p.likes.size} ${icon('chat')}${p.cmts.filter(x => !x.hidden).length}</span></button></li>`; }).join('')}</ul>` : `<div class="empty"><p>${t('home_board_empty')}</p><button class="btn btn-line btn-sm" data-bd="write">${icon('plus')}${t('bd_write')}</button></div>`}
+      </section>
 
       <section class="card me-sum">
         ${S.me && S.me.nick ? `
@@ -161,8 +164,9 @@ VIEWS.scan = {
     el.innerHTML = `
     <div class="page scan">
       <header class="page-head">
-        <h1>${t(sc.mode === 'past' ? 'past_title' : 'scan_title')}</h1>
+        <h1>${t(sc.mode === 'past' ? 'past_title' : 'scan_title')} <span class="beta-chip">${t('beta')}</span></h1>
         <p class="lede">${t(sc.mode === 'past' ? 'past_sub' : 'scan_sub')}</p>
+        <p class="beta-note">${icon('info')} ${t(S.sampleImages ? 'ai_beta_note' : 'ai_free_note')}</p>
         <div class="seg" role="tablist">
           <button role="tab" aria-selected="${sc.mode === 'now'}" data-scanmode="now">${icon('camera')}${t('mode_now')}</button>
           <button role="tab" aria-selected="${sc.mode === 'past'}" data-scanmode="past">${icon('clock')}${t('mode_past')}</button>
@@ -181,7 +185,6 @@ function scanSideHTML() {
   const ls = learnStats();
   const acc = ls.total ? Math.round(ls.correct / ls.total * 100) : null;
   return `
-          ${sc.mode === 'past' ? pastQuotaCard() : ''}
           <div class="card">
             <h3 class="h4">${icon('sparkle')}${t('how_title')}</h3>
             <ol class="how">
@@ -196,27 +199,12 @@ function scanSideHTML() {
             <div class="stats2"><div><span class="num">${fmtN(ls.total)}</span><span>${t('learn_n')}</span></div><div><span class="num">${acc == null ? '—' : acc + '%'}</span><span>${t('learn_acc')}</span></div></div>
             ${ls.confusions.length ? `<p class="small muted">${t('learn_conf')}</p><ul class="conf">${ls.confusions.slice(0, 4).map(c => `<li>${esc(nameOf(c.p))} → <b>${esc(nameOf(c.a))}</b> <span class="muted">×${c.n}</span></li>`).join('')}</ul>` : `<p class="small muted">${t('learn_empty')}</p>`}
           </div>
-          ${!S.sampleImages ? `<div class="card note-card">${icon('info')}<p>${t(S.sample ? 'ai_need_images' : 'ai_need_claude')}</p></div>` : ''}`;
-}
-function pastQuotaCard() {
-  const left = pastLeft(), used = pastUsed(), credits = pastCredits();
-  const pips = Array.from({ length: FREE_PAST }, (_, i) => `<i class="${i < Math.min(used, FREE_PAST) ? 'used' : ''}"></i>`).join('');
-  return `<div class="card quota">
-    <h3 class="h4">${icon('clock')}${t('quota_title')}</h3>
-    <div class="pips" aria-label="${esc(t('quota_aria', { u: used, n: FREE_PAST }))}">${pips}</div>
-    <p><b class="num">${left}</b> ${t('quota_left')}${credits ? ` <span class="muted small">(${t('quota_credits', { n: credits })})</span>` : ''}</p>
-    <p class="small muted">${t('quota_rule', { n: FREE_PAST, p: fmtN(PAST_PRICE) })}</p>
-    <button class="btn btn-line btn-sm" data-act="buy-past">${icon('plus')}${t('quota_buy', { p: fmtN(PAST_PRICE) })}</button>
-  </div>`;
+          <div class="card note-card">${icon(S.sampleImages ? 'sparkle' : 'lens')}<div><p><b>${t(S.sampleImages ? 'ai_on_title' : 'ai_off_title')}</b></p><p class="small">${t(S.sampleImages ? 'ai_on_sub' : 'ai_off_sub')}</p>${window.APP_RT === 'web' && S.sampleImages ? `<p class="small muted">${t('ai_provider_note')}</p>` : ''}</div></div>`;
 }
 function renderScanWork() {
   const box = $('#scan-work'); if (!box) return;
   const sc = S.scan;
   if (sc.phase === 'idle') {
-    if (sc.mode === 'past' && pastLeft() <= 0) {
-      box.innerHTML = `<div class="paywall card"><h2>${t('pw_title')}</h2><p>${t('pw_sub', { n: FREE_PAST, p: fmtN(PAST_PRICE) })}</p><button class="btn btn-primary btn-lg" data-act="buy-past">${t('quota_buy', { p: fmtN(PAST_PRICE) })}</button></div>`;
-      return;
-    }
     box.innerHTML = `
       <div class="drop" id="drop" tabindex="0" aria-label="${esc(t('drop_aria'))}">
         <div class="sonar" aria-hidden="true"><i></i><i></i><i></i><span class="sweep"></span></div>
@@ -249,6 +237,10 @@ function renderScanWork() {
     box.innerHTML = `<div class="work card">${photo}<div class="work-side"><h2>${t('scan_err_title')}</h2>${stepHTML}<p class="err">${esc(sc.err || '')}</p><div class="actions"><button class="btn btn-primary" data-act="scan-retry">${icon('refresh')}${t('retry')}</button><button class="btn btn-line" data-act="scan-manual">${t('choose_manually')}</button><button class="btn btn-ghost" data-act="scan-reset">${t('new_photo')}</button></div></div></div>`;
     return;
   }
+  if (sc.phase === 'nofish') {
+    box.innerHTML = `<div class="work card">${photo}<div class="work-side"><h2>${t('nofish_title')}</h2><p>${t('nofish_sub')}</p>${stepHTML}<div class="actions"><button class="btn btn-primary" data-act="scan-reset">${icon('camera')}${t('new_photo')}</button><button class="btn btn-line" data-act="scan-manual">${t('nofish_review')}</button></div><p class="hint">${t('nofish_hint')}</p></div></div>`;
+    return;
+  }
   if (sc.phase === 'reject') {
     box.innerHTML = `<div class="work card">${photo}<div class="work-side"><h2>${t('reject_title')}</h2><p>${t(sc.rejectKey || 'reject_sub')}</p>${trustHTML(sc.trust)}<div class="actions"><button class="btn btn-primary" data-act="scan-reset">${t('new_photo')}</button><a class="btn btn-line" href="#help">${t('ask_review')}</a></div></div></div>`;
     return;
@@ -261,7 +253,7 @@ function renderScanWork() {
       <div class="result card">
         ${photo}
         <div class="result-main">
-          <p class="eyebrow">${t(sc.chosen && sc.corrected ? 'res_corrected' : sc.ai ? 'res_ai' : 'res_manual')}</p>
+          <p class="eyebrow">${t(sc.chosen && sc.corrected ? 'res_corrected' : sc.ai ? 'res_ai' : 'res_manual')}${sc.ai && !sc.corrected ? ` <span class="beta-chip">${t('beta')}</span>` : ''}</p>
           <div class="res-head">
             <img class="res-sprite" src="${sp ? FD.thumb(sp, 220, 120) : ''}" alt="" width="220" height="120">
             <div>
@@ -274,7 +266,9 @@ function renderScanWork() {
           ${sp && sp.tox ? `<div class="tox-panel tox-${sp.tox} slim"><p><b>${t('tox_' + ['', 'poison', 'sting', 'cig', 'caution'][sp.tox])}</b> — ${t('toxd_' + sp.tox)}</p></div>` : ''}
           ${sc.ai && sc.ai.features ? `<p class="features">${icon('eye')} ${esc(sc.ai.features)}</p>` : ''}
           ${sc.fused && sc.fused.list.length > 1 && !sc.corrected ? `<div class="alts"><span class="muted small">${t('alts')}</span>${sc.fused.list.slice(1, 4).map(x => `<button class="chip chip-tab" data-pickalt="${x.id}">${esc(nameOf(x.id))} ${Math.round(x.p * 100)}%</button>`).join('')}</div>` : ''}
-          ${sc.phase === 'result' ? `<div class="actions"><button class="btn btn-primary btn-lg" data-act="ask-confirm">${t('continue')}</button><button class="btn btn-ghost" data-act="scan-reset">${t('new_photo')}</button></div>` : ''}
+          ${sc.ai && !sc.corrected ? `<p class="hint">${icon('info')} ${t('ai_maybe_wrong')}</p>` : ''}
+          ${sc.phase === 'result' ? (top ? `<div class="actions"><button class="btn btn-primary btn-lg" data-act="ask-confirm">${t('continue')}</button><button class="btn btn-line" data-act="lens">${icon('lens')}${t('lens_btn')}</button><button class="btn btn-ghost" data-act="scan-reset">${t('new_photo')}</button></div>`
+            : `<div class="actions"><button class="btn btn-primary btn-lg" data-act="scan-manual">${icon('layers')}${t('pick_species')}</button><button class="btn btn-line" data-act="lens">${icon('lens')}${t('lens_btn')}</button><button class="btn btn-ghost" data-act="scan-reset">${t('new_photo')}</button></div>`) : `<div class="actions"><button class="btn btn-ghost btn-sm" data-act="scan-manual">${t('change_species')}</button></div>`}
         </div>
       </div>
       ${sc.phase === 'form' ? registerFormHTML() : ''}`;
@@ -287,7 +281,8 @@ function renderScanWork() {
       <div class="done-art"><img src="${sp ? FD.thumb(sp, 300, 160) : ''}" alt=""></div>
       <h2>${t(c.st === 'ok' ? 'done_title' : 'done_review_title')}</h2>
       <p class="lede">${t(c.st === 'ok' ? 'done_sub' : 'done_review_sub', { name: esc(nameOf(c.sp)), len: lenFmt(c.len) })}</p>
-      <div class="done-score"><span class="num">+${fmtN(c.sc || 0)}</span><span>pt</span>${statusChip(c.st, c.tr)}</div>
+      <div class="done-score"><span class="num">+${fmtN(c.sc || 0)}</span><span>pt</span>${statusChip(c.st, c.tr)}<span class="lv-chip">+${fmtN(sc.xpGain || 0)} XP</span></div>
+      ${sc.lvUp ? `<div class="lvup">${icon('star')}<div><b>${t('lv_up', { n: sc.lvUp })}</b>${sc.unlocks && sc.unlocks.length ? `<p class="small">${t('unlock_line', { name: esc(sc.unlocks.map(id => dict(SHOPI[id].n)).slice(0, 4).join(', ')) })}</p>` : ''}</div><a class="btn btn-light btn-sm" href="#sea">${t('go_decorate')}</a></div>` : ''}
       ${trustHTML(sc.trust)}
       <div class="actions"><button class="btn btn-primary" data-act="scan-reset">${icon('camera')}${t('scan_another')}</button><a class="btn btn-line" href="#rank">${icon('trophy')}${t('see_rank')}</a><a class="btn btn-line" href="#sea">${icon('sea')}${t('go_my_sea')}</a></div>
     </div>`;
@@ -327,11 +322,14 @@ async function startScan(file) {
   sc.rg = rg;
   if (sc.dup && sc.mode === 'past') { sc.trust = trustScore({ exif: sc.exif, fname: sc.fname, dup: true, ai: null, past: true, skipAi: true }); sc.phase = 'reject'; sc.rejectKey = 'reject_dup'; renderScanWork(); return; }
   if (!S.sample || !S.sampleImages) {
+    // free mode: no AI, so the person picks (Google Lens can help) and the operator checks the photo
     setStep(2, 'warn', t('ai_off'));
-    if (sc.mode === 'past') { sc.phase = 'error'; sc.err = t('past_needs_ai'); renderScanWork(); return; }
-    setStep(3, 'done'); setStep(4, 'done');
-    sc.fused = { list: [], other: null }; sc.phase = 'result'; renderScanWork(); openTrainPicker(true); return;
+    const pr = GEO.prior(lon, lat, sc.month);
+    sc.sugg = [...pr].sort((a, b) => b[1] - a[1]).slice(0, 6).map(x => x[0]).filter(id => SPI[id]);
+    setStep(3, 'done', sc.lon != null ? t('prior_gps') : t('prior_home', { rg: regionName(homeRegion()) })); setStep(4, 'done');
+    sc.noAI = true; sc.fused = { list: [], other: null }; sc.phase = 'result'; renderScanWork(); openTrainPicker(true); return;
   }
+  sc.noAI = false; sc.sugg = null;
   setStep(2, 'run', t('ai_running'));
   sc.ctl = new AbortController();
   try {
@@ -346,10 +344,11 @@ async function startScan(file) {
   setStep(3, 'done', sc.lon != null ? t('prior_gps') : t('prior_home', { rg: regionName(homeRegion()) }));
   const top = sc.fused.list[0] && SPI[sc.fused.list[0].id];
   setStep(4, top && top.tox ? 'warn' : 'done', top && top.tox ? t('tox_' + ['', 'poison', 'sting', 'cig', 'caution'][top.tox]) : t('tox_none'));
-  if (sc.ai.fish_visible === false && sc.mode === 'past') { sc.trust = trustScore({ exif: sc.exif, fname: sc.fname, dup: !!sc.dup, ai: sc.ai, past: true }); sc.phase = 'reject'; sc.rejectKey = 'reject_nofish'; renderScanWork(); return; }
+  if (sc.ai.fish_visible === false) { sc.phase = 'nofish'; renderScanWork(); return; }
   sc.phase = 'result';
   renderScanWork();
-  if (sc.fused.list.length || sc.fused.other) setTimeout(openConfirm, 350); else openTrainPicker(true);
+  const p0 = sc.fused.list[0] ? sc.fused.list[0].p : 0;
+  if ((sc.fused.list.length && p0 >= .2) || (sc.fused.other && sc.fused.other.p >= .3)) setTimeout(openConfirm, 350); else openTrainPicker(true);
 }
 function openConfirm() {
   const sc = S.scan; const top = sc.fused.list[0]; const id = top ? top.id : null; const sp = SPI[id];
@@ -365,19 +364,22 @@ function openConfirm() {
         <button class="btn btn-line btn-lg btn-block" id="cf-no">${icon('layers')}${t('confirm_no')}</button>
       </div>
       <p class="hint">${t('confirm_hint')}</p>
+      <p class="beta-note small">${icon('info')} ${t('ai_maybe_wrong')}</p>
     </div>`, { label: t('confirm_eyebrow') });
   $('#cf-yes', w).onclick = () => { closeModal(w); acceptSpecies(id, false); };
   $('#cf-no', w).onclick = () => { closeModal(w); openTrainPicker(false); };
 }
 function openTrainPicker(manual) {
-  const sc = S.scan; const sugg = (sc.fused && sc.fused.list.slice(0, 5).map(x => x.id)) || [];
+  const sc = S.scan; const aiSugg = (sc.fused && sc.fused.list.slice(0, 5).map(x => x.id)) || [];
+  const sugg = aiSugg.length ? aiSugg : (sc.sugg || []);
   const w = openModal(`
     <div class="trainer">
       <p class="eyebrow">${icon('layers')} ${t(manual ? 'train_eyebrow_manual' : 'train_eyebrow')}</p>
       <h2>${t(manual ? 'train_title_manual' : 'train_title')}</h2>
       <p class="lede">${t(manual ? 'train_sub_manual' : 'train_sub')}</p>
+      ${sc.file ? `<button class="lens-row" type="button" data-lens>${icon('lens')}<span><b>${t('lens_btn')}</b><span class="muted small">${t('lens_row_sub')}</span></span></button>` : ''}
       <input class="search" id="tr-q" type="search" placeholder="${esc(t('train_search'))}" autocomplete="off">
-      ${sugg.length ? `<p class="small muted">${t('train_sugg')}</p><div class="tr-sugg">${sugg.map(id => `<button class="tr-item" data-pick="${id}"><img src="${FD.thumb(SPI[id], 120, 66)}" alt=""><span>${esc(nameOf(id))}</span></button>`).join('')}</div>` : ''}
+      ${sugg.length ? `<p class="small muted">${t(aiSugg.length ? 'train_sugg' : 'train_sugg_prior')}</p><div class="tr-sugg">${sugg.map(id => `<button class="tr-item" data-pick="${id}"><img src="${FD.thumb(SPI[id], 120, 66)}" alt=""><span>${esc(nameOf(id))}</span></button>`).join('')}</div>` : ''}
       <div class="tr-list" id="tr-list"></div>
       <details class="tr-other"><summary>${t('train_notlisted')}</summary><div class="row-inline"><input id="tr-other" maxlength="40" placeholder="${esc(t('train_other_ph'))}"><button class="btn btn-line" id="tr-other-ok">${t('ok')}</button></div></details>
     </div>`, { wide: true, label: t('train_title') });
@@ -389,7 +391,7 @@ function openTrainPicker(manual) {
   };
   draw('');
   $('#tr-q', w).addEventListener('input', e => draw(e.target.value));
-  w.addEventListener('click', e => { const b = e.target.closest('[data-pick]'); if (b) { closeModal(w); acceptSpecies(b.dataset.pick, !manual); } });
+  w.addEventListener('click', e => { if (e.target.closest('[data-lens]')) { openLens(); return; } const b = e.target.closest('[data-pick]'); if (b) { closeModal(w); acceptSpecies(b.dataset.pick, !manual); } });
   $('#tr-other-ok', w).onclick = () => { const v = $('#tr-other', w).value.trim(); if (!v) return; closeModal(w); acceptSpecies('other:' + v, !manual); };
 }
 async function acceptSpecies(id, corrected) {
@@ -423,7 +425,8 @@ function registerFormHTML() {
     </div>
     <label class="switch"><input type="checkbox" id="rf-rel"><span class="sw"></span><span>${t('reg_release')} <em class="muted">${t('reg_release_bonus')}</em></span></label>
     <div class="field"><label for="rf-memo">${t('reg_memo')}</label><textarea id="rf-memo" rows="2" maxlength="300" placeholder="${esc(t('reg_memo_ph'))}"></textarea></div>
-    ${sc.mode === 'past' ? `<p class="note">${icon('shield')} ${t('reg_past_note', { left: pastLeft() })}</p>` : ''}
+    ${sc.mode === 'past' ? `<p class="note">${icon('shield')} ${t('reg_past_note2')}</p>` : ''}
+    ${!sc.ai ? `<p class="note">${icon('info')} ${t('reg_review_note')}</p>` : sc.ai.fish_visible === false ? `<p class="note">${icon('warn')} ${t('reg_nofish_note')}</p>` : ''}
     ${S.mode !== 'shared' ? `<p class="note">${icon('info')} ${t(S.mode === 'local' ? 'mode_local_note' : 'mode_offline_note')}</p>` : ''}
     <p class="err" id="rf-err" hidden></p>
     <div class="actions"><button class="btn btn-primary btn-lg" type="submit" id="rf-go">${icon('check')}${t('reg_submit')}</button><button class="btn btn-ghost" type="button" data-act="scan-reset">${t('cancel')}</button></div>
@@ -431,7 +434,7 @@ function registerFormHTML() {
 }
 function bindRegisterForm() {
   const sc = S.scan; const f = $('#reg-form'); if (!f) return;
-  const updDt = () => { const v = $('#rf-dt').value; const ts = v ? new Date(v).getTime() : nowMs(); const old = sc.mode !== 'past' && ts < nowMs() - 3 * 86400000; const n = $('#rf-dt-note'); if (n) n.textContent = old ? t('reg_old_note', { left: pastLeft() }) : ''; };
+  const updDt = () => { const v = $('#rf-dt').value; const ts = v ? new Date(v).getTime() : nowMs(); const old = sc.mode !== 'past' && ts < nowMs() - 3 * 86400000; const n = $('#rf-dt-note'); if (n) n.textContent = old ? t('reg_old_note2') : ''; };
   $('#rf-dt').addEventListener('input', updDt); updDt();
   $('#rf-pick').onclick = () => { const h = GEO.HOME[homeRegion()]; openMapPicker(sc.lon != null ? [sc.lon, sc.lat] : h, pos => { sc.lon = pos[0]; sc.lat = pos[1]; sc.picked = true; const env = GEO.envAt(pos[0], pos[1]); $('#rf-loc').innerHTML = `${esc(env && env.water ? dict(GEO.seaOf(pos[0], pos[1]).n) : t('fresh_land'))} · <span class="mono">${GEO.fmtLL(pos[1], pos[0])}</span>`; }); };
   f.addEventListener('submit', async e => {
@@ -443,12 +446,14 @@ function bindRegisterForm() {
     const dtv = $('#rf-dt').value; const ts = dtv ? new Date(dtv).getTime() : nowMs();
     if (sp && sp.lg && sp.lg.min && len <= sp.lg.min && !$('#rf-rel').checked) { if (!f.dataset.warned) { f.dataset.warned = '1'; err.textContent = t('reg_warn_small', { n: sp.lg.min }); err.hidden = false; return; } }
     const past = sc.mode === 'past' || (ts < nowMs() - 3 * 86400000);
-    if (past && pastLeft() <= 0) { err.textContent = t('pw_sub', { n: FREE_PAST, p: fmtN(PAST_PRICE) }); err.hidden = false; buyPastCredit(); return; }
     $('#rf-go').disabled = true;
-    const trust = trustScore({ exif: sc.exif, fname: sc.fname, dup: !!sc.dup, ai: sc.ai, len, sp, ts, past });
+    const noAI = !sc.ai;
+    const trust = trustScore({ exif: sc.exif, fname: sc.fname, dup: !!sc.dup, ai: sc.ai, len, sp, ts, past, skipAi: noAI });
     sc.trust = trust;
     let st;
     if (sc.dup) st = 'no';
+    else if (noAI) st = trust.score >= 30 ? 'review' : 'no';            // without AI a person always checks the photo
+    else if (sc.ai.fish_visible === false) st = 'review';               // the AI saw no fish: the operator decides
     else if (past) st = trust.score >= 70 ? 'ok' : trust.score >= 40 ? 'review' : 'no';
     else st = trust.score >= 40 ? 'ok' : 'review';
     const ticket = sc.ai && sc.ai.__ticket; // web build: proof that the server screened this photo
@@ -466,7 +471,12 @@ function bindRegisterForm() {
     };
     if (ticket) c.tk = ticket;
     c.sc = SPI[c.sp] ? scoreOf(c.sp, c.len, c.rel, trust.score >= 70, !past && isFeaturedCatch(c)) : 0;
+    const before = lvInfo(S.me, myId());
     S.me.catches = S.me.catches || []; S.me.catches.push(c);
+    const after = lvInfo(Object.assign({}, S.me, { upd: nowMs() }), myId());
+    sc.xpGain = Math.max(0, after.xp - before.xp);
+    sc.lvUp = after.L > before.L ? after.L : 0;
+    sc.unlocks = sc.lvUp ? SHOP.filter(x => x.lv && x.lv > before.L && x.lv <= after.L).map(x => x.id) : [];
     await store.saveMe();
     await store.savePhoto(c.id, { t: sc.thumb, h: sc.hash });
     sc.saved = c; sc.phase = 'done'; renderScanWork();
@@ -614,9 +624,9 @@ VIEWS.rank = {
     el.innerHTML = `
     <div class="page rank">
       <header class="page-head"><h1>${t('rank_title')}</h1><p class="lede">${t('rank_sub')}</p></header>
-      <div class="rank-tabs" role="tablist">${['KR', 'EA', 'W', 'FR'].map(s => `<button role="tab" aria-selected="${rk.scope === s}" data-scope="${s}"><span class="rt-flag">${s === 'KR' ? flag('KR') : s === 'EA' ? flag('KR') + flag('JP') + flag('CN') : s === 'W' ? icon('globe') : icon('users')}</span><span>${t('scope_' + s)}</span>${s === 'FR' && frLists().inc.length ? `<i class="dot" aria-hidden="true"></i>` : ''}</button>`).join('')}</div>
+      <div class="rank-tabs" role="tablist">${['KR', 'EA', 'W', 'FR', 'TEAM'].map(s => `<button role="tab" aria-selected="${rk.scope === s}" data-scope="${s}"><span class="rt-flag">${s === 'KR' ? flag('KR') : s === 'EA' ? flag('KR') + flag('JP') + flag('CN') : s === 'W' ? icon('globe') : s === 'FR' ? icon('users') : icon('flag')}</span><span>${t('scope_' + s)}</span>${s === 'FR' && frLists().inc.length ? `<i class="dot" aria-hidden="true"></i>` : ''}</button>`).join('')}</div>
       ${rk.scope === 'FR' ? `<p class="hint">${icon('users')} ${t('fr_rank_hint')} <a href="#friends">${t('fr_manage')}</a></p>` : ''}
-      <div class="rank-filters">
+      ${rk.scope === 'TEAM' ? VIEWS.rank.teamHTML() : `<div class="rank-filters">
         <div class="seg seg-sm" role="group">${['points', 'biggest', 'count', 'species'].map(c => `<button aria-pressed="${rk.cat === c}" data-cat="${c}">${t('cat_' + c)}</button>`).join('')}</div>
         <label class="field-inline" for="rk-period"><span>${t('period')}</span><select id="rk-period">${['month', 'season', 'year', 'all'].map(p => `<option value="${p}" ${rk.period === p ? 'selected' : ''}>${t('per_' + p)}</option>`).join('')}</select></label>
         ${rk.cat === 'biggest' ? `<label class="field-inline" for="rk-sp"><span>${t('species')}</span><select id="rk-sp">${spOpts}</select></label>` : ''}
@@ -624,17 +634,17 @@ VIEWS.rank = {
       ${rk.scope === 'FR' && !frLists().friends.length ? `
       <div class="empty card big">${icon('users', 'big')}<h2>${t('fr_rank_empty')}</h2><p class="muted">${t('fr_empty_sub')}</p><a class="btn btn-primary" href="#friends">${icon('user-plus')}${t('fr_find_cta')}</a></div>` : ranked.length ? `
       <div class="podium">${[1, 0, 2].map(i => podium[i] ? `<button class="pod pod-${i + 1}" data-seauid="${podium[i].uid}">
-        <span class="pod-medal num">${i + 1}</span>${avatar(podium[i].a, 56)}<span class="pod-nick">${nickHTML(podium[i].a)}</span><span class="muted small">${flag(podium[i].a.cc)} ${esc(ccName(podium[i].a.cc || 'KR'))}</span><span class="num pod-val">${fmtVal(podium[i].val)}</span>
+        <span class="pod-medal num">${i + 1}</span>${avatar(podium[i].a, 56)}<span class="pod-nick">${nickHTML(podium[i].a)}${teamTag(podium[i].uid)}</span><span class="muted small">${flag(podium[i].a.cc)} ${esc(ccName(podium[i].a.cc || 'KR'))}</span><span class="num pod-val">${fmtVal(podium[i].val)}</span>
         ${podium[i].best ? `<img src="${FD.thumb(SPI[podium[i].best.sp] || SP[0], 120, 66)}" alt="" class="pod-fish">` : ''}</button>` : `<div class="pod pod-empty pod-${i + 1}"></div>`).join('')}</div>
       <div class="lb card"><table><thead><tr><th>#</th><th>${t('angler')}</th><th class="hide-s">${t('best_catch')}</th><th class="r">${t('cat_' + rk.cat)}</th></tr></thead><tbody>
-        ${rows.map(r => `<tr class="${r.uid === (S.uid || 'local') ? 'me' : ''}" data-seauid="${r.uid}"><td class="num">${r.rank || '—'}</td><td><span class="lb-who">${avatar(r.a, 30)}${nickHTML(r.a)} <span class="muted">${flag(r.a.cc)}</span>${r.local ? `<span class="chip chip-local">${t('st_local')}</span>` : ''}</span></td><td class="hide-s">${r.best ? `${esc(nameOf(r.best.sp))} <span class="muted">${lenFmt(r.best.len)}</span>` : '—'}</td><td class="r num">${fmtVal(r.val)}</td></tr>`).join('')}
+        ${rows.map(r => `<tr class="${r.uid === (S.uid || 'local') ? 'me' : ''}" data-seauid="${r.uid}"><td class="num">${r.rank || '—'}</td><td><span class="lb-who">${avatar(r.a, 30)}${nickHTML(r.a)}${teamTag(r.uid)} <span class="muted">${flag(r.a.cc)}</span>${r.local ? `<span class="chip chip-local">${t('st_local')}</span>` : ''}</span></td><td class="hide-s">${r.best ? `${esc(nameOf(r.best.sp))} <span class="muted">${lenFmt(r.best.len)}</span>` : '—'}</td><td class="r num">${fmtVal(r.val)}</td></tr>`).join('')}
       </tbody></table></div>` : `
       <div class="empty card big">
         <div class="empty-art"><img src="${FD.thumb(SPI[feat[0]], 260, 140)}" alt=""></div>
         <h2>${t('rank_empty_title')}</h2><p class="muted">${t('rank_empty_sub')}</p>
         <a class="btn btn-primary" href="#scan">${icon('scan')}${t('cta_scan')}</a>
       </div>`}
-      ${me && !me.rank && me.local ? `<p class="note">${icon('info')} ${t('rank_local_note')}</p>` : ''}
+      ${me && !me.rank && me.local ? `<p class="note">${icon('info')} ${t('rank_local_note')}</p>` : ''}`}
       <section class="card rules">
         <h2 class="h3">${icon('star')}${t('rules_title')}</h2>
         <ul>
@@ -642,6 +652,11 @@ VIEWS.rank = {
         </ul>
       </section>
     </div>`;
+  },
+  teamHTML() {
+    const ti = teamIndex(); const mine = teamOf(myId());
+    return `<p class="hint">${icon('flag')} ${t('tm_rank_hint')} <a href="#teams">${t('tm_manage')}</a></p>
+      ${ti.ranked.length ? `<ul class="tm-list card">${ti.ranked.map(e => teamRow(e, mine && mine.ok ? mine.id : null)).join('')}</ul>` : `<div class="empty card big">${icon('flag', 'big')}<h2>${t('tm_rank_empty')}</h2><p class="muted">${t('tm_none_sub')}</p><a class="btn btn-primary" href="#teams">${icon('plus')}${t('tm_create')}</a></div>`}`;
   }
 };
 
@@ -741,8 +756,8 @@ VIEWS.sea = {
       S.scene.start();
     }
     $('#sea-head', el).innerHTML = `
-      <div class="sh-left">${avatar(a, 64)}<div><p class="eyebrow">${t(mine ? 'my_sea' : 'their_sea')}</p><h1>${nickHTML(a)} <span class="flagbig">${flag(a.cc)}</span></h1><p class="muted">${esc(ccName(a.cc || 'KR'))} · ${esc(regionName(a.home || 'KS'))} · ${esc(dict(METHOD[a.style]) || '')}${mine && supporter() ? ` · <span class="chip chip-heart">${icon('heart')}${t('supporter')}</span>` : ''}</p>
-        ${mine ? `<p class="sh-fr"><a class="chip chip-tab" href="#friends">${icon('users')}${t('fr_list_n', { n: frLists().friends.length })}${frLists().inc.length ? ` · <b class="acc-txt">${t('fr_new_n', { n: frLists().inc.length })}</b>` : ''}</a></p>` : `<div class="sh-acts">${frBtns(uid, relation(uid), { inSea: true })}${(() => { const m = mutualCount(uid); return m ? `<span class="muted small">${t('fr_mutual', { n: m })}</span>` : ''; })()}</div>`}</div></div>
+      <div class="sh-left">${mine ? `<a class="sh-av" href="#char" aria-label="${esc(t('ch_title'))}">${avatar(a, 64)}<span class="sh-av-edit">${icon('gear')}</span></a>` : avatar(a, 64)}<div><p class="eyebrow">${t(mine ? 'my_sea' : 'their_sea')} · ${lvChip(a, uid || myId())} ${esc(lvInfo(a, uid || myId()).title)}</p><h1>${nickHTML(a)}${teamTag(uid || myId())} <span class="flagbig">${flag(a.cc)}</span></h1><p class="muted">${esc(ccName(a.cc || 'KR'))} · ${esc(regionName(a.home || 'KS'))} · ${esc(dict(METHOD[a.style]) || '')}${mine && supporter() ? ` · <span class="chip chip-heart">${icon('heart')}${t('supporter')}</span>` : ''}</p>
+        ${mine ? `<p class="sh-fr"><a class="chip chip-tab" href="#char">${icon('user')}${t('ch_edit_btn')}</a><a class="chip chip-tab" href="#friends">${icon('users')}${t('fr_list_n', { n: frLists().friends.length })}${frLists().inc.length ? ` · <b class="acc-txt">${t('fr_new_n', { n: frLists().inc.length })}</b>` : ''}</a></p>` : (S.isOwner && a.pic && !picHidden(uid, a) ? `<p class="sh-fr"><button class="btn btn-ghost btn-xs" data-modav="${esc(uid)}">${t('ad_hide_pic')}</button></p>` : '') + `<div class="sh-acts">${frBtns(uid, relation(uid), { inSea: true })}${(() => { const m = mutualCount(uid); return m ? `<span class="muted small">${t('fr_mutual', { n: m })}</span>` : ''; })()}</div>`}</div></div>
       <div class="stats4 sh-stats">
         <div><span class="num">${rk[0]}</span><span>${t('scope_KR')}</span></div><div><span class="num">${rk[1]}</span><span>${t('scope_EA')}</span></div><div><span class="num">${rk[2]}</span><span>${t('scope_W')}</span></div>
         <div><span class="num">${best ? lenFmt(best.len) : '—'}</span><span>${best ? esc(nameOf(best.sp)) : t('best_catch')}</span></div>
@@ -750,17 +765,21 @@ VIEWS.sea = {
     const fishMap = new Map();
     for (const c of cs.slice().sort((x, y) => (y.len || 0) - (x.len || 0))) if (SPI[c.sp] && !fishMap.has(c.sp)) fishMap.set(c.sp, c);
     const fish = [...fishMap.values()].slice(0, 16).map(c => ({ key: c.id, sp: c.sp, len: c.len, ts: c.ts }));
-    const decor = a.decor || { theme: 'th_dawn', items: ['dc_weed', 'dc_rock', 'dc_buoy'], fx: [] };
-    const items = decor.items.filter(x => x !== 'dc_trophy' || (mine ? trophyEarned() : true));
-    S.scene.setState({ theme: (decor.theme || 'th_dawn').replace('th_', ''), decor: items, fx: decor.fx || [], fish, preview: mine && S.preview ? { theme: S.preview.theme, decor: S.preview.decor, fx: S.preview.fx } : null });
+    const decor = Object.assign(DEFAULT_DECOR(), a.decor || {});
+    const items = (decor.items || []).filter(x => x !== 'dc_trophy' || (mine ? trophyEarned() : true));
+    S.scene.setState({ theme: (decor.theme || 'th_dawn').replace('th_', ''), decor: items, fx: decor.fx || [], fish, char: charOf(a, uid || myId()), rod: (a.char && a.char.rd) || null, preview: mine && S.preview ? { theme: S.preview.theme, decor: S.preview.decor, fx: S.preview.fx } : null });
     const banner = $('#sea-banner', el);
-    if (mine && S.preview) { const it = SHOPI[S.preview.id]; banner.hidden = false; banner.innerHTML = `<span>${icon('eye')} ${t('preview_on', { name: esc(dict(it.n)) })}</span><button class="btn btn-primary btn-sm" data-buy="${it.id}">${t('keep_it', { p: fmtN(it.p) })}</button><button class="btn btn-ghost btn-sm" data-act="preview-off">${t('close')}</button>`; }
+    if (mine && S.preview) {
+      const it = SHOPI[S.preview.id]; banner.hidden = false;
+      const act = owned(it.id) ? `<button class="btn btn-primary btn-sm" data-toggle="${it.id}">${t('use_item')}</button>` : it.pr ? `<button class="btn btn-primary btn-sm" data-buy="${it.id}">${t('prem_buy', { p: fmtN(PREMIUM_PRICE) })}</button>` : `<span class="chip chip-local">${icon('lock')}${it.top ? t('earned_top10') : t('lock_lv', { n: it.lv })}</span>`;
+      banner.innerHTML = `<span>${icon('eye')} ${t('preview_on', { name: esc(dict(it.n)) })}</span>${act}<button class="btn btn-ghost btn-sm" data-act="preview-off">${t('close')}</button>`;
+    }
     else banner.hidden = true;
-    // gentle recommendation
-    const rec = mine ? this.recommend(a) : null;
-    // visiting someone else: if their sea uses a paid look I don't own yet, offer to try it on mine
-    const theirLook = !mine && S.me && S.me.nick ? [decor.theme, ...(decor.items || []), ...(decor.fx || [])].find(id => SHOPI[id] && SHOPI[id].p > 0 && !owned(id)) : null;
-    $('#sea-rec', el).innerHTML = rec && !S.recDismiss && !S.preview ? `<div class="rec card"><img src="${this.itemThumb(rec.id)}" alt="" width="96" height="60"><div><p class="eyebrow">${t('rec_eyebrow')}</p><p>${t(rec.why, { name: esc(dict(SHOPI[rec.id].n)) })}</p></div><div class="rec-btns"><button class="btn btn-line btn-sm" data-preview="${rec.id}">${icon('eye')}${t('try_on')}</button><button class="btn btn-ghost btn-xs" data-act="rec-off" aria-label="${esc(t('close'))}">${icon('close')}</button></div></div>`
+    // newly unlocked looks (levels only — never a purchase nudge) / a friend's look to try on
+    const fresh = mine ? this.freshUnlocks() : [];
+    const myD = (S.me && S.me.decor) || DEFAULT_DECOR();
+    const theirLook = !mine && S.me && S.me.nick ? [decor.theme, ...(decor.items || []), ...(decor.fx || [])].find(id => SHOPI[id] && !SHOPI[id].top && id !== myD.theme && !(myD.items || []).includes(id) && !(myD.fx || []).includes(id)) : null;
+    $('#sea-rec', el).innerHTML = fresh.length && !S.recDismiss && !S.preview ? `<div class="rec card new"><img src="${this.itemThumb(fresh[0])}" alt="" width="96" height="60"><div><p class="eyebrow">${t('unlock_eyebrow', { n: myLevel() })}</p><p>${t('unlock_line', { name: esc(fresh.map(id => dict(SHOPI[id].n)).slice(0, 3).join(', ')) })}</p></div><div class="rec-btns"><button class="btn btn-primary btn-sm" data-toggle="${fresh[0]}">${t('use_item')}</button><button class="btn btn-ghost btn-xs" data-act="rec-off" aria-label="${esc(t('close'))}">${icon('close')}</button></div></div>`
       : theirLook ? `<div class="rec card"><img src="${this.itemThumb(theirLook)}" alt="" width="96" height="60"><div><p class="eyebrow no-up">${t('fr_tryon_eyebrow', { nick: esc(a.nick) })}</p><p>${t('fr_tryon_line', { name: esc(dict(SHOPI[theirLook].n)) })}</p></div><div class="rec-btns"><button class="btn btn-line btn-sm" data-tryon="${theirLook}">${icon('eye')}${t('fr_tryon')}</button></div></div>` : '';
     S.seaTab = S.seaTab || 'shop';
     const tabs = mine ? ['shop', 'catches', 'dex'] : ['catches', 'dex'];
@@ -770,45 +789,58 @@ VIEWS.sea = {
       <div class="tabs" role="tablist">${tabs.map(k => `<button role="tab" aria-selected="${S.seaTab === k}" data-seatab="${k}">${t('seatab_' + k)}</button>`).join('')}</div>
       <div class="tab-body">${S.seaTab === 'shop' ? this.shopHTML() : S.seaTab === 'catches' ? this.catchesHTML(cs, uid) : this.dexHTML(cs)}</div>`;
     hydratePhotos(el);
+    if (mine && S.seaTab === 'shop' && S.me && myLevel() > (S.me.lvSeen || 1) && !S._lvSeenT) { S._lvSeenT = setTimeout(() => { S._lvSeenT = null; if (S.me) { S.me.lvSeen = myLevel(); store.saveMe(); } }, 4000); }
   },
-  recommend(a) {
-    const cs = a.catches || [];
-    const cand = [];
-    if (cs.some(c => ['surumeika', 'kensakiika', 'aoriika', 'tachiuo'].includes(c.sp))) cand.push({ id: 'th_night', why: 'rec_night' });
-    const r = myRank('KR'); if (r && r.rank <= 50) cand.push({ id: 'fl_wave', why: 'rec_frame' });
-    if (cs.length >= 3) cand.push({ id: 'dc_jelly', why: 'rec_jelly' });
-    cand.push({ id: 'bd_starter', why: 'rec_starter' }, { id: 'th_sunset', why: 'rec_sunset' }, { id: 'dc_light', why: 'rec_light' });
-    return cand.find(c => !owned(c.id)) || null;
+  freshUnlocks() {
+    if (!S.me) return [];
+    const L = myLevel(), seen = S.me.lvSeen || 1; if (L <= seen) return [];
+    const d = S.me.decor || DEFAULT_DECOR();
+    return SHOP.filter(x => x.lv && x.lv > seen && x.lv <= L && d.theme !== x.id && !(d.items || []).includes(x.id) && !(d.fx || []).includes(x.id)).map(x => x.id);
   },
   itemThumb(id) {
     const key = 'item:' + id; if (FD._it && FD._it[key]) return FD._it[key];
     FD._it = FD._it || {};
     const c = document.createElement('canvas'); c.width = 240; c.height = 150; c.style.width = '240px'; c.style.height = '150px';
     document.body.appendChild(c); c.style.position = 'absolute'; c.style.left = '-9999px';
-    const sc = new SeaScene(c); const it = SHOPI[id]; const inc = it.inc || [id];
-    const theme = (inc.find(x => SHOPI[x].k === 'theme') || 'th_dawn').replace('th_', '');
+    const sc = new SeaScene(c, { thumb: true }); const it = SHOPI[id]; const inc = it.inc || [id];
+    const theme = (inc.find(x => SHOPI[x].k === 'theme') || (id === 'pr_gold' ? 'th_sunset' : 'th_day')).replace('th_', '');
     const decor = ['dc_weed', 'dc_rock', ...inc.filter(x => SHOPI[x].k === 'decor')];
-    sc.setState({ theme, decor, fx: inc.filter(x => SHOPI[x].k === 'fx'), fish: it.k === 'flair' ? [] : [{ key: 'a', sp: 'madai', len: 45 }] });
+    const ch = S.me && S.me.char ? S.me.char : CH.DEF;
+    sc.setState({ theme, decor, fx: inc.filter(x => SHOPI[x].k === 'fx'), fish: it.k === 'flair' ? [] : [{ key: 'a', sp: 'madai', len: 45 }], char: Object.assign({}, ch, id === 'pr_gold' ? { rd: 'gold' } : {}), rod: id === 'pr_gold' ? 'gold' : ch.rd, hideChar: it.k === 'flair' });
     sc.t = 2.2; sc.frame(16, true);
-    if (it.k === 'flair') { const x = c.getContext('2d'); x.setTransform(1, 0, 0, 1, 0, 0); x.fillStyle = 'rgba(0,0,0,.35)'; x.fillRect(0, 0, c.width, c.height); x.font = '700 34px "Big Shoulders Display", sans-serif'; x.textAlign = 'center'; x.fillStyle = id === 'fl_gold' ? '#ffd54a' : '#fff'; x.fillText(APP_NAME[1], c.width / 2, c.height / 2 + 12); if (id === 'fl_wave') { x.strokeStyle = '#3fb6d8'; x.lineWidth = 6; x.beginPath(); x.arc(c.width / 2, c.height / 2, 54, 0, Math.PI * 2); x.stroke(); } }
+    if (it.k === 'flair') { const x = c.getContext('2d'); x.setTransform(1, 0, 0, 1, 0, 0); x.fillStyle = 'rgba(0,0,0,.35)'; x.fillRect(0, 0, c.width, c.height); x.font = '700 34px "Big Shoulders Display", sans-serif'; x.textAlign = 'center'; x.fillStyle = id === 'fl_gold' ? '#ffd54a' : '#fff'; x.fillText(APP_NAME[1], c.width / 2, c.height / 2 + 12); x.strokeStyle = id === 'fl_gold' ? '#ffd54a' : '#3fb6d8'; x.lineWidth = 6; x.beginPath(); x.arc(c.width / 2, c.height / 2, 54, 0, Math.PI * 2); x.stroke(); }
     sc.stop(); if (sc._ro) sc._ro.disconnect();
     const url = c.toDataURL('image/jpeg', .82); c.remove(); FD._it[key] = url; return url;
   },
   shopHTML() {
-    const allKinds = ['theme', 'decor', 'fx', 'flair', 'bundle'];
-    S.shopKind = S.shopKind || 'theme';
-    const kinds = S.shopKind === 'all' ? allKinds : [S.shopKind];
-    const d = (S.me && S.me.decor) || { theme: 'th_dawn', items: [], fx: [] };
-    const active = id => { const it = SHOPI[id]; if (it.k === 'theme') return d.theme === id; if (it.k === 'decor') return d.items.includes(id); if (it.k === 'fx') return (d.fx || []).includes(id); if (it.k === 'flair') return !!(S.me.flair && S.me.flair[id === 'fl_gold' ? 'gold' : 'frame']); return false; };
-    return `<p class="muted small">${t('shop_sub')}</p><div class="chip-row shop-kinds">${['all', ...allKinds].map(k => `<button class="chip chip-tab" aria-pressed="${S.shopKind === k}" data-shopkind="${k}">${k === 'all' ? t('shop_all') : t('kind_' + k)}</button>`).join('')}</div>` + kinds.map(k => `
-      <h3 class="h4">${t('kind_' + k)}</h3>
-      <div class="shop-grid">${SHOP.filter(s => s.k === k).map(s => {
-        const own = owned(s.id); const pend = S.myOrders.some(o => o.kind === 'item' && (o.ref === s.id || (SHOPI[o.ref] && SHOPI[o.ref].inc && SHOPI[o.ref].inc.includes(s.id))) && orderState(o) === 'pending');
-        return `<div class="shop-item ${active(s.id) ? 'on' : ''}">
-          <img src="${this.itemThumb(s.id)}" alt="" width="240" height="150" loading="lazy">
-          <div class="si-txt"><b>${esc(dict(s.n))}</b>${s.p === 0 ? `<span class="chip chip-ok">${t('free')}</span>` : s.p === -1 ? `<span class="chip chip-feat">${t('earned_top10')}</span>` : `<span class="price num">${fmtN(s.p)}${t('won')}</span>${s.was ? `<s class="muted small">${fmtN(s.was)}</s>` : ''}`}${pend ? `<span class="chip chip-review">${t('pay_pending')}</span>` : ''}</div>
-          <div class="si-btns">${own ? (s.k === 'bundle' ? `<span class="muted small">${t('owned')}</span>` : `<button class="btn btn-sm ${active(s.id) ? 'btn-line' : 'btn-primary'}" data-toggle="${s.id}">${active(s.id) ? (s.k === 'theme' ? t('applied') : t('remove')) : t('apply')}</button>`) : s.p > 0 ? `<button class="btn btn-ghost btn-sm" data-preview="${s.id}">${icon('eye')}${t('try_on')}</button><button class="btn btn-primary btn-sm" data-buy="${s.id}">${t('buy')}</button>` : `<span class="muted small">${t('earn_hint')}</span>`}</div>
-        </div>`; }).join('')}</div>`).join('');
+    const kinds = ['theme', 'decor', 'fx', 'flair'];
+    S.shopKind = S.shopKind && (S.shopKind === 'all' || kinds.includes(S.shopKind)) ? S.shopKind : 'all';
+    const d = Object.assign(DEFAULT_DECOR(), (S.me && S.me.decor) || {});
+    const fl = (S.me && S.me.flair) || {};
+    const active = id => { const it = SHOPI[id]; if (it.k === 'theme') return d.theme === id; if (it.k === 'decor') return (d.items || []).includes(id); if (it.k === 'fx') return (d.fx || []).includes(id); if (it.k === 'flair') return id === 'fl_gold' ? !!fl.gold : !!fl.frame; if (it.k === 'set') return it.inc.every(x => active(x)); return false; };
+    const li = lvInfo(S.me, myId()); const seen = (S.me && S.me.lvSeen) || 1;
+    const pct = Math.round((li.xp - li.cur) / Math.max(1, li.next - li.cur) * 100);
+    const nextUnlock = SHOP.filter(x => x.lv && x.lv > li.L).sort((a, b) => a.lv - b.lv)[0];
+    const card = s => {
+      const own = owned(s.id), on = own && active(s.id), isNew = s.lv && s.lv > seen && own;
+      const btn = own ? (s.k === 'theme' ? (on ? `<span class="chip chip-ok">${t('in_use')}</span>` : `<button class="btn btn-primary btn-sm" data-toggle="${s.id}">${t('use_item')}</button>`)
+        : `<button class="btn btn-sm ${on ? 'btn-line' : 'btn-primary'}" data-toggle="${s.id}">${on ? t('remove') : t('use_item')}</button>`)
+        : `<button class="btn btn-ghost btn-sm" data-preview="${s.id}">${icon('eye')}${t('try_on')}</button>`;
+      const tag = own ? (isNew ? `<span class="chip chip-new">NEW</span>` : '') : s.top ? `<span class="chip chip-feat">${t('earned_top10')}</span>` : s.in ? `<span class="chip chip-prem">${t('premium')}</span>` : `<span class="chip chip-lock">${icon('lock')}Lv.${s.lv}</span>`;
+      return `<div class="shop-item ${on ? 'on' : ''}${own ? '' : ' locked'}"><img src="${this.itemThumb(s.id)}" alt="" width="240" height="150" loading="lazy"><div class="si-txt"><b>${esc(dict(s.n))}</b>${tag}</div><div class="si-btns">${btn}</div></div>`;
+    };
+    const prem = SHOP.filter(s => s.pr);
+    return `
+      <div class="lv-card card">
+        <div class="lv-l"><span class="lv-chip big">Lv.${li.L}</span><div><b>${esc(li.title)}</b><p class="muted small">${t('xp_left', { n: fmtN(Math.max(0, li.next - li.xp)) })}${nextUnlock ? ' · ' + t('next_unlock', { name: esc(dict(nextUnlock.n)), n: nextUnlock.lv }) : ''}</p></div></div>
+        <div class="meter xp"><i style="width:${pct}%"></i></div>
+        <p class="hint">${t('decor_free_note')}</p>
+      </div>
+      <h3 class="h4">${icon('star')}${t('premium_title')}</h3>
+      <div class="prem-grid">${prem.map(s => { const own = owned(s.id); return `<div class="prem-item${own ? ' owned' : ''}"><img src="${this.itemThumb(s.id)}" alt="" width="240" height="150" loading="lazy"><div class="pi-txt"><b>${esc(dict(s.n))}</b><p class="muted small">${t('prem_desc_' + s.id)}</p></div><div class="si-btns">${own ? (active(s.id) ? `<span class="chip chip-ok">${t('in_use')}</span>` : `<button class="btn btn-primary btn-sm" data-toggle="${s.id}">${t('use_item')}</button>`) : `<button class="btn btn-ghost btn-sm" data-preview="${s.id}">${icon('eye')}${t('try_on')}</button><button class="btn btn-primary btn-sm" data-buy="${s.id}">${t('prem_buy', { p: fmtN(PREMIUM_PRICE) })}</button>`}</div></div>`; }).join('')}</div>
+      <p class="hint">${t('prem_note')}</p>
+      <div class="chip-row shop-kinds">${['all', ...kinds].map(k => `<button class="chip chip-tab" aria-pressed="${S.shopKind === k}" data-shopkind="${k}">${k === 'all' ? t('shop_all') : t('kind_' + k)}</button>`).join('')}</div>
+      ${(S.shopKind === 'all' ? kinds : [S.shopKind]).map(k => `<h3 class="h4">${t('kind_' + k)}</h3><div class="shop-grid">${SHOP.filter(s => s.k === k && !s.pr).map(card).join('')}</div>`).join('')}`;
   },
   catchesHTML(cs, uid) {
     if (!cs.length) return `<div class="empty"><p class="muted">${t('no_catches')}</p>${!uid ? `<a class="btn btn-primary btn-sm" href="#scan">${t('cta_scan')}</a>` : ''}</div>`;
@@ -929,9 +961,9 @@ VIEWS.log = {
     <div class="page log">
       <header class="page-head"><h1>${t('log_title')}</h1><p class="lede">${t('log_sub')}</p>
         <div class="hero-cta"><a class="btn btn-primary" href="#scan">${icon('camera')}${t('mode_now')}</a><a class="btn btn-line" href="#past">${icon('clock')}${t('mode_past')}</a></div></header>
-      <div class="stats4 card"><div><span class="num">${fmtN(cs.length)}</span><span>${t('catches')}</span></div><div><span class="num">${fmtN(pts)}</span><span>${t('total_pts')}</span></div><div><span class="num">${pastUsed()} / ${FREE_PAST + pastCredits()}</span><span>${t('past_used')}</span></div><div><span class="num">${fmtN(cs.filter(c => c.st === 'review').length)}</span><span>${t('st_review')}</span></div></div>
+      <div class="stats4 card"><div><span class="num">${fmtN(cs.length)}</span><span>${t('catches')}</span></div><div><span class="num">${fmtN(pts)}</span><span>${t('total_pts')}</span></div><div><span class="num">Lv.${myLevel()}</span><span>${esc(lvInfo(S.me, myId()).title)}</span></div><div><span class="num">${fmtN(cs.filter(c => c.st === 'review').length)}</span><span>${t('st_review')}</span></div></div>
       ${cs.length ? VIEWS.sea.catchesHTML(cs, null) : `<div class="empty card big"><div class="empty-art"><img src="${FD.thumb(SPI.kurodai, 260, 140)}" alt=""></div><h2>${t('log_empty')}</h2><p class="muted">${t('log_empty_sub')}</p><a class="btn btn-primary" href="#scan">${t('cta_scan')}</a></div>`}
-      ${S.myOrders.length ? `<section class="card"><h2 class="h3">${icon('heart')}${t('orders_title')}</h2><ul class="orders">${S.myOrders.slice().reverse().map(o => `<li><span>${esc(o.kind === 'item' ? dict(SHOPI[o.ref]?.n) : o.kind === 'past' ? t('past_buy_title') : t('donate_title'))}</span><span class="num">${fmtN(o.amt)}${t('won')}</span><span class="mono small">${esc(o.code)}</span><span class="chip ${orderState(o) === 'ok' ? 'chip-ok' : orderState(o) === 'no' ? 'chip-closed' : 'chip-review'}">${t('ord_' + orderState(o))}</span></li>`).join('')}</ul></section>` : ''}
+      ${S.myOrders.length ? `<section class="card"><h2 class="h3">${icon('heart')}${t('orders_title')}</h2><ul class="orders">${S.myOrders.slice().reverse().map(o => `<li><span>${esc(o.kind === 'item' ? dict(SHOPI[o.ref]?.n) || o.ref : o.kind === 'past' ? t('ord_past_old') : t('donate_title'))}</span><span class="num">${fmtN(o.amt)}${t('won')}</span><span class="mono small">${esc(o.code)}</span><span class="chip ${orderState(o) === 'no' ? 'chip-closed' : 'chip-ok'}">${t('ord_' + orderState(o))}</span></li>`).join('')}</ul></section>` : ''}
     </div>`;
     hydratePhotos(el);
   }
@@ -975,7 +1007,7 @@ VIEWS.help = {
       </section>
       <section class="faq">
         <h2 class="h3">${t('faq_title')}</h2>
-        ${['scan', 'train', 'score', 'past', 'fake', 'friends', 'pay', 'spot', 'legal', 'beta'].map(k => `<details class="card"><summary>${t('faq_' + k + '_q')}</summary><p>${t('faq_' + k + '_a', { n: FREE_PAST, p: fmtN(PAST_PRICE) })}</p></details>`).join('')}
+        ${['scan', 'train', 'score', 'past', 'fake', 'friends', 'pay', 'spot', 'legal', 'beta'].map(k => `<details class="card"><summary>${t('faq_' + k + '_q')}</summary><p>${t('faq_' + k + '_a', { p: fmtN(PREMIUM_PRICE) })}</p></details>`).join('')}
       </section>
     </div>`;
     const compose = () => { const cat = ($('input[name="sg-cat"]:checked', el) || {}).value || 'feature'; const text = $('#sg-text', el).value.trim(); return { cat, text, msg: `[${APP_NAME[0]} ${APP_NAME[1]} · ${t('sgc_' + cat)}]\n${text}\n— ${S.me?.nick || ''} ${S.me?.cc ? '(' + S.me.cc + ')' : ''}` }; };
@@ -1000,7 +1032,13 @@ VIEWS.prefs = {
     el.innerHTML = `
     <div class="page prefs">
       <header class="page-head"><h1>${t('prefs_title')}</h1></header>
-      <section class="card"><h2 class="h3">${t('prefs_profile')}</h2><div id="pf-box">${profileFormHTML(p)}</div><div class="actions"><button class="btn btn-primary" id="pf-save">${t('save')}</button></div></section>
+      <section class="card"><h2 class="h3">${t('prefs_profile')}</h2>
+        ${S.me && S.me.nick ? `<a class="pf-char" href="#char">${avatar(S.me, 48)}<span><b>${t('ch_title')}</b><span class="muted small">${t('pf_char_hint')}</span></span>${icon('gear')}</a>` : ''}
+        <div id="pf-box">${profileFormHTML(p)}</div><div class="actions"><button class="btn btn-primary" id="pf-save">${t('save')}</button></div></section>
+      ${linkSupported() ? `<section class="card link-card"><h2 class="h3">${icon('link')}${t('link_title')}</h2><p class="muted">${t('link_sub')}</p>
+        ${window.APP_AUTH.link.linked() ? `<p class="note ok">${icon('check')} ${t('link_linked')}</p>` : ''}
+        <div class="actions"><button class="btn btn-primary" data-link="make">${icon('qr')}${t('link_make')}</button><button class="btn btn-line" data-link="enter">${t('link_enter')}</button>${window.APP_AUTH.link.linked() ? `<button class="btn btn-ghost" data-link="leave">${t('link_leave')}</button>` : ''}</div>
+        <p class="hint">${t('link_hint')}</p></section>` : window.APP_RT !== 'web' && S.mode === 'shared' ? `<section class="card"><h2 class="h3">${icon('link')}${t('link_title')}</h2><p class="muted">${t('link_artifact_note')}</p></section>` : ''}
       <section class="card"><h2 class="h3">${t('prefs_display')}</h2>
         <div class="row2">
           <div class="field"><span>${t('theme')}</span><div class="seg seg-sm">${['system', 'light', 'dark'].map(x => `<button aria-pressed="${S.theme === x}" data-themeset="${x}">${t('theme_' + x)}</button>`).join('')}</div></div>
@@ -1033,16 +1071,17 @@ VIEWS.admin = {
   render(el) {
     if (!S.isOwner) { el.innerHTML = `<div class="page"><div class="empty card big"><h2>${t('admin_only')}</h2></div></div>`; return; }
     const cfg = S.admin.config || {};
-    const orders = []; for (const [uid, d] of S.allOrders) for (const o of (d.items || [])) orders.push({ uid, o, st: (S.admin.grants[uid] || {})[o.id] || 'pending' });
+    const orders = []; for (const [uid, d] of S.allOrders) for (const o of (d.items || [])) orders.push({ uid, o, st: (S.admin.grants[uid] || {})[o.id] || 'auto' });
     orders.sort((a, b) => b.o.ts - a.o.ts);
     const sugg = []; for (const [uid, d] of S.allSuggest) for (const s of (d.items || [])) sugg.push({ uid, s });
     sugg.sort((a, b) => b.s.ts - a.s.ts);
     const reviews = []; for (const [uid, a] of S.anglers) for (const c of (a.catches || [])) if (c.st === 'review' && !verdict(uid, c.id)) reviews.push({ uid, a, c });
     const nCatch = [...S.anglers.values()].reduce((s, a) => s + (a.catches || []).length, 0);
+    const flagged = [...boardIndex().posts.values()].filter(p => p.reps > 0 || p.hidden).sort((x, y) => (x.hidden - y.hidden) || (y.reps - x.reps) || (y.ts - x.ts)).slice(0, 60);
     el.innerHTML = `
     <div class="page admin">
       <header class="page-head"><h1>${t('admin_title')}</h1><p class="lede">${t('admin_sub')}</p></header>
-      <div class="stats4 card"><div><span class="num">${S.anglers.size}</span><span>${t('ad_users')}</span></div><div><span class="num">${nCatch}</span><span>${t('catches')}</span></div><div><span class="num">${learnStats().total}</span><span>${t('learn_n')}</span></div><div><span class="num">${orders.filter(x => x.st === 'pending').length}</span><span>${t('ad_pending')}</span></div></div>
+      <div class="stats4 card"><div><span class="num">${S.anglers.size}</span><span>${t('ad_users')}</span></div><div><span class="num">${nCatch}</span><span>${t('catches')}</span></div><div><span class="num">${learnStats().total}</span><span>${t('learn_n')}</span></div><div><span class="num">${orders.filter(x => x.st === 'auto').length}</span><span>${t('ad_pending')}</span></div></div>
       <section class="card"><h2 class="h3">${icon('heart')}${t('ad_pay')}</h2>
         <div class="row2">
           <div class="field"><label for="ad-toss">${t('ad_toss')}</label><input id="ad-toss" value="${esc(cfg.tossId || '')}" placeholder="toss.me/___"></div>
@@ -1052,11 +1091,14 @@ VIEWS.admin = {
         <p class="hint">${t('ad_pay_hint')}</p>
         <div class="actions"><button class="btn btn-primary" id="ad-save">${t('save')}</button></div>
       </section>
-      <section class="card"><h2 class="h3">${icon('clock')}${t('ad_orders')}</h2>
-        ${orders.length ? `<div class="tbl"><table><thead><tr><th>${t('angler')}</th><th>${t('ad_item')}</th><th class="r">${t('ad_amt')}</th><th>${t('pay_memo')}</th><th>${t('ad_when')}</th><th></th></tr></thead><tbody>${orders.map(({ uid, o, st }) => `<tr><td>${esc(o.nick || S.anglers.get(uid)?.nick || '?')}</td><td>${esc(o.kind === 'item' ? dict(SHOPI[o.ref]?.n) : o.kind === 'past' ? t('past_buy_title') : t('donate_title'))}</td><td class="r num">${fmtN(o.amt)}</td><td class="mono">${esc(o.code)}</td><td class="small">${fmtDT(o.ts)}</td><td class="nowrap">${st === 'pending' ? `<button class="btn btn-primary btn-xs" data-grant="${uid}|${o.id}|ok">${t('approve')}</button> <button class="btn btn-ghost btn-xs" data-grant="${uid}|${o.id}|no">${t('reject')}</button>` : `<span class="chip ${st === 'ok' ? 'chip-ok' : 'chip-closed'}">${t('ord_' + st)}</span>`}</td></tr>`).join('')}</tbody></table></div>` : `<p class="muted">${t('ad_none')}</p>`}
+      <section class="card"><h2 class="h3">${icon('clock')}${t('ad_orders')}</h2><p class="hint">${t('ad_orders_hint')}</p>
+        ${orders.length ? `<div class="tbl"><table><thead><tr><th>${t('angler')}</th><th>${t('ad_item')}</th><th class="r">${t('ad_amt')}</th><th>${t('pay_memo')}</th><th>${t('ad_when')}</th><th></th></tr></thead><tbody>${orders.map(({ uid, o, st }) => `<tr><td>${esc(o.nick || S.anglers.get(uid)?.nick || '?')}</td><td>${esc(o.kind === 'item' ? dict(SHOPI[o.ref]?.n) || o.ref : o.kind === 'past' ? t('ord_past_old') : t('donate_title'))}</td><td class="r num">${fmtN(o.amt)}</td><td class="mono">${esc(o.code)}</td><td class="small">${fmtDT(o.ts)}</td><td class="nowrap">${st === 'auto' ? `<button class="btn btn-primary btn-xs" data-grant="${uid}|${o.id}|ok">${t('ad_confirm')}</button> <button class="btn btn-ghost btn-xs" data-grant="${uid}|${o.id}|no">${t('ad_cancel_order')}</button>` : `<span class="chip ${st === 'ok' ? 'chip-ok' : 'chip-closed'}">${t('ord_' + st)}</span> <button class="btn btn-ghost btn-xs" data-grant="${uid}|${o.id}|auto">${t('ad_undo')}</button>`}</td></tr>`).join('')}</tbody></table></div>` : `<p class="muted">${t('ad_none')}</p>`}
       </section>
       <section class="card"><h2 class="h3">${icon('shield')}${t('ad_reviews')}</h2>
         ${reviews.length ? `<div class="catch-grid">${reviews.map(({ uid, a, c }) => `<div class="catch-card"><span class="cc-ph" data-ph="${uid}|${c.id}"></span><span class="cc-txt"><b>${esc(nameOf(c.sp))}</b> ${lenFmt(c.len)} · ${esc(a.nick)}<br><span class="muted small">${t('trust')} ${c.tr} · ${fmtDate(c.ts)}${c.past ? ' · ' + t('past_short') : ''}</span></span><span class="nowrap"><button class="btn btn-primary btn-xs" data-verdict="${uid}|${c.id}|ok">${t('approve')}</button> <button class="btn btn-ghost btn-xs" data-verdict="${uid}|${c.id}|no">${t('reject')}</button> <button class="btn btn-ghost btn-xs" data-catch="${uid}|${c.id}">${t('view')}</button></span></div>`).join('')}</div>` : `<p class="muted">${t('ad_none')}</p>`}
+      </section>
+      <section class="card"><h2 class="h3">${icon('board')}${t('ad_reports')}</h2>
+        ${flagged.length ? `<ul class="ad-reports">${flagged.map(p => `<li class="${p.hidden ? 'is-hidden' : ''}"><button class="link" data-post="${esc(p.key)}"><span class="chip chip-cat cat-${esc(p.cat)}">${t('bdc_' + p.cat)}</span> ${esc(p.title)}</button><span class="muted small">${esc((anglerOf(p.uid) || {}).nick || '?')} · ${ago(p.ts)}</span>${p.reps ? `<span class="chip chip-review">${icon('warn')}${p.reps}</span>` : ''}${p.hidden ? `<span class="chip chip-closed">${t('bd_hidden_chip')}</span>` : ''}<button class="btn btn-ghost btn-xs" data-modhp="${esc(p.key)}">${t(p.hidden ? 'bd_unhide' : 'bd_hide')}</button></li>`).join('')}</ul>` : `<p class="muted">${t('ad_none')}</p>`}
       </section>
       <section class="card"><h2 class="h3">${icon('chat')}${t('ad_suggest')}</h2>
         ${sugg.length ? `<ul class="sg-list">${sugg.map(({ s }) => `<li><span class="chip">${t('sgc_' + s.cat)}</span><span>${esc(s.text)}</span><span class="muted small">${esc(s.nick || '')} · ${ago(s.ts)}</span></li>`).join('')}</ul>` : `<p class="muted">${t('ad_none')}</p>`}
@@ -1075,7 +1117,7 @@ VIEWS.admin = {
 
 /* ---------- More (mobile) ---------- */
 function openMore() {
-  const items = [['friends', 'users'], ['dex', 'book'], ['tackle', 'lure'], ['log', 'log'], ['help', 'chat'], ['prefs', 'gear']];
+  const items = [['friends', 'users'], ['board', 'board'], ['teams', 'flag'], ['char', 'user'], ['dex', 'book'], ['tackle', 'lure'], ['log', 'log'], ['help', 'chat'], ['prefs', 'gear']];
   if (S.isOwner) items.push(['admin', 'shield']);
   const nIn = frLists().inc.length;
   const w = openModal(`<nav class="more"><h2 class="sr">${t('more')}</h2>${items.map(([r, ic]) => `<a href="#${r}" class="more-item">${icon(ic)}<span>${t('nav_' + r)}</span>${r === 'friends' && nIn ? `<i class="badge num">${nIn}</i>` : ''}</a>`).join('')}<button class="more-item heart" data-act="donate">${icon('heart')}<span>${t('donate_btn')}</span></button></nav>`, { sheet: true, label: t('more') });

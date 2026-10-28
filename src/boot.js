@@ -1,7 +1,7 @@
 /* ===== Router, global events, boot ===== */
 const QR_PATH = '__QR_PATH__';
-const ROUTES = ['home', 'scan', 'past', 'map', 'rank', 'friends', 'sea', 'dex', 'tackle', 'log', 'help', 'prefs', 'admin'];
-const LIVE_VIEWS = new Set(['home', 'rank', 'friends', 'sea', 'dex', 'log', 'admin']);
+const ROUTES = ['home', 'scan', 'past', 'map', 'rank', 'friends', 'board', 'teams', 'sea', 'char', 'dex', 'tackle', 'log', 'help', 'prefs', 'admin'];
+const LIVE_VIEWS = new Set(['home', 'rank', 'friends', 'board', 'teams', 'sea', 'dex', 'log', 'admin']);
 const viewOf = r => (r === 'past' ? 'scan' : r);
 
 function updateStatic() {
@@ -54,6 +54,7 @@ function onHash() {
   let h = (location.hash || '').replace(/^#/, '');
   if (h === 'donate') { openDonate(); h = S.route && S.route !== 'donate' ? S.route : 'home'; }
   if (h === 'claim') { openClaim(); h = S.route && S.route !== 'claim' ? S.route : 'home'; }
+  if (/^link=/.test(h)) { const code = decodeURIComponent(h.slice(5)).toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 8); h = 'prefs'; try { history.replaceState(null, '', '#prefs'); } catch (e) { } setTimeout(() => openLinkEnter(code), 400); }
   if (/^add=/.test(h)) { S.frQ = decodeURIComponent(h.slice(4)).toUpperCase().slice(0, 12); h = 'friends'; try { history.replaceState(null, '', '#friends'); } catch (e) { } }
   if (h === 'shop') { S.seaTab = 'shop'; h = 'sea'; }
   if (!ROUTES.includes(h)) h = 'home';
@@ -82,6 +83,8 @@ const rerenderSoon = debounce(() => {
   const vid = viewOf(S.route);
   if (vid === 'map') { VIEWS.map.onData(); updateShell(); return; }
   if (LIVE_VIEWS.has(vid)) rerender(); else updateShell();
+  // an open post keeps up with new comments and likes (unless someone is typing a comment)
+  if (S.openPost && S.openPost.w.isConnected) { const ae = document.activeElement; if (!(ae && ae.id === 'pc-body')) S.openPost.render(); }
 }, 300);
 
 function openSeaOf(u) {
@@ -100,6 +103,12 @@ document.addEventListener('click', e => {
   const cp = tgt.closest('[data-copy]'); if (cp) { e.preventDefault(); copyText(cp.dataset.copy, cp); return; }
   const fr = tgt.closest('[data-fr]'); if (fr) { const i = fr.dataset.fr.indexOf('|'); friendAction(fr.dataset.fr.slice(0, i), fr.dataset.fr.slice(i + 1), fr); return; }
   if (inModal) { const su = tgt.closest('[data-seauid]'); if (su) { closeModal(inModal); openSeaOf(su.dataset.seauid); return; } }
+  if (inModal) {
+    const ct = tgt.closest('.post [data-catch]'); if (ct) { const [u, c] = ct.dataset.catch.split('|'); openCatch(u, c); return; }
+    const tj = tgt.closest('[data-tmjoin]'); if (tj) { closeModal(inModal); tmJoin(tj.dataset.tmjoin); return; }
+    const tl = tgt.closest('[data-tmleave]'); if (tl) { if (!armed(tl, t('tm_leave_confirm'))) return; closeModal(inModal); tmLeave(); return; }
+    const te = tgt.closest('[data-tmedit]'); if (te) { closeModal(inModal); openTeamEdit(te.dataset.tmedit === 'new'); return; }
+  }
   if (inModal && !tgt.closest('[data-act="donate"]')) { const c = tgt.closest('[data-catch]'); if (c && tgt.closest('.admin')) { } return; }
   const sp = tgt.closest('[data-sp]'); if (sp) { openSpecies(sp.dataset.sp); return; }
   const ct = tgt.closest('[data-catch]'); if (ct && !tgt.closest('[data-verdict]')) { const [uid, cid] = ct.dataset.catch.split('|'); openCatch(uid, cid); return; }
@@ -109,10 +118,10 @@ document.addEventListener('click', e => {
     if (a === 'donate') openDonate();
     else if (a === 'onboard') openOnboarding();
     else if (a === 'more') openMore();
-    else if (a === 'buy-past') buyPastCredit(() => { if (viewOf(S.route) === 'scan') { S.scan.phase = 'idle'; show(S.route); } });
+    else if (a === 'lens') openLens();
     else if (a === 'scan-stop') { if (S.scan && S.scan.ctl) S.scan.ctl.abort(); S.scan.phase = 'idle'; renderScanWork(); }
     else if (a === 'scan-retry') { if (S.scan && S.scan.file) startScan(S.scan.file); }
-    else if (a === 'scan-manual') { S.scan.phase = 'result'; S.scan.fused = S.scan.fused || { list: [], other: null }; renderScanWork(); openTrainPicker(true); }
+    else if (a === 'scan-manual') { S.scan.phase = 'result'; S.scan.fused = S.scan.fused || { list: [], other: null }; renderScanWork(); openTrainPicker(!(S.scan.ai && S.scan.ai.fish_visible !== false && S.scan.fused.list.length)); }
     else if (a === 'scan-reset') { S.scan.phase = 'idle'; renderScanWork(); window.scrollTo({ top: 0 }); }
     else if (a === 'ask-confirm') openConfirm();
     else if (a === 'preview-off') { S.preview = null; rerender(); }
@@ -126,6 +135,21 @@ document.addEventListener('click', e => {
   const sc = tgt.closest('[data-scope]'); if (sc) { S.rk.scope = sc.dataset.scope; rerender(); return; }
   const ca = tgt.closest('[data-cat]'); if (ca) { S.rk.cat = ca.dataset.cat; rerender(); return; }
   const su = tgt.closest('[data-seauid]'); if (su) { openSeaOf(su.dataset.seauid); return; }
+  const bw = tgt.closest('[data-bd="write"]'); if (bw) { openWrite(); return; }
+  const po = tgt.closest('[data-post]'); if (po) { openPost(po.dataset.post); return; }
+  const mh = tgt.closest('[data-modhp]'); if (mh) { modToggle('hp', mh.dataset.modhp).then(rerender); return; }
+  const ma = tgt.closest('[data-modav]'); if (ma) { modToggle('av', ma.dataset.modav).then(rerender); return; }
+  const nt = tgt.closest('[data-newstab]'); if (nt) { S.newsTab = nt.dataset.newstab; rerender(); return; }
+  const nm = tgt.closest('[data-news="more"]'); if (nm) { openNews(); return; }
+  const lk = tgt.closest('[data-link]'); if (lk) { const k = lk.dataset.link; if (k === 'make') openLinkMake(); else if (k === 'enter') openLinkEnter(); else if (k === 'leave') linkLeave(lk); return; }
+  const bc = tgt.closest('[data-bdcat]'); if (bc) { S.bd = Object.assign(S.bd || {}, { cat: bc.dataset.bdcat }); if (S.route !== 'board') location.hash = 'board'; else VIEWS.board.render($('#v-board')); return; }
+  const bs = tgt.closest('[data-bdsort]'); if (bs) { S.bd = Object.assign(S.bd || {}, { sort: bs.dataset.bdsort }); VIEWS.board.render($('#v-board')); return; }
+  const tmv = tgt.closest('[data-team]'); if (tmv) { openTeam(tmv.dataset.team); return; }
+  const tj = tgt.closest('[data-tmjoin]'); if (tj) { tmJoin(tj.dataset.tmjoin); return; }
+  const tl = tgt.closest('[data-tmleave]'); if (tl) { if (!armed(tl, t('tm_leave_confirm'))) return; tmLeave(); return; }
+  const te = tgt.closest('[data-tmedit]'); if (te) { openTeamEdit(te.dataset.tmedit === 'new'); return; }
+  const tok = tgt.closest('[data-tmok]'); if (tok) { tmApprove(tok.dataset.tmok); return; }
+  const tno = tgt.closest('[data-tmno]'); if (tno) { tmBan(tno.dataset.tmno).then(rerender); return; }
   const mySea = tgt.closest('a[href="#sea"]'); if (mySea && S.viewUid) { S.viewUid = null; if (location.hash === '#sea') { e.preventDefault(); show('sea'); window.scrollTo({ top: 0 }); } return; }
   const fs = tgt.closest('[data-frsort]'); if (fs) { S.frSort = fs.dataset.frsort; rerender(); return; }
   const ff = tgt.closest('[data-feedf]'); if (ff) { S.feedF = ff.dataset.feedf; rerender(); return; }

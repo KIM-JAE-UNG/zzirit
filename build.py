@@ -24,7 +24,7 @@ WEB = {
     'supabase_js': 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.js',
 }
 
-APP_JS = ['i18n.js', 'fishdb.js', 'fishdraw.js', 'geo.js', 'map.js', 'core.js', 'flows.js', 'views.js', 'boot.js']
+APP_JS = ['i18n.js', 'i18n-more.js', 'fishdb.js', 'fishdraw.js', 'scene.js', 'geo.js', 'map.js', 'core.js', 'flows.js', 'views.js', 'char.js', 'community.js', 'news.js', 'boot.js']
 
 
 def read(name):
@@ -35,7 +35,7 @@ def read(name):
 def build(target):
     files = list(APP_JS)
     if target == 'web':
-        files = ['rt-supabase.js', 'i18n.js', 'web-texts.js'] + APP_JS[1:]
+        files = ['rt-supabase.js', 'i18n.js', 'i18n-more.js', 'web-texts.js'] + APP_JS[2:]
     js = '\n'.join(read(f) for f in files)
     qr = read('qr.txt').strip().split('|', 1)[1]
     js = js.replace('__QR_PATH__', qr)

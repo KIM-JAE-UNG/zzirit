@@ -66,8 +66,14 @@ function hamming(a, b) {
   const pc = x => { x = x - ((x >>> 1) & 0x55555555); x = (x & 0x33333333) + ((x >>> 2) & 0x33333333); return (((x + (x >>> 4)) & 0x0F0F0F0F) * 0x01010101) >>> 24; };
   return pc((parseInt(a.slice(0, 8), 16) ^ parseInt(b.slice(0, 8), 16)) >>> 0) + pc((parseInt(a.slice(8), 16) ^ parseInt(b.slice(8), 16)) >>> 0);
 }
+function hashBits(h) { if (!h || h.length !== 16) return 0; let n = 0; for (const ch of h) { let v = parseInt(ch, 16); while (v) { n += v & 1; v >>= 1; } } return n; }
 function findDuplicate(hash) {
-  for (const [uid, a] of allAnglers()) for (const c of (a.catches || [])) if (c.h && hamming(c.h, hash) <= 5 && c.st !== 'no') return { uid, c };
+  // flat pictures (screenshots of plain colours, drawings) give nearly empty hashes; only an exact match counts for those
+  const weak = hashBits(hash) < 10 || hashBits(hash) > 54;
+  for (const [uid, a] of allAnglers()) for (const c of (a.catches || [])) {
+    if (!c.h || c.st === 'no') continue;
+    if (weak || hashBits(c.h) < 10 || hashBits(c.h) > 54 ? c.h === hash : hamming(c.h, hash) <= 5) return { uid, c };
+  }
   return null;
 }
 async function readExif(file) {
@@ -311,35 +317,46 @@ function openPay({ kind, ref, amt, title, desc, onDone }) {
   const desktop = matchMedia('(hover: hover) and (pointer: fine)').matches;
   const w = openModal(`
     <div class="pay">
-      <p class="eyebrow">${t(kind === 'donate' ? 'pay_eyebrow_donate' : kind === 'past' ? 'pay_eyebrow_past' : 'pay_eyebrow_item')}</p>
+      <p class="eyebrow">${t(kind === 'donate' ? 'pay_eyebrow_donate' : 'pay_eyebrow_item')}</p>
       <h2>${esc(title)}</h2>
       ${desc ? `<p class="lede">${desc}</p>` : ''}
       <div class="pay-amt"><span class="num">${fmtN(amt)}</span><span>${t('won')}</span></div>
       ${ready ? `
-      <div class="pay-methods">
-        ${L.kakao ? `<a class="btn btn-kpay btn-lg" href="${esc(L.kakao)}" target="_blank" rel="noopener" data-pm="kakao">${t('pay_kakao')}</a>` : ''}
-        ${L.toss ? `<a class="btn btn-toss btn-lg" href="${esc(L.toss)}" target="_blank" rel="noopener" data-pm="toss">${t('pay_toss')}</a>` : ''}
-      </div>
-      ${L.kakao && desktop ? `<div class="pay-qr"><div class="pay-qr-img" id="pay-qr"></div><p class="hint">${t('pay_qr_hint')}</p></div>` : ''}
-      <div class="pay-code" data-copybox>
-        <div><span class="lbl">${t('pay_memo')}</span><span class="copy-src mono big">${code}</span></div>
-        <button class="btn btn-line btn-sm" data-copy="${code}">${icon('copy')} ${t('copy')}</button>
-      </div>
-      <p class="hint">${t('pay_hint')}</p>
-      <div class="actions"><button class="btn btn-primary btn-lg btn-block" id="pay-done">${t('pay_done')}</button></div>` : `
+      <ol class="pay-steps">
+        <li><p class="ps-h"><span class="ps-n">1</span>${t(desktop && L.kakao ? 'pay_step1_pc' : 'pay_step1')}</p>
+          <div class="pay-methods">
+            ${L.kakao ? `<a class="btn btn-kpay btn-lg" href="${esc(L.kakao)}" target="_blank" rel="noopener" data-pm="kakao">${t('pay_kakao')}</a>` : ''}
+            ${L.toss ? `<a class="btn btn-toss btn-lg" href="${esc(L.toss)}" target="_blank" rel="noopener" data-pm="toss">${t('pay_toss')}</a>` : ''}
+          </div>
+          ${L.kakao && desktop ? `<div class="pay-qr"><div class="pay-qr-img" id="pay-qr"></div><p class="hint">${t('pay_qr_hint')}</p></div>` : ''}
+          <div class="pay-code" data-copybox>
+            <div><span class="lbl">${t('pay_memo')}</span><span class="copy-src mono big">${code}</span></div>
+            <button class="btn btn-line btn-sm" data-copy="${code}">${icon('copy')} ${t('copy')}</button>
+          </div>
+          <p class="hint">${t('pay_hint')}</p></li>
+        <li><p class="ps-h"><span class="ps-n">2</span>${t('pay_step2')}</p>
+          <button class="btn btn-primary btn-lg btn-block" id="pay-done" disabled>${t('pay_done')}</button>
+          <p class="hint" id="pay-wait">${t('pay_wait')}</p></li>
+      </ol>
+      <p class="fine">${t('pay_fine2')}</p>` : `
       <p class="note">${icon('info')} ${t('pay_none')}</p>
       <div class="actions"><a class="btn btn-kakao btn-lg btn-block" href="${DEV.kakaoUrl}" target="_blank" rel="noopener">${icon('chat')}${t('kakao_ask')}</a></div>`}
-      <p class="fine">${t('pay_fine')}</p>
     </div>`, { label: title });
   const qbox = $('#pay-qr', w); if (qbox) drawQr(qbox, L.kakao);
-  let method = L.kakao ? 'kakao' : 'toss';
-  $$('[data-pm]', w).forEach(a => a.addEventListener('click', () => { method = a.dataset.pm; }));
   if (!ready) return;
-  $('#pay-done', w).onclick = async () => {
+  let method = L.kakao ? 'kakao' : 'toss';
+  const done = $('#pay-done', w);
+  // "I sent it" only wakes up after the payment page was opened (phone) or the QR has been on screen a while (computer)
+  const arm = () => { if (!done.isConnected) return; done.disabled = false; const pw = $('#pay-wait', w); if (pw) pw.hidden = true; };
+  $$('[data-pm]', w).forEach(a => a.addEventListener('click', () => { method = a.dataset.pm; setTimeout(arm, 1200); }));
+  if (desktop && L.kakao) setTimeout(arm, 9000);
+  done.onclick = async () => {
+    if (done.disabled) return;
+    done.disabled = true;
     const o = { id: rid(10), kind, ref: ref || null, amt, code, m: method, ts: nowMs(), nick: S.me?.nick || '', qty: 1 };
     await store.addOrder(o);
     closeModal(w);
-    toast(t(kind === 'donate' ? 'pay_thanks' : 'pay_applied'), 'ok', 4200);
+    toast(t(kind === 'donate' ? 'pay_thanks' : 'pay_applied2'), 'ok', 5200);
     onDone && onDone(o);
     rerender();
   };
@@ -348,32 +365,141 @@ function openDonate() {
   openPay({ kind: 'donate', amt: DONATE_AMT, title: t('donate_title'), desc: t('donate_desc') });
 }
 function buyItem(id) {
-  const it = SHOPI[id]; if (!it || it.p <= 0) return;
-  ensureProfile(() => openPay({ kind: 'item', ref: id, amt: it.p, title: dict(it.n), desc: it.inc ? t('bundle_desc', { items: it.inc.map(x => dict(SHOPI[x].n)).join(' · ') }) : t('item_desc'), onDone: () => { applyItem(id); } }));
+  const it = SHOPI[id]; if (!it || !it.pr) return;
+  if (owned(id)) { applyItem(id); toast(t('applied')); rerender(); return; }
+  ensureProfile(() => openPay({ kind: 'item', ref: id, amt: PREMIUM_PRICE, title: dict(it.n), desc: t('prem_desc_' + id), onDone: () => { applyItem(id); } }));
 }
-function buyPastCredit(then) {
-  ensureProfile(() => openPay({ kind: 'past', amt: PAST_PRICE, title: t('past_buy_title'), desc: t('past_buy_desc', { n: FREE_PAST }), onDone: () => then && then() }));
+function setFlair(id, on) {
+  S.me.flair = S.me.flair || {};
+  if (id === 'fl_gold') S.me.flair.gold = on; else if (id === 'fl_wave') S.me.flair.frame = on;
 }
 function applyItem(id) {
   if (!S.me) return; const it = SHOPI[id]; if (!it) return;
-  const d = S.me.decor || (S.me.decor = { theme: 'th_dawn', items: [], fx: [] });
-  const ids = it.inc || [id];
-  for (const x of ids) {
-    const i = SHOPI[x];
+  const d = S.me.decor || (S.me.decor = DEFAULT_DECOR());
+  d.items = d.items || []; d.fx = d.fx || [];
+  for (const x of (it.inc || [id])) {
+    const i = SHOPI[x]; if (!i || !owned(x)) continue;
     if (i.k === 'theme') d.theme = x;
-    else if (i.k === 'decor') { if (!d.items.includes(x)) d.items.push(x); }
-    else if (i.k === 'fx') { d.fx = d.fx || []; if (!d.fx.includes(x)) d.fx.push(x); }
-    else if (i.k === 'flair') { S.me.flair = S.me.flair || {}; S.me.flair[x === 'fl_gold' ? 'gold' : 'frame'] = true; }
+    else if (i.k === 'decor') { if (x === 'dc_boat' || x === 'dc_goldboat') d.items = d.items.filter(y => y !== 'dc_boat' && y !== 'dc_goldboat'); if (!d.items.includes(x)) d.items.push(x); }
+    else if (i.k === 'fx') { if (!d.fx.includes(x)) d.fx.push(x); }
+    else if (i.k === 'flair') setFlair(x, true);
   }
+  if (id === 'pr_gold' && S.me.char) S.me.char.rd = 'gold';
   store.saveMe();
 }
 function toggleItem(id) {
-  if (!S.me) return; const it = SHOPI[id]; const d = S.me.decor;
-  if (it.k === 'decor') { const i = d.items.indexOf(id); if (i >= 0) d.items.splice(i, 1); else d.items.push(id); }
-  else if (it.k === 'fx') { d.fx = d.fx || []; const i = d.fx.indexOf(id); if (i >= 0) d.fx.splice(i, 1); else d.fx.push(id); }
+  if (!S.me) return; const it = SHOPI[id]; if (!it) return;
+  if (!owned(id)) { toast(it.pr || it.in ? t('prem_need') : it.top ? t('earned_top10') : t('lock_lv', { n: it.lv }), 'info'); return; }
+  const d = S.me.decor || (S.me.decor = DEFAULT_DECOR()); d.items = d.items || []; d.fx = d.fx || [];
+  if (it.k === 'decor') { const i = d.items.indexOf(id); if (i >= 0) d.items.splice(i, 1); else { if (id === 'dc_boat' || id === 'dc_goldboat') d.items = d.items.filter(y => y !== 'dc_boat' && y !== 'dc_goldboat'); d.items.push(id); } }
+  else if (it.k === 'fx') { const i = d.fx.indexOf(id); if (i >= 0) d.fx.splice(i, 1); else d.fx.push(id); }
   else if (it.k === 'theme') d.theme = id;
-  else if (it.k === 'flair') { S.me.flair = S.me.flair || {}; const k = id === 'fl_gold' ? 'gold' : 'frame'; S.me.flair[k] = !S.me.flair[k]; }
+  else if (it.k === 'flair') { const on = id === 'fl_gold' ? !(S.me.flair && S.me.flair.gold) : !(S.me.flair && S.me.flair.frame); setFlair(id, on); if (on) setFlair(id === 'fl_gold' ? 'fl_wave' : 'fl_gold', false); }
+  else if (it.k === 'set') { applyItem(id); rerender(); return; }
   store.saveMe(); rerender();
+}
+/* Drop looks that are no longer owned (a cancelled order, a level that went down after a rejected catch) */
+function cleanLooks() {
+  if (!S.me || !S.me.decor) return false;
+  const d = S.me.decor; let changed = false;
+  if (d.theme && SHOPI[d.theme] && !owned(d.theme)) { d.theme = 'th_dawn'; changed = true; }
+  const keep = x => !SHOPI[x] || owned(x);
+  const items = (d.items || []).filter(keep), fx = (d.fx || []).filter(keep);
+  if (items.length !== (d.items || []).length || fx.length !== (d.fx || []).length) { d.items = items; d.fx = fx; changed = true; }
+  if (S.me.flair && S.me.flair.gold && !owned('fl_gold')) { S.me.flair.gold = false; changed = true; }
+  if (S.me.flair && S.me.flair.frame && !owned('fl_wave')) { S.me.flair.frame = false; changed = true; }
+  if (S.me.char && S.me.char.rd === 'gold' && !paidFor('pr_gold')) { S.me.char.rd = 'carbon'; changed = true; }
+  return changed;
+}
+
+/* ===== Free identification help: Google Lens (no AI cost) ===== */
+function lensBlob(type) { const sc = S.scan; if (!sc || !sc.im) return Promise.resolve(null); const c = canvasFrom(sc.im, 1280); return new Promise(r => c.toBlob(b => r(b), type, .9)); }
+async function openLens() {
+  const sc = S.scan; if (!sc || !sc.im) return;
+  const coarse = matchMedia('(pointer: coarse)').matches;
+  if (coarse && navigator.canShare) {
+    // phones: share a re-encoded copy (no GPS or camera data) straight to Google / Google Lens
+    const jpg = await lensBlob('image/jpeg');
+    const file = jpg && new File([jpg], 'zzirit-fish.jpg', { type: 'image/jpeg' });
+    if (file && navigator.canShare({ files: [file] })) {
+      try { await navigator.share({ files: [file] }); toast(t('lens_hint_mobile'), 'info', 7000); return; }
+      catch (e) { if (e && e.name === 'AbortError') return; }
+    }
+  }
+  // computer (or no file sharing): show the steps at once; the clean copy and the clipboard follow in the background
+  const w = openModal(`<div class="lens">
+    <h2>${icon('lens')} ${t('lens_title')}</h2>
+    <p class="lede">${t('lens_sub')}</p>
+    <div class="lens-body">
+      <div class="lens-ph"><img src="${sc.url || ''}" alt=""></div>
+      <ol class="lens-steps">
+        <li id="ln-step1"><span class="btn btn-line btn-sm" aria-disabled="true">${icon('image')}${t('lens_save')}</span></li>
+        <li><a class="btn btn-primary btn-sm" href="https://images.google.com/" target="_blank" rel="noopener">${icon('lens')}${t('lens_open')}</a><p class="muted small" id="ln-how">${t('lens_how_drop')}</p></li>
+        <li>${t('lens_step3')}</li>
+      </ol>
+    </div>
+    <p class="hint">${icon('info')} ${t('lens_note')}</p>
+  </div>`, { label: t('lens_title'), onClose: () => { if (w._url) setTimeout(() => URL.revokeObjectURL(w._url), 2000); } });
+  const jpg = await lensBlob('image/jpeg'); if (!jpg || !w.isConnected) return;
+  const url = w._url = URL.createObjectURL(jpg);
+  const s1 = $('#ln-step1', w); if (s1) s1.innerHTML = `<a class="btn btn-line btn-sm" href="${url}" download="zzirit-fish.jpg">${icon('image')}${t('lens_save')}</a>`;
+  if (!(navigator.clipboard && window.ClipboardItem)) return;
+  try {
+    const png = await lensBlob('image/png');
+    const copied = await Promise.race([navigator.clipboard.write([new ClipboardItem({ 'image/png': png })]).then(() => true), new Promise(r => setTimeout(() => r(false), 4000))]);
+    if (copied && w.isConnected) {
+      if (s1) s1.innerHTML = `<b>${icon('check')} ${t('lens_copied')}</b> <a class="link small" href="${url}" download="zzirit-fish.jpg">${t('lens_save')}</a>`;
+      const how = $('#ln-how', w); if (how) how.textContent = t('lens_how_paste');
+    }
+  } catch (e) { /* saving the photo still works */ }
+}
+
+/* ===== PC ↔ phone: one account on several devices (web build) ===== */
+function linkSupported() { return window.APP_RT === 'web' && window.APP_AUTH && window.APP_AUTH.link; }
+async function openLinkMake() {
+  if (!linkSupported()) return;
+  const w = openModal(`<div class="link-make"><h2>${icon('link')} ${t('link_make')}</h2><p class="lede">${t('link_make_sub')}</p><div class="link-box" id="lk-box"><p class="muted">${t('thinking')}</p></div></div>`, { label: t('link_make') });
+  const box = $('#lk-box', w);
+  try {
+    const code = await window.APP_AUTH.link.create();
+    const pretty = code.slice(0, 4) + '-' + code.slice(4);
+    const url = location.origin + location.pathname + '#link=' + code;
+    const until = nowMs() + 10 * 60000;
+    box.innerHTML = `<div class="link-qr" id="lk-qr"></div><div class="link-code" data-copybox><span class="copy-src mono">${pretty}</span><button class="btn btn-line btn-sm" data-copy="${code}">${icon('copy')}${t('copy')}</button></div><p class="hint">${t('link_code_hint')} <b id="lk-left" class="num"></b></p>`;
+    drawQr($('#lk-qr', w), url);
+    const tick = () => { const n = $('#lk-left', w); if (!n) return; const s = Math.max(0, Math.round((until - nowMs()) / 1000)); n.textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; if (s > 0) setTimeout(tick, 1000); else box.innerHTML = `<p class="muted">${t('link_expired')}</p>`; };
+    tick();
+  } catch (e) { box.innerHTML = `<p class="err">${esc(linkErr(e))}</p>`; }
+}
+function linkErr(e) { const m = String((e && (e.code || e.message)) || ''); return /slow|rate/i.test(m) ? t('link_slow') : /bad|expired|invalid/i.test(m) ? t('link_bad') : /team_leader/i.test(m) ? t('link_err_leader') : t('link_fail'); }
+function openLinkEnter(pre) {
+  if (!linkSupported()) return;
+  const local = myCatches().length;
+  const w = openModal(`<div class="link-enter"><h2>${icon('link')} ${t('link_confirm_title')}</h2><p class="lede">${t('link_enter_sub')}</p>
+    <div class="field"><label for="lk-code">${t('link_enter')}</label><input id="lk-code" class="mono" maxlength="9" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABCD-EF12" value="${esc(pre ? pre.slice(0, 4) + (pre.length > 4 ? '-' + pre.slice(4) : '') : '')}"></div>
+    ${local ? `<p class="note">${icon('info')} ${t('link_merge_note', { n: local })}</p>` : ''}
+    <p class="err" id="lk-err" hidden></p>
+    <div class="actions"><button class="btn btn-primary" id="lk-go">${t('link_go')}</button><button class="btn btn-ghost" data-close>${t('cancel')}</button></div></div>`, { label: t('link_enter') });
+  const inp = $('#lk-code', w), err = $('#lk-err', w), go = $('#lk-go', w);
+  const run = async () => {
+    err.hidden = true; const code = inp.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    if (code.length !== 8) { err.textContent = t('link_bad'); err.hidden = false; return; }
+    go.disabled = true;
+    try {
+      await window.APP_AUTH.link.redeem(code);
+      for (const k of ['me', 'labels', 'orders', 'suggest', 'photos']) lsSet(k, null);
+      try { localStorage.removeItem('eosin.spots'); } catch (e) { }
+      toast(t('link_ok')); closeModal(w);
+      setTimeout(() => { location.hash = 'sea'; location.reload(); }, 800);
+    } catch (e) { go.disabled = false; err.textContent = linkErr(e); err.hidden = false; }
+  };
+  go.onclick = run; inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); run(); } });
+}
+async function linkLeave(btn) {
+  if (!linkSupported()) return;
+  if (btn && !armed(btn, t('link_leave_confirm'))) return;
+  try { await window.APP_AUTH.link.leave(); for (const k of ['me', 'labels', 'orders', 'suggest', 'photos']) lsSet(k, null); toast(t('link_left')); setTimeout(() => location.reload(), 700); }
+  catch (e) { toast(linkErr(e), 'warn'); }
 }
 
 /* ===== Species sheet ===== */
