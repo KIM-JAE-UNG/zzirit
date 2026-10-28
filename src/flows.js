@@ -255,9 +255,17 @@ function profileFormHTML(p) {
   </div>
   <p class="hint">${icon('globe')} ${t('pf_rank_hint')}</p>`;
 }
+/* names that would look like the operator or the app itself */
+const NICK_RESERVED = /(운영자|관리자|운영진|공식|admin|official|staff|매니저|運営|管理者|管理员|官方)|^(찌릿|zzirit|gm)$/i;
+function nickProblem(nick) { if (S.isOwner) return null; return NICK_RESERVED.test(nick.replace(/[\s._-]/g, '')) ? 'pf_nick_reserved' : null; }
 function readProfileForm(root) {
-  const nick = $('#pf-nick', root).value.trim().slice(0, 16);
-  return { nick: nick || ('Angler' + Math.floor(1000 + Math.random() * 9000)), cc: $('#pf-cc', root).value, home: $('#pf-home', root).value, style: $('#pf-style', root).value, lang: $('#pf-lang', root).value };
+  const nick = $('#pf-nick', root).value.trim().replace(/\s+/g, ' ').slice(0, 16);
+  return { nick: nick || ('Angler' + Math.floor(1000 + Math.random() * 9000)), cc: $('#pf-cc', root).value, home: $('#pf-home', root).value, style: $('#pf-style', root).value, lang: $('#pf-lang', root).value, bad: nick ? nickProblem(nick) : null };
+}
+function nickRefused(f, root) {
+  if (!f.bad) return false;
+  toast(t(f.bad), 'warn', 4800); const n = $('#pf-nick', root); if (n) n.focus();
+  return true;
 }
 function openOnboarding(then) {
   const p = { nick: '', cc: defaultCC(), home: defaultHome(), style: 'float' };
@@ -274,6 +282,7 @@ function openOnboarding(then) {
   const cv = $('#onb-cv', w); if (cv) { const ctx = cv.getContext('2d'); ['kurodai', 'madai', 'aoriika', 'buri'].forEach((id, i) => FD.draw(ctx, SPI[id], 80 + i * 135, 78 + (i % 2) * 10, i === 2 ? 110 : 120, { still: true, flip: i % 2 === 1 })); }
   $('#onb-go', w).onclick = async () => {
     const f = readProfileForm(w);
+    if (nickRefused(f, w)) return; delete f.bad;
     S.me = Object.assign({ v: 1, joined: nowMs(), catches: [], decor: { theme: 'th_dawn', items: ['dc_weed', 'dc_rock', 'dc_buoy'], fx: [] }, flair: {} }, S.me || {}, f);
     if (f.lang !== S.lang) setLang(f.lang);
     await store.saveMe();
@@ -447,11 +456,12 @@ function cleanLooks() {
 }
 
 /* ===== Free identification help: Google Lens (no AI cost) ===== */
+/* phones and tablets: hand pictures to the system share sheet (KakaoTalk, Instagram, Google Lens...) */
+function touchDevice() { return matchMedia('(pointer: coarse)').matches || (navigator.maxTouchPoints > 0 && Math.min(screen.width, screen.height) < 820); }
 function lensBlob(type) { const sc = S.scan; if (!sc || !sc.im) return Promise.resolve(null); const c = canvasFrom(sc.im, 1280); return new Promise(r => c.toBlob(b => r(b), type, .9)); }
 async function openLens() {
   const sc = S.scan; if (!sc || !sc.im) return;
-  const coarse = matchMedia('(pointer: coarse)').matches;
-  if (coarse && navigator.canShare) {
+  if (touchDevice() && navigator.canShare) {
     // phones: share a re-encoded copy (no GPS or camera data) straight to Google / Google Lens
     const jpg = await lensBlob('image/jpeg');
     const file = jpg && new File([jpg], 'zzirit-fish.jpg', { type: 'image/jpeg' });
@@ -745,8 +755,8 @@ async function openCatch(uid, cid) {
       <div class="cd-info">
         <p class="eyebrow">${c.past ? t('past_catch') : t('catch')} · ${fmtDT(c.ts)}</p>
         <h2>${esc(nameOf(c.sp))} <span class="num len">${lenFmt(c.len)}</span></h2>
-        <div class="chips">${statusChip(st, c.tr)}${toxChip(sp)}${c.rel ? `<span class="chip chip-ok">${t('released')}</span>` : ''}${isFeaturedCatch(c) ? `<span class="chip chip-feat">${t('x2')}</span>` : ''}</div>
-        ${note && note.v !== 'ok' ? `<p class="note rv-note">${icon('shield')} <span><b>${t(note.v === 'no' ? 'rv_title_no' : 'rv_title_hold')}</b> ${esc(reviewReason(note))}</span></p>` : st === 'review' && mine ? `<p class="note rv-note">${icon('clock')} <span>${t('rv_waiting')}</span></p>` : ''}
+        <div class="chips">${statusChip(st, c.tr, logOnly(uid, c))}${toxChip(sp)}${c.rel ? `<span class="chip chip-ok">${t('released')}</span>` : ''}${isFeaturedCatch(c) ? `<span class="chip chip-feat">${t('x2')}</span>` : ''}</div>
+        ${note && note.v !== 'ok' ? `<p class="note rv-note">${icon('shield')} <span><b>${t(note.v === 'no' ? (note.code === 'no_photo' ? 'rv_title_log' : 'rv_title_no') : 'rv_title_hold')}</b> ${esc(reviewReason(note))}</span></p>` : st === 'review' && mine ? `<p class="note rv-note">${icon('clock')} <span>${t('rv_waiting')}</span></p>` : ''}
         <dl class="kv">
           <div><dt>${t('angler')}</dt><dd>${mine ? `${flag(a.cc)} ${esc(a.nick)}` : `<button class="link" data-seauid="${esc(uid)}">${flag(a.cc)} ${esc(a.nick)}</button>${relation(uid) === 'friend' ? ` <span class="chip chip-ok">${t('fr_is_friend')}</span>` : ''}`}</dd></div>
           <div><dt>${t('score')}</dt><dd class="num">${fmtN(c.sc || 0)} pt</dd></div>
@@ -757,7 +767,7 @@ async function openCatch(uid, cid) {
           <div><dt>${t('trust')}</dt><dd><span class="trust-meter"><i style="width:${c.tr || 0}%"></i></span> ${c.tr ?? '—'}</dd></div>
         </dl>
         ${c.memo ? `<blockquote class="memo" id="cd-memo">${esc(c.memo)}</blockquote>${!mine && S.sample ? `<button class="btn btn-ghost btn-sm" id="cd-tr">${icon('globe')} ${t('translate')}</button>` : ''}` : ''}
-        ${mine ? `<div class="actions split"><button class="btn btn-ghost btn-sm" id="cd-del">${icon('trash')} ${t('delete')}</button></div>` : ''}
+        <div class="actions split"><button class="btn btn-line btn-sm" data-share="${esc(uid)}|${esc(c.id)}">${icon('share')} ${t('share_btn')}</button>${mine ? `<button class="btn btn-ghost btn-sm" id="cd-del">${icon('trash')} ${t('delete')}</button>` : ''}</div>
       </div>
     </article>`, { wide: true });
   store.getPhoto(uid, c.id).then(src => { if (src) { const ph = $('#cd-ph', w); if (ph) ph.innerHTML = `<img src="${src}" alt="${esc(nameOf(c.sp))}">`; } });
@@ -807,7 +817,10 @@ async function friendAction(act, uid, btn) {
   if (msg) toast(msg, act === 'dec' || act === 'cancel' ? 'info' : 'ok');
   rerender();
 }
-function statusChip(st, tr) {
+/* A catch the reviewer could not check because it has no photo stays in the angler's log, outside rankings */
+function logOnly(uid, c) { if (catchState(uid, c) !== 'no') return false; const n = reviewNote(uid, c); return !!(n && n.code === 'no_photo'); }
+function statusChip(st, tr, log) {
+  if (log) return `<span class="chip chip-local">${icon('log')}${t('st_logonly')}</span>`;
   if (st === 'ok') return `<span class="chip chip-ok">${icon('check')}${tr >= 70 ? t('st_verified') : t('st_ok')}</span>`;
   if (st === 'review') return `<span class="chip chip-review">${icon('clock')}${t('st_review')}</span>`;
   if (st === 'hold') return `<span class="chip chip-wait">${icon('clock')}${t('st_hold')}</span>`;
@@ -843,4 +856,121 @@ function openMapPicker(init, cb) {
   });
   setTimeout(() => map.invalidateSize(), 250);
   $('#pk-ok', w).onclick = () => { closeModal(w); cb && cb(pos); };
+}
+
+/* ===== Share card: one picture of a catch to send to friends (KakaoTalk, Instagram...) =====
+   Drawn on this device; shows the sea area at most, never the exact spot. */
+function imgFrom(src) { return new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = rej; im.src = src; }); }
+function rrect(g, x, y, w, h, r) { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); }
+function fitText(g, s, max) { if (g.measureText(s).width <= max) return s; let a = [...s]; while (a.length > 1 && g.measureText(a.join('') + '…').width > max) a.pop(); return a.join('') + '…'; }
+async function catchCardBlob(uid, a, c) {
+  const W = 1080, H = 1350, P = 60;
+  const SANS = '"IBM Plex Sans KR", "IBM Plex Sans JP", "Noto Sans SC", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif';
+  const DISP = '"Big Shoulders Display", ' + SANS;
+  try { await Promise.race([Promise.all([document.fonts.load(`800 170px ${DISP}`, '0123456789.cm'), document.fonts.load(`700 64px ${SANS}`, nameOf(c.sp) + (a.nick || ''))]), new Promise(r => setTimeout(r, 2500))]); } catch (e) { }
+  const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+  const g = cv.getContext('2d');
+  const bg = g.createLinearGradient(0, 0, W, H); bg.addColorStop(0, '#0E2440'); bg.addColorStop(1, '#070C16');
+  g.fillStyle = bg; g.fillRect(0, 0, W, H);
+  const glow = g.createRadialGradient(W * .85, H * .1, 0, W * .85, H * .1, W * .7); glow.addColorStop(0, 'rgba(255,90,31,.18)'); glow.addColorStop(1, 'rgba(255,90,31,0)');
+  g.fillStyle = glow; g.fillRect(0, 0, W, H);
+  // photo (or the drawn fish when there is none)
+  const sp = SPI[c.sp];
+  const photo = await store.getPhoto(uid, c.id).catch(() => null);
+  const px = P, py = P, pw = W - P * 2, ph = 800;
+  g.save(); rrect(g, px, py, pw, ph, 40); g.clip();
+  g.fillStyle = '#CFE6F0'; g.fillRect(px, py, pw, ph);
+  try {
+    const im = await imgFrom(photo || FD.thumb(sp || SP[0], 960, 680));
+    const s = Math.max(pw / im.width, ph / im.height), dw = im.width * s, dh = im.height * s;
+    g.drawImage(im, px + (pw - dw) / 2, py + (ph - dh) / 2, dw, dh);
+  } catch (e) { }
+  const shade = g.createLinearGradient(0, py + ph - 220, 0, py + ph); shade.addColorStop(0, 'rgba(7,12,22,0)'); shade.addColorStop(1, 'rgba(7,12,22,.55)');
+  g.fillStyle = shade; g.fillRect(px, py + ph - 220, pw, 220);
+  g.restore();
+  // status pills on the photo
+  const pills = [];
+  if (eligible(c, uid)) pills.push([t('share_pill_ok'), '#1F9D63']);
+  if (c.rel) pills.push([t('released'), '#2A7FB8']);
+  if (c.past) pills.push([t('past_short'), '#5B6B80']);
+  let x = px + 28; g.font = `700 34px ${SANS}`; g.textBaseline = 'middle';
+  for (const [label, col] of pills) { const w = g.measureText(label).width + 44; g.fillStyle = col; rrect(g, x, py + 28, w, 60, 30); g.fill(); g.fillStyle = '#fff'; g.fillText(label, x + 22, py + 59); x += w + 14; }
+  // name and length
+  g.textBaseline = 'alphabetic'; g.fillStyle = '#FFFFFF';
+  g.font = `700 64px ${SANS}`; g.fillText(fitText(g, nameOf(c.sp) || '?', W - P * 2), P, py + ph + 100);
+  const lenTxt = String(Math.round(c.len * 10) / 10);
+  g.font = `800 176px ${DISP}`; g.fillStyle = '#FF6A2B'; g.fillText(lenTxt, P - 4, py + ph + 270);
+  const lw = g.measureText(lenTxt).width;
+  g.font = `800 72px ${DISP}`; g.fillStyle = '#FFFFFF'; g.fillText('cm', P + lw + 14, py + ph + 270);
+  // when, where (sea area only), who
+  const where = c.sea && c.lon != null ? dict(GEO.seaOf(c.lon, c.lat).n) : regionName(c.rg || '');
+  const lv = uid ? lvInfo(a, uid).L : 1;
+  g.font = `500 36px ${SANS}`; g.fillStyle = '#A9BBCF';
+  g.fillText(fitText(g, [fmtDate(c.ts), where, `${a.nick || '?'} · Lv.${lv}`].filter(Boolean).join('  ·  '), W - P * 2), P, py + ph + 340);
+  // brand footer
+  g.fillStyle = 'rgba(255,255,255,.12)'; g.fillRect(P, H - 150, W - P * 2, 2);
+  try { const logo = await imgFrom(LOGO.mark); g.save(); rrect(g, P, H - 118, 76, 76, 18); g.clip(); g.drawImage(logo, P, H - 118, 76, 76); g.restore(); } catch (e) { }
+  g.fillStyle = '#FFFFFF'; g.font = `800 42px ${SANS}`; g.fillText(`${APP_NAME[0]} ${APP_NAME[1]}`, P + 98, H - 68);
+  g.fillStyle = '#7F95AD'; g.font = `500 28px ${SANS}`; g.textAlign = 'right'; g.fillText(SITE_URL.replace(/^https?:\/\//, '').replace(/\/$/, ''), W - P, H - 70); g.textAlign = 'left';
+  return new Promise(r => cv.toBlob(b => r(b), 'image/jpeg', .9));
+}
+async function shareCatch(uid, cid, btn) {
+  const a = uid === (S.uid || 'local') ? S.me : allAnglers().get(uid);
+  const c = a && (a.catches || []).find(x => x.id === cid); if (!c) return;
+  if (btn) { if (btn.disabled) return; btn.disabled = true; }
+  try {
+    const blob = await catchCardBlob(uid, a, c); if (!blob) throw new Error('no card');
+    const name = `zzirit-${SPI[c.sp] ? c.sp : 'catch'}-${Math.round(c.len)}cm.jpg`;
+    const text = t('share_text', { name: nameOf(c.sp), len: lenFmt(c.len) });
+    const file = new File([blob], name, { type: 'image/jpeg' });
+    // phones: straight to KakaoTalk, Instagram and the rest; computers: the picture with a save button
+    if (touchDevice() && navigator.canShare && navigator.canShare({ files: [file] })) {
+      try { await navigator.share({ files: [file], text: text + '\n' + SITE_URL }); return; }
+      catch (e) { if (e && e.name === 'AbortError') return; }
+    }
+    openShareCard(blob, name, text);
+  } catch (e) { console.warn(e); toast(t('share_fail'), 'warn'); }
+  finally { if (btn) btn.disabled = false; }
+}
+function openShareCard(blob, name, text) {
+  const url = URL.createObjectURL(blob);
+  const web = window.APP_RT === 'web';
+  const w = openModal(`<div class="share-card">
+    <h2>${icon('share')} ${t('share_title')}</h2>
+    <p class="lede">${t('share_sub')}</p>
+    <img class="sc-img" src="${url}" alt="${esc(text)}">
+    <div class="actions"><a class="btn btn-primary" id="sc-save" href="${web ? url : '#'}"${web ? ` download="${esc(name)}"` : ''}>${icon('image')}${t('share_save')}</a><button class="btn btn-line" data-copy="${esc(text + ' ' + SITE_URL)}">${icon('copy')}${t('share_copy')}</button></div>
+  </div>`, { label: t('share_title'), onClose: () => setTimeout(() => URL.revokeObjectURL(url), 2000) });
+  // inside Claude a page can't download by itself; it asks through the downloads permission
+  if (!web) $('#sc-save', w).onclick = async e => {
+    e.preventDefault();
+    try { const dl = await claude.use('downloads'); await dl.save({ filename: name, data: blob }); }
+    catch (err) { if (!err || err.code !== 'declined') toast(t('share_fail'), 'warn'); }
+  };
+}
+
+/* ===== What's new: shown once after a big update (website only; needs the matching server update) ===== */
+const WHATS_NEW = '2026-10-28', WN_TS = Date.parse('2026-10-28T14:00:00Z'); // people who joined after this never saw the old records
+const BOOT_AT = Date.now();
+function maybeWhatsNew(tries = 0) {
+  if (window.APP_RT !== 'web' || lsGet('wn', '') === WHATS_NEW || tries > 6) return;
+  if (!S.ready || $('.modal-wrap.in')) { setTimeout(() => maybeWhatsNew(tries + 1), 4000); return; }
+  // a first visit gets the welcome dialog instead, and someone who joined after the update has nothing to catch up on
+  if (!S.me || !S.me.nick || (S.me.joined && S.me.joined >= Math.min(WN_TS, BOOT_AT))) { lsSet('wn', WHATS_NEW); return; }
+  myLoginId().then(id => {
+    if (S.idOff || lsGet('wn', '') === WHATS_NEW) return; // the server update isn't in yet: try again next visit
+    if ($('.modal-wrap.in')) { setTimeout(() => maybeWhatsNew(tries + 1), 4000); return; }
+    lsSet('wn', WHATS_NEW); openWhatsNew(id);
+  });
+}
+function openWhatsNew(id) {
+  const items = [['refresh', 'wn_reset'], ['shield', 'wn_review'], ['user', 'wn_id'], ['heart', 'wn_pay'], ['share', 'wn_share']];
+  const w = openModal(`<div class="wn">
+    <p class="eyebrow">${t('wn_eyebrow')}</p>
+    <h2>${t('wn_title')}</h2>
+    <ul class="wn-list">${items.map(([ic, k]) => `<li>${icon(ic)}<div><b>${t(k + '_h')}</b><p class="muted">${t(k + '_p')}</p></div></li>`).join('')}</ul>
+    <div class="actions"><button class="btn btn-primary" id="wn-ok">${t('ok')}</button>${!id && idSupported() ? `<button class="btn btn-line" id="wn-id">${icon('user')}${t('id_create')}</button>` : ''}</div>
+  </div>`, { label: t('wn_title') });
+  $('#wn-ok', w).onclick = () => closeModal(w);
+  const b = $('#wn-id', w); if (b) b.onclick = () => { closeModal(w); openIdCreate(); };
 }

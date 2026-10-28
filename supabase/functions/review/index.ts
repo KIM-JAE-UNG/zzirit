@@ -1,6 +1,8 @@
 // Automatic review of catches waiting for a check. Clear photos are approved, impossible claims are rejected,
-// unclear ones are put on hold for the operator. Runs every few minutes (pg_cron) and right after a catch is sent
-// for review; it works at most about once a minute however often it is called. Uses the same free Gemini key as `ai`.
+// unclear ones are put on hold for the operator. A catch with no photo can't be checked, so it stays in the
+// angler's log only ("no" with the code no_photo; the app shows it as "log only", not as a rejection).
+// Runs every few minutes (pg_cron) and right after a catch is sent for review; it works at most about once a
+// minute however often it is called. Uses the same free Gemini key as `ai`.
 import { createClient } from "npm:@supabase/supabase-js@2.117.3";
 
 const CORS = {
@@ -57,16 +59,20 @@ const n01 = (v: unknown) => (typeof v === "number" && isFinite(v) ? Math.max(0, 
 
 async function judge(row: Row, key: string, deadline: number): Promise<Verdict> {
   const now = Date.now(), age = row.at ? now - row.at : 0;
+  const sp = String(row.sp || "");
   // plain rules first — no AI needed
-  if (!row.len || row.len <= 0) return { v: "no", why: "bad_len|", model: "rule" };
+  if (!row.len || row.len <= 0 || row.len > 1000) return { v: "no", why: "bad_len|", model: "rule" };
   if (row.ts && row.ts > now + 864e5) return { v: "no", why: "future|", model: "rule" };
   if (row.x && row.len > row.x * 1.3) return { v: "no", why: `size|${row.len}cm`, model: "rule" };
+  // a typed-in fish we don't know: nothing anglers land in this app is over 3 m
+  if (!row.x && sp.startsWith("other:") && row.len > 300) return { v: "no", why: `size|${row.len}cm`, model: "rule" };
   if (row.x && row.len > row.x) return { v: "hold", why: `record|${row.len}cm`, model: "rule" }; // a record claim: a person takes a look
-  if (!row.photo) return age > 30 * 60000 ? { v: "hold", why: "no_photo|", model: "rule" } : null; // the photo may still be uploading
+  // no photo to check: it stays in the angler's own log but never counts (the photo may still be uploading for a while)
+  if (!row.photo) return age > 30 * 60000 ? { v: "no", why: "no_photo|", model: "rule" } : null;
   const m = /^data:(image\/[a-z]+);base64,(.+)$/.exec(row.photo);
-  if (!m) return { v: "hold", why: "no_photo|", model: "rule" };
-  const other = row.sp.startsWith("other:") ? row.sp.slice(6) : "";
-  const name = other ? `${other} (not in our catalog)` : `${row.en || row.sp}${row.sci ? ` (${row.sci})` : ""}`;
+  if (!m) return { v: "no", why: "no_photo|", model: "rule" };
+  const other = sp.startsWith("other:") ? sp.slice(6) : "";
+  const name = other ? `${other} (not in our catalog)` : `${row.en || sp || "fish"}${row.sci ? ` (${row.sci})` : ""}`;
   const size = row.l && row.x ? ` This species is usually about ${row.l} cm and the largest on record is about ${row.x} cm.` : "";
   const prompt = `You check catches for a fishing competition app. Judge only what the photo shows.
 The angler says this photo shows: ${name}, total length ${row.len} cm.${size}
@@ -110,7 +116,8 @@ Deno.serve(async (req: Request) => {
   for (const row of (rows || []) as Row[]) {
     if (Date.now() > deadline - 15000) break;
     let verdict: Verdict = null;
-    const needsAi = !!row.photo && !(row.x && row.len && row.len > row.x) && !!row.len && row.len > 0;
+    const needsAi = !!row.photo && !!row.len && row.len > 0 && row.len <= 1000 && !(row.x && row.len > row.x)
+      && !(!row.x && String(row.sp || "").startsWith("other:") && row.len > 300);
     if (needsAi) {
       if (!key || aiCalls >= PER_ITEM) { done.later++; continue; }
       // count against the app's daily image budget

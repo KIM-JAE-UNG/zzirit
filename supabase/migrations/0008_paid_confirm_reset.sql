@@ -193,6 +193,19 @@ drop trigger if exists orders_guard on public.orders;
 create trigger orders_guard before insert or update on public.orders for each row execute function private.orders_guard();
 
 -- 3. Start over (trusted: this migration may clear `own`)
+--    First a copy of everything that is about to be cleared, in the private schema (the app can't reach it),
+--    so the reset can be undone by hand if it ever has to be.
+create table if not exists private.bak_20261028_anglers as table public.anglers;
+create table if not exists private.bak_20261028_orders as table public.orders;
+create table if not exists private.bak_20261028_admin_docs as table public.admin_docs;
+create table if not exists private.bak_20261028_photos as table public.photos;
+create table if not exists private.bak_20261028_spots as table public.spots;
+create table if not exists private.bak_20261028_ai_tickets as table public.ai_tickets;
+create table if not exists private.bak_20261028_labels as table public.labels;
+revoke all on private.bak_20261028_anglers, private.bak_20261028_orders, private.bak_20261028_admin_docs,
+  private.bak_20261028_photos, private.bak_20261028_spots, private.bak_20261028_ai_tickets, private.bak_20261028_labels
+  from public, anon, authenticated;
+
 select set_config('zz.trusted', '1', false);
 
 update public.anglers a set data = (a.data - 'catches' - 'lvSeen' - 'own' - 'decor' - 'flair')

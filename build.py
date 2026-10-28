@@ -73,8 +73,8 @@ def build(target):
     else:
         html = html.replace('<!--__WEB_META__-->\n', '').replace('<!--__WEB_HEAD__-->\n', '')
     html = html.replace('/*__CSS__*/', read('styles.css')).replace('/*__JS__*/', js)
-    html = html.replace('__APP_KO__', BRAND['ko']).replace('__APP_EN__', BRAND['en'])
-    js = js.replace('__APP_KO__', BRAND['ko']).replace('__APP_EN__', BRAND['en'])
+    html = html.replace('__APP_KO__', BRAND['ko']).replace('__APP_EN__', BRAND['en']).replace('__SITE__', WEB['site'])
+    js = js.replace('__APP_KO__', BRAND['ko']).replace('__APP_EN__', BRAND['en']).replace('__SITE__', WEB['site'])
     for key, (fname, mime) in LOGO.items():
         uri = data_uri(fname, mime)
         html = html.replace(key, uri); js = js.replace(key, uri)

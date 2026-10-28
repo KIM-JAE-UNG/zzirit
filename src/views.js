@@ -58,7 +58,8 @@ VIEWS.home = {
     const myTm = teamOf(myId());
     el.innerHTML = `
     <div class="page home">
-      ${FL.inc.length ? `<a class="fr-banner" href="#friends">${icon('users')}<span>${t('fr_home_banner', { n: FL.inc.length })}</span><span class="fr-banner-who">${FL.inc.slice(0, 3).map(r => avatar(r.a, 26)).join('')}</span><b>${t('fr_home_banner_cta')}</b></a>` : ''}
+      ${noticeBarHTML()}
+      ${FL.inc.length ?`<a class="fr-banner" href="#friends">${icon('users')}<span>${t('fr_home_banner', { n: FL.inc.length })}</span><span class="fr-banner-who">${FL.inc.slice(0, 3).map(r => avatar(r.a, 26)).join('')}</span><b>${t('fr_home_banner_cta')}</b></a>` : ''}
       <section class="hero">
         <div class="hero-main">
           <p class="eyebrow">${fmtDate(now.getTime(), { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' })} · ${t('lunar_day', { d: ti.Lr.day })}</p>
@@ -150,8 +151,15 @@ VIEWS.home = {
     hydratePhotos(el);
   }
 };
+/* Catch photos in lists load when they come near the screen (the drawn fish shows until then) */
+const PH_IO = 'IntersectionObserver' in window ? new IntersectionObserver(es => { for (const e of es) if (e.isIntersecting) { PH_IO.unobserve(e.target); loadPh(e.target); } }, { rootMargin: '400px 0px' }) : null;
+function loadPh(n) { const [uid, cid] = n.dataset.ph.split('|'); store.getPhoto(uid, cid).then(src => { if (src && n.isConnected) n.innerHTML = `<img src="${src}" alt="">`; }); }
 function hydratePhotos(root) {
-  $$('[data-ph]', root).forEach(async n => { const [uid, cid] = n.dataset.ph.split('|'); const src = await store.getPhoto(uid, cid); if (src && n.isConnected) n.innerHTML = `<img src="${src}" alt="">`; });
+  $$('[data-ph]', root).forEach(n => {
+    const [uid, cid] = n.dataset.ph.split('|'); const key = uid + '/' + cid;
+    if (S.photoCache.has(key)) { const src = S.photoCache.get(key); if (src) n.innerHTML = `<img src="${src}" alt="">`; return; }
+    if (PH_IO) PH_IO.observe(n); else loadPh(n);
+  });
 }
 
 /* ---------- SCAN ---------- */
@@ -285,7 +293,7 @@ function renderScanWork() {
       <div class="done-score"><span class="num">+${fmtN(c.sc || 0)}</span><span>pt</span>${statusChip(c.st, c.tr)}${c.st === 'ok' ? `<span class="lv-chip">+${fmtN(sc.xpGain || 0)} XP</span>` : `<span class="lv-chip lv-wait">${t('xp_after_review')}</span>`}</div>
       ${sc.lvUp ? `<div class="lvup">${icon('star')}<div><b>${t('lv_up', { n: sc.lvUp })}</b>${sc.unlocks && sc.unlocks.length ? `<p class="small">${t('unlock_line', { name: esc(sc.unlocks.map(id => dict(SHOPI[id].n)).slice(0, 4).join(', ')) })}</p>` : ''}</div><a class="btn btn-light btn-sm" href="#sea">${t('go_decorate')}</a></div>` : ''}
       ${trustHTML(sc.trust)}
-      <div class="actions"><button class="btn btn-primary" data-act="scan-reset">${icon('camera')}${t('scan_another')}</button><a class="btn btn-line" href="#rank">${icon('trophy')}${t('see_rank')}</a><a class="btn btn-line" href="#sea">${icon('sea')}${t('go_my_sea')}</a></div>
+      <div class="actions"><button class="btn btn-primary" data-act="scan-reset">${icon('camera')}${t('scan_another')}</button><button class="btn btn-line" data-share="${esc(myId())}|${esc(c.id)}">${icon('share')}${t('share_btn')}</button><a class="btn btn-line" href="#rank">${icon('trophy')}${t('see_rank')}</a><a class="btn btn-line" href="#sea">${icon('sea')}${t('go_my_sea')}</a></div>
     </div>`;
   }
 }
@@ -393,7 +401,17 @@ function openTrainPicker(manual) {
   draw('');
   $('#tr-q', w).addEventListener('input', e => draw(e.target.value));
   w.addEventListener('click', e => { if (e.target.closest('[data-lens]')) { openLens(); return; } const b = e.target.closest('[data-pick]'); if (b) { closeModal(w); acceptSpecies(b.dataset.pick, !manual); } });
-  $('#tr-other-ok', w).onclick = () => { const v = $('#tr-other', w).value.trim(); if (!v) return; closeModal(w); acceptSpecies('other:' + v, !manual); };
+  $('#tr-other-ok', w).onclick = () => {
+    const inp = $('#tr-other', w); const v = cleanOtherName(inp.value);
+    if (!v) { toast(t('train_other_bad'), 'warn', 4200); inp.focus(); return; }
+    closeModal(w); acceptSpecies('other:' + v, !manual);
+  };
+}
+/* A typed-in fish name: 2–30 letters, no links, not just numbers or symbols */
+function cleanOtherName(s) {
+  const v = String(s || '').replace(/\s+/g, ' ').trim().slice(0, 30);
+  if ([...v].length < 2 || /https?:|www\.|\.com|[<>{}]/i.test(v) || !/\p{L}/u.test(v)) return '';
+  return v;
 }
 async function acceptSpecies(id, corrected) {
   const sc = S.scan; const pred = sc.fused && sc.fused.list[0] ? sc.fused.list[0].id : null;
@@ -444,6 +462,8 @@ function bindRegisterForm() {
     const len = parseFloat($('#rf-len').value);
     if (!len || len <= 0) { err.textContent = t('reg_err_len'); err.hidden = false; $('#rf-len').focus(); return; }
     const sp = SPI[sc.chosen];
+    // no fish anyone lands is longer than 6 m, and one we don't know (typed in) over 3 m isn't believable either
+    if (len > 600 || (!sp && len > 300)) { err.textContent = t('reg_err_toobig_any', { n: sp ? 600 : 300 }); err.hidden = false; $('#rf-len').focus(); return; }
     const dtv = $('#rf-dt').value; const ts = dtv ? new Date(dtv).getTime() : nowMs();
     // a length far beyond the species record can't be real (the server refuses it too); past the record a person checks it
     if (sp && len > sp.X * 1.3) { err.textContent = t('reg_err_toobig', { n: Math.round(sp.X), name: spName(sp) }); err.hidden = false; $('#rf-len').focus(); return; }
@@ -642,10 +662,10 @@ VIEWS.rank = {
       ${rk.scope === 'FR' && !frLists().friends.length ? `
       <div class="empty card big">${icon('users', 'big')}<h2>${t('fr_rank_empty')}</h2><p class="muted">${t('fr_empty_sub')}</p><a class="btn btn-primary" href="#friends">${icon('user-plus')}${t('fr_find_cta')}</a></div>` : ranked.length ? `
       <div class="podium">${[1, 0, 2].map(i => podium[i] ? `<button class="pod pod-${i + 1}" data-seauid="${podium[i].uid}">
-        <span class="pod-medal num">${i + 1}</span>${avatar(podium[i].a, 56)}<span class="pod-nick">${nickHTML(podium[i].a)}${teamTag(podium[i].uid)}</span><span class="muted small">${flag(podium[i].a.cc)} ${esc(ccName(podium[i].a.cc || 'KR'))}</span><span class="num pod-val">${fmtVal(podium[i].val)}</span>
+        <span class="pod-medal num">${i + 1}</span>${avatar(podium[i].a, 56)}<span class="pod-nick">${nickHTML(podium[i].a)}${teamTag(podium[i].uid)}</span><span class="pod-lv">${lvMini(podium[i].a, podium[i].uid)}</span><span class="muted small">${flag(podium[i].a.cc)} ${esc(ccName(podium[i].a.cc || 'KR'))}</span><span class="num pod-val">${fmtVal(podium[i].val)}</span>
         ${podium[i].best ? `<img src="${FD.thumb(SPI[podium[i].best.sp] || SP[0], 120, 66)}" alt="" class="pod-fish">` : ''}</button>` : `<div class="pod pod-empty pod-${i + 1}"></div>`).join('')}</div>
       <div class="lb card"><table><thead><tr><th>#</th><th>${t('angler')}</th><th class="hide-s">${t('best_catch')}</th><th class="r">${t('cat_' + rk.cat)}</th></tr></thead><tbody>
-        ${rows.map(r => `<tr class="${r.uid === (S.uid || 'local') ? 'me' : ''}" data-seauid="${r.uid}"><td class="num">${r.rank || '—'}</td><td><span class="lb-who">${avatar(r.a, 30)}${nickHTML(r.a)}${teamTag(r.uid)} <span class="muted">${flag(r.a.cc)}</span>${r.local ? `<span class="chip chip-local">${t('st_local')}</span>` : ''}</span></td><td class="hide-s">${r.best ? `${esc(nameOf(r.best.sp))} <span class="muted">${lenFmt(r.best.len)}</span>` : '—'}</td><td class="r num">${fmtVal(r.val)}</td></tr>`).join('')}
+        ${rows.map(r => `<tr class="${r.uid === (S.uid || 'local') ? 'me' : ''}" data-seauid="${r.uid}"><td class="num">${r.rank || '—'}</td><td><span class="lb-who">${avatar(r.a, 30)}${nickHTML(r.a)}${lvMini(r.a, r.uid)}${teamTag(r.uid)} <span class="muted">${flag(r.a.cc)}</span>${r.local ? `<span class="chip chip-local">${t('st_local')}</span>` : ''}</span></td><td class="hide-s">${r.best ? `${esc(nameOf(r.best.sp))} <span class="muted">${lenFmt(r.best.len)}</span>` : '—'}</td><td class="r num">${fmtVal(r.val)}</td></tr>`).join('')}
       </tbody></table></div>` : `
       <div class="empty card big">
         <div class="empty-art"><img src="${FD.thumb(SPI[feat[0]], 260, 140)}" alt=""></div>
@@ -679,7 +699,7 @@ function frBtns(uid, rel, opt = {}) {
 }
 function frRow(row, rel, sub) {
   const { uid, a } = row;
-  return `<li class="fr-row"><button class="fr-who" data-seauid="${esc(uid)}">${avatar(a, 44)}<span class="fr-txt"><span class="fr-name">${nickHTML(a)} <span class="fr-flag">${flag(a.cc)}</span></span><span class="muted small">${sub}</span></span></button><span class="fr-acts">${frBtns(uid, rel)}</span></li>`;
+  return `<li class="fr-row"><button class="fr-who" data-seauid="${esc(uid)}">${avatar(a, 44)}<span class="fr-txt"><span class="fr-name">${nickHTML(a)}${lvMini(a, uid)} <span class="fr-flag">${flag(a.cc)}</span></span><span class="muted small">${sub}</span></span></button><span class="fr-acts">${frBtns(uid, rel)}</span></li>`;
 }
 function frLastLine(uid, a) { const c = lastCatch(uid, a); return c ? `${esc(nameOf(c.sp))} ${lenFmt(c.len)} · ${ago(c.at || c.ts)}` : t('fr_no_catch'); }
 VIEWS.friends = {
@@ -853,7 +873,7 @@ VIEWS.sea = {
   },
   catchesHTML(cs, uid) {
     if (!cs.length) return `<div class="empty"><p class="muted">${t('no_catches')}</p>${!uid ? `<a class="btn btn-primary btn-sm" href="#scan">${t('cta_scan')}</a>` : ''}</div>`;
-    return `<div class="catch-grid">${cs.slice().sort((a, b) => b.ts - a.ts).map(c => `<button class="catch-card" data-catch="${uid || S.uid || 'local'}|${c.id}"><span class="cc-ph" data-ph="${uid || S.uid || 'local'}|${c.id}"><img src="${FD.thumb(SPI[c.sp] || SP[0], 200, 110)}" alt=""></span><span class="cc-txt"><b>${esc(nameOf(c.sp))}</b> <span class="num">${lenFmt(c.len)}</span><br><span class="muted small">${fmtDate(c.ts)}${c.past ? ' · ' + t('past_short') : ''}</span></span>${statusChip(catchState(uid || S.uid || 'local', c), c.tr)}</button>`).join('')}</div>`;
+    return `<div class="catch-grid">${cs.slice().sort((a, b) => b.ts - a.ts).map(c => `<button class="catch-card" data-catch="${uid || S.uid || 'local'}|${c.id}"><span class="cc-ph" data-ph="${uid || S.uid || 'local'}|${c.id}"><img src="${FD.thumb(SPI[c.sp] || SP[0], 200, 110)}" alt=""></span><span class="cc-txt"><b>${esc(nameOf(c.sp))}</b> <span class="num">${lenFmt(c.len)}</span><br><span class="muted small">${fmtDate(c.ts)}${c.past ? ' · ' + t('past_short') : ''}</span></span>${statusChip(catchState(uid || S.uid || 'local', c), c.tr, logOnly(uid || S.uid || 'local', c))}</button>`).join('')}</div>`;
   },
   dexHTML(cs) {
     const got = new Set(cs.map(c => c.sp));
@@ -1109,6 +1129,7 @@ VIEWS.prefs = {
     if (fo) fo.onchange = async () => { S.me.frOff = !fo.checked; await store.saveMe(); toast(t('saved')); };
     $('#pf-save', el).onclick = async () => {
       const f = readProfileForm(el);
+      if (nickRefused(f, el)) return; delete f.bad;
       S.me = Object.assign({ v: 1, joined: nowMs(), catches: [], decor: { theme: 'th_dawn', items: ['dc_weed', 'dc_rock', 'dc_buoy'], fx: [] }, flair: {} }, S.me || {}, f);
       if (f.lang !== S.lang) setLang(f.lang);
       await store.saveMe(); toast(t('saved')); rerender();
@@ -1139,6 +1160,10 @@ VIEWS.admin = {
     <div class="page admin">
       <header class="page-head"><h1>${t('admin_title')}</h1><p class="lede">${t('admin_sub')}</p></header>
       <div class="stats4 card"><div><span class="num">${S.anglers.size}</span><span>${t('ad_users')}</span></div><div><span class="num">${nCatch}</span><span>${t('catches')}</span></div><div><span class="num">${learnStats().total}</span><span>${t('learn_n')}</span></div><div><span class="num">${orders.filter(x => x.st === 'wait').length}</span><span>${t('ad_pending')}</span></div></div>
+      <section class="card ad-notice"><h2 class="h3">${icon('megaphone')}${t('ad_notice')}</h2><p class="hint">${t('ad_notice_hint')}</p>
+        <div class="field"><textarea id="ad-notice" rows="3" maxlength="400" placeholder="${esc(t('ad_notice_ph'))}">${esc((noticeOf() || {}).t || '')}</textarea></div>
+        <div class="actions"><button class="btn btn-primary" id="ad-notice-go">${icon('megaphone')}${t('ad_notice_go')}</button>${noticeOf() ? `<button class="btn btn-ghost" id="ad-notice-off">${t('ad_notice_off')}</button>` : ''}</div>
+      </section>
       <section class="card"><h2 class="h3">${icon('heart')}${t('ad_pay')}</h2>
         <div class="row2">
           <div class="field"><label for="ad-toss">${t('ad_toss')}</label><input id="ad-toss" value="${esc(cfg.tossId || '')}" placeholder="toss.me/___"></div>
@@ -1171,8 +1196,20 @@ VIEWS.admin = {
       const toss = $('#ad-toss', el).value.trim().replace(/^https?:\/\/toss\.me\//, '').replace(/\/.*$/, '');
       const kakao = $('#ad-kakao', el).value.trim();
       if (kakao && !/^https:\/\/qr\.kakaopay\.com\//.test(kakao)) { toast(t('ad_kakao_bad'), 'warn'); return; }
-      await store.saveAdmin('config', Object.assign({}, cfg, { tossId: toss, kakaoUrl: kakao, kakaoAmt: $('#ad-kamt', el).checked }));
+      await store.saveAdmin('config', Object.assign({}, S.admin.config || {}, { tossId: toss, kakaoUrl: kakao, kakaoAmt: $('#ad-kamt', el).checked }));
       toast(t('saved'));
+    };
+    $('#ad-notice-go', el).onclick = async () => {
+      const v = $('#ad-notice', el).value.trim().slice(0, 400);
+      if (!v) { toast(t('ad_notice_empty'), 'warn'); return; }
+      if (await store.saveAdmin('config', Object.assign({}, S.admin.config || {}, { notice: { id: rid(8), t: v, ts: nowMs() } }))) toast(t('ad_notice_done'));
+      rerender();
+    };
+    const nOff = $('#ad-notice-off', el);
+    if (nOff) nOff.onclick = async () => {
+      const cur = Object.assign({}, S.admin.config || {}); delete cur.notice;
+      if (await store.saveAdmin('config', cur)) toast(t('ad_notice_removed'));
+      rerender();
     };
     const idr = $('#ad-idreset', el);
     if (idr) idr.onsubmit = async e => {

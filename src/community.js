@@ -27,7 +27,7 @@ function bdCard(p) {
       <span class="bd-meta"><span class="chip chip-cat cat-${esc(p.cat)}">${t('bdc_' + p.cat)}</span>${p.hidden ? `<span class="chip chip-closed">${t('bd_hidden_chip')}</span>` : ''}${S.isOwner && p.reps ? `<span class="chip chip-review">${icon('warn')}${p.reps}</span>` : ''}</span>
       <b class="bd-title">${esc(p.title)}</b>
       <span class="bd-ex">${esc(String(p.body || '').replace(/\s+/g, ' ').slice(0, 140))}</span>
-      <span class="bd-by">${avatar(a, 22)}${nickHTML(a)}${teamTag(p.uid)}<span class="muted"> · ${ago(p.ts)}</span></span>
+      <span class="bd-by">${avatar(a, 22)}${nickHTML(a)}${lvMini(a, p.uid)}${teamTag(p.uid)}<span class="muted"> · ${ago(p.ts)}</span></span>
     </span>
     ${c ? `<span class="bd-ph" data-ph="${esc(p.uid)}|${esc(c.id)}"><img src="${FD.thumb(SPI[c.sp] || SP[0], 160, 90)}" alt=""></span>` : ''}
     <span class="bd-stats"><span class="${p.likes.has(myId()) ? 'on' : ''}">${icon('heart')}${p.likes.size}</span><span>${icon('chat')}${n}</span></span>
@@ -44,6 +44,7 @@ VIEWS.board = {
         <button class="btn btn-primary" data-bd="write">${icon('plus')}${t('bd_write')}</button>
       </header>
       ${shared ? '' : `<p class="note">${icon('info')} ${t('bd_local_note')}</p>`}
+      ${noticeCardHTML()}
       <div class="bd-bar">
         <div class="chip-row" role="group" aria-label="${esc(t('bd_f_cat'))}">${['all', ...BD_CATS].map(c => `<button class="chip chip-tab" aria-pressed="${bd.cat === c}" data-bdcat="${c}">${t('bdc_' + c)}</button>`).join('')}</div>
         <div class="bd-tools">
@@ -120,7 +121,7 @@ function openPost(key) {
       <p class="eyebrow"><span class="chip chip-cat cat-${esc(p.cat)}">${t('bdc_' + p.cat)}</span> ${fmtDT(p.ts)}${p.upd && p.upd > p.ts + 60000 ? ' · ' + t('bd_edited') : ''}</p>
       <h2>${esc(p.title)}</h2>
       ${p.hidden ? `<p class="note">${icon('warn')} ${t('bd_hidden_note')}</p>` : ''}
-      <button class="post-by" data-seauid="${esc(p.uid)}">${avatar(a, 34)}<span>${nickHTML(a)}${teamTag(p.uid)} <span class="muted">${flag(a.cc)} ${esc(regionName(p.rg || a.home || 'KS'))}</span></span></button>
+      <button class="post-by" data-seauid="${esc(p.uid)}">${avatar(a, 34)}<span>${nickHTML(a)}${lvMini(a, p.uid)}${teamTag(p.uid)} <span class="muted">${flag(a.cc)} ${esc(regionName(p.rg || a.home || 'KS'))}</span></span></button>
       <div class="post-body">${esc(p.body)}</div>
       ${catchMini(p.uid, c)}
       <div class="post-acts">
@@ -130,7 +131,7 @@ function openPost(key) {
       </div>
       <section class="cmts">
         <h3 class="h4">${icon('chat')}${t('bd_cmts', { n: cmts.filter(x => !x.hidden).length })}</h3>
-        ${cmts.length ? `<ul class="cmt-list">${cmts.map(x => { const ca = anglerOf(x.uid) || { nick: '?' }; return `<li class="${x.hidden ? 'is-hidden' : ''}"><button class="cmt-who" data-seauid="${esc(x.uid)}">${avatar(ca, 26)}</button><div><p class="cmt-head">${nickHTML(ca)}${teamTag(x.uid)} <span class="muted small">${ago(x.ts)}</span>${x.uid === myId() ? `<button class="link small" data-cmtdel="${esc(x.id)}">${t('delete')}</button>` : ''}${S.isOwner ? `<button class="link small" data-cmthide="${esc(x.key)}">${t(x.hidden ? 'bd_unhide' : 'bd_hide')}</button>` : ''}</p><p class="cmt-body">${esc(x.body)}</p></div></li>`; }).join('')}</ul>` : `<p class="muted small">${t('bd_cmt_empty')}</p>`}
+        ${cmts.length ? `<ul class="cmt-list">${cmts.map(x => { const ca = anglerOf(x.uid) || { nick: '?' }; return `<li class="${x.hidden ? 'is-hidden' : ''}"><button class="cmt-who" data-seauid="${esc(x.uid)}">${avatar(ca, 26)}</button><div><p class="cmt-head">${nickHTML(ca)}${lvMini(ca, x.uid)}${teamTag(x.uid)} <span class="muted small">${ago(x.ts)}</span>${x.uid === myId() ? `<button class="link small" data-cmtdel="${esc(x.id)}">${t('delete')}</button>` : ''}${S.isOwner ? `<button class="link small" data-cmthide="${esc(x.key)}">${t(x.hidden ? 'bd_unhide' : 'bd_hide')}</button>` : ''}</p><p class="cmt-body">${esc(x.body)}</p></div></li>`; }).join('')}</ul>` : `<p class="muted small">${t('bd_cmt_empty')}</p>`}
         <form class="cmt-form" id="pc-form" novalidate><textarea id="pc-body" rows="2" maxlength="${BD_MAX.cmt}" placeholder="${esc(t('bd_cmt_ph'))}">${esc(draft)}</textarea><button class="btn btn-primary btn-sm" type="submit">${icon('send')}${t('bd_cmt_send')}</button></form>
       </section>`;
     hydratePhotos(box);
@@ -247,7 +248,7 @@ function openTeam(tid) {
       <div class="tm-mine-head">${teamEmblem(tm, 72)}<div><p class="eyebrow">${t(tm.open ? 'tm_open' : 'tm_closed')} · ${esc(regionName(tm.home || 'KS'))}</p><h2>${esc(tm.name)} <span class="team-tag" style="--tc:${esc(tm.color)}">${esc(tm.tag)}</span></h2>
         <p class="muted">${t('tm_members_n', { n: e.members.length, max: TEAM_MAX })} · ${t('tm_pts', { n: fmtN(e.pts) })}${e.rank ? ' · ' + t('tm_rank', { n: e.rank }) : ''}</p></div></div>
       ${tm.intro ? `<p class="tm-intro">${esc(tm.intro)}</p>` : ''}
-      <ul class="fr-list tm-members">${members.map(m => `<li class="fr-row"><button class="fr-who" data-seauid="${esc(m.uid)}">${avatar(m.a, 36)}<span class="fr-txt"><span class="fr-name">${m.uid === tid ? '👑 ' : ''}${nickHTML(m.a)} <span class="fr-flag">${flag(m.a.cc)}</span></span><span class="muted small">${t('tm_pts', { n: fmtN(m.pts) })}</span></span></button>${leaderView && m.uid !== tid ? `<span class="fr-acts"><button class="btn btn-ghost btn-sm" data-tmkick="${esc(m.uid)}">${t('tm_kick')}</button></span>` : ''}</li>`).join('')}</ul>
+      <ul class="fr-list tm-members">${members.map(m => `<li class="fr-row"><button class="fr-who" data-seauid="${esc(m.uid)}">${avatar(m.a, 36)}<span class="fr-txt"><span class="fr-name">${m.uid === tid ? '👑 ' : ''}${nickHTML(m.a)}${lvMini(m.a, m.uid)} <span class="fr-flag">${flag(m.a.cc)}</span></span><span class="muted small">${t('tm_pts', { n: fmtN(m.pts) })}</span></span></button>${leaderView && m.uid !== tid ? `<span class="fr-acts"><button class="btn btn-ghost btn-sm" data-tmkick="${esc(m.uid)}">${t('tm_kick')}</button></span>` : ''}</li>`).join('')}</ul>
       <div class="actions">${inThis ? (leaderView ? `<button class="btn btn-line" data-tmedit="1">${t('tm_edit')}</button><button class="btn btn-ghost" id="tm-disband">${t('tm_disband')}</button>` : `<button class="btn btn-ghost" data-tmleave="1">${t(mine.pending ? 'tm_cancel_req' : 'tm_leave')}</button>`) : e.members.length >= TEAM_MAX ? `<span class="chip chip-local">${t('tm_full')}</span>` : `<button class="btn btn-primary" data-tmjoin="${esc(tid)}">${t(tm.open ? 'tm_join' : 'tm_request')}</button>`}</div>
     </div>`, { label: tm.name });
   const dis = $('#tm-disband', w); if (dis) dis.onclick = async () => { if (!armed(dis, t('tm_disband_confirm'))) return; await store.saveTeam(null); closeModal(w); toast(t('tm_disbanded')); rerender(); };

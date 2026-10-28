@@ -246,7 +246,7 @@ async function loadAvatarPhoto(uid, ts) {
   if (S.photoCache.has(key)) return S.photoCache.get(key);
   let v = null;
   if (uid === myId() && S._myPic && S._myPic.ts === +ts) v = S._myPic.t;
-  else if (S.db) { try { const d = await S.db.doc('anglers/' + uid + '/photos/_pic').get(); v = d.exists ? d.data().t : null; } catch (e) { v = null; } }
+  else if (S.db) return cachedPhoto(key, async () => { const d = await S.db.doc('anglers/' + uid + '/photos/_pic').get(); return d.exists ? d.data().t : null; });
   else if (uid === myId()) { const ph = lsGet('photos', {}); v = ph._pic || null; }
   S.photoCache.set(key, v); return v;
 }

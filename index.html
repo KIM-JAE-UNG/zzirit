@@ -1075,6 +1075,35 @@ h1 .beta-chip { font-size: 13px; margin-left: 4px; vertical-align: 6px; }
 
 .lv-chip.lv-wait { opacity: .75; }
 
+/* ===== 2026-10-28b: level tags, operator notice, share card, what's new, phone dex grid ===== */
+.lv-mini { display: inline-flex; align-items: center; margin-left: 5px; font: 800 10.5px/1 var(--f-disp); letter-spacing: .05em; color: var(--sea); background: var(--sea-soft); border-radius: 5px; padding: 3px 5px 2px; vertical-align: 1px; white-space: nowrap; }
+.pod-lv { display: block; margin-top: 2px; }
+.pod-lv .lv-mini { margin-left: 0; }
+.notice-bar { display: flex; align-items: flex-start; gap: 10px; background: var(--accent-soft); color: var(--ink); border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent); border-radius: var(--r); padding: 12px 10px 12px 14px; margin-bottom: 16px; }
+.notice-bar > .ic { color: var(--accent); width: 22px; height: 22px; flex: none; margin-top: 1px; }
+.notice-bar p { flex: 1; margin: 0; font-size: 14px; line-height: 1.55; white-space: pre-line; overflow-wrap: anywhere; }
+.notice-bar p b { color: var(--accent-2); margin-right: 4px; }
+.notice-x { flex: none; display: grid; place-items: center; width: 30px; height: 30px; border: 0; border-radius: 8px; background: transparent; color: var(--ink-3); cursor: pointer; }
+.notice-x:hover { background: color-mix(in srgb, var(--accent) 12%, transparent); color: var(--ink); }
+.bd-notice { display: flex; gap: 12px; align-items: flex-start; background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: var(--r); padding: 14px 16px; margin: 4px 0 14px; }
+.bd-notice > .ic { color: var(--accent); width: 22px; height: 22px; flex: none; margin-top: 2px; }
+.bd-notice-h { display: flex; gap: 8px; align-items: baseline; margin: 0 0 2px; }
+.bd-notice-t { margin: 0; white-space: pre-line; overflow-wrap: anywhere; color: var(--ink-2); }
+.ad-notice textarea { width: 100%; }
+.share-card { text-align: center; }
+.share-card .sc-img { display: block; width: 100%; max-width: 360px; margin: 6px auto 14px; border-radius: 16px; box-shadow: 0 10px 30px rgba(7, 12, 22, .28); }
+.share-card .actions { justify-content: center; flex-wrap: wrap; }
+.wn h2 { margin-bottom: 6px; }
+.wn-list { list-style: none; margin: 14px 0 6px; padding: 0; display: grid; gap: 12px; }
+.wn-list li { display: flex; gap: 12px; align-items: flex-start; }
+.wn-list li > .ic { flex: none; width: 34px; height: 34px; padding: 7px; border-radius: 10px; background: var(--sea-soft); color: var(--sea); }
+.wn-list b { display: block; font-size: 15px; }
+.wn-list p { margin: 2px 0 0; font-size: 13.5px; line-height: 1.55; }
+@media (max-width: 520px) {
+  .sp-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .sp-grid .sp-card { padding: 8px 8px 10px; }
+}
+
 </style>
 </head>
 <body>
@@ -1205,7 +1234,7 @@ h1 .beta-chip { font-size: 13px; margin-left: 4px; vertical-align: 6px; }
   <symbol id="i-lens" viewBox="0 0 24 24"><path d="M4 9V6.5A2.5 2.5 0 0 1 6.5 4H9M15 4h2.5A2.5 2.5 0 0 1 20 6.5V9M4 15v2.5A2.5 2.5 0 0 0 6.5 20H9"/><circle cx="12" cy="12" r="3.5"/><circle cx="18" cy="18" r="1.6" fill="currentColor"/></symbol>
   <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3.3-3.3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0L5 13.3a4 4 0 0 0 5.7 5.7l1-1"/></symbol>
   <symbol id="i-qr" viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><path d="M14 14h2v2h-2zM18 14h2M14 18h2M18 18h2v2h-2z"/></symbol>
-  <symbol id="i-share" viewBox="0 0 24 24"><path d="M12 15V3.5M7.5 8L12 3.5 16.5 8"/><path d="M5 12v6.5A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5V12"/></symbol>
+  <symbol id="i-megaphone" viewBox="0 0 24 24"><path d="M4 10.2v3.6a1 1 0 0 0 1 1h2.6L14 19V5L7.6 9.2H5a1 1 0 0 0-1 1z"/><path d="M17.5 9a4 4 0 0 1 0 6"/><path d="M7.8 15l1.1 4.3"/></symbol><symbol id="i-share" viewBox="0 0 24 24"><path d="M12 15V3.5M7.5 8L12 3.5 16.5 8"/><path d="M5 12v6.5A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5V12"/></symbol>
 </svg>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.js"></script>
 <script>window.APP_CFG = {"url": "https://tnvzckfssjocgtmlxkii.supabase.co", "key": "sb_publishable_boTFYfsXMus91z3d6JpNvA_ffnrQvXk"};</script>
@@ -2008,9 +2037,9 @@ Object.assign(T, {
   nofish_review: ['물고기가 맞아요 · 직접 고르기', 'It is a fish · pick it myself', '魚です・自分で選ぶ', '确实是鱼·手动选择'],
   nofish_hint: ['직접 골라서 올리면 운영자가 사진을 확인한 뒤 점수에 반영해요.', 'If you pick it yourself, the operator checks the photo before it scores.', '自分で選んで登録すると、運営者が写真を確認してから加点します。', '手动选择提交后，运营者核对照片再计分。'],
   pick_species: ['어종 고르기', 'Pick the species', '魚種を選ぶ', '选择鱼种'], change_species: ['어종 바꾸기', 'Change species', '魚種を変える', '更换鱼种'],
-  reg_past_note2: ['과거 조과도 무료예요. AI 검사 결과에 따라 바로 반영되거나, 운영자가 확인한 뒤 반영돼요.', 'Past catches are free. They count right away or after the operator checks, depending on the AI screening.', '過去の釣果も無料。AI審査の結果により即反映、または運営者確認後に反映されます。', '以往渔获也免费，视AI审核结果立即计入或经运营者确认后计入。'],
-  reg_review_note: ['AI 판별 없이 올리는 조과는 운영자가 사진을 확인한 뒤 랭킹에 반영돼요.', 'Catches registered without AI are checked by the operator before they count.', 'AI判定なしの釣果は、運営者が写真を確認してからランキングに反映されます。', '未经AI识别的渔获，运营者核对照片后计入排行。'],
-  reg_nofish_note: ['AI가 물고기를 찾지 못한 사진이라 운영자 확인 후 반영돼요.', 'The AI saw no fish, so the operator will check this one.', 'AIが魚を見つけられなかったため、運営者確認後に反映されます。', 'AI未识别到鱼，需运营者确认后计入。'],
+  reg_past_note2: ['과거 조과도 무료예요. AI 검사 결과에 따라 바로 반영되거나, AI가 몇 분 안에 다시 확인한 뒤 반영돼요.', 'Past catches are free. They count right away, or after the AI takes a second look within minutes.', '過去の釣果も無料。AI審査の結果により即反映、または数分以内にAIが再確認してから反映されます。', '以往渔获也免费，视AI审核结果立即计入，或在几分钟内由AI复查后计入。'],
+  reg_review_note: ['AI 판별 없이 올리는 조과는 AI가 몇 분 안에 사진을 다시 확인한 뒤 랭킹에 반영돼요.', 'Catches registered without AI get an automatic photo check within minutes before they count.', 'AI判定なしの釣果は、数分以内にAIが写真を確認してからランキングに反映されます。', '未经AI识别的渔获，会在几分钟内由AI复查照片后计入排行。'],
+  reg_nofish_note: ['AI가 물고기를 찾지 못한 사진이라 한 번 더 확인한 뒤 반영돼요.', 'The AI saw no fish, so this one gets a second check first.', 'AIが魚を見つけられなかったため、再確認してから反映されます。', 'AI未识别到鱼，复查后再计入。'],
   reg_old_note2: ['촬영한 지 3일이 지나 과거 조과로 등록돼요', 'Taken over 3 days ago, so it counts as a past catch', '撮影から3日以上経過したため過去の釣果として登録されます', '拍摄已超过3天，将登记为以往渔获'],
 
   /* levels · decorations · premium */
@@ -2058,7 +2087,7 @@ Object.assign(T, {
   rv_size: ['사진으로 보이는 크기와 길이가 맞지 않아요{x}', 'The length does not match the fish in the photo{x}', '写真の魚と長さが合いません{x}', '长度与照片中的鱼不符{x}'],
   rv_record: ['이 어종의 기록 크기를 넘어서 운영자가 직접 확인해요', 'Larger than the species record, so the operator checks it', 'この魚種の記録を超えているため運営者が確認します', '超过该鱼种纪录，由运营者亲自确认'],
   rv_unclear: ['사진만으로는 확실하지 않아 운영자가 확인해요', 'Not clear from the photo alone; the operator checks it', '写真だけでは判断できないため運営者が確認します', '仅凭照片无法确定，由运营者确认'],
-  rv_no_photo: ['사진이 없어 운영자가 확인해요', 'No photo, so the operator checks it', '写真がないため運営者が確認します', '没有照片，由运营者确认'],
+  rv_no_photo: ['사진이 없어 확인할 수 없어요. 내 기록에는 남지만 랭킹·경험치에는 들어가지 않아요.', 'There is no photo to check. It stays in your log but does not count for rankings or XP.', '確認できる写真がありません。記録には残りますが、ランキングと経験値には入りません。', '没有可确认的照片。会保留在你的记录里，但不计入排行和经验。'],
   rv_ai_late: ['AI 확인이 늦어져 운영자가 확인해요', 'The AI check is delayed, so the operator checks it', 'AI確認が遅れているため運営者が確認します', 'AI审核延迟，由运营者确认'],
   rv_bad_len: ['길이가 올바르지 않아요', 'The length is not valid', '長さが正しくありません', '长度无效'],
   rv_future: ['날짜가 미래로 되어 있어요', 'The date is in the future', '日付が未来になっています', '日期在未来'],
@@ -2213,12 +2242,48 @@ Object.assign(T, {
   hlk_top: ['최대어', 'Biggest', '最大魚', '最大'], hlk_big: ['대어', 'Big one', '大物', '大鱼'], hlk_team: ['팀', 'Team', 'チーム', '战队'],
 
   /* rewritten texts (free past catches, payments) */
-  past_sub: ['예전에 잡은 물고기도 무료로 기록할 수 있어요. 원본 사진 정보·중복 여부를 확인하고, AI 판별이 없으면 운영자가 확인해요.', 'Log fish you caught before, for free. We check the original photo data and duplicates; without AI the operator checks it.', '以前釣った魚も無料で記録できます。元画像の情報と重複を確認し、AI判定がない場合は運営者が確認します。', '以往的渔获也可免费登记。会检查原图信息与重复，没有AI识别时由运营者审核。'],
+  past_sub: ['예전에 잡은 물고기도 무료로 기록할 수 있어요. 원본 사진 정보·중복 여부를 확인하고, 확인이 필요한 사진은 AI가 자동으로 다시 봐요.', 'Log fish you caught before, for free. We check the original photo data and duplicates, and the AI takes a second look when needed.', '以前釣った魚も無料で記録できます。元画像の情報と重複を確認し、必要な写真はAIが自動で再確認します。', '以往的渔获也可免费登记。会检查原图信息与重复，需要时由AI自动复查。'],
   scan_sub: ['사진을 올리면 AI가 어종을 판별하고, 독성·금어기까지 바로 알려줘요. 틀리면 알려주세요. 그만큼 똑똑해져요.', 'Upload a photo: AI names the species and flags toxins and closed seasons. If it is wrong, tell it—the model learns.', '写真を送るとAIが魚種を判定し、毒性や禁漁期まで知らせます。間違っていたら教えてください。', '上传照片，AI识别鱼种并提示毒性与禁渔期。认错了就告诉它。'],
   faq_past_q: ['예전 조과도 올릴 수 있나요?', 'Can I add past catches?', '過去の釣果も登録できる?', '能登记以往渔获吗？'],
   faq_past_a: ['네, 무료로 몇 번이든 올릴 수 있어요. 원본 촬영 정보와 중복 여부를 확인하고, 검토가 필요한 사진은 AI가 자동으로 다시 확인해요. 애매한 것만 운영자가 직접 확인해요.', 'Yes—free and unlimited. We check the original capture data and duplicates; photos that need a check are re-checked automatically by AI, and only unclear ones go to the operator.', 'はい、無料で何回でも登録できます。元の撮影情報と重複を確認し、確認が必要な写真はAIが自動で再確認します。判断が難しいものだけ運営者が確認します。', '可以，免费且不限次数。会核对原始拍摄信息和重复情况；需要审核的照片由AI自动复核，只有难以判断的才交给运营者。'],
   faq_pay_q: ['돈을 내야 하는 게 있나요?', 'Is anything paid?', '有料のものはある?', '有需要付费的吗？'],
-  faq_pay_a: ['과거 조과 등록, 꾸미기, 캐릭터는 전부 무료예요(꾸미기는 레벨로 해금). 돈이 드는 건 프리미엄 꾸미기 2개(각 {p}원)와 개발자 후원 500원뿐이고, 점수·랭킹에는 영향이 없어요. 카카오페이로 보내고 "보냈어요"를 누르면, 운영자가 입금을 확인한 뒤 적용돼요(보통 하루 안). 계좌번호는 공개하지 않아요.', 'Past catches, decorations and characters are all free (decorations unlock with levels). Only two premium decorations (₩{p} each) and an optional ₩500 tip cost money, and they never affect points or rankings. Send with KakaoPay and tap "I sent it"; it applies once the operator confirms the payment (usually within a day). We never show a bank account.', '過去の釣果登録・デコ・キャラはすべて無料(デコはレベルで解放)。有料はプレミアムデコ2つ(各{p}ウォン)と開発者への応援500ウォンだけで、得点・ランキングには影響しません。カカオペイで送って「送りました」を押すと、運営者が入金を確認した後に適用(通常1日以内)。口座番号は公開しません。', '以往渔获登记、装扮、角色全部免费（装扮靠等级解锁）。付费的只有两个高级装扮（每个{p}韩元）和500韩元打赏，且不影响积分和排名。用KakaoPay转账后点击"已转账"，运营者确认到账后生效（通常一天内）。不公开银行账号。']
+  faq_pay_a: ['과거 조과 등록, 꾸미기, 캐릭터는 전부 무료예요(꾸미기는 레벨로 해금). 돈이 드는 건 프리미엄 꾸미기 2개(각 {p}원)와 개발자 후원 500원뿐이고, 점수·랭킹에는 영향이 없어요. 카카오페이로 보내고 "보냈어요"를 누르면, 운영자가 입금을 확인한 뒤 적용돼요(보통 하루 안). 계좌번호는 공개하지 않아요.', 'Past catches, decorations and characters are all free (decorations unlock with levels). Only two premium decorations (₩{p} each) and an optional ₩500 tip cost money, and they never affect points or rankings. Send with KakaoPay and tap "I sent it"; it applies once the operator confirms the payment (usually within a day). We never show a bank account.', '過去の釣果登録・デコ・キャラはすべて無料(デコはレベルで解放)。有料はプレミアムデコ2つ(各{p}ウォン)と開発者への応援500ウォンだけで、得点・ランキングには影響しません。カカオペイで送って「送りました」を押すと、運営者が入金を確認した後に適用(通常1日以内)。口座番号は公開しません。', '以往渔获登记、装扮、角色全部免费（装扮靠等级解锁）。付费的只有两个高级装扮（每个{p}韩元）和500韩元打赏，且不影响积分和排名。用KakaoPay转账后点击"已转账"，运营者确认到账后生效（通常一天内）。不公开银行账号。'],
+
+  /* iteration 2026-10-28b: notice, share card, what's new, level tags, sanity checks */
+  notice_label: ['운영자 공지', 'Notice', '運営からのお知らせ', '运营公告'],
+  ad_notice: ['공지 올리기', 'Post a notice', 'お知らせを出す', '发布公告'],
+  ad_notice_hint: ['홈 화면 맨 위와 게시판 맨 위에 보여요. 새로 올리면 닫았던 사람에게도 다시 보여요.', 'Shown at the top of the home page and the board. A new notice shows again even to people who closed the last one.', 'ホーム画面と掲示板のいちばん上に表示されます。新しく出すと、前のものを閉じた人にも再び表示されます。', '显示在首页和论坛最上方。发布新公告后，关闭过旧公告的人也会再次看到。'],
+  ad_notice_ph: ['예: 오늘 밤 10시부터 30분 동안 점검해요.', 'e.g. Maintenance tonight from 10 pm for 30 minutes.', '例: 今夜22時から30分間メンテナンスします。', '例：今晚10点起维护30分钟。'],
+  ad_notice_go: ['공지 올리기', 'Post', '掲示する', '发布'],
+  ad_notice_off: ['공지 내리기', 'Remove notice', 'お知らせを下げる', '撤下公告'],
+  ad_notice_empty: ['공지 내용을 적어 주세요', 'Write the notice first', 'お知らせの内容を書いてください', '请先填写公告内容'],
+  ad_notice_done: ['공지를 올렸어요', 'Notice posted', 'お知らせを掲示しました', '公告已发布'],
+  ad_notice_removed: ['공지를 내렸어요', 'Notice removed', 'お知らせを下げました', '公告已撤下'],
+  reg_err_toobig_any: ['{n}cm가 넘는 길이는 등록할 수 없어요. 다시 재 보세요.', 'Lengths over {n} cm can\'t be registered. Please measure again.', '{n}cmを超える長さは登録できません。もう一度測ってください。', '超过{n}cm的长度无法登记，请重新测量。'],
+  train_other_bad: ['물고기 이름을 2~30자로 적어 주세요 (링크·숫자만은 안 돼요)', 'Type the fish name in 2–30 letters (no links or numbers only)', '魚の名前を2〜30文字で入力してください(リンクや数字だけは不可)', '请输入2~30个字的鱼名（不能只有链接或数字）'],
+  st_logonly: ['기록만', 'Log only', '記録のみ', '仅记录'],
+  rv_title_log: ['AI 검토: 기록만', 'AI review: log only', 'AI審査: 記録のみ', 'AI审核：仅记录'],
+  pf_nick_reserved: ['운영자나 찌릿 공식 계정처럼 보이는 닉네임은 쓸 수 없어요', 'Names that look like the operator or an official account can\'t be used', '運営や公式アカウントに見えるニックネームは使えません', '不能使用看起来像运营者或官方账号的昵称'],
+  share_btn: ['자랑하기', 'Share', '自慢する', '分享'],
+  share_text: ['찌릿에서 {name} {len} 잡았어요!', 'Landed a {name}, {len}, on ZZIRIT!', '찌릿(ZZIRIT)で{name} {len}を釣りました!', '在찌릿(ZZIRIT)钓到了{name} {len}！'],
+  share_title: ['조과 카드', 'Catch card', '釣果カード', '渔获卡片'],
+  share_sub: ['이미지를 저장해 카카오톡·인스타그램에 올려 보세요. 정확한 위치는 들어가지 않아요.', 'Save the picture and post it on KakaoTalk or Instagram. The exact spot is never included.', '画像を保存してカカオトークやインスタグラムに投稿してみましょう。正確な場所は入りません。', '保存图片后发到KakaoTalk或Instagram吧。不会包含精确位置。'],
+  share_save: ['이미지 저장', 'Save picture', '画像を保存', '保存图片'],
+  share_copy: ['문구·링크 복사', 'Copy text & link', '文とリンクをコピー', '复制文字和链接'],
+  share_fail: ['카드를 만들지 못했어요. 잠시 후 다시 해 보세요.', 'Couldn\'t make the card. Please try again in a moment.', 'カードを作れませんでした。少ししてからもう一度お試しください。', '卡片生成失败，请稍后再试。'],
+  share_pill_ok: ['검증된 조과', 'Verified catch', '認証済みの釣果', '已认证渔获'],
+  wn_eyebrow: ['업데이트 안내', 'Update', 'アップデートのお知らせ', '更新说明'],
+  wn_title: ['찌릿이 새로워졌어요', 'ZZIRIT just got better', '찌릿(ZZIRIT)が新しくなりました', '찌릿(ZZIRIT)焕然一新'],
+  wn_reset_h: ['조과 기록을 새로 시작해요', 'A fresh start for catch records', '釣果の記録が新しく始まります', '渔获记录重新开始'],
+  wn_reset_p: ['장난 기록과 결제 오류를 정리하려고 10월 28일에 모든 조과·꾸미기·주문을 초기화했어요. 계정·닉네임·친구·팀·캐릭터·프로필 사진·게시글은 그대로예요.', 'To clear out joke entries and a payment bug, all catches, decorations and orders were reset on Oct 28. Accounts, nicknames, friends, teams, characters, profile photos and posts are untouched.', 'いたずらの記録と決済の不具合を整理するため、10月28日にすべての釣果・飾り・注文を初期化しました。アカウント・ニックネーム・友だち・チーム・キャラ・プロフィール写真・投稿はそのままです。', '为清理恶作剧记录和支付故障，10月28日重置了所有渔获、装饰和订单。账号、昵称、好友、战队、角色、头像和帖子都保留。'],
+  wn_review_h: ['AI 자동 검토', 'Automatic AI review', 'AI自動審査', 'AI自动审核'],
+  wn_review_p: ['확인이 필요한 조과는 AI가 몇 분 안에 다시 봐요. 말이 안 되는 기록은 반려되고, 이유는 조과 화면에서 볼 수 있어요.', 'Catches that need a check get a second look from the AI within minutes. Impossible entries are rejected, with the reason shown on the catch.', '確認が必要な釣果は数分以内にAIが再確認します。ありえない記録は却下され、理由は釣果画面で見られます。', '需要确认的渔获会在几分钟内由AI复查。不合理的记录会被驳回，原因可在渔获页面查看。'],
+  wn_id_h: ['아이디 로그인', 'Login ID', 'IDログイン', 'ID登录'],
+  wn_id_p: ['아이디를 만들어 두면 폰을 바꾸거나 다른 기기에서도 같은 계정을 쓸 수 있어요.', 'Create a login ID to keep your account when you switch phones or use another device.', 'IDを作っておけば、機種変更や別の端末でも同じアカウントを使えます。', '创建登录ID后，换手机或用其他设备也能使用同一账号。'],
+  wn_pay_h: ['유료 아이템은 입금 확인 후', 'Paid items after payment check', '有料アイテムは入金確認後', '付费道具在确认到账后生效'],
+  wn_pay_p: ['"보냈어요"만으로는 적용되지 않고, 운영자가 입금을 확인하면 자동으로 적용돼요.', '"I sent it" alone no longer applies an item; it switches on automatically once the operator confirms the payment.', '「送りました」だけでは適用されず、運営が入金を確認すると自動で適用されます。', '仅点"已转账"不会生效，运营者确认到账后会自动生效。'],
+  wn_share_h: ['조과 카드로 자랑하기', 'Share a catch card', '釣果カードで自慢', '用渔获卡片分享'],
+  wn_share_p: ['조과 화면의 "자랑하기"를 누르면 카카오톡·인스타그램에 올릴 이미지가 만들어져요.', 'Tap "Share" on a catch to make a picture for KakaoTalk or Instagram.', '釣果画面の「自慢する」を押すと、カカオトークやインスタグラム用の画像ができます。', '在渔获页面点"分享"，即可生成可发到KakaoTalk或Instagram的图片。'],
 });
 
 /* ===== Web build only: texts that differ from the Claude artifact version ===== */
@@ -4336,9 +4401,43 @@ const nowMs = () => Date.now();
 function tagUid(o, id) { if (o && typeof o === 'object' && id) { try { Object.defineProperty(o, '_uid', { value: id, enumerable: false, configurable: true, writable: true }); } catch (e) { } } return o; }
 function icon(id, cls = '') { return `<svg class="ic ${cls}" aria-hidden="true"><use href="#i-${id}"/></svg>`; }
 
+/* Photos already downloaded stay on this device (IndexedDB), so lists don't fetch them again on every visit.
+   A catch photo never changes once saved, and a profile photo is keyed by its upload time, so nothing goes stale.
+   Keeps the newest 400; if the browser blocks storage, everything still works without it. */
+const PHDB = (() => {
+  const MAX = 400;
+  let dbp = null;
+  const open = () => dbp || (dbp = new Promise(res => {
+    let done = false; const fin = v => { if (!done) { done = true; res(v); } };
+    try {
+      if (!window.indexedDB) return fin(null);
+      const r = indexedDB.open('zz-photos', 1);
+      r.onupgradeneeded = () => { try { r.result.createObjectStore('p'); } catch (e) { } };
+      r.onsuccess = () => fin(r.result); r.onerror = () => fin(null); r.onblocked = () => fin(null);
+      setTimeout(() => fin(null), 2500);
+    } catch (e) { fin(null); }
+  }));
+  const req = (mode, fn) => open().then(db => db ? new Promise(res => {
+    try { const q = fn(db.transaction('p', mode).objectStore('p')); q.onsuccess = () => res(q.result); q.onerror = () => res(undefined); } catch (e) { res(undefined); }
+  }) : undefined);
+  return {
+    get: k => req('readonly', s => s.get(k)).then(v => (typeof v === 'string' ? v : null)),
+    put(k, v) {
+      if (typeof v !== 'string' || !v.startsWith('data:image/') || v.length > 900000) return;
+      req('readwrite', s => s.put(v, k));
+      const keys = lsGet('phk', []).filter(x => x !== k); keys.push(k);
+      const drop = keys.length > MAX ? keys.splice(0, keys.length - MAX) : [];
+      lsSet('phk', keys);
+      for (const d of drop) req('readwrite', s => s.delete(d));
+    },
+    del(k) { req('readwrite', s => s.delete(k)); lsSet('phk', lsGet('phk', []).filter(x => x !== k)); }
+  };
+})();
+
 /* ===== Constants ===== */
 /* App name lives in build.py (BRAND) so a rename is a one-line change */
 const APP_NAME = ['찌릿', 'ZZIRIT', 'ZZIRIT', 'ZZIRIT'];
+const SITE_URL = 'https://kim-jae-ung.github.io/zzirit/';
 const DEV = { name: '김재웅', kakaoId: 'rlawodnd12', kakaoUrl: 'https://qr.kakao.com/talk/p1SyBTckPfcUiMyir.g0YMNOWaQ-', kakaoPayUrl: 'https://qr.kakaopay.com/FJ3WJxUGJfa07228' };
 const EA_CC = ['KR', 'JP', 'CN', 'TW', 'HK', 'MO', 'MN'];
 const COUNTRIES = ['KR', 'JP', 'CN', 'TW', 'HK', 'MO', 'MN', 'US', 'CA', 'MX', 'BR', 'AR', 'CL', 'PE', 'CO', 'GB', 'IE', 'FR', 'DE', 'ES', 'PT', 'IT', 'NL', 'BE', 'CH', 'AT', 'SE', 'NO', 'FI', 'DK', 'IS', 'PL', 'CZ', 'HU', 'GR', 'TR', 'RU', 'UA', 'IL', 'AE', 'SA', 'EG', 'ZA', 'KE', 'MA', 'IN', 'LK', 'BD', 'TH', 'VN', 'MY', 'SG', 'ID', 'PH', 'KH', 'MM', 'AU', 'NZ', 'FJ'];
@@ -4394,9 +4493,23 @@ const S = {
   admin: { config: {}, grants: {}, verdicts: {}, mod: {} },
   myOrders: [], myLabels: [], mySuggest: [],
   allOrders: new Map(), allSuggest: new Map(),
-  photoCache: new Map(),
+  photoCache: new Map(), photoWait: new Map(),
   route: 'home', viewUid: null, dataVer: 0
 };
+/* Memory first, then this device's photo store, then the server; one request per photo even if asked for twice at once */
+function cachedPhoto(key, fetcher) {
+  if (S.photoCache.has(key)) return Promise.resolve(S.photoCache.get(key));
+  if (S.photoWait.has(key)) return S.photoWait.get(key);
+  const p = (async () => {
+    let v = await PHDB.get(key), net = false;
+    if (!v) { try { v = await fetcher(); net = true; } catch (e) { S.photoWait.delete(key); return null; } } // a network error is not "no photo"
+    if (v && net) PHDB.put(key, v);
+    S.photoCache.set(key, v || null); S.photoWait.delete(key);
+    return v || null;
+  })();
+  S.photoWait.set(key, p);
+  return p;
+}
 
 /* ===== Store: shared db with local fallback ===== */
 const store = (() => {
@@ -4503,7 +4616,7 @@ const store = (() => {
     },
     async savePhoto(cid, data) {
       S.photoCache.set((S.uid || 'local') + '/' + cid, data.t);
-      if (S.mode === 'shared') return safeWrite('anglers/' + S.uid + '/photos/' + cid, data, null);
+      if (S.mode === 'shared') { if (cid !== '_pic') PHDB.put(S.uid + '/' + cid, data.t); return safeWrite('anglers/' + S.uid + '/photos/' + cid, data, null); }
       const ph = lsGet('photos', {}); ph[cid] = data.t; const keys = Object.keys(ph); if (keys.length > 40) delete ph[keys[0]]; lsSet('photos', ph);
     },
     async getPhoto(uid, cid) {
@@ -4511,9 +4624,12 @@ const store = (() => {
       if (S.photoCache.has(key)) return S.photoCache.get(key);
       if (!uid || uid === 'local') { const ph = lsGet('photos', {}); return ph[cid] || null; }
       if (!S.db) return null;
-      try { const d = await S.db.doc('anglers/' + uid + '/photos/' + cid).get(); const v = d.exists ? d.data().t : null; S.photoCache.set(key, v); return v; } catch (e) { return null; }
+      return cachedPhoto(key, async () => { const d = await S.db.doc('anglers/' + uid + '/photos/' + cid).get(); return d.exists ? d.data().t : null; });
     },
-    async deletePhoto(cid) { if (S.mode === 'shared' && S.db) { try { await S.db.doc('anglers/' + S.uid + '/photos/' + cid).delete(); } catch (e) { } } else { const ph = lsGet('photos', {}); delete ph[cid]; lsSet('photos', ph); } },
+    async deletePhoto(cid) {
+      S.photoCache.delete((S.uid || 'local') + '/' + cid);
+      if (S.mode === 'shared' && S.db) { PHDB.del(S.uid + '/' + cid); try { await S.db.doc('anglers/' + S.uid + '/photos/' + cid).delete(); } catch (e) { } } else { const ph = lsGet('photos', {}); delete ph[cid]; lsSet('photos', ph); }
+    },
     async addLabel(l) {
       S.myLabels.push(l); if (S.myLabels.length > 400) S.myLabels.shift();
       lsSet('labels', S.myLabels);
@@ -4684,6 +4800,24 @@ function lvInfo(a, uid) {
 }
 function myLevel() { return lvInfo(S.me, myId()).L; }
 function lvChip(a, uid) { const i = lvInfo(a, uid); return `<span class="lv-chip" title="${esc(i.title)}">Lv.${i.L}</span>`; }
+/* small level tag next to a name (board, rankings, friends) */
+function lvMini(a, uid) { if (!a || !a.nick || !uid) return ''; const i = lvInfo(a, uid); return `<span class="lv-mini" title="${esc(i.title)}">Lv.${i.L}</span>`; }
+
+/* Operator notice: one short message the operator posts from the admin page (kept in the admin `config` doc,
+   which only the operator can write). Shown on the home page (each person can close it) and pinned on the board. */
+function noticeOf() {
+  const n = S.admin.config && S.admin.config.notice;
+  if (!n || typeof n.t !== 'string' || !n.t.trim() || !n.id) return null;
+  return { id: String(n.id).slice(0, 16), t: n.t.trim().slice(0, 400), ts: +n.ts || 0 };
+}
+function noticeBarHTML() {
+  const n = noticeOf(); if (!n || lsGet('noticeX', '') === n.id) return '';
+  return `<div class="notice-bar" role="status">${icon('megaphone')}<p><b>${t('notice_label')}</b> ${esc(n.t)}</p><button class="notice-x" data-act="notice-x" aria-label="${esc(t('close'))}">${icon('x')}</button></div>`;
+}
+function noticeCardHTML() {
+  const n = noticeOf(); if (!n) return '';
+  return `<div class="bd-notice">${icon('megaphone')}<div><p class="bd-notice-h"><b>${t('notice_label')}</b><span class="muted small">${n.ts ? fmtDate(n.ts) : ''}</span></p><p class="bd-notice-t">${esc(n.t)}</p></div></div>`;
+}
 
 /* Leaderboard */
 function periodStart(period, now = new Date()) {
@@ -5231,9 +5365,17 @@ function profileFormHTML(p) {
   </div>
   <p class="hint">${icon('globe')} ${t('pf_rank_hint')}</p>`;
 }
+/* names that would look like the operator or the app itself */
+const NICK_RESERVED = /(운영자|관리자|운영진|공식|admin|official|staff|매니저|運営|管理者|管理员|官方)|^(찌릿|zzirit|gm)$/i;
+function nickProblem(nick) { if (S.isOwner) return null; return NICK_RESERVED.test(nick.replace(/[\s._-]/g, '')) ? 'pf_nick_reserved' : null; }
 function readProfileForm(root) {
-  const nick = $('#pf-nick', root).value.trim().slice(0, 16);
-  return { nick: nick || ('Angler' + Math.floor(1000 + Math.random() * 9000)), cc: $('#pf-cc', root).value, home: $('#pf-home', root).value, style: $('#pf-style', root).value, lang: $('#pf-lang', root).value };
+  const nick = $('#pf-nick', root).value.trim().replace(/\s+/g, ' ').slice(0, 16);
+  return { nick: nick || ('Angler' + Math.floor(1000 + Math.random() * 9000)), cc: $('#pf-cc', root).value, home: $('#pf-home', root).value, style: $('#pf-style', root).value, lang: $('#pf-lang', root).value, bad: nick ? nickProblem(nick) : null };
+}
+function nickRefused(f, root) {
+  if (!f.bad) return false;
+  toast(t(f.bad), 'warn', 4800); const n = $('#pf-nick', root); if (n) n.focus();
+  return true;
 }
 function openOnboarding(then) {
   const p = { nick: '', cc: defaultCC(), home: defaultHome(), style: 'float' };
@@ -5250,6 +5392,7 @@ function openOnboarding(then) {
   const cv = $('#onb-cv', w); if (cv) { const ctx = cv.getContext('2d'); ['kurodai', 'madai', 'aoriika', 'buri'].forEach((id, i) => FD.draw(ctx, SPI[id], 80 + i * 135, 78 + (i % 2) * 10, i === 2 ? 110 : 120, { still: true, flip: i % 2 === 1 })); }
   $('#onb-go', w).onclick = async () => {
     const f = readProfileForm(w);
+    if (nickRefused(f, w)) return; delete f.bad;
     S.me = Object.assign({ v: 1, joined: nowMs(), catches: [], decor: { theme: 'th_dawn', items: ['dc_weed', 'dc_rock', 'dc_buoy'], fx: [] }, flair: {} }, S.me || {}, f);
     if (f.lang !== S.lang) setLang(f.lang);
     await store.saveMe();
@@ -5423,11 +5566,12 @@ function cleanLooks() {
 }
 
 /* ===== Free identification help: Google Lens (no AI cost) ===== */
+/* phones and tablets: hand pictures to the system share sheet (KakaoTalk, Instagram, Google Lens...) */
+function touchDevice() { return matchMedia('(pointer: coarse)').matches || (navigator.maxTouchPoints > 0 && Math.min(screen.width, screen.height) < 820); }
 function lensBlob(type) { const sc = S.scan; if (!sc || !sc.im) return Promise.resolve(null); const c = canvasFrom(sc.im, 1280); return new Promise(r => c.toBlob(b => r(b), type, .9)); }
 async function openLens() {
   const sc = S.scan; if (!sc || !sc.im) return;
-  const coarse = matchMedia('(pointer: coarse)').matches;
-  if (coarse && navigator.canShare) {
+  if (touchDevice() && navigator.canShare) {
     // phones: share a re-encoded copy (no GPS or camera data) straight to Google / Google Lens
     const jpg = await lensBlob('image/jpeg');
     const file = jpg && new File([jpg], 'zzirit-fish.jpg', { type: 'image/jpeg' });
@@ -5721,8 +5865,8 @@ async function openCatch(uid, cid) {
       <div class="cd-info">
         <p class="eyebrow">${c.past ? t('past_catch') : t('catch')} · ${fmtDT(c.ts)}</p>
         <h2>${esc(nameOf(c.sp))} <span class="num len">${lenFmt(c.len)}</span></h2>
-        <div class="chips">${statusChip(st, c.tr)}${toxChip(sp)}${c.rel ? `<span class="chip chip-ok">${t('released')}</span>` : ''}${isFeaturedCatch(c) ? `<span class="chip chip-feat">${t('x2')}</span>` : ''}</div>
-        ${note && note.v !== 'ok' ? `<p class="note rv-note">${icon('shield')} <span><b>${t(note.v === 'no' ? 'rv_title_no' : 'rv_title_hold')}</b> ${esc(reviewReason(note))}</span></p>` : st === 'review' && mine ? `<p class="note rv-note">${icon('clock')} <span>${t('rv_waiting')}</span></p>` : ''}
+        <div class="chips">${statusChip(st, c.tr, logOnly(uid, c))}${toxChip(sp)}${c.rel ? `<span class="chip chip-ok">${t('released')}</span>` : ''}${isFeaturedCatch(c) ? `<span class="chip chip-feat">${t('x2')}</span>` : ''}</div>
+        ${note && note.v !== 'ok' ? `<p class="note rv-note">${icon('shield')} <span><b>${t(note.v === 'no' ? (note.code === 'no_photo' ? 'rv_title_log' : 'rv_title_no') : 'rv_title_hold')}</b> ${esc(reviewReason(note))}</span></p>` : st === 'review' && mine ? `<p class="note rv-note">${icon('clock')} <span>${t('rv_waiting')}</span></p>` : ''}
         <dl class="kv">
           <div><dt>${t('angler')}</dt><dd>${mine ? `${flag(a.cc)} ${esc(a.nick)}` : `<button class="link" data-seauid="${esc(uid)}">${flag(a.cc)} ${esc(a.nick)}</button>${relation(uid) === 'friend' ? ` <span class="chip chip-ok">${t('fr_is_friend')}</span>` : ''}`}</dd></div>
           <div><dt>${t('score')}</dt><dd class="num">${fmtN(c.sc || 0)} pt</dd></div>
@@ -5733,7 +5877,7 @@ async function openCatch(uid, cid) {
           <div><dt>${t('trust')}</dt><dd><span class="trust-meter"><i style="width:${c.tr || 0}%"></i></span> ${c.tr ?? '—'}</dd></div>
         </dl>
         ${c.memo ? `<blockquote class="memo" id="cd-memo">${esc(c.memo)}</blockquote>${!mine && S.sample ? `<button class="btn btn-ghost btn-sm" id="cd-tr">${icon('globe')} ${t('translate')}</button>` : ''}` : ''}
-        ${mine ? `<div class="actions split"><button class="btn btn-ghost btn-sm" id="cd-del">${icon('trash')} ${t('delete')}</button></div>` : ''}
+        <div class="actions split"><button class="btn btn-line btn-sm" data-share="${esc(uid)}|${esc(c.id)}">${icon('share')} ${t('share_btn')}</button>${mine ? `<button class="btn btn-ghost btn-sm" id="cd-del">${icon('trash')} ${t('delete')}</button>` : ''}</div>
       </div>
     </article>`, { wide: true });
   store.getPhoto(uid, c.id).then(src => { if (src) { const ph = $('#cd-ph', w); if (ph) ph.innerHTML = `<img src="${src}" alt="${esc(nameOf(c.sp))}">`; } });
@@ -5783,7 +5927,10 @@ async function friendAction(act, uid, btn) {
   if (msg) toast(msg, act === 'dec' || act === 'cancel' ? 'info' : 'ok');
   rerender();
 }
-function statusChip(st, tr) {
+/* A catch the reviewer could not check because it has no photo stays in the angler's log, outside rankings */
+function logOnly(uid, c) { if (catchState(uid, c) !== 'no') return false; const n = reviewNote(uid, c); return !!(n && n.code === 'no_photo'); }
+function statusChip(st, tr, log) {
+  if (log) return `<span class="chip chip-local">${icon('log')}${t('st_logonly')}</span>`;
   if (st === 'ok') return `<span class="chip chip-ok">${icon('check')}${tr >= 70 ? t('st_verified') : t('st_ok')}</span>`;
   if (st === 'review') return `<span class="chip chip-review">${icon('clock')}${t('st_review')}</span>`;
   if (st === 'hold') return `<span class="chip chip-wait">${icon('clock')}${t('st_hold')}</span>`;
@@ -5819,6 +5966,123 @@ function openMapPicker(init, cb) {
   });
   setTimeout(() => map.invalidateSize(), 250);
   $('#pk-ok', w).onclick = () => { closeModal(w); cb && cb(pos); };
+}
+
+/* ===== Share card: one picture of a catch to send to friends (KakaoTalk, Instagram...) =====
+   Drawn on this device; shows the sea area at most, never the exact spot. */
+function imgFrom(src) { return new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = rej; im.src = src; }); }
+function rrect(g, x, y, w, h, r) { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); }
+function fitText(g, s, max) { if (g.measureText(s).width <= max) return s; let a = [...s]; while (a.length > 1 && g.measureText(a.join('') + '…').width > max) a.pop(); return a.join('') + '…'; }
+async function catchCardBlob(uid, a, c) {
+  const W = 1080, H = 1350, P = 60;
+  const SANS = '"IBM Plex Sans KR", "IBM Plex Sans JP", "Noto Sans SC", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif';
+  const DISP = '"Big Shoulders Display", ' + SANS;
+  try { await Promise.race([Promise.all([document.fonts.load(`800 170px ${DISP}`, '0123456789.cm'), document.fonts.load(`700 64px ${SANS}`, nameOf(c.sp) + (a.nick || ''))]), new Promise(r => setTimeout(r, 2500))]); } catch (e) { }
+  const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+  const g = cv.getContext('2d');
+  const bg = g.createLinearGradient(0, 0, W, H); bg.addColorStop(0, '#0E2440'); bg.addColorStop(1, '#070C16');
+  g.fillStyle = bg; g.fillRect(0, 0, W, H);
+  const glow = g.createRadialGradient(W * .85, H * .1, 0, W * .85, H * .1, W * .7); glow.addColorStop(0, 'rgba(255,90,31,.18)'); glow.addColorStop(1, 'rgba(255,90,31,0)');
+  g.fillStyle = glow; g.fillRect(0, 0, W, H);
+  // photo (or the drawn fish when there is none)
+  const sp = SPI[c.sp];
+  const photo = await store.getPhoto(uid, c.id).catch(() => null);
+  const px = P, py = P, pw = W - P * 2, ph = 800;
+  g.save(); rrect(g, px, py, pw, ph, 40); g.clip();
+  g.fillStyle = '#CFE6F0'; g.fillRect(px, py, pw, ph);
+  try {
+    const im = await imgFrom(photo || FD.thumb(sp || SP[0], 960, 680));
+    const s = Math.max(pw / im.width, ph / im.height), dw = im.width * s, dh = im.height * s;
+    g.drawImage(im, px + (pw - dw) / 2, py + (ph - dh) / 2, dw, dh);
+  } catch (e) { }
+  const shade = g.createLinearGradient(0, py + ph - 220, 0, py + ph); shade.addColorStop(0, 'rgba(7,12,22,0)'); shade.addColorStop(1, 'rgba(7,12,22,.55)');
+  g.fillStyle = shade; g.fillRect(px, py + ph - 220, pw, 220);
+  g.restore();
+  // status pills on the photo
+  const pills = [];
+  if (eligible(c, uid)) pills.push([t('share_pill_ok'), '#1F9D63']);
+  if (c.rel) pills.push([t('released'), '#2A7FB8']);
+  if (c.past) pills.push([t('past_short'), '#5B6B80']);
+  let x = px + 28; g.font = `700 34px ${SANS}`; g.textBaseline = 'middle';
+  for (const [label, col] of pills) { const w = g.measureText(label).width + 44; g.fillStyle = col; rrect(g, x, py + 28, w, 60, 30); g.fill(); g.fillStyle = '#fff'; g.fillText(label, x + 22, py + 59); x += w + 14; }
+  // name and length
+  g.textBaseline = 'alphabetic'; g.fillStyle = '#FFFFFF';
+  g.font = `700 64px ${SANS}`; g.fillText(fitText(g, nameOf(c.sp) || '?', W - P * 2), P, py + ph + 100);
+  const lenTxt = String(Math.round(c.len * 10) / 10);
+  g.font = `800 176px ${DISP}`; g.fillStyle = '#FF6A2B'; g.fillText(lenTxt, P - 4, py + ph + 270);
+  const lw = g.measureText(lenTxt).width;
+  g.font = `800 72px ${DISP}`; g.fillStyle = '#FFFFFF'; g.fillText('cm', P + lw + 14, py + ph + 270);
+  // when, where (sea area only), who
+  const where = c.sea && c.lon != null ? dict(GEO.seaOf(c.lon, c.lat).n) : regionName(c.rg || '');
+  const lv = uid ? lvInfo(a, uid).L : 1;
+  g.font = `500 36px ${SANS}`; g.fillStyle = '#A9BBCF';
+  g.fillText(fitText(g, [fmtDate(c.ts), where, `${a.nick || '?'} · Lv.${lv}`].filter(Boolean).join('  ·  '), W - P * 2), P, py + ph + 340);
+  // brand footer
+  g.fillStyle = 'rgba(255,255,255,.12)'; g.fillRect(P, H - 150, W - P * 2, 2);
+  try { const logo = await imgFrom(LOGO.mark); g.save(); rrect(g, P, H - 118, 76, 76, 18); g.clip(); g.drawImage(logo, P, H - 118, 76, 76); g.restore(); } catch (e) { }
+  g.fillStyle = '#FFFFFF'; g.font = `800 42px ${SANS}`; g.fillText(`${APP_NAME[0]} ${APP_NAME[1]}`, P + 98, H - 68);
+  g.fillStyle = '#7F95AD'; g.font = `500 28px ${SANS}`; g.textAlign = 'right'; g.fillText(SITE_URL.replace(/^https?:\/\//, '').replace(/\/$/, ''), W - P, H - 70); g.textAlign = 'left';
+  return new Promise(r => cv.toBlob(b => r(b), 'image/jpeg', .9));
+}
+async function shareCatch(uid, cid, btn) {
+  const a = uid === (S.uid || 'local') ? S.me : allAnglers().get(uid);
+  const c = a && (a.catches || []).find(x => x.id === cid); if (!c) return;
+  if (btn) { if (btn.disabled) return; btn.disabled = true; }
+  try {
+    const blob = await catchCardBlob(uid, a, c); if (!blob) throw new Error('no card');
+    const name = `zzirit-${SPI[c.sp] ? c.sp : 'catch'}-${Math.round(c.len)}cm.jpg`;
+    const text = t('share_text', { name: nameOf(c.sp), len: lenFmt(c.len) });
+    const file = new File([blob], name, { type: 'image/jpeg' });
+    // phones: straight to KakaoTalk, Instagram and the rest; computers: the picture with a save button
+    if (touchDevice() && navigator.canShare && navigator.canShare({ files: [file] })) {
+      try { await navigator.share({ files: [file], text: text + '\n' + SITE_URL }); return; }
+      catch (e) { if (e && e.name === 'AbortError') return; }
+    }
+    openShareCard(blob, name, text);
+  } catch (e) { console.warn(e); toast(t('share_fail'), 'warn'); }
+  finally { if (btn) btn.disabled = false; }
+}
+function openShareCard(blob, name, text) {
+  const url = URL.createObjectURL(blob);
+  const web = window.APP_RT === 'web';
+  const w = openModal(`<div class="share-card">
+    <h2>${icon('share')} ${t('share_title')}</h2>
+    <p class="lede">${t('share_sub')}</p>
+    <img class="sc-img" src="${url}" alt="${esc(text)}">
+    <div class="actions"><a class="btn btn-primary" id="sc-save" href="${web ? url : '#'}"${web ? ` download="${esc(name)}"` : ''}>${icon('image')}${t('share_save')}</a><button class="btn btn-line" data-copy="${esc(text + ' ' + SITE_URL)}">${icon('copy')}${t('share_copy')}</button></div>
+  </div>`, { label: t('share_title'), onClose: () => setTimeout(() => URL.revokeObjectURL(url), 2000) });
+  // inside Claude a page can't download by itself; it asks through the downloads permission
+  if (!web) $('#sc-save', w).onclick = async e => {
+    e.preventDefault();
+    try { const dl = await claude.use('downloads'); await dl.save({ filename: name, data: blob }); }
+    catch (err) { if (!err || err.code !== 'declined') toast(t('share_fail'), 'warn'); }
+  };
+}
+
+/* ===== What's new: shown once after a big update (website only; needs the matching server update) ===== */
+const WHATS_NEW = '2026-10-28', WN_TS = Date.parse('2026-10-28T14:00:00Z'); // people who joined after this never saw the old records
+const BOOT_AT = Date.now();
+function maybeWhatsNew(tries = 0) {
+  if (window.APP_RT !== 'web' || lsGet('wn', '') === WHATS_NEW || tries > 6) return;
+  if (!S.ready || $('.modal-wrap.in')) { setTimeout(() => maybeWhatsNew(tries + 1), 4000); return; }
+  // a first visit gets the welcome dialog instead, and someone who joined after the update has nothing to catch up on
+  if (!S.me || !S.me.nick || (S.me.joined && S.me.joined >= Math.min(WN_TS, BOOT_AT))) { lsSet('wn', WHATS_NEW); return; }
+  myLoginId().then(id => {
+    if (S.idOff || lsGet('wn', '') === WHATS_NEW) return; // the server update isn't in yet: try again next visit
+    if ($('.modal-wrap.in')) { setTimeout(() => maybeWhatsNew(tries + 1), 4000); return; }
+    lsSet('wn', WHATS_NEW); openWhatsNew(id);
+  });
+}
+function openWhatsNew(id) {
+  const items = [['refresh', 'wn_reset'], ['shield', 'wn_review'], ['user', 'wn_id'], ['heart', 'wn_pay'], ['share', 'wn_share']];
+  const w = openModal(`<div class="wn">
+    <p class="eyebrow">${t('wn_eyebrow')}</p>
+    <h2>${t('wn_title')}</h2>
+    <ul class="wn-list">${items.map(([ic, k]) => `<li>${icon(ic)}<div><b>${t(k + '_h')}</b><p class="muted">${t(k + '_p')}</p></div></li>`).join('')}</ul>
+    <div class="actions"><button class="btn btn-primary" id="wn-ok">${t('ok')}</button>${!id && idSupported() ? `<button class="btn btn-line" id="wn-id">${icon('user')}${t('id_create')}</button>` : ''}</div>
+  </div>`, { label: t('wn_title') });
+  $('#wn-ok', w).onclick = () => closeModal(w);
+  const b = $('#wn-id', w); if (b) b.onclick = () => { closeModal(w); openIdCreate(); };
 }
 
 /* ===== Views ===== */
@@ -5881,7 +6145,8 @@ VIEWS.home = {
     const myTm = teamOf(myId());
     el.innerHTML = `
     <div class="page home">
-      ${FL.inc.length ? `<a class="fr-banner" href="#friends">${icon('users')}<span>${t('fr_home_banner', { n: FL.inc.length })}</span><span class="fr-banner-who">${FL.inc.slice(0, 3).map(r => avatar(r.a, 26)).join('')}</span><b>${t('fr_home_banner_cta')}</b></a>` : ''}
+      ${noticeBarHTML()}
+      ${FL.inc.length ?`<a class="fr-banner" href="#friends">${icon('users')}<span>${t('fr_home_banner', { n: FL.inc.length })}</span><span class="fr-banner-who">${FL.inc.slice(0, 3).map(r => avatar(r.a, 26)).join('')}</span><b>${t('fr_home_banner_cta')}</b></a>` : ''}
       <section class="hero">
         <div class="hero-main">
           <p class="eyebrow">${fmtDate(now.getTime(), { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' })} · ${t('lunar_day', { d: ti.Lr.day })}</p>
@@ -5973,8 +6238,15 @@ VIEWS.home = {
     hydratePhotos(el);
   }
 };
+/* Catch photos in lists load when they come near the screen (the drawn fish shows until then) */
+const PH_IO = 'IntersectionObserver' in window ? new IntersectionObserver(es => { for (const e of es) if (e.isIntersecting) { PH_IO.unobserve(e.target); loadPh(e.target); } }, { rootMargin: '400px 0px' }) : null;
+function loadPh(n) { const [uid, cid] = n.dataset.ph.split('|'); store.getPhoto(uid, cid).then(src => { if (src && n.isConnected) n.innerHTML = `<img src="${src}" alt="">`; }); }
 function hydratePhotos(root) {
-  $$('[data-ph]', root).forEach(async n => { const [uid, cid] = n.dataset.ph.split('|'); const src = await store.getPhoto(uid, cid); if (src && n.isConnected) n.innerHTML = `<img src="${src}" alt="">`; });
+  $$('[data-ph]', root).forEach(n => {
+    const [uid, cid] = n.dataset.ph.split('|'); const key = uid + '/' + cid;
+    if (S.photoCache.has(key)) { const src = S.photoCache.get(key); if (src) n.innerHTML = `<img src="${src}" alt="">`; return; }
+    if (PH_IO) PH_IO.observe(n); else loadPh(n);
+  });
 }
 
 /* ---------- SCAN ---------- */
@@ -6108,7 +6380,7 @@ function renderScanWork() {
       <div class="done-score"><span class="num">+${fmtN(c.sc || 0)}</span><span>pt</span>${statusChip(c.st, c.tr)}${c.st === 'ok' ? `<span class="lv-chip">+${fmtN(sc.xpGain || 0)} XP</span>` : `<span class="lv-chip lv-wait">${t('xp_after_review')}</span>`}</div>
       ${sc.lvUp ? `<div class="lvup">${icon('star')}<div><b>${t('lv_up', { n: sc.lvUp })}</b>${sc.unlocks && sc.unlocks.length ? `<p class="small">${t('unlock_line', { name: esc(sc.unlocks.map(id => dict(SHOPI[id].n)).slice(0, 4).join(', ')) })}</p>` : ''}</div><a class="btn btn-light btn-sm" href="#sea">${t('go_decorate')}</a></div>` : ''}
       ${trustHTML(sc.trust)}
-      <div class="actions"><button class="btn btn-primary" data-act="scan-reset">${icon('camera')}${t('scan_another')}</button><a class="btn btn-line" href="#rank">${icon('trophy')}${t('see_rank')}</a><a class="btn btn-line" href="#sea">${icon('sea')}${t('go_my_sea')}</a></div>
+      <div class="actions"><button class="btn btn-primary" data-act="scan-reset">${icon('camera')}${t('scan_another')}</button><button class="btn btn-line" data-share="${esc(myId())}|${esc(c.id)}">${icon('share')}${t('share_btn')}</button><a class="btn btn-line" href="#rank">${icon('trophy')}${t('see_rank')}</a><a class="btn btn-line" href="#sea">${icon('sea')}${t('go_my_sea')}</a></div>
     </div>`;
   }
 }
@@ -6216,7 +6488,17 @@ function openTrainPicker(manual) {
   draw('');
   $('#tr-q', w).addEventListener('input', e => draw(e.target.value));
   w.addEventListener('click', e => { if (e.target.closest('[data-lens]')) { openLens(); return; } const b = e.target.closest('[data-pick]'); if (b) { closeModal(w); acceptSpecies(b.dataset.pick, !manual); } });
-  $('#tr-other-ok', w).onclick = () => { const v = $('#tr-other', w).value.trim(); if (!v) return; closeModal(w); acceptSpecies('other:' + v, !manual); };
+  $('#tr-other-ok', w).onclick = () => {
+    const inp = $('#tr-other', w); const v = cleanOtherName(inp.value);
+    if (!v) { toast(t('train_other_bad'), 'warn', 4200); inp.focus(); return; }
+    closeModal(w); acceptSpecies('other:' + v, !manual);
+  };
+}
+/* A typed-in fish name: 2–30 letters, no links, not just numbers or symbols */
+function cleanOtherName(s) {
+  const v = String(s || '').replace(/\s+/g, ' ').trim().slice(0, 30);
+  if ([...v].length < 2 || /https?:|www\.|\.com|[<>{}]/i.test(v) || !/\p{L}/u.test(v)) return '';
+  return v;
 }
 async function acceptSpecies(id, corrected) {
   const sc = S.scan; const pred = sc.fused && sc.fused.list[0] ? sc.fused.list[0].id : null;
@@ -6267,6 +6549,8 @@ function bindRegisterForm() {
     const len = parseFloat($('#rf-len').value);
     if (!len || len <= 0) { err.textContent = t('reg_err_len'); err.hidden = false; $('#rf-len').focus(); return; }
     const sp = SPI[sc.chosen];
+    // no fish anyone lands is longer than 6 m, and one we don't know (typed in) over 3 m isn't believable either
+    if (len > 600 || (!sp && len > 300)) { err.textContent = t('reg_err_toobig_any', { n: sp ? 600 : 300 }); err.hidden = false; $('#rf-len').focus(); return; }
     const dtv = $('#rf-dt').value; const ts = dtv ? new Date(dtv).getTime() : nowMs();
     // a length far beyond the species record can't be real (the server refuses it too); past the record a person checks it
     if (sp && len > sp.X * 1.3) { err.textContent = t('reg_err_toobig', { n: Math.round(sp.X), name: spName(sp) }); err.hidden = false; $('#rf-len').focus(); return; }
@@ -6465,10 +6749,10 @@ VIEWS.rank = {
       ${rk.scope === 'FR' && !frLists().friends.length ? `
       <div class="empty card big">${icon('users', 'big')}<h2>${t('fr_rank_empty')}</h2><p class="muted">${t('fr_empty_sub')}</p><a class="btn btn-primary" href="#friends">${icon('user-plus')}${t('fr_find_cta')}</a></div>` : ranked.length ? `
       <div class="podium">${[1, 0, 2].map(i => podium[i] ? `<button class="pod pod-${i + 1}" data-seauid="${podium[i].uid}">
-        <span class="pod-medal num">${i + 1}</span>${avatar(podium[i].a, 56)}<span class="pod-nick">${nickHTML(podium[i].a)}${teamTag(podium[i].uid)}</span><span class="muted small">${flag(podium[i].a.cc)} ${esc(ccName(podium[i].a.cc || 'KR'))}</span><span class="num pod-val">${fmtVal(podium[i].val)}</span>
+        <span class="pod-medal num">${i + 1}</span>${avatar(podium[i].a, 56)}<span class="pod-nick">${nickHTML(podium[i].a)}${teamTag(podium[i].uid)}</span><span class="pod-lv">${lvMini(podium[i].a, podium[i].uid)}</span><span class="muted small">${flag(podium[i].a.cc)} ${esc(ccName(podium[i].a.cc || 'KR'))}</span><span class="num pod-val">${fmtVal(podium[i].val)}</span>
         ${podium[i].best ? `<img src="${FD.thumb(SPI[podium[i].best.sp] || SP[0], 120, 66)}" alt="" class="pod-fish">` : ''}</button>` : `<div class="pod pod-empty pod-${i + 1}"></div>`).join('')}</div>
       <div class="lb card"><table><thead><tr><th>#</th><th>${t('angler')}</th><th class="hide-s">${t('best_catch')}</th><th class="r">${t('cat_' + rk.cat)}</th></tr></thead><tbody>
-        ${rows.map(r => `<tr class="${r.uid === (S.uid || 'local') ? 'me' : ''}" data-seauid="${r.uid}"><td class="num">${r.rank || '—'}</td><td><span class="lb-who">${avatar(r.a, 30)}${nickHTML(r.a)}${teamTag(r.uid)} <span class="muted">${flag(r.a.cc)}</span>${r.local ? `<span class="chip chip-local">${t('st_local')}</span>` : ''}</span></td><td class="hide-s">${r.best ? `${esc(nameOf(r.best.sp))} <span class="muted">${lenFmt(r.best.len)}</span>` : '—'}</td><td class="r num">${fmtVal(r.val)}</td></tr>`).join('')}
+        ${rows.map(r => `<tr class="${r.uid === (S.uid || 'local') ? 'me' : ''}" data-seauid="${r.uid}"><td class="num">${r.rank || '—'}</td><td><span class="lb-who">${avatar(r.a, 30)}${nickHTML(r.a)}${lvMini(r.a, r.uid)}${teamTag(r.uid)} <span class="muted">${flag(r.a.cc)}</span>${r.local ? `<span class="chip chip-local">${t('st_local')}</span>` : ''}</span></td><td class="hide-s">${r.best ? `${esc(nameOf(r.best.sp))} <span class="muted">${lenFmt(r.best.len)}</span>` : '—'}</td><td class="r num">${fmtVal(r.val)}</td></tr>`).join('')}
       </tbody></table></div>` : `
       <div class="empty card big">
         <div class="empty-art"><img src="${FD.thumb(SPI[feat[0]], 260, 140)}" alt=""></div>
@@ -6502,7 +6786,7 @@ function frBtns(uid, rel, opt = {}) {
 }
 function frRow(row, rel, sub) {
   const { uid, a } = row;
-  return `<li class="fr-row"><button class="fr-who" data-seauid="${esc(uid)}">${avatar(a, 44)}<span class="fr-txt"><span class="fr-name">${nickHTML(a)} <span class="fr-flag">${flag(a.cc)}</span></span><span class="muted small">${sub}</span></span></button><span class="fr-acts">${frBtns(uid, rel)}</span></li>`;
+  return `<li class="fr-row"><button class="fr-who" data-seauid="${esc(uid)}">${avatar(a, 44)}<span class="fr-txt"><span class="fr-name">${nickHTML(a)}${lvMini(a, uid)} <span class="fr-flag">${flag(a.cc)}</span></span><span class="muted small">${sub}</span></span></button><span class="fr-acts">${frBtns(uid, rel)}</span></li>`;
 }
 function frLastLine(uid, a) { const c = lastCatch(uid, a); return c ? `${esc(nameOf(c.sp))} ${lenFmt(c.len)} · ${ago(c.at || c.ts)}` : t('fr_no_catch'); }
 VIEWS.friends = {
@@ -6676,7 +6960,7 @@ VIEWS.sea = {
   },
   catchesHTML(cs, uid) {
     if (!cs.length) return `<div class="empty"><p class="muted">${t('no_catches')}</p>${!uid ? `<a class="btn btn-primary btn-sm" href="#scan">${t('cta_scan')}</a>` : ''}</div>`;
-    return `<div class="catch-grid">${cs.slice().sort((a, b) => b.ts - a.ts).map(c => `<button class="catch-card" data-catch="${uid || S.uid || 'local'}|${c.id}"><span class="cc-ph" data-ph="${uid || S.uid || 'local'}|${c.id}"><img src="${FD.thumb(SPI[c.sp] || SP[0], 200, 110)}" alt=""></span><span class="cc-txt"><b>${esc(nameOf(c.sp))}</b> <span class="num">${lenFmt(c.len)}</span><br><span class="muted small">${fmtDate(c.ts)}${c.past ? ' · ' + t('past_short') : ''}</span></span>${statusChip(catchState(uid || S.uid || 'local', c), c.tr)}</button>`).join('')}</div>`;
+    return `<div class="catch-grid">${cs.slice().sort((a, b) => b.ts - a.ts).map(c => `<button class="catch-card" data-catch="${uid || S.uid || 'local'}|${c.id}"><span class="cc-ph" data-ph="${uid || S.uid || 'local'}|${c.id}"><img src="${FD.thumb(SPI[c.sp] || SP[0], 200, 110)}" alt=""></span><span class="cc-txt"><b>${esc(nameOf(c.sp))}</b> <span class="num">${lenFmt(c.len)}</span><br><span class="muted small">${fmtDate(c.ts)}${c.past ? ' · ' + t('past_short') : ''}</span></span>${statusChip(catchState(uid || S.uid || 'local', c), c.tr, logOnly(uid || S.uid || 'local', c))}</button>`).join('')}</div>`;
   },
   dexHTML(cs) {
     const got = new Set(cs.map(c => c.sp));
@@ -6932,6 +7216,7 @@ VIEWS.prefs = {
     if (fo) fo.onchange = async () => { S.me.frOff = !fo.checked; await store.saveMe(); toast(t('saved')); };
     $('#pf-save', el).onclick = async () => {
       const f = readProfileForm(el);
+      if (nickRefused(f, el)) return; delete f.bad;
       S.me = Object.assign({ v: 1, joined: nowMs(), catches: [], decor: { theme: 'th_dawn', items: ['dc_weed', 'dc_rock', 'dc_buoy'], fx: [] }, flair: {} }, S.me || {}, f);
       if (f.lang !== S.lang) setLang(f.lang);
       await store.saveMe(); toast(t('saved')); rerender();
@@ -6962,6 +7247,10 @@ VIEWS.admin = {
     <div class="page admin">
       <header class="page-head"><h1>${t('admin_title')}</h1><p class="lede">${t('admin_sub')}</p></header>
       <div class="stats4 card"><div><span class="num">${S.anglers.size}</span><span>${t('ad_users')}</span></div><div><span class="num">${nCatch}</span><span>${t('catches')}</span></div><div><span class="num">${learnStats().total}</span><span>${t('learn_n')}</span></div><div><span class="num">${orders.filter(x => x.st === 'wait').length}</span><span>${t('ad_pending')}</span></div></div>
+      <section class="card ad-notice"><h2 class="h3">${icon('megaphone')}${t('ad_notice')}</h2><p class="hint">${t('ad_notice_hint')}</p>
+        <div class="field"><textarea id="ad-notice" rows="3" maxlength="400" placeholder="${esc(t('ad_notice_ph'))}">${esc((noticeOf() || {}).t || '')}</textarea></div>
+        <div class="actions"><button class="btn btn-primary" id="ad-notice-go">${icon('megaphone')}${t('ad_notice_go')}</button>${noticeOf() ? `<button class="btn btn-ghost" id="ad-notice-off">${t('ad_notice_off')}</button>` : ''}</div>
+      </section>
       <section class="card"><h2 class="h3">${icon('heart')}${t('ad_pay')}</h2>
         <div class="row2">
           <div class="field"><label for="ad-toss">${t('ad_toss')}</label><input id="ad-toss" value="${esc(cfg.tossId || '')}" placeholder="toss.me/___"></div>
@@ -6994,8 +7283,20 @@ VIEWS.admin = {
       const toss = $('#ad-toss', el).value.trim().replace(/^https?:\/\/toss\.me\//, '').replace(/\/.*$/, '');
       const kakao = $('#ad-kakao', el).value.trim();
       if (kakao && !/^https:\/\/qr\.kakaopay\.com\//.test(kakao)) { toast(t('ad_kakao_bad'), 'warn'); return; }
-      await store.saveAdmin('config', Object.assign({}, cfg, { tossId: toss, kakaoUrl: kakao, kakaoAmt: $('#ad-kamt', el).checked }));
+      await store.saveAdmin('config', Object.assign({}, S.admin.config || {}, { tossId: toss, kakaoUrl: kakao, kakaoAmt: $('#ad-kamt', el).checked }));
       toast(t('saved'));
+    };
+    $('#ad-notice-go', el).onclick = async () => {
+      const v = $('#ad-notice', el).value.trim().slice(0, 400);
+      if (!v) { toast(t('ad_notice_empty'), 'warn'); return; }
+      if (await store.saveAdmin('config', Object.assign({}, S.admin.config || {}, { notice: { id: rid(8), t: v, ts: nowMs() } }))) toast(t('ad_notice_done'));
+      rerender();
+    };
+    const nOff = $('#ad-notice-off', el);
+    if (nOff) nOff.onclick = async () => {
+      const cur = Object.assign({}, S.admin.config || {}); delete cur.notice;
+      if (await store.saveAdmin('config', cur)) toast(t('ad_notice_removed'));
+      rerender();
     };
     const idr = $('#ad-idreset', el);
     if (idr) idr.onsubmit = async e => {
@@ -7265,7 +7566,7 @@ async function loadAvatarPhoto(uid, ts) {
   if (S.photoCache.has(key)) return S.photoCache.get(key);
   let v = null;
   if (uid === myId() && S._myPic && S._myPic.ts === +ts) v = S._myPic.t;
-  else if (S.db) { try { const d = await S.db.doc('anglers/' + uid + '/photos/_pic').get(); v = d.exists ? d.data().t : null; } catch (e) { v = null; } }
+  else if (S.db) return cachedPhoto(key, async () => { const d = await S.db.doc('anglers/' + uid + '/photos/_pic').get(); return d.exists ? d.data().t : null; });
   else if (uid === myId()) { const ph = lsGet('photos', {}); v = ph._pic || null; }
   S.photoCache.set(key, v); return v;
 }
@@ -7403,7 +7704,7 @@ function bdCard(p) {
       <span class="bd-meta"><span class="chip chip-cat cat-${esc(p.cat)}">${t('bdc_' + p.cat)}</span>${p.hidden ? `<span class="chip chip-closed">${t('bd_hidden_chip')}</span>` : ''}${S.isOwner && p.reps ? `<span class="chip chip-review">${icon('warn')}${p.reps}</span>` : ''}</span>
       <b class="bd-title">${esc(p.title)}</b>
       <span class="bd-ex">${esc(String(p.body || '').replace(/\s+/g, ' ').slice(0, 140))}</span>
-      <span class="bd-by">${avatar(a, 22)}${nickHTML(a)}${teamTag(p.uid)}<span class="muted"> · ${ago(p.ts)}</span></span>
+      <span class="bd-by">${avatar(a, 22)}${nickHTML(a)}${lvMini(a, p.uid)}${teamTag(p.uid)}<span class="muted"> · ${ago(p.ts)}</span></span>
     </span>
     ${c ? `<span class="bd-ph" data-ph="${esc(p.uid)}|${esc(c.id)}"><img src="${FD.thumb(SPI[c.sp] || SP[0], 160, 90)}" alt=""></span>` : ''}
     <span class="bd-stats"><span class="${p.likes.has(myId()) ? 'on' : ''}">${icon('heart')}${p.likes.size}</span><span>${icon('chat')}${n}</span></span>
@@ -7420,6 +7721,7 @@ VIEWS.board = {
         <button class="btn btn-primary" data-bd="write">${icon('plus')}${t('bd_write')}</button>
       </header>
       ${shared ? '' : `<p class="note">${icon('info')} ${t('bd_local_note')}</p>`}
+      ${noticeCardHTML()}
       <div class="bd-bar">
         <div class="chip-row" role="group" aria-label="${esc(t('bd_f_cat'))}">${['all', ...BD_CATS].map(c => `<button class="chip chip-tab" aria-pressed="${bd.cat === c}" data-bdcat="${c}">${t('bdc_' + c)}</button>`).join('')}</div>
         <div class="bd-tools">
@@ -7496,7 +7798,7 @@ function openPost(key) {
       <p class="eyebrow"><span class="chip chip-cat cat-${esc(p.cat)}">${t('bdc_' + p.cat)}</span> ${fmtDT(p.ts)}${p.upd && p.upd > p.ts + 60000 ? ' · ' + t('bd_edited') : ''}</p>
       <h2>${esc(p.title)}</h2>
       ${p.hidden ? `<p class="note">${icon('warn')} ${t('bd_hidden_note')}</p>` : ''}
-      <button class="post-by" data-seauid="${esc(p.uid)}">${avatar(a, 34)}<span>${nickHTML(a)}${teamTag(p.uid)} <span class="muted">${flag(a.cc)} ${esc(regionName(p.rg || a.home || 'KS'))}</span></span></button>
+      <button class="post-by" data-seauid="${esc(p.uid)}">${avatar(a, 34)}<span>${nickHTML(a)}${lvMini(a, p.uid)}${teamTag(p.uid)} <span class="muted">${flag(a.cc)} ${esc(regionName(p.rg || a.home || 'KS'))}</span></span></button>
       <div class="post-body">${esc(p.body)}</div>
       ${catchMini(p.uid, c)}
       <div class="post-acts">
@@ -7506,7 +7808,7 @@ function openPost(key) {
       </div>
       <section class="cmts">
         <h3 class="h4">${icon('chat')}${t('bd_cmts', { n: cmts.filter(x => !x.hidden).length })}</h3>
-        ${cmts.length ? `<ul class="cmt-list">${cmts.map(x => { const ca = anglerOf(x.uid) || { nick: '?' }; return `<li class="${x.hidden ? 'is-hidden' : ''}"><button class="cmt-who" data-seauid="${esc(x.uid)}">${avatar(ca, 26)}</button><div><p class="cmt-head">${nickHTML(ca)}${teamTag(x.uid)} <span class="muted small">${ago(x.ts)}</span>${x.uid === myId() ? `<button class="link small" data-cmtdel="${esc(x.id)}">${t('delete')}</button>` : ''}${S.isOwner ? `<button class="link small" data-cmthide="${esc(x.key)}">${t(x.hidden ? 'bd_unhide' : 'bd_hide')}</button>` : ''}</p><p class="cmt-body">${esc(x.body)}</p></div></li>`; }).join('')}</ul>` : `<p class="muted small">${t('bd_cmt_empty')}</p>`}
+        ${cmts.length ? `<ul class="cmt-list">${cmts.map(x => { const ca = anglerOf(x.uid) || { nick: '?' }; return `<li class="${x.hidden ? 'is-hidden' : ''}"><button class="cmt-who" data-seauid="${esc(x.uid)}">${avatar(ca, 26)}</button><div><p class="cmt-head">${nickHTML(ca)}${lvMini(ca, x.uid)}${teamTag(x.uid)} <span class="muted small">${ago(x.ts)}</span>${x.uid === myId() ? `<button class="link small" data-cmtdel="${esc(x.id)}">${t('delete')}</button>` : ''}${S.isOwner ? `<button class="link small" data-cmthide="${esc(x.key)}">${t(x.hidden ? 'bd_unhide' : 'bd_hide')}</button>` : ''}</p><p class="cmt-body">${esc(x.body)}</p></div></li>`; }).join('')}</ul>` : `<p class="muted small">${t('bd_cmt_empty')}</p>`}
         <form class="cmt-form" id="pc-form" novalidate><textarea id="pc-body" rows="2" maxlength="${BD_MAX.cmt}" placeholder="${esc(t('bd_cmt_ph'))}">${esc(draft)}</textarea><button class="btn btn-primary btn-sm" type="submit">${icon('send')}${t('bd_cmt_send')}</button></form>
       </section>`;
     hydratePhotos(box);
@@ -7623,7 +7925,7 @@ function openTeam(tid) {
       <div class="tm-mine-head">${teamEmblem(tm, 72)}<div><p class="eyebrow">${t(tm.open ? 'tm_open' : 'tm_closed')} · ${esc(regionName(tm.home || 'KS'))}</p><h2>${esc(tm.name)} <span class="team-tag" style="--tc:${esc(tm.color)}">${esc(tm.tag)}</span></h2>
         <p class="muted">${t('tm_members_n', { n: e.members.length, max: TEAM_MAX })} · ${t('tm_pts', { n: fmtN(e.pts) })}${e.rank ? ' · ' + t('tm_rank', { n: e.rank }) : ''}</p></div></div>
       ${tm.intro ? `<p class="tm-intro">${esc(tm.intro)}</p>` : ''}
-      <ul class="fr-list tm-members">${members.map(m => `<li class="fr-row"><button class="fr-who" data-seauid="${esc(m.uid)}">${avatar(m.a, 36)}<span class="fr-txt"><span class="fr-name">${m.uid === tid ? '👑 ' : ''}${nickHTML(m.a)} <span class="fr-flag">${flag(m.a.cc)}</span></span><span class="muted small">${t('tm_pts', { n: fmtN(m.pts) })}</span></span></button>${leaderView && m.uid !== tid ? `<span class="fr-acts"><button class="btn btn-ghost btn-sm" data-tmkick="${esc(m.uid)}">${t('tm_kick')}</button></span>` : ''}</li>`).join('')}</ul>
+      <ul class="fr-list tm-members">${members.map(m => `<li class="fr-row"><button class="fr-who" data-seauid="${esc(m.uid)}">${avatar(m.a, 36)}<span class="fr-txt"><span class="fr-name">${m.uid === tid ? '👑 ' : ''}${nickHTML(m.a)}${lvMini(m.a, m.uid)} <span class="fr-flag">${flag(m.a.cc)}</span></span><span class="muted small">${t('tm_pts', { n: fmtN(m.pts) })}</span></span></button>${leaderView && m.uid !== tid ? `<span class="fr-acts"><button class="btn btn-ghost btn-sm" data-tmkick="${esc(m.uid)}">${t('tm_kick')}</button></span>` : ''}</li>`).join('')}</ul>
       <div class="actions">${inThis ? (leaderView ? `<button class="btn btn-line" data-tmedit="1">${t('tm_edit')}</button><button class="btn btn-ghost" id="tm-disband">${t('tm_disband')}</button>` : `<button class="btn btn-ghost" data-tmleave="1">${t(mine.pending ? 'tm_cancel_req' : 'tm_leave')}</button>`) : e.members.length >= TEAM_MAX ? `<span class="chip chip-local">${t('tm_full')}</span>` : `<button class="btn btn-primary" data-tmjoin="${esc(tid)}">${t(tm.open ? 'tm_join' : 'tm_request')}</button>`}</div>
     </div>`, { label: tm.name });
   const dis = $('#tm-disband', w); if (dis) dis.onclick = async () => { if (!armed(dis, t('tm_disband_confirm'))) return; await store.saveTeam(null); closeModal(w); toast(t('tm_disbanded')); rerender(); };
@@ -7899,6 +8201,7 @@ document.addEventListener('click', e => {
   const tgt = e.target;
   const inModal = tgt.closest('.modal-wrap');
   const cp = tgt.closest('[data-copy]'); if (cp) { e.preventDefault(); copyText(cp.dataset.copy, cp); return; }
+  const sh = tgt.closest('[data-share]'); if (sh) { e.preventDefault(); const i = sh.dataset.share.indexOf('|'); shareCatch(sh.dataset.share.slice(0, i), sh.dataset.share.slice(i + 1), sh); return; }
   const fr = tgt.closest('[data-fr]'); if (fr) { const i = fr.dataset.fr.indexOf('|'); friendAction(fr.dataset.fr.slice(0, i), fr.dataset.fr.slice(i + 1), fr); return; }
   if (inModal) { const su = tgt.closest('[data-seauid]'); if (su) { closeModal(inModal); openSeaOf(su.dataset.seauid); return; } }
   if (inModal) {
@@ -7925,6 +8228,7 @@ document.addEventListener('click', e => {
     else if (a === 'preview-off') { S.preview = null; rerender(); }
     else if (a === 'rec-off') { S.recDismiss = true; rerender(); }
     else if (a === 'idtip-off') { lsSet('idTipOff', 1); rerender(); }
+    else if (a === 'notice-x') { const n = noticeOf(); if (n) lsSet('noticeX', n.id); const bar = act.closest('.notice-bar'); if (bar) bar.remove(); }
     else if (a === 'theme-cycle') setTheme(S.theme === 'system' ? 'dark' : S.theme === 'dark' ? 'light' : 'system');
     return;
   }
@@ -7992,7 +8296,7 @@ matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', () => { 
   S.unit = lsGet('unit', 'cm');
   S.me = lsGet('me', null);
   onHash();
-  store.init().then(() => { updateStatic(); updateShell(); if (S.route === 'admin' && !S.isOwner) location.hash = 'home'; });
+  store.init().then(() => { updateStatic(); updateShell(); if (S.route === 'admin' && !S.isOwner) location.hash = 'home'; setTimeout(maybeWhatsNew, 2500); });
   const idle = window.requestIdleCallback || (f => setTimeout(f, 1200));
   idle(() => { GEO.loadEnv(); });
 })();

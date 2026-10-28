@@ -12,9 +12,43 @@ const nowMs = () => Date.now();
 function tagUid(o, id) { if (o && typeof o === 'object' && id) { try { Object.defineProperty(o, '_uid', { value: id, enumerable: false, configurable: true, writable: true }); } catch (e) { } } return o; }
 function icon(id, cls = '') { return `<svg class="ic ${cls}" aria-hidden="true"><use href="#i-${id}"/></svg>`; }
 
+/* Photos already downloaded stay on this device (IndexedDB), so lists don't fetch them again on every visit.
+   A catch photo never changes once saved, and a profile photo is keyed by its upload time, so nothing goes stale.
+   Keeps the newest 400; if the browser blocks storage, everything still works without it. */
+const PHDB = (() => {
+  const MAX = 400;
+  let dbp = null;
+  const open = () => dbp || (dbp = new Promise(res => {
+    let done = false; const fin = v => { if (!done) { done = true; res(v); } };
+    try {
+      if (!window.indexedDB) return fin(null);
+      const r = indexedDB.open('zz-photos', 1);
+      r.onupgradeneeded = () => { try { r.result.createObjectStore('p'); } catch (e) { } };
+      r.onsuccess = () => fin(r.result); r.onerror = () => fin(null); r.onblocked = () => fin(null);
+      setTimeout(() => fin(null), 2500);
+    } catch (e) { fin(null); }
+  }));
+  const req = (mode, fn) => open().then(db => db ? new Promise(res => {
+    try { const q = fn(db.transaction('p', mode).objectStore('p')); q.onsuccess = () => res(q.result); q.onerror = () => res(undefined); } catch (e) { res(undefined); }
+  }) : undefined);
+  return {
+    get: k => req('readonly', s => s.get(k)).then(v => (typeof v === 'string' ? v : null)),
+    put(k, v) {
+      if (typeof v !== 'string' || !v.startsWith('data:image/') || v.length > 900000) return;
+      req('readwrite', s => s.put(v, k));
+      const keys = lsGet('phk', []).filter(x => x !== k); keys.push(k);
+      const drop = keys.length > MAX ? keys.splice(0, keys.length - MAX) : [];
+      lsSet('phk', keys);
+      for (const d of drop) req('readwrite', s => s.delete(d));
+    },
+    del(k) { req('readwrite', s => s.delete(k)); lsSet('phk', lsGet('phk', []).filter(x => x !== k)); }
+  };
+})();
+
 /* ===== Constants ===== */
 /* App name lives in build.py (BRAND) so a rename is a one-line change */
 const APP_NAME = ['__APP_KO__', '__APP_EN__', '__APP_EN__', '__APP_EN__'];
+const SITE_URL = '__SITE__';
 const DEV = { name: '김재웅', kakaoId: 'rlawodnd12', kakaoUrl: 'https://qr.kakao.com/talk/p1SyBTckPfcUiMyir.g0YMNOWaQ-', kakaoPayUrl: 'https://qr.kakaopay.com/FJ3WJxUGJfa07228' };
 const EA_CC = ['KR', 'JP', 'CN', 'TW', 'HK', 'MO', 'MN'];
 const COUNTRIES = ['KR', 'JP', 'CN', 'TW', 'HK', 'MO', 'MN', 'US', 'CA', 'MX', 'BR', 'AR', 'CL', 'PE', 'CO', 'GB', 'IE', 'FR', 'DE', 'ES', 'PT', 'IT', 'NL', 'BE', 'CH', 'AT', 'SE', 'NO', 'FI', 'DK', 'IS', 'PL', 'CZ', 'HU', 'GR', 'TR', 'RU', 'UA', 'IL', 'AE', 'SA', 'EG', 'ZA', 'KE', 'MA', 'IN', 'LK', 'BD', 'TH', 'VN', 'MY', 'SG', 'ID', 'PH', 'KH', 'MM', 'AU', 'NZ', 'FJ'];
@@ -70,9 +104,23 @@ const S = {
   admin: { config: {}, grants: {}, verdicts: {}, mod: {} },
   myOrders: [], myLabels: [], mySuggest: [],
   allOrders: new Map(), allSuggest: new Map(),
-  photoCache: new Map(),
+  photoCache: new Map(), photoWait: new Map(),
   route: 'home', viewUid: null, dataVer: 0
 };
+/* Memory first, then this device's photo store, then the server; one request per photo even if asked for twice at once */
+function cachedPhoto(key, fetcher) {
+  if (S.photoCache.has(key)) return Promise.resolve(S.photoCache.get(key));
+  if (S.photoWait.has(key)) return S.photoWait.get(key);
+  const p = (async () => {
+    let v = await PHDB.get(key), net = false;
+    if (!v) { try { v = await fetcher(); net = true; } catch (e) { S.photoWait.delete(key); return null; } } // a network error is not "no photo"
+    if (v && net) PHDB.put(key, v);
+    S.photoCache.set(key, v || null); S.photoWait.delete(key);
+    return v || null;
+  })();
+  S.photoWait.set(key, p);
+  return p;
+}
 
 /* ===== Store: shared db with local fallback ===== */
 const store = (() => {
@@ -179,7 +227,7 @@ const store = (() => {
     },
     async savePhoto(cid, data) {
       S.photoCache.set((S.uid || 'local') + '/' + cid, data.t);
-      if (S.mode === 'shared') return safeWrite('anglers/' + S.uid + '/photos/' + cid, data, null);
+      if (S.mode === 'shared') { if (cid !== '_pic') PHDB.put(S.uid + '/' + cid, data.t); return safeWrite('anglers/' + S.uid + '/photos/' + cid, data, null); }
       const ph = lsGet('photos', {}); ph[cid] = data.t; const keys = Object.keys(ph); if (keys.length > 40) delete ph[keys[0]]; lsSet('photos', ph);
     },
     async getPhoto(uid, cid) {
@@ -187,9 +235,12 @@ const store = (() => {
       if (S.photoCache.has(key)) return S.photoCache.get(key);
       if (!uid || uid === 'local') { const ph = lsGet('photos', {}); return ph[cid] || null; }
       if (!S.db) return null;
-      try { const d = await S.db.doc('anglers/' + uid + '/photos/' + cid).get(); const v = d.exists ? d.data().t : null; S.photoCache.set(key, v); return v; } catch (e) { return null; }
+      return cachedPhoto(key, async () => { const d = await S.db.doc('anglers/' + uid + '/photos/' + cid).get(); return d.exists ? d.data().t : null; });
     },
-    async deletePhoto(cid) { if (S.mode === 'shared' && S.db) { try { await S.db.doc('anglers/' + S.uid + '/photos/' + cid).delete(); } catch (e) { } } else { const ph = lsGet('photos', {}); delete ph[cid]; lsSet('photos', ph); } },
+    async deletePhoto(cid) {
+      S.photoCache.delete((S.uid || 'local') + '/' + cid);
+      if (S.mode === 'shared' && S.db) { PHDB.del(S.uid + '/' + cid); try { await S.db.doc('anglers/' + S.uid + '/photos/' + cid).delete(); } catch (e) { } } else { const ph = lsGet('photos', {}); delete ph[cid]; lsSet('photos', ph); }
+    },
     async addLabel(l) {
       S.myLabels.push(l); if (S.myLabels.length > 400) S.myLabels.shift();
       lsSet('labels', S.myLabels);
@@ -360,6 +411,24 @@ function lvInfo(a, uid) {
 }
 function myLevel() { return lvInfo(S.me, myId()).L; }
 function lvChip(a, uid) { const i = lvInfo(a, uid); return `<span class="lv-chip" title="${esc(i.title)}">Lv.${i.L}</span>`; }
+/* small level tag next to a name (board, rankings, friends) */
+function lvMini(a, uid) { if (!a || !a.nick || !uid) return ''; const i = lvInfo(a, uid); return `<span class="lv-mini" title="${esc(i.title)}">Lv.${i.L}</span>`; }
+
+/* Operator notice: one short message the operator posts from the admin page (kept in the admin `config` doc,
+   which only the operator can write). Shown on the home page (each person can close it) and pinned on the board. */
+function noticeOf() {
+  const n = S.admin.config && S.admin.config.notice;
+  if (!n || typeof n.t !== 'string' || !n.t.trim() || !n.id) return null;
+  return { id: String(n.id).slice(0, 16), t: n.t.trim().slice(0, 400), ts: +n.ts || 0 };
+}
+function noticeBarHTML() {
+  const n = noticeOf(); if (!n || lsGet('noticeX', '') === n.id) return '';
+  return `<div class="notice-bar" role="status">${icon('megaphone')}<p><b>${t('notice_label')}</b> ${esc(n.t)}</p><button class="notice-x" data-act="notice-x" aria-label="${esc(t('close'))}">${icon('x')}</button></div>`;
+}
+function noticeCardHTML() {
+  const n = noticeOf(); if (!n) return '';
+  return `<div class="bd-notice">${icon('megaphone')}<div><p class="bd-notice-h"><b>${t('notice_label')}</b><span class="muted small">${n.ts ? fmtDate(n.ts) : ''}</span></p><p class="bd-notice-t">${esc(n.t)}</p></div></div>`;
+}
 
 /* Leaderboard */
 function periodStart(period, now = new Date()) {
