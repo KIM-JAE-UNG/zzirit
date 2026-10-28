@@ -1,0 +1,16 @@
+{
+  "name": "zzirit-tests",
+  "private": true,
+  "description": "Checks for the ZZIRIT app: database rules, the website (fake Supabase) and the Claude page (fake Claude runtime)",
+  "scripts": {
+    "test": "bash run-all.sh",
+    "db": "node db/rules.test.mjs",
+    "web": "node web/run.js",
+    "claude": "node claude/run.js"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "0.3.15",
+    "leaflet": "1.9.4",
+    "qrcode-generator": "1.4.4"
+  }
+}

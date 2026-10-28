@@ -5,3 +5,6 @@ __pycache__/
 .env
 .env.*
 supabase/.temp/
+tests/node_modules/
+tests/out/
+tests/out-*
