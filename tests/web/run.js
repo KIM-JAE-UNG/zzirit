@@ -18,6 +18,8 @@ const AI_NOFISH = { fish_visible: false, candidates: [], other_en: '', other_sci
   try {
   const mk = async (name, opts = {}) => {
     const ctx = await b.newContext(Object.assign({ viewport: { width: 1440, height: 900 }, locale: 'ko-KR' }, opts.ctx || {}));
+    // the first-visit sign-up dialog is tested on its own; everywhere else it would get in the way
+    if (!opts.welcome) await ctx.addInitScript(() => { try { localStorage.setItem('eosin.welcomed', '1'); } catch (e) { } });
     await ctx.route('https://cdn.jsdelivr.net/npm/@supabase/**', r => r.fulfill({ contentType: 'text/javascript', body: FAKE }));
     await ctx.route('https://cdn.jsdelivr.net/npm/qrcode-generator**', r => r.fulfill({ contentType: 'text/javascript', body: QRLIB }));
     await ctx.route('https://cdnjs.cloudflare.com/**', r => r.fulfill({ contentType: 'text/javascript', body: LEAF }));
@@ -43,7 +45,7 @@ const AI_NOFISH = { fish_visible: false, candidates: [], other_en: '', other_sci
   const dump = async () => (await fetch('http://127.0.0.1:8768/__sb/dump')).json();
   const toasts = p => p.$$eval('.toast', ns => ns.map(n => n.textContent));
   const go = async (p, h, w = 900) => { await p.evaluate(x => { location.hash = x; }, h); await p.waitForTimeout(w); };
-  const onboard = async (p, nick) => { await go(p, 'home'); await p.click('[data-act="onboard"]'); await p.waitForTimeout(300); await p.fill('#pf-nick', nick); await p.selectOption('#pf-home', 'KS'); await p.click('#onb-go'); await p.waitForTimeout(1500); };
+  const onboard = async (p, nick) => { await go(p, 'home'); await p.click('[data-act="onboard"]:visible'); await p.waitForTimeout(400); await p.fill('#pf-nick', nick); await p.selectOption('#pf-home', 'KS'); if (await p.$('#onb-noid')) await p.click('#onb-noid'); else await p.click('#onb-go'); await p.waitForTimeout(1500); };
   const shot = (p, n, full) => p.screenshot({ path: OUT + n + '.png', fullPage: !!full });
   const closeModals = async p => { for (let i = 0; i < 5; i++) { const xs = await p.$$('.modal-wrap.in .modal-x'); if (!xs.length) break; await xs[xs.length - 1].click(); await p.waitForTimeout(320); } };
   const scan = async (p, mode = 'scan') => { await closeModals(p); await go(p, mode, 900); if (!(await p.$('#file-pick'))) { await p.evaluate(() => { if (S.scan) S.scan.phase = 'idle'; renderScanWork(); }); await p.waitForTimeout(300); } if (!(await p.$('#file-pick'))) { logs.push('scan page html: ' + (await p.$eval('#v-scan', n => n.innerText.slice(0, 300)).catch(() => '?'))); } await p.setInputFiles('#file-pick', PHOTOS[photoN++ % PHOTOS.length], { timeout: 5000 }); await p.waitForTimeout(2600); };
@@ -198,15 +200,16 @@ const AI_NOFISH = { fish_visible: false, candidates: [], other_en: '', other_sci
   /* ---------- login ID: A makes one, a new device G signs in with it ---------- */
   await go(A, 'prefs', 1200);
   await A.click('#id-card [data-id="create"]'); await A.waitForTimeout(400);
-  await A.fill('#idc-name', 'busan_ann'); await A.fill('#idc-pass', 'pw1234'); await A.fill('#idc-pass2', 'pw1234');
-  await A.click('#idc-go'); await A.waitForTimeout(1500);
+  ok(!!(await A.$('.auth #au-id')) && !(await A.$('.auth #pf-nick')), 'adding an ID keeps the profile (no nickname form)');
+  await A.fill('#au-id', 'busan_ann'); await A.fill('#au-pw', 'pw1234'); await A.fill('#au-pw2', 'pw1234');
+  await A.click('#onb-go'); await A.waitForTimeout(1500);
   ok(await A.$eval('#id-card', n => /busan_ann/.test(n.textContent)), 'ID created and shown in settings');
   await shot(A, 'i01_id_card');
   const G = await mk('G');
   await G.evaluate(() => lsSet('wn', WHATS_NEW)); // this device signs in to an existing account: skip the update notes here
-  await go(G, 'home'); await G.click('[data-act="onboard"]'); await G.waitForTimeout(300);
-  ok(!!(await G.$('#onb-login')), 'first-run dialog offers "I already have an ID"');
-  await G.click('#onb-login'); await G.waitForTimeout(400);
+  await go(G, 'home'); await G.click('[data-act="onboard"]:visible'); await G.waitForTimeout(300);
+  ok(!!(await G.$('.auth [data-atab="login"]')), 'first-run dialog has a login tab');
+  await G.click('.auth [data-atab="login"]'); await G.waitForTimeout(400);
   await G.fill('#idl-name', 'busan_ann'); await G.fill('#idl-pass', 'wrong1'); await G.click('#idl-go'); await G.waitForTimeout(800);
   ok(await G.$eval('#idl-err', n => !n.hidden && n.textContent.length > 3), 'wrong password refused');
   await shot(G, 'i02_login');
@@ -356,6 +359,113 @@ const AI_NOFISH = { fish_visible: false, candidates: [], other_en: '', other_sci
   const ph2 = (await dump()).STATS.photoSelects;
   const feedImgs = await P.$$eval('.feed .feed-ph img', ns => ns.filter(n => /^data:image\/(jpeg|webp|png)/.test(n.src) && n.naturalWidth > 0).length);
   ok(ph2 === ph1 && feedImgs > 0, `photos come from this device on the second visit (requests ${ph1} → ${ph2}, shown ${feedImgs})`);
+
+  /* ---------- 2026-10-29: sign-up / login dialog, account card, lost sessions, operator help, fishing points ---------- */
+  // first visit: the sign-up dialog opens by itself
+  const N = await mk('N', { welcome: true });
+  await N.waitForTimeout(3800);
+  ok(!!(await N.$('.auth #au-id')) && !!(await N.$('.auth [data-atab="login"]')), 'first visit shows sign-up (with ID) and a login tab');
+  await shot(N, 'r01_signup');
+  const nId = await N.evaluate(() => S.uid);
+  await N.fill('#pf-nick', '새회원'); await N.fill('#au-id', 'ab'); await N.fill('#au-pw', 'pw1234'); await N.fill('#au-pw2', 'pw1234');
+  await N.click('#onb-go'); await N.waitForTimeout(700);
+  ok(await N.$eval('#au-err', n => !n.hidden && /3~20/.test(n.textContent)), 'a too-short ID is explained');
+  d = await dump(); ok(!d.T.anglers[nId], 'nothing saved while the form has a mistake');
+  await N.fill('#au-id', 'new_member'); await N.fill('#au-pw2', 'different'); await N.click('#onb-go'); await N.waitForTimeout(700);
+  ok(await N.$eval('#au-err', n => /비밀번호 확인/.test(n.textContent)), 'different passwords explained');
+  await N.fill('#au-pw2', 'pw1234'); await N.click('#onb-go'); await N.waitForTimeout(1600);
+  d = await dump(); ok(d.T.anglers[nId] && d.T.anglers[nId].data.nick === '새회원', 'profile saved');
+  ok(await N.evaluate(() => S.loginId === 'new_member'), 'ID made in the same step');
+  await N.reload(); await N.waitForTimeout(3800);
+  ok(!(await N.$('.auth')), 'the sign-up dialog does not come back');
+  await go(N, 'prefs', 1300);
+  ok(await N.$eval('.prefs .card', n => n.id === 'id-card'), 'settings start with the account');
+  ok(await N.$eval('#id-card', n => /new_member/.test(n.textContent) && /조과 0개/.test(n.textContent)), 'account card shows the ID and what is stored');
+  await shot(N, 'r02_account');
+  // log in on another device: what that device recorded joins the account
+  const N2 = await mk('N2');
+  await N2.evaluate(() => lsSet('wn', WHATS_NEW));
+  await onboard(N2, '폰기기');
+  await N2.evaluate(async () => { S.me.catches.push({ id: 'n2c1', sp: 'mejina', len: 31, ts: Date.now() - 3600e3, at: Date.now(), st: 'review', tr: 50 }); await store.saveMe(); });
+  await go(N2, 'prefs', 1300);
+  ok(await N2.$eval('#id-card .acct-state', n => /아이디가 없어요/.test(n.textContent)), 'without an ID the card says the account lives only in this browser');
+  await N2.click('#id-card [data-id="login"]'); await N2.waitForTimeout(500);
+  ok(await N2.$eval('.auth [data-atab="login"]', n => n.getAttribute('aria-pressed') === 'true'), 'login tab opens from settings');
+  ok(await N2.$eval('.auth [data-pane="login"] .note', n => /1/.test(n.textContent)).catch(() => false), 'login says this device\'s catch will join the account');
+  await N2.fill('#idl-name', 'new_member'); await N2.fill('#idl-pass', 'pw1234'); await N2.click('#idl-go'); await N2.waitForTimeout(3800);
+  ok(await N2.evaluate(id => S.uid === id, nId), 'logged in: the same account as the first device');
+  d = await dump(); ok(d.T.anglers[nId].data.catches.some(c => c.id === 'n2c1'), 'the other device\'s catch joined the account');
+  // a dropped sign-in (a server hiccup during a token refresh) comes back instead of a new empty account
+  await N.evaluate(() => { localStorage.removeItem('eosin.auth'); }); await N.reload(); await N.waitForTimeout(3200);
+  ok(await N.evaluate(id => S.uid === id && !!S.me && S.me.nick === '새회원', nId), 'a dropped session is restored from the saved copy');
+  // logging out really logs out
+  await go(N, 'prefs', 1200); await N.click('#id-card [data-id="logout"]'); await N.waitForTimeout(300); await N.click('#id-card [data-id="logout"]'); await N.waitForTimeout(3000);
+  ok(await N.evaluate(id => S.uid !== id && !(S.me && S.me.nick), nId), 'logout starts fresh (the saved copy is not reused)');
+
+  // operator: IDs in the user list, a recovery code, deleting
+  await go(A, 'admin', 1500); await A.evaluate(() => { S.adm.at = 0; adminLoad(); }); await A.waitForTimeout(1000);
+  ok(await A.$$eval('.ad-users .chip-id', ns => ns.some(n => /new_member/.test(n.textContent))), 'operator sees login IDs next to users');
+  const relinkBtn = await A.$(`[data-relink="${nId}"]`); ok(!!relinkBtn, 'recovery code button for a user');
+  await relinkBtn.click(); await A.waitForTimeout(900);
+  const rcode = await A.$eval('.relink .link-code b', n => n.textContent.replace('-', '')).catch(() => '');
+  ok(/^[A-Z2-9]{8}$/.test(rcode), 'recovery code shown: ' + rcode);
+  ok(await A.$eval('.relink textarea', (n, c) => n.value.includes(c.slice(0, 4)), rcode), 'a ready-to-send message includes the code');
+  await shot(A, 'r03_relink');
+  await closeModals(A);
+  const R = await mk('R'); await R.evaluate(() => lsSet('wn', WHATS_NEW));
+  await R.goto(BASE + '#link=' + rcode); await R.waitForTimeout(1800);
+  await R.click('#lk-go'); await R.waitForTimeout(3800);
+  ok(await R.evaluate(id => S.uid === id, nId), 'the recovery code brought someone back to their account');
+  // before the server update: a clear note instead of the old misleading "operator account" message
+  await fetch('http://127.0.0.1:8768/__sb/feature?del=0');
+  await A.evaluate(() => { S.adm.at = 0; S.adm.canDelete = undefined; }); await go(A, 'home', 400); await go(A, 'admin', 2000);
+  ok(await A.$$eval('.admin .note', ns => ns.some(n => /서버 업데이트/.test(n.textContent))), 'admin page says deleting needs the server update');
+  const anyDel = await A.$('[data-deluser]'); ok(!!anyDel && await anyDel.isDisabled(), 'delete buttons wait for the update');
+  await A.evaluate(id => adminDeleteUser(id), bId); await A.waitForTimeout(700);
+  const tz = await toasts(A); ok(tz.some(x => /서버 업데이트/.test(x)) && !tz.some(x => /운영자 계정은 삭제할 수 없어요/.test(x)), 'a missing server function is explained as such');
+  await fetch('http://127.0.0.1:8768/__sb/feature?del=1');
+  // after the update: another operator account can be deleted (the one in use can't)
+  await go(W, 'claim', 600); await W.fill('#cl-code', 'testcode1234abcd'); await W.click('#cl-go'); await W.waitForTimeout(2600);
+  const wId = await W.evaluate(() => S.uid);
+  await A.evaluate(() => { S.adm.at = 0; S.adm.canDelete = undefined; }); await go(A, 'home', 400); await go(A, 'admin', 2000);
+  const wDel = await A.$(`[data-deluser="${wId}"]`); ok(!!wDel && !(await wDel.isDisabled()), 'deleting is available after the update');
+  if (wDel) { await wDel.click(); await A.waitForTimeout(300); await wDel.click(); await A.waitForTimeout(2000); }
+  d = await dump(); ok(!d.T.anglers[wId] && !d.admins.includes(wId), 'another operator account deleted, with its operator rights');
+  ok(!(await A.$(`[data-deluser="${aId}"]`)), 'no delete button for the account in use');
+
+  // fishing points
+  await N2.evaluate(() => openPointEdit(null, { lat: 35.0465, lon: 128.9654, sp: ['kurodai'] })); await N2.waitForTimeout(600);
+  await N2.fill('#pt-name', '다대포 방파제 끝'); await N2.fill('#pt-memo', '들물 때 좋아요. 주차는 공영주차장.'); await N2.click('#pt-go'); await N2.waitForTimeout(1600);
+  d = await dump(); const pPriv = Object.values(d.T.points).find(x => x.data.name === '다대포 방파제 끝');
+  ok(pPriv && pPriv.owner === nId && pPriv.pub === false && pPriv.data.sp[0] === 'kurodai', 'point saved privately, owned by the account');
+  ok(await N2.evaluate(() => S.route === 'points' && document.querySelectorAll('.pt-card').length === 1), 'point listed under my points');
+  await N2.evaluate(() => openPointEdit(null, { lat: 35.1532, lon: 129.1189, sp: [] })); await N2.waitForTimeout(600);
+  await N2.fill('#pt-name', '광안리 백사장'); await N2.selectOption('#pt-kind', 'beach'); await N2.fill('#pt-sp', '보리멸, 고등어'); await N2.click('label.switch:has(#pt-pub)'); await N2.waitForTimeout(200);
+  ok(!(await N2.$eval('#pt-pub-note', n => n.hidden)), 'sharing shows the exact-location warning');
+  await N2.click('#pt-go'); await N2.waitForTimeout(1600);
+  d = await dump(); const pPub = Object.values(d.T.points).find(x => x.data.name === '광안리 백사장');
+  ok(pPub && pPub.pub === true && pPub.data.sp.join() === 'shirogisu,saba', 'shared point saved, species names turned into ids: ' + JSON.stringify(pPub && pPub.data.sp));
+  await shot(N2, 'r04_points');
+  await go(B, 'points', 1300); await B.click('[data-pttab="shared"]'); await B.waitForTimeout(600);
+  ok(await B.$$eval('.pt-card', ns => ns.length === 1 && /광안리/.test(ns[0].textContent)), 'others see the shared point');
+  ok(!(await B.evaluate(() => [...S.points.values()].some(p => p.name === '다대포 방파제 끝'))), 'a private point never reaches others');
+  await B.click('.pt-card'); await B.waitForTimeout(500);
+  ok(!!(await B.$('.pt-detail')) && !(await B.$('#pt-edit')) && !(await B.$('#pt-del')), 'others can read it but not edit or delete it');
+  await shot(B, 'r05_point_detail');
+  await closeModals(B);
+  await go(B, 'map', 2600);
+  ok((await B.$$('.pt-mark')).length >= 1, 'the shared point is on the map');
+  await go(A, 'log', 1200); await A.click('.catch-card'); await A.waitForTimeout(700);
+  ok(!!(await A.$('#cd-pt')), 'a catch with a spot can be saved as a point');
+  await closeModals(A);
+  await go(A, 'points', 1300); await A.click('[data-pttab="shared"]'); await A.waitForTimeout(500); await A.click('.pt-card'); await A.waitForTimeout(500);
+  ok(!!(await A.$('#pt-hide')), 'the operator can hide a shared point');
+  await A.click('#pt-hide'); await A.waitForTimeout(1500);
+  await go(B, 'points', 1300);
+  ok(!(await B.evaluate(() => [...S.points.values()].some(p => p.name === '광안리 백사장' && ptVisible(p)))), 'a hidden point disappears for others');
+  await go(N2, 'points', 1200); await N2.click('.pt-card'); await N2.waitForTimeout(500);
+  await N2.click('#pt-del'); await N2.waitForTimeout(200); await N2.click('#pt-del'); await N2.waitForTimeout(1500);
+  d = await dump(); ok(Object.values(d.T.points).filter(x => x.owner === nId).length === 1, 'the owner deletes a point');
   // dark mode + english
   const E = await mk('E', { ctx: { colorScheme: 'dark', locale: 'en-US' } });
   await E.evaluate(() => { setLang('en'); rerender(); }); await onboard(E, 'Reeler');

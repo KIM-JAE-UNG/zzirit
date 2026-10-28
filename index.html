@@ -1104,6 +1104,59 @@ h1 .beta-chip { font-size: 13px; margin-left: 4px; vertical-align: 6px; }
   .sp-grid .sp-card { padding: 8px 8px 10px; }
 }
 
+/* ===== 2026-10-29: sign-up / login, account card, operator help, fishing points ===== */
+.auth { display: flex; flex-direction: column; }
+.auth-tabs { margin: 14px 0 4px; align-self: stretch; display: grid; grid-template-columns: 1fr 1fr; }
+.auth-tabs button { justify-content: center; font-size: 15px; padding: 9px 10px; }
+.auth-pane h2 { margin-top: 12px; font-size: 22px; }
+.auth-pane .lede { margin-bottom: 6px; }
+.auth-me { display: flex; align-items: center; gap: 8px; margin: 2px 0 0; flex-wrap: wrap; }
+.auth-noid { display: block; margin: 10px auto 0; color: var(--ink-3); text-decoration: underline; background: none; border: 0; cursor: pointer; padding: 6px; }
+.auth-noid:hover { color: var(--ink); }
+.acct-sum { display: flex; align-items: center; gap: 12px; margin: 4px 0 10px; }
+.acct-sum p { margin: 2px 0 0; }
+.acct-state { display: flex; align-items: flex-start; gap: 8px; border-radius: var(--r-s); padding: 10px 12px; margin: 0 0 6px; font-size: 14px; }
+.acct-state .ic { flex: none; margin-top: 2px; }
+.acct-state.ok { background: var(--ok-soft); color: var(--ink); }
+.acct-state.ok .ic { color: var(--ok); }
+.acct-state.warn { background: var(--warn-soft); color: var(--ink); }
+.acct-state.warn .ic { color: var(--warn); }
+.more-acct { grid-column: 1 / -1; display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 14px; background: var(--sea-soft); color: var(--ink); border: 0; text-align: left; cursor: pointer; font: inherit; }
+.more-acct:hover { text-decoration: none; filter: brightness(.98); }
+.more-acct > .ic { width: 26px; height: 26px; color: var(--sea); flex: none; }
+.more-acct span { display: flex; flex-direction: column; min-width: 0; }
+.chip-id { background: var(--sea-soft); color: var(--sea); border-color: transparent; }
+.chip-id .ic { width: 12px; height: 12px; }
+.ad-acts { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+#ad-uq { margin: 4px 0 8px; }
+.relink .link-code { margin: 10px 0 14px; flex-wrap: wrap; }
+.relink .link-code b { font-size: 30px; letter-spacing: .1em; }
+.relink textarea { width: 100%; font-size: 13.5px; margin-bottom: 8px; }
+/* fishing points */
+.points .seg { margin: 6px 0 14px; }
+.pt-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 10px; }
+.pt-card { display: flex; gap: 12px; width: 100%; text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 14px; cursor: pointer; color: inherit; font: inherit; height: 100%; }
+.pt-card:hover { border-color: var(--sea); }
+.pt-card.is-hidden { opacity: .6; }
+.pt-pin { flex: none; display: grid; place-items: center; width: 38px; height: 38px; border-radius: 12px; background: var(--sea-soft); color: var(--sea); }
+.pt-main { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.pt-top { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.pt-top b { font-size: 15.5px; margin-right: 2px; overflow-wrap: anywhere; }
+.pt-memo { font-size: 13.5px; color: var(--ink-2); overflow-wrap: anywhere; }
+.pt-by { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--ink-2); margin-top: 2px; }
+.pt-detail h2 { display: flex; align-items: center; gap: 8px; }
+.pt-detail .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 10px; }
+.pt-form .loc-row { flex-wrap: wrap; }
+.pt-mark { color: var(--sea); filter: drop-shadow(0 1px 2px rgba(0,0,0,.45)); }
+.pt-mark .ic { width: 26px; height: 26px; fill: rgba(255,255,255,.92); }
+.pt-mark.mine { color: var(--accent); }
+.pt-mark.mine .ic { fill: color-mix(in srgb, var(--accent) 30%, #fff); }
+@media (max-width: 520px) {
+  .pt-list { grid-template-columns: 1fr; }
+  .ad-users li { flex-wrap: wrap; }
+  .ad-acts { width: 100%; justify-content: flex-start; padding-left: 44px; }
+}
+
 </style>
 </head>
 <body>
@@ -1121,6 +1174,7 @@ h1 .beta-chip { font-size: 13px; margin-left: 4px; vertical-align: 6px; }
       <a href="#friends" data-route="friends"><svg class="ic" aria-hidden="true"><use href="#i-users"/></svg><span data-t="nav_friends"></span><i class="badge num" data-frbadge hidden></i></a>
       <a href="#board" data-route="board"><svg class="ic" aria-hidden="true"><use href="#i-board"/></svg><span data-t="nav_board"></span></a>
       <a href="#teams" data-route="teams"><svg class="ic" aria-hidden="true"><use href="#i-flag"/></svg><span data-t="nav_teams"></span></a>
+      <a href="#points" data-route="points" class="nav-web"><svg class="ic" aria-hidden="true"><use href="#i-pin"/></svg><span data-t="nav_points"></span></a>
       <a href="#sea" data-route="sea"><svg class="ic" aria-hidden="true"><use href="#i-sea"/></svg><span data-t="nav_sea"></span></a>
       <a href="#char" data-route="char"><svg class="ic" aria-hidden="true"><use href="#i-user"/></svg><span data-t="nav_char"></span></a>
       <div class="nav-sep"></div>
@@ -1167,7 +1221,8 @@ h1 .beta-chip { font-size: 13px; margin-left: 4px; vertical-align: 6px; }
     <section class="view" id="v-tackle" hidden></section>
     <section class="view" id="v-log" hidden></section>
     <section class="view" id="v-help" hidden></section>
-    <section class="view" id="v-about" hidden></section>
+    <section class="view" id="v-points" hidden></section>
+<section class="view" id="v-about" hidden></section>
     <section class="view" id="v-prefs" hidden></section>
     <section class="view" id="v-admin" hidden></section>
   </main>
@@ -1255,12 +1310,25 @@ h1 .beta-chip { font-size: 13px; margin-left: 4px; vertical-align: 6px; }
   const mkErr = (code, msg) => { const e = new Error(msg || code); e.code = code; return e; };
 
   /* ---- session: one anonymous account per browser ---- */
+  // A copy of the last sign-in: if a token refresh fails during a short server hiccup, supabase-js drops the session,
+  // and starting a new anonymous account would make the person's records vanish from this device. Try the copy first.
+  const BK = 'eosin.auth.bk';
+  const saveBk = s => { try { if (s && s.refresh_token) localStorage.setItem(BK, JSON.stringify({ a: s.access_token, r: s.refresh_token, u: s.user && s.user.id })); } catch (e) { } };
+  const dropBk = () => { try { localStorage.removeItem(BK); } catch (e) { } };
+  try { sb.auth.onAuthStateChange((ev, s) => { if (s) saveBk(s); }); } catch (e) { }
   let sessP = null, authErr = null;
   function session() {
     if (!sessP) sessP = (async () => {
       try {
         const { data } = await sb.auth.getSession();
-        if (data && data.session) return data.session;
+        if (data && data.session) { saveBk(data.session); return data.session; }
+        let bk = null; try { bk = JSON.parse(localStorage.getItem(BK) || 'null'); } catch (e) { bk = null; }
+        if (bk && bk.r) {
+          try {
+            const rs = await sb.auth.setSession({ access_token: bk.a || '', refresh_token: bk.r });
+            if (!rs.error && rs.data && rs.data.session) { console.info('[auth] sign-in restored'); return rs.data.session; }
+          } catch (e) { console.warn('[auth] restore failed', e); }
+        }
         const r = await sb.auth.signInAnonymously();
         if (r.error) { authErr = r.error; console.warn('[auth]', r.error.message); return null; }
         return r.data.session;
@@ -1281,10 +1349,22 @@ h1 .beta-chip { font-size: 13px; margin-left: 4px; vertical-align: 6px; }
     })();
     return acctP;
   }
+  // what went wrong, as a short code the app can explain (a missing server function means the server update isn't in yet)
+  function rpcCode(error) {
+    const m = String((error && (error.message || error.details)) || '');
+    if ((error && error.code === 'PGRST202') || /could not find the function|schema cache/i.test(m)) return 'need_update';
+    if (/cannot_delete_self/.test(m)) return 'self';
+    if (/not_admin/.test(m)) return 'not_admin';
+    if (/no_account/.test(m)) return 'no_account';
+    if (/team_leader/i.test(m)) return 'team_leader';
+    if (/slow|rate limit/i.test(m)) return 'slow';
+    if (/bad_code|expired/i.test(m)) return 'bad_code';
+    return 'unavailable';
+  }
   async function rpcOrThrow(name, args) {
     const s = await session(); if (!s) throw mkErr('not_granted', 'not signed in');
     const { data, error } = await sb.rpc(name, args || {});
-    if (error) throw mkErr(/slow|rate/i.test(error.message) ? 'slow' : /bad|expired|invalid/i.test(error.message) ? 'bad_code' : /team_leader/i.test(error.message) ? 'team_leader' : 'unavailable', error.message);
+    if (error) throw mkErr(rpcCode(error), error.message);
     return data;
   }
   const link = {
@@ -1301,8 +1381,14 @@ h1 .beta-chip { font-size: 13px; margin-left: 4px; vertical-align: 6px; }
   const news = { refresh: () => callFn('news') };
   // the automatic reviewer runs on its own every few minutes; a fresh catch just nudges it (it ignores extra nudges)
   const review = { ping: () => callFn('review').catch(() => false) };
-  // operator only (checked on the server): remove an account with everything it posted
-  const admin = { deleteUser: uid => rpcOrThrow('admin_delete_user', { p_uid: uid }) };
+  // operator only (checked on the server): remove an account with everything it posted; which account has which ID;
+  // a one-time code that brings someone back to an account they lost
+  const admin = {
+    deleteUser: uid => rpcOrThrow('admin_delete_user', { p_uid: uid }),
+    async canDelete() { try { await rpcOrThrow('admin_delete_user', { p_uid: null }); return true; } catch (e) { return e.code === 'need_update' ? false : null; } },
+    logins: () => rpcOrThrow('admin_logins'),
+    linkCode: uid => rpcOrThrow('admin_link_code', { p_acct: uid })
+  };
   // login ID + password: the server keeps only a hash; logging in joins this device to that account
   const ids = {
     me: () => rpcOrThrow('id_me'),
@@ -1310,7 +1396,7 @@ h1 .beta-chip { font-size: 13px; margin-left: 4px; vertical-align: 6px; }
     login: (name, pass) => rpcOrThrow('id_login', { p_name: name, p_pass: pass }),
     password: (o, n) => rpcOrThrow('id_password', { p_old: o, p_new: n }),
     adminReset: (name, pass) => rpcOrThrow('admin_id_reset', { p_name: name, p_new: pass }),
-    async logout() { try { await sb.auth.signOut({ scope: 'local' }); } catch (e) { } }
+    async logout() { dropBk(); try { await sb.auth.signOut({ scope: 'local' }); } catch (e) { } dropBk(); }
   };
   window.APP_AUTH = { sb, session, acct, link, news, review, admin, ids, error: () => authErr };
 
@@ -1319,12 +1405,13 @@ h1 .beta-chip { font-size: 13px; margin-left: 4px; vertical-align: 6px; }
     const p = String(path).split('/');
     if (p[0] === 'anglers' && p.length === 2) return { t: 'anglers', k: { id: p[1] }, conflict: 'id' };
     if (p[0] === 'anglers' && p[2] === 'photos' && p.length === 4) return { t: 'photos', k: { angler: p[1], cid: p[3] }, conflict: 'angler,cid' };
-    if ((p[0] === 'labels' || p[0] === 'orders' || p[0] === 'suggest' || p[0] === 'board' || p[0] === 'teams') && p.length === 2) return { t: p[0], k: { id: p[1] }, conflict: 'id' };
+    if ((p[0] === 'labels' || p[0] === 'orders' || p[0] === 'suggest' || p[0] === 'board' || p[0] === 'teams' || p[0] === 'points') && p.length === 2) return { t: p[0], k: { id: p[1] }, conflict: 'id' };
+    if (p[0] === 'reviews' && p.length === 2) return { t: 'reviews', k: { id: p[1] }, conflict: 'id', ro: true };
     if (p[0] === 'news' && p.length === 2) return { t: 'news', k: { id: p[1] }, conflict: 'id', ro: true };
     if (p[0] === 'admin' && p.length === 2) return { t: 'admin_docs', k: { id: p[1] }, conflict: 'id' };
     return null;
   }
-  const COLL = { anglers: 'anglers', labels: 'labels', orders: 'orders', suggest: 'suggest', admin: 'admin_docs', board: 'board', teams: 'teams', news: 'news' };
+  const COLL = { anglers: 'anglers', labels: 'labels', orders: 'orders', suggest: 'suggest', admin: 'admin_docs', board: 'board', teams: 'teams', news: 'news', points: 'points', reviews: 'reviews' };
   function dbErr(e) {
     const m = (e && (e.message || e.details)) || String(e);
     if (e && e.code === '42501') return mkErr('not_granted', m);
@@ -1360,6 +1447,7 @@ h1 .beta-chip { font-size: 13px; margin-left: 4px; vertical-align: 6px; }
 
   function snapOf(table, id, row) {
     let data = row ? (table === 'news' ? { lang: row.lang, title: row.title, link: row.link, source: row.source, pub: row.pub, score: row.score, fetched_at: row.fetched_at } : clone(row.data)) : undefined;
+    if (data && table === 'points') data = Object.assign({}, data, { _owner: row.owner, _upd: row.updated_at });
     if (data && table === 'anglers') data = withSpots(id, data);
     return { id, exists: !!row, data: () => clone(data), metadata: { fromCache: false, hasPendingWrites: false } };
   }
@@ -2284,6 +2372,83 @@ Object.assign(T, {
   wn_pay_p: ['"보냈어요"만으로는 적용되지 않고, 운영자가 입금을 확인하면 자동으로 적용돼요.', '"I sent it" alone no longer applies an item; it switches on automatically once the operator confirms the payment.', '「送りました」だけでは適用されず、運営が入金を確認すると自動で適用されます。', '仅点"已转账"不会生效，运营者确认到账后会自动生效。'],
   wn_share_h: ['조과 카드로 자랑하기', 'Share a catch card', '釣果カードで自慢', '用渔获卡片分享'],
   wn_share_p: ['조과 화면의 "자랑하기"를 누르면 카카오톡·인스타그램에 올릴 이미지가 만들어져요.', 'Tap "Share" on a catch to make a picture for KakaoTalk or Instagram.', '釣果画面の「自慢する」を押すと、カカオトークやインスタグラム用の画像ができます。', '在渔获页面点"分享"，即可生成可发到KakaoTalk或Instagram的图片。'],
+
+  /* 2026-10-29: sign-up / login, account card, operator help, fishing points */
+  auth_tab_join: ['회원가입', 'Sign up', '新規登録', '注册'],
+  auth_tab_id: ['아이디 만들기', 'Create an ID', 'IDを作る', '创建ID'],
+  auth_tab_login: ['로그인', 'Log in', 'ログイン', '登录'],
+  auth_join_title: ['찌릿 시작하기', 'Join ZZIRIT', '찌릿(ZZIRIT)をはじめる', '加入찌릿(ZZIRIT)'],
+  auth_join_sub: ['아이디를 만들면 휴대폰을 바꾸거나 PC에서도 같은 계정을 써요. 이 기기에서 한 것도 그대로 이어져요.', 'With an ID you keep the same account on a new phone or on your PC. What you did on this device comes along.', 'IDを作れば、機種変更やPCでも同じアカウントを使えます。この端末での記録もそのまま引き継がれます。', '创建ID后，换手机或在电脑上也能用同一账号。在这台设备上的记录也会保留。'],
+  auth_join_title_me: ['내 계정에 아이디 만들기', 'Add an ID to my account', '今のアカウントにIDを作る', '为我的账号创建ID'],
+  auth_join_sub_me: ['지금 계정(조과·친구·팀·캐릭터)에 아이디를 붙여요. 기록은 하나도 사라지지 않아요.', 'Your current account (catches, friends, team, character) gets an ID. Nothing is lost.', '今のアカウント(釣果・友だち・チーム・キャラ)にIDを付けます。記録は何も消えません。', '为当前账号（渔获、好友、战队、角色）加上ID，记录不会丢失。'],
+  auth_join_go: ['가입하고 시작하기', 'Sign up and start', '登録してはじめる', '注册并开始'],
+  auth_no_id: ['아이디 없이 이 기기에서만 시작하기', 'Start without an ID (this device only)', 'IDなしでこの端末だけで始める', '不创建ID，仅在此设备使用'],
+  auth_pw_note: ['비밀번호는 암호화해 저장해서 운영자도 볼 수 없어요. 잊으면 고객센터(카카오톡)에 아이디를 알려 주세요.', 'Passwords are stored encrypted; not even the operator can read them. If you forget yours, send your ID to support (KakaoTalk).', 'パスワードは暗号化して保存し、運営者も見られません。忘れたらサポート(カカオトーク)にIDを伝えてください。', '密码加密保存，运营者也看不到。忘记时请把ID发给客服（KakaoTalk）。'],
+  auth_login_sub: ['다른 기기에서 만든 아이디로 로그인하면 같은 계정이 돼요. 이 기기에 있던 기록도 그 계정으로 합쳐져요.', 'Log in with the ID you made on another device to use the same account. Records on this device join that account.', '別の端末で作ったIDでログインすると同じアカウントになります。この端末の記録もそのアカウントにまとまります。', '用在其他设备创建的ID登录即为同一账号，此设备上的记录也会合并到该账号。'],
+  auth_joined: ['가입 완료! 아이디 {name}로 어디서든 로그인할 수 있어요.', 'You\'re in! Log in anywhere with the ID {name}.', '登録完了!ID「{name}」でどこからでもログインできます。', '注册完成！可在任何设备用ID {name} 登录。'],
+  auth_chip: ['로그인 · 회원가입', 'Log in · Sign up', 'ログイン・新規登録', '登录 · 注册'],
+  acct_title: ['내 계정', 'My account', 'マイアカウント', '我的账号'],
+  acct_sum: ['조과 {n}개 · {pts}점 · Lv.{lv}', '{n} catches · {pts} pts · Lv.{lv}', '釣果{n}件・{pts}点・Lv.{lv}', '渔获{n}条 · {pts}分 · Lv.{lv}'],
+  acct_no_id: ['아직 아이디가 없어요. 지금 계정은 이 기기(브라우저)에만 있어서, 브라우저 기록을 지우거나 휴대폰을 바꾸면 찾기 어려워요. 아이디를 만들어 두세요.', 'No ID yet. This account lives only in this browser: clearing browser data or changing phones makes it hard to get back. Create an ID.', 'まだIDがありません。今のアカウントはこのブラウザにしかないので、履歴の削除や機種変更で戻せなくなります。IDを作っておきましょう。', '还没有ID。当前账号只保存在此浏览器里，清除浏览数据或换手机后很难找回。请创建ID。'],
+  acct_none: ['아직 계정이 없어요. 가입하면 조과를 올리고 랭킹에 참여할 수 있어요.', 'No account yet. Sign up to post catches and join the rankings.', 'まだアカウントがありません。登録すると釣果を投稿してランキングに参加できます。', '还没有账号。注册后即可上传渔获并参加排行。'],
+  more_acct_join: ['로그인 · 회원가입', 'Log in · Sign up', 'ログイン・新規登録', '登录 · 注册'],
+  more_acct_join_sub: ['아이디로 어느 기기에서든', 'One ID on every device', 'IDでどの端末からでも', '一个ID，所有设备通用'],
+  more_acct_keep: ['아이디 만들어 계정 지키기', 'Create an ID to keep your account', 'IDを作ってアカウントを守る', '创建ID，保住账号'],
+  more_acct_keep_sub: ['휴대폰을 바꿔도 기록 그대로', 'Your records survive a new phone', '機種変更しても記録はそのまま', '换手机记录也还在'],
+  id_err_update: ['아직 서버에서 준비 중인 기능이에요. 잠시 후 다시 해 주세요', 'This isn\'t ready on the server yet. Please try again later', 'サーバーでまだ準備中の機能です。しばらくしてからお試しください', '服务器尚未准备好该功能，请稍后再试'],
+  id_err_signin: ['연결이 끊겼어요. 새로고침한 뒤 다시 해 주세요', 'Connection lost. Reload and try again', '接続が切れました。再読み込みしてからお試しください', '连接已断开，请刷新后再试'],
+  id_err_not_admin: ['운영자만 할 수 있어요', 'Only the operator can do this', '運営者だけができます', '仅运营者可操作'],
+  ad_need_update: ['이 기능은 서버 업데이트(SQL)를 실행한 뒤에 쓸 수 있어요. 보내 드린 zzirit_update.sql을 Supabase에서 실행해 주세요.', 'This needs the server update (SQL). Run zzirit_update.sql in Supabase first.', 'この機能はサーバー更新(SQL)の実行後に使えます。zzirit_update.sqlをSupabaseで実行してください。', '此功能需先执行服务器更新(SQL)。请在Supabase中运行zzirit_update.sql。'],
+  ad_del_self: ['지금 쓰고 있는 계정은 삭제할 수 없어요', 'You can\'t delete the account you are using', '使用中のアカウントは削除できません', '不能删除正在使用的账号'],
+  ad_not_admin: ['운영자 인증이 필요해요 (주소 뒤에 #claim)', 'Operator sign-in needed (#claim)', '運営者認証が必要です(#claim)', '需要运营者认证（#claim）'],
+  ad_del_needs_update: ['계정 삭제는 서버 업데이트(SQL)를 실행한 뒤에 쓸 수 있어요. 같은 사람의 계정이 여러 개면 지금도 \'복구 코드\'로 하나로 합칠 수 있어요.', 'Deleting accounts needs the server update (SQL). Duplicate accounts of one person can already be joined with a recovery code.', 'アカウント削除はサーバー更新(SQL)後に使えます。同じ人の重複アカウントは今でも「復旧コード」でまとめられます。', '删除账号需先执行服务器更新(SQL)。同一人的多个账号现在就能用"恢复码"合并。'],
+  ad_users_search: ['닉네임·아이디로 찾기', 'Search nickname or ID', 'ニックネーム・IDで検索', '按昵称或ID搜索'],
+  ad_relink: ['복구 코드', 'Recovery code', '復旧コード', '恢复码'],
+  ad_relink_fail: ['코드를 만들지 못했어요', 'Could not make a code', 'コードを作れませんでした', '无法生成代码'],
+  ad_relink_title: ['{nick} 계정 복구 코드', 'Recovery code for {nick}', '{nick}のアカウント復旧コード', '{nick}的账号恢复码'],
+  ad_relink_sub: ['이 계정을 잃어버린 사람(브라우저 기록 삭제, 휴대폰 변경)에게 보내 주세요. 설정 → PC·휴대폰 연결 → \'코드 입력\'에 넣으면 이 계정으로 돌아와요. 30분 동안 한 번 쓸 수 있어요.', 'Send it to the person who lost this account (cleared browser, new phone). Entering it in Settings → Link PC and phone → Enter code brings them back. Valid once, for 30 minutes.', 'このアカウントを失った人(履歴削除・機種変更)に送ってください。設定→PC・スマホ連携→「コード入力」に入れるとこのアカウントに戻れます。30分間・1回だけ有効です。', '请发给丢失此账号的人（清除浏览数据、换手机）。在设置→连接电脑和手机→"输入代码"中输入即可回到此账号。30分钟内可用一次。'],
+  ad_relink_send: ['보낼 메시지', 'Message to send', '送るメッセージ', '要发送的消息'],
+  ad_relink_msg: ['[찌릿] 계정 복구 코드: {code}\n30분 안에 찌릿 → 설정 → PC·휴대폰 연결 → \'코드 입력\'에 넣어 주세요.', '[ZZIRIT] Account recovery code: {code}\nWithin 30 minutes, enter it in Settings → Link PC and phone → Enter code.', '[찌릿] アカウント復旧コード: {code}\n30分以内に 設定→PC・スマホ連携→「コード入力」に入れてください。', '[찌릿] 账号恢复码：{code}\n请在30分钟内到 设置→连接电脑和手机→"输入代码" 中输入。'],
+  ad_relink_copy: ['메시지 복사', 'Copy message', 'メッセージをコピー', '复制消息'],
+  ad_relink_note: ['본인이 맞는지 꼭 확인한 뒤 보내 주세요. 코드를 넣은 기기는 이 계정을 그대로 쓰게 돼요.', 'Make sure it is really them first: the device that enters the code takes over this account.', '必ず本人か確認してから送ってください。コードを入れた端末はこのアカウントをそのまま使えるようになります。', '请务必先确认是本人：输入代码的设备将直接使用此账号。'],
+  nav_points: ['낚시 포인트', 'Fishing spots', '釣りポイント', '钓点'],
+  pt_title: ['낚시 포인트', 'Fishing spots', '釣りポイント', '钓点'],
+  pt_sub: ['자주 가는 포인트, 잘 무는 어종, 팁을 적어 두세요. 공유하지 않은 포인트는 나만 봐요.', 'Keep notes on your spots: what bites, tips. Spots you don\'t share are only for you.', 'よく行くポイント、釣れる魚、コツをメモしましょう。共有しないポイントは自分だけが見られます。', '记下常去的钓点、好钓的鱼和技巧。未分享的钓点只有自己能看到。'],
+  pt_add: ['포인트 추가', 'Add a spot', 'ポイントを追加', '添加钓点'],
+  pt_tab_mine: ['내 포인트', 'My spots', 'マイポイント', '我的钓点'],
+  pt_tab_shared: ['공유된 포인트', 'Shared spots', '共有ポイント', '共享钓点'],
+  pt_empty_mine: ['아직 적어 둔 포인트가 없어요', 'No spots yet', 'まだポイントがありません', '还没有钓点'],
+  pt_empty_mine_sub: ['조과 화면의 \'포인트로 저장\'이나 \'포인트 추가\'로 시작해 보세요.', 'Start from "Save as spot" on a catch, or "Add a spot".', '釣果画面の「ポイントに保存」か「ポイントを追加」から始めましょう。', '从渔获页面的"存为钓点"或"添加钓点"开始吧。'],
+  pt_empty_shared: ['아직 공유된 포인트가 없어요', 'No shared spots yet', 'まだ共有ポイントはありません', '还没有共享的钓点'],
+  pt_empty_shared_sub: ['내 포인트를 공유하면 여기와 지도에 보여요.', 'Share one of yours and it shows here and on the map.', '自分のポイントを共有するとここと地図に表示されます。', '分享你的钓点后会显示在这里和地图上。'],
+  pt_privacy: ['정확한 위치는 공유한 포인트만 다른 사람에게 보여요. 운영자는 부적절한 공유 포인트를 가릴 수 있어요.', 'Only shared spots show their exact place to others. The operator can hide inappropriate shared spots.', '正確な位置が他の人に見えるのは共有したポイントだけです。不適切な共有ポイントは運営者が非表示にできます。', '只有分享的钓点会向他人显示精确位置。运营者可隐藏不当的共享钓点。'],
+  pt_shared: ['공유 중', 'Shared', '共有中', '已分享'],
+  pt_private: ['나만 보기', 'Private', '自分だけ', '仅自己'],
+  pt_hidden_chip: ['가려짐', 'Hidden', '非表示', '已隐藏'],
+  pt_by: ['올린 사람', 'By', '投稿者', '分享者'],
+  pt_on_map: ['지도에서 보기', 'Show on map', '地図で見る', '在地图上查看'],
+  pt_edit_title: ['포인트 수정', 'Edit spot', 'ポイントを編集', '编辑钓点'],
+  pt_name: ['이름', 'Name', '名前', '名称'],
+  pt_name_ph: ['예: 다대포 방파제 끝', 'e.g. End of the breakwater', '例: 防波堤の先端', '例：防波堤尽头'],
+  pt_kind: ['종류', 'Type', '種類', '类型'],
+  pt_where: ['위치', 'Place', '場所', '位置'],
+  pt_species: ['잘 잡히는 어종', 'What bites here', 'よく釣れる魚', '常钓到的鱼'],
+  pt_species_ph: ['예: 감성돔, 농어 (최대 5개)', 'e.g. black porgy, sea bass (up to 5)', '例: クロダイ、スズキ(5つまで)', '例：黑鲷、鲈鱼（最多5个）'],
+  pt_memo: ['메모', 'Notes', 'メモ', '备注'],
+  pt_memo_ph: ['물때, 채비, 주차, 주의할 점…', 'Tides, rig, parking, cautions…', '潮、仕掛け、駐車、注意点…', '潮汐、钓组、停车、注意事项…'],
+  pt_share: ['다른 낚시꾼과 공유하기', 'Share with other anglers', '他の釣り人と共有する', '与其他钓友分享'],
+  pt_share_note: ['공유하면 누구나 이 포인트의 정확한 위치를 볼 수 있어요.', 'Once shared, anyone can see this spot\'s exact place.', '共有すると誰でもこのポイントの正確な位置を見られます。', '分享后任何人都能看到此钓点的精确位置。'],
+  pt_err_name: ['이름을 2글자 이상 적어 주세요 (링크는 안 돼요)', 'Give it a name of 2+ letters (no links)', '名前を2文字以上入れてください(リンク不可)', '请填写2个字以上的名称（不能是链接）'],
+  pt_err_where: ['지도에서 위치를 골라 주세요', 'Pick the place on the map', '地図で場所を選んでください', '请在地图上选择位置'],
+  pt_saved: ['포인트를 저장했어요 (나만 보기)', 'Spot saved (private)', 'ポイントを保存しました(自分だけ)', '钓点已保存（仅自己）'],
+  pt_saved_shared: ['포인트를 공유했어요', 'Spot shared', 'ポイントを共有しました', '钓点已分享'],
+  pt_from_catch: ['포인트로 저장', 'Save as spot', 'ポイントに保存', '存为钓点'],
+  pt_web_only: ['낚시 포인트는 웹사이트에서 쓸 수 있어요.', 'Fishing spots are on the website.', '釣りポイントはウェブサイトで使えます。', '钓点功能请在网站上使用。'],
+  pt_hidden_done: ['포인트를 가렸어요', 'Spot hidden', 'ポイントを非表示にしました', '钓点已隐藏'],
+  pt_unhidden_done: ['다시 보이게 했어요', 'Spot visible again', '再表示しました', '已重新显示'],
+  ptk_breakwater: ['방파제', 'Breakwater', '堤防', '防波堤'], ptk_rocks: ['갯바위', 'Rocks', '磯', '矶钓礁石'], ptk_beach: ['해변·백사장', 'Beach', '砂浜', '海滩'],
+  ptk_boat: ['선상', 'Boat', '船', '船钓'], ptk_river: ['강·하천', 'River', '川', '河流'], ptk_lake: ['저수지·호수', 'Lake', '湖・ため池', '湖泊水库'], ptk_other: ['기타', 'Other', 'その他', '其他'],
+  tg_points: ['낚시 포인트', 'Fishing spots', '釣りポイント', '钓点'],
 });
 
 /* ===== Web build only: texts that differ from the Claude artifact version ===== */
@@ -4489,6 +4654,7 @@ const S = {
   uid: null, isOwner: false, writable: null, mode: 'boot', ready: false,
   db: null, user: null, sample: null, sampleImages: false,
   me: null, anglers: new Map(), labels: new Map(), board: new Map(), teams: new Map(), news: [],
+  reviews: new Map(), reviewByCid: new Map(), points: new Map(),
   myBoard: null,
   admin: { config: {}, grants: {}, verdicts: {}, mod: {} },
   myOrders: [], myLabels: [], mySuggest: [],
@@ -4583,6 +4749,16 @@ const store = (() => {
         });
         sub(db.collection('teams').limit(1000), snap => { const m = new Map(); for (const d of snap.docs) if (d.exists) m.set(d.id, d.data()); S.teams = m; S.dataVer++; rerenderSoon(); });
         if (window.APP_RT === 'web') sub(db.collection('news').limit(200), snap => { S.news = snap.docs.filter(d => d.exists).map(d => Object.assign({ id: d.id }, d.data())); S.newsVer = (S.newsVer || 0) + 1; rerenderSoon(); });
+        if (window.APP_RT === 'web') {
+          // the reviewer's notes on my catches (the server only sends mine; the operator gets all), indexed by catch id
+          sub(db.collection('reviews').limit(1000), snap => {
+            const m = new Map(), byCid = new Map();
+            for (const d of snap.docs) if (d.exists) { const v = d.data() || {}; m.set(d.id, v); for (const [cid, note] of Object.entries(v)) byCid.set(cid, note); }
+            S.reviews = m; S.reviewByCid = byCid; S.dataVer++; rerenderSoon();
+          });
+          // fishing points: my own and the ones people share
+          sub(db.collection('points').limit(1000), snap => { const m = new Map(); for (const d of snap.docs) if (d.exists) m.set(d.id, Object.assign({ id: d.id }, d.data())); S.points = m; S.pointsLoaded = true; S.dataVer++; rerenderSoon(); });
+        }
         sub(db.collection('admin'), snap => { for (const d of snap.docs) if (d.exists) S.admin[d.id] = d.data(); S.adminLoaded = true; S.dataVer++; maybeCleanLooks(); payNotify(); rerenderSoon(); });
         if (S.uid && S.writable !== false) {
           S.mode = 'shared';
@@ -4625,6 +4801,17 @@ const store = (() => {
       if (!uid || uid === 'local') { const ph = lsGet('photos', {}); return ph[cid] || null; }
       if (!S.db) return null;
       return cachedPhoto(key, async () => { const d = await S.db.doc('anglers/' + uid + '/photos/' + cid).get(); return d.exists ? d.data().t : null; });
+    },
+    async savePoint(p) {
+      if (S.mode !== 'shared' || !S.uid || window.APP_RT !== 'web') return false;
+      const d = Object.assign({}, p); const id = d.id; delete d.id; delete d._owner; delete d._upd;
+      S.points.set(id, Object.assign({ id, _owner: S.uid }, d)); S.dataVer++;
+      return safeWrite('points/' + id, d, null);
+    },
+    async deletePoint(id) {
+      if (!S.db) return false;
+      S.points.delete(id); S.dataVer++;
+      try { await S.db.doc('points/' + id).delete(); return true; } catch (e) { console.warn(e); toast(t('toast_write_fail'), 'warn'); return false; }
     },
     async deletePhoto(cid) {
       S.photoCache.delete((S.uid || 'local') + '/' + cid);
@@ -4691,7 +4878,7 @@ function verdict(uid, cid) { return (S.admin.verdicts && S.admin.verdicts[uid] &
 function catchState(uid, c) { const v = verdict(uid, c.id); return v === 'ok' || v === 'no' || v === 'hold' ? v : c.st; }
 /* The automatic reviewer's note for a catch: { v, code, text, m, at } (code is translated, text is the AI's own words in Korean) */
 function reviewNote(uid, c) {
-  const r = S.admin.autorev && S.admin.autorev[uid] && S.admin.autorev[uid][c.id]; if (!r) return null;
+  const r = S.reviewByCid.get(c.id) || (S.admin.autorev && S.admin.autorev[uid] && S.admin.autorev[uid][c.id]); if (!r) return null;
   const s = String(r.why || ''); const i = s.indexOf('|');
   return { v: r.v, code: i >= 0 ? s.slice(0, i) : s, text: i >= 0 ? s.slice(i + 1) : '', m: r.m, at: r.at };
 }
@@ -4759,7 +4946,9 @@ function supporter() { const g = grantsOf(myId()); return S.myOrders.some(o => o
 function lookOk(a, uid, id) {
   const it = SHOPI[id]; if (!it) return false;
   if (a === S.me || (uid && uid === myId())) return owned(id);
-  if (it.top || it.pr || it.in) return true;
+  if (it.top) return true;
+  // someone else's premium look: only once the operator has confirmed a payment from them (the public decisions doc)
+  if (it.pr || it.in) return carried(a, id) || (!!uid && Object.values(grantsOf(uid)).includes('ok'));
   return lvInfo(a, uid).L >= (it.lv || 1) || carried(a, id);
 }
 function decorOf(a, uid) {
@@ -5349,12 +5538,13 @@ function ensureProfile(then) {
   if (S.me && S.me.nick) { then && then(); return; }
   openOnboarding(then);
 }
-function profileFormHTML(p) {
+function profileFormHTML(p, afterNick = '') {
   const opts = COUNTRIES.map(c => `<option value="${c}" ${p.cc === c ? 'selected' : ''}>${flag(c)} ${esc(ccName(c))}</option>`).join('');
   const homes = HOMES.map(h => `<option value="${h}" ${p.home === h ? 'selected' : ''}>${esc(regionName(h))}</option>`).join('');
   const styles = Object.keys(METHOD).map(m => `<option value="${m}" ${p.style === m ? 'selected' : ''}>${esc(dict(METHOD[m]))}</option>`).join('');
   return `
   <div class="field"><label for="pf-nick">${t('pf_nick')}</label><input id="pf-nick" maxlength="16" value="${esc(p.nick || '')}" placeholder="${t('pf_nick_ph')}" autocomplete="nickname"></div>
+  ${afterNick}
   <div class="row2">
     <div class="field"><label for="pf-cc">${t('pf_country')}</label><select id="pf-cc">${opts}</select></div>
     <div class="field"><label for="pf-home">${t('pf_home')}</label><select id="pf-home">${homes}</select></div>
@@ -5377,7 +5567,19 @@ function nickRefused(f, root) {
   toast(t(f.bad), 'warn', 4800); const n = $('#pf-nick', root); if (n) n.focus();
   return true;
 }
+const NEW_ME = () => ({ v: 1, joined: nowMs(), catches: [], decor: { theme: 'th_dawn', items: ['dc_weed', 'dc_rock', 'dc_buoy'], fx: [] }, flair: {} });
+async function saveProfileFrom(w, f) {
+  S.me = Object.assign(NEW_ME(), S.me || {}, f);
+  if (f.lang !== S.lang) setLang(f.lang);
+  await store.saveMe();
+}
+function onbArt(w) { const cv = $('#onb-cv', w); if (cv) { const ctx = cv.getContext('2d'); ['kurodai', 'madai', 'aoriika', 'buri'].forEach((id, i) => FD.draw(ctx, SPI[id], 80 + i * 135, 78 + (i % 2) * 10, i === 2 ? 110 : 120, { still: true, flip: i % 2 === 1 })); } }
 function openOnboarding(then) {
+  // website: sign-up and login in one dialog (once we know the server can do login IDs)
+  if (idSupported()) {
+    if (S.loginId === undefined) { myLoginId().then(() => openOnboarding(then)); return; }
+    if (!S.idOff) { openAuth('join', then); return; }
+  }
   const p = { nick: '', cc: defaultCC(), home: defaultHome(), style: 'float' };
   const w = openModal(`
     <div class="onb">
@@ -5386,20 +5588,126 @@ function openOnboarding(then) {
       <p class="lede">${t('onb_sub')}</p>
       ${profileFormHTML(p)}
       ${S.mode !== 'shared' ? `<p class="note">${icon('info')} ${t(S.mode === 'local' ? 'mode_local_note' : 'mode_offline_note')}</p>` : ''}
-      <div class="actions"><button class="btn btn-primary btn-lg" id="onb-go">${t('onb_go')}</button>${idSupported() ? `<button class="btn btn-ghost" id="onb-login">${icon('user')}${t('id_have')}</button>` : ''}</div>
+      <div class="actions"><button class="btn btn-primary btn-lg" id="onb-go">${t('onb_go')}</button></div>
     </div>`, { label: t('onb_title') });
-  const lg = $('#onb-login', w); if (lg) lg.onclick = () => { closeModal(w); openIdLogin(); };
-  const cv = $('#onb-cv', w); if (cv) { const ctx = cv.getContext('2d'); ['kurodai', 'madai', 'aoriika', 'buri'].forEach((id, i) => FD.draw(ctx, SPI[id], 80 + i * 135, 78 + (i % 2) * 10, i === 2 ? 110 : 120, { still: true, flip: i % 2 === 1 })); }
+  onbArt(w);
   $('#onb-go', w).onclick = async () => {
     const f = readProfileForm(w);
     if (nickRefused(f, w)) return; delete f.bad;
-    S.me = Object.assign({ v: 1, joined: nowMs(), catches: [], decor: { theme: 'th_dawn', items: ['dc_weed', 'dc_rock', 'dc_buoy'], fx: [] }, flair: {} }, S.me || {}, f);
-    if (f.lang !== S.lang) setLang(f.lang);
-    await store.saveMe();
+    await saveProfileFrom(w, f);
     closeModal(w); toast(t('onb_done', { nick: S.me.nick }));
     rerender(); then && then();
   };
 }
+
+/* ===== Sign up / log in (website). Signing up keeps everything this device already recorded;
+   logging in joins this device to the ID's account, and this device's records come along. ===== */
+function openAuth(tab = 'join', then) {
+  if (!idSupported() || S.idOff) { openOnboarding(then); return; }
+  const hasProfile = !!(S.me && S.me.nick), hasId = !!S.loginId;
+  const p = Object.assign({ nick: '', cc: defaultCC(), home: defaultHome(), style: 'float' }, S.me || {});
+  const local = myCatches().length;
+  const idFields = hasId ? `<p class="note ok">${icon('check')} ${t('id_signed_in', { name: `<b class="mono">${esc(S.loginId)}</b>` })}</p>` : `
+    <div class="field"><label for="au-id">${t('id_name')}</label><input id="au-id" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="20" placeholder="zzirit_fisher"><small class="muted">${t('id_name_hint')}</small></div>
+    <div class="row2">
+      <div class="field"><label for="au-pw">${t('id_pass')}</label><input id="au-pw" type="password" autocomplete="new-password" maxlength="72"><small class="muted">${t('id_pass_hint')}</small></div>
+      <div class="field"><label for="au-pw2">${t('id_pass2')}</label><input id="au-pw2" type="password" autocomplete="new-password" maxlength="72"></div>
+    </div>`;
+  const w = openModal(`
+    <div class="auth">
+      <div class="onb-art" aria-hidden="true"><canvas width="560" height="150" id="onb-cv"></canvas></div>
+      <div class="seg auth-tabs" role="tablist">
+        <button role="tab" data-atab="join" aria-pressed="${tab === 'join'}">${t(hasProfile ? 'auth_tab_id' : 'auth_tab_join')}</button>
+        <button role="tab" data-atab="login" aria-pressed="${tab === 'login'}">${t('auth_tab_login')}</button>
+      </div>
+      <form class="auth-pane" id="au-join" data-pane="join" ${tab === 'join' ? '' : 'hidden'} novalidate>
+        <h2>${t(hasProfile ? 'auth_join_title_me' : 'auth_join_title')}</h2>
+        <p class="lede">${t(hasProfile ? 'auth_join_sub_me' : 'auth_join_sub')}</p>
+        ${hasProfile ? `<div class="field"><label>${t('pf_nick')}</label><p class="auth-me">${avatar(S.me, 30)} <b>${esc(S.me.nick)}</b> <span class="muted small">${t('acct_sum', { n: fmtN(local), pts: fmtN(myPoints()), lv: myLevel() })}</span></p></div>${idFields}`
+          : profileFormHTML(p, idFields)}
+        ${S.mode !== 'shared' ? `<p class="note">${icon('info')} ${t(S.mode === 'local' ? 'mode_local_note' : 'mode_offline_note')}</p>` : ''}
+        <p class="err" id="au-err" hidden></p>
+        <div class="actions"><button class="btn btn-primary btn-lg" type="submit" id="onb-go">${t(hasId ? 'onb_go' : hasProfile ? 'id_create_go' : 'auth_join_go')}</button></div>
+        ${hasProfile || hasId ? '' : `<button class="link small auth-noid" type="button" id="onb-noid">${t('auth_no_id')}</button>`}
+        <p class="hint">${icon('shield')} ${t('auth_pw_note')}</p>
+      </form>
+      <form class="auth-pane" id="au-login" data-pane="login" ${tab === 'login' ? '' : 'hidden'} novalidate>
+        <h2>${t('id_login')}</h2>
+        <p class="lede">${t('auth_login_sub')}</p>
+        <div class="field"><label for="idl-name">${t('id_name')}</label><input id="idl-name" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="20"></div>
+        <div class="field"><label for="idl-pass">${t('id_pass')}</label><input id="idl-pass" type="password" autocomplete="current-password" maxlength="72"></div>
+        ${local ? `<p class="note">${icon('info')} ${t('link_merge_note', { n: local })}</p>` : ''}
+        <p class="err" id="idl-err" hidden></p>
+        <div class="actions"><button class="btn btn-primary btn-lg" type="submit" id="idl-go">${t('id_login_go')}</button></div>
+        <p class="hint">${t('id_forgot')}</p>
+      </form>
+    </div>`, { label: t('auth_tab_join') });
+  onbArt(w);
+  const show = k => { $$('[data-atab]', w).forEach(b => b.setAttribute('aria-pressed', String(b.dataset.atab === k))); $$('[data-pane]', w).forEach(f => { f.hidden = f.dataset.pane !== k; }); const first = $(`[data-pane="${k}"] input`, w); if (first) setTimeout(() => first.focus(), 40); };
+  w.addEventListener('click', e => { const b = e.target.closest('[data-atab]'); if (b) show(b.dataset.atab); });
+  const fail = (box, code) => { box.textContent = idErr(code); box.hidden = false; };
+  // sign up (or add an ID to the profile this device already has)
+  const jf = $('#au-join', w), jerr = $('#au-err', w), jgo = $('#onb-go', w);
+  jf.addEventListener('submit', async e => {
+    e.preventDefault(); jerr.hidden = true;
+    let f = null;
+    if (!hasProfile) { f = readProfileForm(w); if (nickRefused(f, w)) return; delete f.bad; }
+    jgo.disabled = true;
+    try {
+      if (!hasId) {
+        const name = $('#au-id', w).value.trim().toLowerCase(), p1 = $('#au-pw', w).value, p2 = $('#au-pw2', w).value;
+        if (!/^[a-z0-9_]{3,20}$/.test(name)) throw { code: 'bad_name' };
+        if (p1.length < 6) throw { code: 'bad_pass' };
+        if (p1 !== p2) throw { code: 'mismatch' };
+        const r = await window.APP_AUTH.ids.register(name, p1);
+        if (!r || r.ok !== true) throw { code: (r && r.err) || 'fail' };
+        S.loginId = r.name;
+      }
+      if (f) await saveProfileFrom(w, f);
+      closeModal(w);
+      toast(t(hasProfile ? 'id_created' : 'auth_joined', { name: S.loginId, nick: (S.me && S.me.nick) || '' }), 'ok', 6000);
+      rerender(); then && then();
+    } catch (x) { jgo.disabled = false; fail(jerr, x && x.code); }
+  });
+  const noid = $('#onb-noid', w);
+  if (noid) noid.onclick = async () => {
+    const f = readProfileForm(w); if (nickRefused(f, w)) return; delete f.bad;
+    await saveProfileFrom(w, f);
+    closeModal(w); toast(t('onb_done', { nick: S.me.nick }));
+    rerender(); then && then();
+  };
+  // log in with an ID made on another device
+  const lf = $('#au-login', w), lerr = $('#idl-err', w), lgo = $('#idl-go', w);
+  lf.addEventListener('submit', async e => {
+    e.preventDefault(); lerr.hidden = true;
+    const name = $('#idl-name', w).value.trim().toLowerCase(), pw = $('#idl-pass', w).value;
+    if (!name || !pw) { fail(lerr, 'wrong'); return; }
+    lgo.disabled = true;
+    try {
+      const r = await window.APP_AUTH.ids.login(name, pw);
+      if (!r || r.ok !== true) throw { code: (r && r.err) || 'fail' };
+      for (const k of ['me', 'labels', 'orders', 'suggest', 'photos']) lsSet(k, null);
+      try { localStorage.removeItem('eosin.spots'); } catch (x) { }
+      closeModal(w); toast(t('id_login_ok', { name: r.name || name }), 'ok');
+      setTimeout(() => { location.hash = 'sea'; location.reload(); }, 800);
+    } catch (x) { lgo.disabled = false; fail(lerr, x && x.code); }
+  });
+  setTimeout(() => { const first = $(`[data-pane="${tab}"] input`, w); if (first) first.focus(); }, 80);
+  return w;
+}
+/* First visit on the website: show sign-up / login once (people can still close it and look around) */
+function maybeWelcome(tries = 0) {
+  if (window.APP_RT !== 'web' || lsGet('welcomed', 0) || tries > 6) return;
+  if (!S.ready || $('.modal-wrap.in') || S.route === 'admin' || /^#(claim|link=)/.test(location.hash)) { setTimeout(() => maybeWelcome(tries + 1), 3000); return; }
+  if (S.me && S.me.nick) { lsSet('welcomed', 1); return; }
+  myLoginId().then(() => {
+    if ((S.me && S.me.nick) || lsGet('welcomed', 0)) { lsSet('welcomed', 1); return; }
+    if ($('.modal-wrap.in')) { setTimeout(() => maybeWelcome(tries + 1), 3000); return; }
+    lsSet('welcomed', 1);
+    if (idSupported() && !S.idOff) openAuth('join'); else openOnboarding();
+  });
+}
+function myPoints() { return myCatches().filter(c => eligible(c, myId())).reduce((a, c) => a + (c.sc || 0), 0); }
 
 /* ===== Payments: KakaoPay transfer-code link (no bank account shown anywhere) ===== */
 function payLinks(amt) {
@@ -5630,7 +5938,7 @@ async function myLoginId(force) {
   return S.loginId;
 }
 function idErr(code) {
-  const k = { bad_name: 'name', bad_pass: 'pass', taken: 'taken', wrong: 'wrong', slow_down: 'slow', slow: 'slow', has_id: 'has_id', team_leader: 'leader', no_id: 'no_id', mismatch: 'mismatch' }[code] || 'fail';
+  const k = { bad_name: 'name', bad_pass: 'pass', taken: 'taken', wrong: 'wrong', slow_down: 'slow', slow: 'slow', has_id: 'has_id', team_leader: 'leader', no_id: 'no_id', mismatch: 'mismatch', need_update: 'update', not_signed_in: 'signin', not_admin: 'not_admin' }[code] || 'fail';
   return t('id_err_' + k);
 }
 function idFormModal({ id, title, sub, fields, go, note, onSubmit }) {
@@ -5650,40 +5958,9 @@ function idFormModal({ id, title, sub, fields, go, note, onSubmit }) {
   return w;
 }
 const idCheck = r => { if (!r || r.ok !== true) throw { code: (r && r.err) || 'fail' }; return r; };
-function openIdCreate() {
-  if (!idSupported()) return;
-  idFormModal({
-    id: 'idc', title: t('id_create'), sub: t('id_create_sub'), go: t('id_create_go'),
-    fields: [{ id: 'idc-name', label: t('id_name'), ac: 'username', max: 20, ph: 'zzirit_fisher', hint: t('id_name_hint') }, { id: 'idc-pass', label: t('id_pass'), type: 'password', ac: 'new-password', hint: t('id_pass_hint') }, { id: 'idc-pass2', label: t('id_pass2'), type: 'password', ac: 'new-password' }],
-    note: `<p class="hint">${icon('info')} ${t('id_forgot')}</p>`,
-    async onSubmit(v, w) {
-      const name = v('idc-name').trim().toLowerCase(), p1 = v('idc-pass'), p2 = v('idc-pass2');
-      if (!/^[a-z0-9_]{3,20}$/.test(name)) throw { code: 'bad_name' };
-      if (p1.length < 6) throw { code: 'bad_pass' };
-      if (p1 !== p2) throw { code: 'mismatch' };
-      const r = idCheck(await window.APP_AUTH.ids.register(name, p1));
-      S.loginId = r.name; closeModal(w); toast(t('id_created', { name: r.name }), 'ok', 6000); rerender();
-    }
-  });
-}
-function openIdLogin() {
-  if (!idSupported()) return;
-  const local = myCatches().length;
-  idFormModal({
-    id: 'idl', title: t('id_login'), sub: t('id_login_sub'), go: t('id_login_go'),
-    fields: [{ id: 'idl-name', label: t('id_name'), ac: 'username', max: 20 }, { id: 'idl-pass', label: t('id_pass'), type: 'password', ac: 'current-password' }],
-    note: (local ? `<p class="note">${icon('info')} ${t('link_merge_note', { n: local })}</p>` : '') + `<p class="hint">${t('id_forgot')}</p>`,
-    async onSubmit(v, w) {
-      const name = v('idl-name').trim().toLowerCase(), p = v('idl-pass');
-      if (!name || !p) throw { code: 'wrong' };
-      const r = idCheck(await window.APP_AUTH.ids.login(name, p));
-      for (const k of ['me', 'labels', 'orders', 'suggest', 'photos']) lsSet(k, null);
-      try { localStorage.removeItem('eosin.spots'); } catch (x) { }
-      closeModal(w); toast(t('id_login_ok', { name: r.name || name }), 'ok');
-      setTimeout(() => { location.hash = 'sea'; location.reload(); }, 800);
-    }
-  });
-}
+// adding an ID and logging in both go through the one sign-up / login dialog
+function openIdCreate() { if (idSupported()) openAuth('join'); }
+function openIdLogin() { if (idSupported()) openAuth('login'); }
 function openIdPassword() {
   if (!idSupported()) return;
   idFormModal({
@@ -5707,14 +5984,18 @@ async function idLogout(btn) {
   for (const k of ['me', 'labels', 'orders', 'suggest', 'photos', 'payok']) lsSet(k, null);
   toast(t('id_logged_out')); setTimeout(() => { location.hash = 'home'; location.reload(); }, 700);
 }
+function acctSumHTML() {
+  if (!S.me || !S.me.nick) return '';
+  return `<div class="acct-sum">${avatar(S.me, 44)}<div><b>${nickHTML(S.me)}</b> ${lvMini(S.me, myId())}<p class="muted small">${t('acct_sum', { n: fmtN(myCatches().length), pts: fmtN(myPoints()), lv: myLevel() })}</p></div></div>`;
+}
 function idCardHTML() {
-  if (S.loginId === undefined) { myLoginId().then(() => { const c = $('#id-card'); if (c) { if (S.idOff) c.remove(); else c.innerHTML = idCardHTML(); } }); return `<h2 class="h3">${icon('user')}${t('id_title')}</h2><p class="muted">${t('thinking')}</p>`; }
+  if (S.loginId === undefined) { myLoginId().then(() => { const c = $('#id-card'); if (c) { if (S.idOff) c.remove(); else c.innerHTML = idCardHTML(); } }); return `<h2 class="h3">${icon('user')}${t('acct_title')}</h2><p class="muted">${t('thinking')}</p>`; }
   const linked = !!(window.APP_AUTH.link && window.APP_AUTH.link.linked());
   return S.loginId
-    ? `<h2 class="h3">${icon('user')}${t('id_title')}</h2><p>${t('id_signed_in', { name: `<b class="mono">${esc(S.loginId)}</b>` })}</p><p class="muted small">${t('id_signed_in_sub')}</p>
+    ? `<h2 class="h3">${icon('user')}${t('acct_title')}</h2>${acctSumHTML()}<p class="acct-state ok">${icon('check')} ${t('id_signed_in', { name: `<b class="mono">${esc(S.loginId)}</b>` })}</p><p class="muted small">${t('id_signed_in_sub')}</p>
        <div class="actions"><button class="btn btn-line" data-id="password">${t('id_change_pw')}</button><button class="btn btn-ghost" data-id="logout">${t('id_logout')}</button></div>`
-    : `<h2 class="h3">${icon('user')}${t('id_title')}</h2><p class="muted">${t('id_card_sub')}</p>
-       <div class="actions"><button class="btn btn-primary" data-id="create">${t('id_create')}</button><button class="btn btn-line" data-id="login">${t('id_login')}</button>${linked ? `<button class="btn btn-ghost" data-id="logout">${t('id_logout')}</button>` : ''}</div>`;
+    : `<h2 class="h3">${icon('user')}${t('acct_title')}</h2>${acctSumHTML()}<p class="acct-state warn">${icon('warn')} ${t(S.me && S.me.nick ? 'acct_no_id' : 'acct_none')}</p>
+       <div class="actions"><button class="btn btn-primary" data-id="create">${t(S.me && S.me.nick ? 'id_create' : 'auth_tab_join')}</button><button class="btn btn-line" data-id="login">${t('id_login')}</button>${linked ? `<button class="btn btn-ghost" data-id="logout">${t('id_logout')}</button>` : ''}</div>`;
 }
 
 /* ===== Operator: remove an account (with everything it posted) ===== */
@@ -5728,7 +6009,11 @@ async function adminDeleteUser(uid, btn) {
     S.anglers.delete(uid); S.dataVer++;
     toast(t('ad_deleted', { nick }), 'ok');
     if (/^#sea/.test(location.hash) && location.hash.includes(uid)) location.hash = 'admin'; else rerender();
-  } catch (e) { toast(t(/admin/i.test(String(e && e.message)) ? 'ad_del_admin' : 'ad_del_fail'), 'warn'); }
+  } catch (e) {
+    // say what actually happened (an older version showed "operator accounts can't be deleted" for any error)
+    const k = { need_update: 'ad_need_update', self: 'ad_del_self', not_admin: 'ad_not_admin' }[e && e.code] || 'ad_del_fail';
+    toast(t(k), 'warn', 7000);
+  }
 }
 
 /* ===== PC ↔ phone: one account on several devices (web build) ===== */
@@ -5877,7 +6162,7 @@ async function openCatch(uid, cid) {
           <div><dt>${t('trust')}</dt><dd><span class="trust-meter"><i style="width:${c.tr || 0}%"></i></span> ${c.tr ?? '—'}</dd></div>
         </dl>
         ${c.memo ? `<blockquote class="memo" id="cd-memo">${esc(c.memo)}</blockquote>${!mine && S.sample ? `<button class="btn btn-ghost btn-sm" id="cd-tr">${icon('globe')} ${t('translate')}</button>` : ''}` : ''}
-        <div class="actions split"><button class="btn btn-line btn-sm" data-share="${esc(uid)}|${esc(c.id)}">${icon('share')} ${t('share_btn')}</button>${mine ? `<button class="btn btn-ghost btn-sm" id="cd-del">${icon('trash')} ${t('delete')}</button>` : ''}</div>
+        <div class="actions split"><button class="btn btn-line btn-sm" data-share="${esc(uid)}|${esc(c.id)}">${icon('share')} ${t('share_btn')}</button>${mine && pointsOn() && c.lat != null ? `<button class="btn btn-line btn-sm" id="cd-pt">${icon('pin')} ${t('pt_from_catch')}</button>` : ''}${mine ? `<button class="btn btn-ghost btn-sm" id="cd-del">${icon('trash')} ${t('delete')}</button>` : ''}</div>
       </div>
     </article>`, { wide: true });
   store.getPhoto(uid, c.id).then(src => { if (src) { const ph = $('#cd-ph', w); if (ph) ph.innerHTML = `<img src="${src}" alt="${esc(nameOf(c.sp))}">`; } });
@@ -5887,6 +6172,8 @@ async function openCatch(uid, cid) {
     try { const r = await S.sample(`Translate the following fishing note into ${LANG_NAME[S.li]}. Output only the translation.\n\n${c.memo}`, { modelTier: 'quick' }); $('#cd-memo', w).textContent = r.text.trim(); tr.remove(); }
     catch (e) { tr.textContent = aiErrorText(e); }
   };
+  const cpt = $('#cd-pt', w);
+  if (cpt) cpt.onclick = () => { closeModal(w); openPointEdit(null, { lat: Math.round(c.lat * 1e4) / 1e4, lon: Math.round(c.lon * 1e4) / 1e4, sp: SPI[c.sp] ? [c.sp] : [], kind: c.sea ? 'breakwater' : 'river' }); };
   const del = $('#cd-del', w);
   if (del) del.onclick = () => {
     if (del.dataset.armed) { S.me.catches = S.me.catches.filter(x => x.id !== c.id); store.saveMe(); store.deletePhoto(c.id); closeModal(w); toast(t('deleted')); rerender(); }
@@ -6608,7 +6895,9 @@ VIEWS.map = {
   render(el) {
     S.mp = S.mp || { month: new Date().getMonth(), sp: S.mapSp || '', base: 'day', fold: window.innerWidth < 760, tg: { coast: true, urban: true, roads: true, fresh: true, bathy: true, grid: true, heat: true, labels: true } };
     if (S.mapSp) { S.mp.sp = S.mapSp; S.mapSp = null; }
-    if (this.built && el.querySelector('#map')) { this.refreshPanels(); setTimeout(() => this.map && this.map.invalidateSize(), 60); return; }
+    if (S.mp.tg.points === undefined) S.mp.tg.points = true;
+    const focus = () => { if (S.mapFocus && this.map) { const [lo, la, z] = S.mapFocus; S.mapFocus = null; this.map.setView([la, lo], z); } };
+    if (this.built && el.querySelector('#map')) { this.refreshPanels(); this.drawMine(); setTimeout(() => { if (this.map) { this.map.invalidateSize(); focus(); } }, 60); return; }
     const mp = S.mp;
     el.innerHTML = `
     <div class="map-wrap">
@@ -6631,7 +6920,9 @@ VIEWS.map = {
     this.vec = new LY.Vec({ toggles: () => Object.assign({ night: S.mp.base === 'night' }, S.mp.tg) }).addTo(map);
     this.labels = MAPX.labelLayer(L, map, () => S.li);
     this.mine = L.layerGroup().addTo(map);
+    this.pts = L.layerGroup().addTo(map);
     this.map = map; this.built = true; this.LY = LY;
+    setTimeout(focus, 120);
     MAPX.load().then(() => { this.labels.refresh(); this.drawMine(); });
     map.on('click', e => this.inspect(e.latlng.lng, e.latlng.lat));
     el.addEventListener('click', e => { const j = e.target.closest('[data-jump]'); if (j) { const [lo, la, z] = j.dataset.jump.split(',').map(Number); map.flyTo([la, lo], z, { duration: .8 }); } });
@@ -6670,7 +6961,7 @@ VIEWS.map = {
           <div class="chip-row">${[['spring', 3], ['summer', 6], ['autumn', 9], ['winter', 0]].map(([s, mm]) => `<button class="chip chip-tab" aria-pressed="${seasonOf(mp.month) === s}" data-season="${mm}">${t('season_' + s)}</button>`).join('')}</div>
         </div>
         <fieldset class="toggles"><legend class="sr">${t('layers')}</legend>
-          ${['heat', 'coast', 'urban', 'roads', 'fresh', 'bathy', 'grid'].map(k => `<label class="tg"><input type="checkbox" data-tg="${k}" ${tg[k] ? 'checked' : ''}><span>${t('tg_' + k)}</span></label>`).join('')}
+          ${['heat', 'coast', 'urban', 'roads', 'fresh', 'bathy', 'grid'].concat(pointsOn() ? ['points'] : []).map(k => `<label class="tg"><input type="checkbox" data-tg="${k}" ${tg[k] ? 'checked' : ''}><span>${t('tg_' + k)}</span></label>`).join('')}
         </fieldset>
         <p class="hint">${t('map_note_detail')}</p>
       </div>`;
@@ -6682,12 +6973,20 @@ VIEWS.map = {
     $('#mp-month').onchange = () => { this.refreshPanels(); if (this.last) this.inspect(...this.last); };
     $$('[data-season]', ctl).forEach(b => b.onclick = () => { mp.month = +b.dataset.season; this.redrawHeat(); this.refreshPanels(); if (this.last) this.inspect(...this.last); });
     $$('[data-base]', ctl).forEach(b => b.onclick = () => { mp.base = b.dataset.base; this.sat.options.night = mp.base === 'night'; this.sat.redraw(); this.vec.redraw(); this.refreshPanels(); });
-    $$('[data-tg]', ctl).forEach(c => c.onchange = () => { const k = c.dataset.tg; tg[k] = c.checked; if (k === 'heat') { if (c.checked) this.heat.addTo(this.map); else this.heat.remove(); } else this.vec.redraw(); });
+    $$('[data-tg]', ctl).forEach(c => c.onchange = () => { const k = c.dataset.tg; tg[k] = c.checked; if (k === 'heat') { if (c.checked) this.heat.addTo(this.map); else this.heat.remove(); } else if (k === 'points') this.drawMine(); else this.vec.redraw(); });
   },
   redrawHeatSoon: debounce(function () { VIEWS.map.redrawHeat(); }, 160),
   drawMine() {
     if (!this.mine) return; this.mine.clearLayers();
     for (const c of myCatches()) if (c.lat != null) this.mine.addLayer(L.marker([c.lat, c.lon], { icon: L.divIcon({ className: 'my-pin', html: `<i></i>`, iconSize: [14, 14] }), title: nameOf(c.sp) }).on('click', () => openCatch(S.uid || 'local', c.id)));
+    // fishing points: mine filled, shared ones outlined
+    if (this.pts) {
+      this.pts.clearLayers();
+      if (pointsOn() && S.mp.tg.points) for (const p of S.points.values()) {
+        if (p.lat == null || p.lon == null || !ptVisible(p) || (!p.pub && !ptMine(p))) continue;
+        this.pts.addLayer(L.marker([p.lat, p.lon], { icon: L.divIcon({ className: 'pt-mark' + (ptMine(p) ? ' mine' : ''), html: icon('pin'), iconSize: [26, 26], iconAnchor: [13, 24] }), title: p.name || '' }).on('click', () => openPoint(p.id)));
+      }
+    }
   },
   inspect(lon, lat) {
     this.last = [lon, lat];
@@ -7191,10 +7490,10 @@ VIEWS.prefs = {
     el.innerHTML = `
     <div class="page prefs">
       <header class="page-head"><h1>${t('prefs_title')}</h1></header>
+      ${idSupported() && S.mode === 'shared' ? `<section class="card id-card" id="id-card">${idCardHTML()}</section>` : ''}
       <section class="card"><h2 class="h3">${t('prefs_profile')}</h2>
         ${S.me && S.me.nick ? `<a class="pf-char" href="#char">${avatar(S.me, 48)}<span><b>${t('ch_title')}</b><span class="muted small">${t('pf_char_hint')}</span></span>${icon('gear')}</a>` : ''}
         <div id="pf-box">${profileFormHTML(p)}</div><div class="actions"><button class="btn btn-primary" id="pf-save">${t('save')}</button></div></section>
-      ${idSupported() && S.mode === 'shared' ? `<section class="card id-card" id="id-card">${idCardHTML()}</section>` : ''}
       ${linkSupported() ? `<section class="card link-card"><h2 class="h3">${icon('link')}${t('link_title')}</h2><p class="muted">${t('link_sub')}</p>
         ${window.APP_AUTH.link.linked() ? `<p class="note ok">${icon('check')} ${t('link_linked')}</p>` : ''}
         <div class="actions"><button class="btn btn-primary" data-link="make">${icon('qr')}${t('link_make')}</button><button class="btn btn-line" data-link="enter">${t('link_enter')}</button>${window.APP_AUTH.link.linked() ? `<button class="btn btn-ghost" data-link="leave">${t('link_leave')}</button>` : ''}</div>
@@ -7243,7 +7542,10 @@ VIEWS.admin = {
     }
     const autoLog = []; for (const [uid, m] of Object.entries(S.admin.autorev || {})) for (const [cid, r] of Object.entries(m || {})) { const a = S.anglers.get(uid); const c = a && (a.catches || []).find(x => x.id === cid); if (c) autoLog.push({ uid, a, c, note: reviewNote(uid, c), at: r.at || 0 }); }
     autoLog.sort((x, y) => y.at - x.at);
-    const users = [...S.anglers.entries()].filter(([, a]) => a && a.nick).map(([uid, a]) => ({ uid, a, n: (a.catches || []).length, L: lvInfo(a, uid).L })).sort((x, y) => (y.a.joined || 0) - (x.a.joined || 0));
+    const users = [...S.anglers.entries()].filter(([, a]) => a && a.nick).map(([uid, a]) => ({ uid, a, n: (a.catches || []).length, L: lvInfo(a, uid).L, pts: (a.catches || []).filter(c => eligible(c, uid)).reduce((x, c) => x + (c.sc || 0), 0) })).sort((x, y) => (y.a.joined || 0) - (x.a.joined || 0));
+    adminLoad();
+    const ids = S.adm.logins || new Map(); const uq = (S.adm.q || '').trim().toLowerCase();
+    const shown = uq ? users.filter(u => u.a.nick.toLowerCase().includes(uq) || (ids.get(u.uid) || '').includes(uq) || u.uid.startsWith(uq)) : users;
     const nCatch = [...S.anglers.values()].reduce((s, a) => s + (a.catches || []).length, 0);
     const flagged = [...boardIndex().posts.values()].filter(p => p.reps > 0 || p.hidden).sort((x, y) => (x.hidden - y.hidden) || (y.reps - x.reps) || (y.ts - x.ts)).slice(0, 60);
     el.innerHTML = `
@@ -7271,7 +7573,9 @@ VIEWS.admin = {
         ${autoLog.length ? `<details class="ad-auto"><summary>${t('ad_auto_log', { n: autoLog.length })}</summary><ul class="ad-autolog">${autoLog.slice(0, 40).map(({ uid, a, c, note }) => `<li><span class="chip ${note.v === 'no' ? 'chip-closed' : note.v === 'ok' ? 'chip-ok' : 'chip-wait'}">${t(note.v === 'no' ? 'st_rejected' : note.v === 'ok' ? 'st_ok' : 'st_hold')}</span><button class="link" data-catch="${uid}|${c.id}">${esc(nameOf(c.sp))} ${lenFmt(c.len)}</button><span class="muted small">${esc(a.nick)} · ${esc(reviewReason(note))}</span>${verdict(uid, c.id) !== 'ok' ? `<button class="btn btn-ghost btn-xs" data-verdict="${uid}|${c.id}|ok">${t('approve')}</button>` : `<button class="btn btn-ghost btn-xs" data-verdict="${uid}|${c.id}|no">${t('reject')}</button>`}</li>`).join('')}</ul></details>` : ''}
       </section>
       <section class="card"><h2 class="h3">${icon('users')}${t('ad_users_title')}</h2><p class="hint">${t('ad_users_hint')}</p>
-        ${users.length ? `<ul class="ad-users">${users.slice(0, 300).map(({ uid, a, n, L }) => `<li><button class="fr-who" data-seauid="${esc(uid)}">${avatar(a, 32)}<span class="fr-txt"><span class="fr-name">${nickHTML(a)} <span class="lv-chip">Lv.${L}</span></span><span class="muted small">${t('catches')} ${n} · ${a.joined ? fmtDate(a.joined) : '—'} · <span class="mono">${esc(uid.slice(0, 8))}</span></span></span></button>${uid === myId() ? `<span class="chip">${t('ad_you')}</span>` : `<button class="btn btn-ghost btn-xs" data-deluser="${esc(uid)}">${icon('x')}${t('ad_del_user')}</button>`}</li>`).join('')}</ul>` : `<p class="muted">${t('ad_none')}</p>`}
+        ${S.adm.canDelete === false ? `<p class="note">${icon('info')} ${t('ad_del_needs_update')}</p>` : ''}
+        <input class="search" id="ad-uq" type="search" placeholder="${esc(t('ad_users_search'))}" value="${esc(S.adm.q || '')}" autocomplete="off">
+        ${shown.length ? `<ul class="ad-users">${shown.slice(0, 300).map(({ uid, a, n, L, pts }) => `<li><button class="fr-who" data-seauid="${esc(uid)}">${avatar(a, 32)}<span class="fr-txt"><span class="fr-name">${nickHTML(a)} <span class="lv-chip">Lv.${L}</span>${ids.get(uid) ? ` <span class="chip chip-id mono">${icon('user')}${esc(ids.get(uid))}</span>` : ''}</span><span class="muted small">${t('catches')} ${n} · ${fmtN(pts)} pt · ${a.joined ? fmtDate(a.joined) : '—'} · <span class="mono">${esc(uid.slice(0, 8))}</span></span></span></button><span class="ad-acts">${uid === myId() ? `<span class="chip">${t('ad_you')}</span>` : `${window.APP_RT === 'web' ? `<button class="btn btn-line btn-xs" data-relink="${esc(uid)}">${icon('link')}${t('ad_relink')}</button>` : ''}<button class="btn btn-ghost btn-xs" data-deluser="${esc(uid)}" ${S.adm.canDelete === false ? 'disabled' : ''}>${icon('x')}${t('ad_del_user')}</button>`}</span></li>`).join('')}</ul>` : `<p class="muted">${t('ad_none')}</p>`}
         ${window.APP_RT === 'web' ? `<form class="ad-idreset" id="ad-idreset"><p class="lbl">${t('ad_id_reset')}</p><div class="row2"><div class="field"><input id="ad-idr-name" placeholder="${esc(t('id_name'))}" autocomplete="off" autocapitalize="none" spellcheck="false"></div><div class="field"><input id="ad-idr-pass" placeholder="${esc(t('ad_id_reset_pw'))}" autocomplete="off"></div></div><div class="actions"><button class="btn btn-line btn-sm" type="submit">${t('ad_id_reset_go')}</button></div><p class="hint">${t('ad_id_reset_hint')}</p></form>` : ''}
       </section>
       <section class="card"><h2 class="h3">${icon('board')}${t('ad_reports')}</h2>
@@ -7306,19 +7610,54 @@ VIEWS.admin = {
       e.preventDefault();
       const name = $('#ad-idr-name', el).value.trim().toLowerCase(), pw = $('#ad-idr-pass', el).value.trim();
       if (!name || pw.length < 6) { toast(t('id_err_pass'), 'warn'); return; }
-      try { const r = await window.APP_AUTH.ids.adminReset(name, pw); if (!r || r.ok !== true) throw { code: (r && r.err) || 'fail' }; toast(t('ad_id_reset_ok', { name }), 'ok'); idr.reset(); }
-      catch (x) { toast(idErr(x && x.code), 'warn'); }
+      try { const r = await window.APP_AUTH.ids.adminReset(name, pw); if (!r || r.ok !== true) throw { code: (r && r.err) || 'fail' }; toast(t('ad_id_reset_ok', { name }), 'ok', 6000); idr.reset(); }
+      catch (x) { toast(idErr(x && x.code), 'warn', 6000); }
     };
+    const uqi = $('#ad-uq', el);
+    if (uqi) uqi.addEventListener('input', debounce(() => { S.adm.q = uqi.value; rerender(); }, 200));
   }
 };
 
+/* operator page extras from the server: who has which login ID, and whether deleting accounts is available yet */
+function adminLoad(force) {
+  S.adm = S.adm || {};
+  if (window.APP_RT !== 'web' || !window.APP_AUTH || !window.APP_AUTH.admin) return;
+  if (!force && S.adm.at && nowMs() - S.adm.at < 60000) return;
+  S.adm.at = nowMs();
+  window.APP_AUTH.admin.logins().then(rows => { S.adm.logins = new Map((rows || []).map(r => [r.acct, r.name])); rerenderSoon(); }).catch(e => { console.warn('admin_logins', e); });
+  window.APP_AUTH.admin.canDelete().then(v => { if (S.adm.canDelete !== v) { S.adm.canDelete = v; rerenderSoon(); } });
+}
+/* operator: a one-time code that brings someone back to an account they lost (they type it in Settings) */
+async function openRelink(uid) {
+  if (!S.isOwner || window.APP_RT !== 'web') return;
+  const a = S.anglers.get(uid); const nick = (a && a.nick) || '?';
+  let code;
+  try { code = await window.APP_AUTH.admin.linkCode(uid); }
+  catch (e) { toast(t(e && e.code === 'need_update' ? 'ad_need_update' : 'ad_relink_fail'), 'warn', 6000); return; }
+  const pretty = String(code).replace(/^(.{4})(.{4})$/, '$1-$2');
+  const msg = t('ad_relink_msg', { code: pretty });
+  openModal(`<div class="relink">
+    <h2>${icon('link')} ${t('ad_relink_title', { nick: esc(nick) })}</h2>
+    <p class="lede">${t('ad_relink_sub')}</p>
+    <p class="link-code"><b class="mono">${esc(pretty)}</b> <button class="btn btn-line btn-sm" data-copy="${esc(code)}">${icon('copy')}${t('copy')}</button></p>
+    <div class="field"><label>${t('ad_relink_send')}</label><textarea rows="3" readonly>${esc(msg)}</textarea><button class="btn btn-primary btn-sm" data-copy="${esc(msg)}">${icon('copy')}${t('ad_relink_copy')}</button></div>
+    <p class="hint">${icon('shield')} ${t('ad_relink_note')}</p>
+  </div>`, { label: t('ad_relink_title', { nick }) });
+}
+
 /* ---------- More (mobile) ---------- */
 function openMore() {
-  const items = [['friends', 'users'], ['board', 'board'], ['teams', 'flag'], ['char', 'user'], ['dex', 'book'], ['tackle', 'lure'], ['log', 'log'], ['help', 'chat'], ['about', 'sparkle'], ['prefs', 'gear']];
+  const items = [['friends', 'users'], ['board', 'board'], ['teams', 'flag'], ['points', 'pin'], ['char', 'user'], ['dex', 'book'], ['tackle', 'lure'], ['log', 'log'], ['help', 'chat'], ['about', 'sparkle'], ['prefs', 'gear']];
+  if (window.APP_RT !== 'web') items.splice(3, 1);
   if (S.isOwner) items.push(['admin', 'shield']);
   const nIn = frLists().inc.length;
-  const w = openModal(`<nav class="more"><h2 class="sr">${t('more')}</h2>${items.map(([r, ic]) => `<a href="#${r}" class="more-item">${icon(ic)}<span>${t('nav_' + r)}</span>${r === 'friends' && nIn ? `<i class="badge num">${nIn}</i>` : ''}</a>`).join('')}<button class="more-item heart" data-act="donate">${icon('heart')}<span>${t('donate_btn')}</span></button></nav>`, { sheet: true, label: t('more') });
-  w.addEventListener('click', e => { if (e.target.closest('a,.heart')) closeModal(w); });
+  const acct = idSupported() && !S.idOff ? (S.loginId ? `<a href="#prefs" class="more-acct">${S.me && S.me.nick ? avatar(S.me, 30) : icon('user')}<span><b>${esc((S.me && S.me.nick) || '')}</b><span class="muted small mono">${esc(S.loginId)}</span></span></a>`
+    : `<button class="more-acct" data-act="auth">${icon('user')}<span><b>${t(S.me && S.me.nick ? 'more_acct_keep' : 'more_acct_join')}</b><span class="muted small">${t(S.me && S.me.nick ? 'more_acct_keep_sub' : 'more_acct_join_sub')}</span></span></button>`) : '';
+  const w = openModal(`<nav class="more"><h2 class="sr">${t('more')}</h2>${acct}${items.map(([r, ic]) => `<a href="#${r}" class="more-item">${icon(ic)}<span>${t('nav_' + r)}</span>${r === 'friends' && nIn ? `<i class="badge num">${nIn}</i>` : ''}</a>`).join('')}<button class="more-item heart" data-act="donate">${icon('heart')}<span>${t('donate_btn')}</span></button></nav>`, { sheet: true, label: t('more') });
+  w.addEventListener('click', e => {
+    if (e.target.closest('[data-act="auth"]')) { closeModal(w); openAuth('join'); return; }
+    if (e.target.closest('a,.heart')) closeModal(w);
+  });
 }
 
 /* ===== My character (original chibi angler) · profile picture ===== */
@@ -8101,10 +8440,138 @@ function newsMaybeRefresh() {
   setTimeout(() => { window.APP_AUTH.news.refresh().catch(() => { }); }, 1500);
 }
 
+/* ===== Fishing points (포인트): where people fish, what bites there, tips. =====
+   Each point belongs to the account that wrote it. It stays private unless the owner shares it; shared points
+   show for everyone on this page and on the map. The operator can hide a shared point. Website only. */
+const PT_KINDS = ['breakwater', 'rocks', 'beach', 'boat', 'river', 'lake', 'other'];
+const PT_MAX_SP = 5;
+function pointsOn() { return window.APP_RT === 'web'; }
+function ptMine(p) { return !!p && (p._owner === S.uid || (!p.pub && !S.isOwner)); }
+function ptVisible(p) { return p && (!p.hidden || ptMine(p) || S.isOwner); }
+function ptLists() {
+  const all = [...S.points.values()].filter(ptVisible);
+  const mine = all.filter(ptMine).sort((a, b) => (b.upd || 0) - (a.upd || 0));
+  const shared = all.filter(p => p.pub && !ptMine(p)).sort((a, b) => (b.upd || 0) - (a.upd || 0));
+  return { mine, shared };
+}
+function ptWhere(p) {
+  if (p.lat == null || p.lon == null) return '';
+  const env = GEO.envAt(p.lon, p.lat);
+  return env && env.water ? dict(GEO.seaOf(p.lon, p.lat).n) : regionName(GEO.region(p.lon, p.lat, false));
+}
+const ptSpName = x => (SPI[x] ? spName(SPI[x]) : String(x || '').slice(0, 20));
+function ptCard(p) {
+  const owner = !ptMine(p) ? (anglerOf(p._owner) || null) : null;
+  return `<li><button class="pt-card${p.hidden ? ' is-hidden' : ''}" data-point="${esc(p.id)}">
+    <span class="pt-pin">${icon('pin')}</span>
+    <span class="pt-main">
+      <span class="pt-top"><b>${esc(p.name || '?')}</b><span class="chip">${t('ptk_' + (PT_KINDS.includes(p.kind) ? p.kind : 'other'))}</span>${ptMine(p) ? `<span class="chip ${p.pub ? 'chip-ok' : 'chip-local'}">${t(p.pub ? 'pt_shared' : 'pt_private')}</span>` : ''}${p.hidden ? `<span class="chip chip-closed">${t('pt_hidden_chip')}</span>` : ''}</span>
+      <span class="muted small">${esc(ptWhere(p))}${(p.sp || []).length ? ' · ' + esc((p.sp || []).slice(0, 3).map(ptSpName).join(', ')) : ''}</span>
+      ${p.memo ? `<span class="pt-memo">${esc(String(p.memo).replace(/\s+/g, ' ').slice(0, 90))}</span>` : ''}
+      ${owner ? `<span class="pt-by">${avatar(owner, 20)}${nickHTML(owner)}${lvMini(owner, p._owner)}</span>` : ''}
+    </span>
+  </button></li>`;
+}
+VIEWS.points = {
+  render(el) {
+    if (!pointsOn()) { el.innerHTML = `<div class="page"><div class="empty card big"><h2>${t('nav_points')}</h2><p class="muted">${t('pt_web_only')}</p></div></div>`; return; }
+    S.ptTab = S.ptTab || 'mine';
+    const L = ptLists(); const list = S.ptTab === 'mine' ? L.mine : L.shared;
+    el.innerHTML = `
+    <div class="page points">
+      <header class="page-head bd-head">
+        <div><h1>${t('pt_title')}</h1><p class="lede">${t('pt_sub')}</p></div>
+        <button class="btn btn-primary" data-ptnew>${icon('plus')}${t('pt_add')}</button>
+      </header>
+      <div class="seg" role="tablist">${['mine', 'shared'].map(k => `<button role="tab" aria-pressed="${S.ptTab === k}" data-pttab="${k}">${t('pt_tab_' + k)} <span class="muted">${(k === 'mine' ? L.mine : L.shared).length}</span></button>`).join('')}</div>
+      ${list.length ? `<ul class="pt-list">${list.slice(0, 300).map(ptCard).join('')}</ul>` : `
+        <div class="empty card big">${icon('pin', 'big')}<h2>${t(S.ptTab === 'mine' ? 'pt_empty_mine' : 'pt_empty_shared')}</h2><p class="muted">${t(S.ptTab === 'mine' ? 'pt_empty_mine_sub' : 'pt_empty_shared_sub')}</p>${S.ptTab === 'mine' ? `<button class="btn btn-primary" data-ptnew>${icon('plus')}${t('pt_add')}</button>` : ''}</div>`}
+      <p class="hint">${icon('shield')} ${t('pt_privacy')}</p>
+    </div>`;
+  }
+};
+function openPoint(id) {
+  const p = S.points.get(id); if (!p || !ptVisible(p)) return;
+  const mine = ptMine(p); const owner = !mine ? anglerOf(p._owner) : null;
+  const w = openModal(`<article class="pt-detail">
+    <p class="eyebrow">${t('ptk_' + (PT_KINDS.includes(p.kind) ? p.kind : 'other'))}${p.upd ? ' · ' + fmtDate(p.upd) : ''}</p>
+    <h2>${icon('pin')} ${esc(p.name || '?')}</h2>
+    <div class="chips">${mine ? `<span class="chip ${p.pub ? 'chip-ok' : 'chip-local'}">${t(p.pub ? 'pt_shared' : 'pt_private')}</span>` : ''}${p.hidden ? `<span class="chip chip-closed">${t('pt_hidden_chip')}</span>` : ''}${(p.sp || []).map(x => SPI[x] ? `<button class="chip chip-tab" data-sp="${esc(x)}">${esc(ptSpName(x))}</button>` : `<span class="chip">${esc(ptSpName(x))}</span>`).join('')}</div>
+    <dl class="kv">
+      <div><dt>${t('area')}</dt><dd>${esc(ptWhere(p) || '—')}${p.lat != null ? `<br><span class="mono small">${GEO.fmtLL(p.lat, p.lon)}</span>` : ''}</dd></div>
+      ${owner ? `<div><dt>${t('pt_by')}</dt><dd><button class="link" data-seauid="${esc(p._owner)}">${flag(owner.cc)} ${esc(owner.nick)}</button></dd></div>` : ''}
+    </dl>
+    ${p.memo ? `<blockquote class="memo">${esc(p.memo)}</blockquote>` : ''}
+    <div class="actions">
+      ${p.lat != null ? `<button class="btn btn-line btn-sm" id="pt-map">${icon('map')}${t('pt_on_map')}</button>` : ''}
+      ${mine ? `<button class="btn btn-line btn-sm" id="pt-edit">${t('bd_edit')}</button><button class="btn btn-ghost btn-sm" id="pt-del">${icon('trash')}${t('delete')}</button>` : ''}
+      ${S.isOwner && !mine ? `<button class="btn btn-ghost btn-sm" id="pt-hide">${t(p.hidden ? 'bd_unhide' : 'bd_hide')}</button>` : ''}
+    </div>
+  </article>`, { label: p.name || t('nav_points') });
+  const mp = $('#pt-map', w); if (mp) mp.onclick = () => { closeModal(w); S.mapFocus = [p.lon, p.lat, 12]; location.hash = 'map'; };
+  const ed = $('#pt-edit', w); if (ed) ed.onclick = () => { closeModal(w); openPointEdit(id); };
+  const dl = $('#pt-del', w); if (dl) dl.onclick = async () => { if (!armed(dl, t('delete_confirm'))) return; await store.deletePoint(id); closeModal(w); toast(t('deleted')); rerender(); };
+  const hd = $('#pt-hide', w); if (hd) hd.onclick = async () => { const d = Object.assign({}, p, { hidden: !p.hidden }); if (await store.savePoint(d)) { toast(t(d.hidden ? 'pt_hidden_done' : 'pt_unhidden_done')); closeModal(w); rerender(); } };
+  w.addEventListener('click', e => { const sp = e.target.closest('[data-sp]'); if (sp) { closeModal(w); openSpecies(sp.dataset.sp); } });
+}
+/* write or change a point; `pre` fills it in (from a catch: its spot and species) */
+function openPointEdit(id, pre) {
+  if (!pointsOn()) return;
+  if (!S.me || !S.me.nick) { ensureProfile(() => openPointEdit(id, pre)); return; }
+  if (S.mode !== 'shared' || !S.uid) { toast(t('fr_need_shared'), 'info', 4800); return; }
+  const old = id ? S.points.get(id) : null;
+  if (id && (!old || !ptMine(old))) return;
+  const p = Object.assign({ name: '', kind: 'breakwater', lat: null, lon: null, sp: [], memo: '', pub: false }, old || {}, pre || {});
+  const spText = (p.sp || []).map(ptSpName).join(', ');
+  const w = openModal(`<form class="pt-form" id="pt-form" novalidate>
+    <h2>${icon('pin')} ${t(old ? 'pt_edit_title' : 'pt_add')}</h2>
+    <div class="field"><label for="pt-name">${t('pt_name')} <span class="req">*</span></label><input id="pt-name" maxlength="30" value="${esc(p.name)}" placeholder="${esc(t('pt_name_ph'))}"></div>
+    <div class="row2">
+      <div class="field"><label for="pt-kind">${t('pt_kind')}</label><select id="pt-kind">${PT_KINDS.map(k => `<option value="${k}" ${p.kind === k ? 'selected' : ''}>${t('ptk_' + k)}</option>`).join('')}</select></div>
+      <div class="field"><label>${t('pt_where')} <span class="req">*</span></label><div class="loc-row"><span id="pt-loc" class="loc-txt">${p.lat != null ? `${esc(ptWhere(p))} · <span class="mono">${GEO.fmtLL(p.lat, p.lon)}</span>` : t('loc_none')}</span><button type="button" class="btn btn-line btn-sm" id="pt-pick">${icon('pin')}${t('reg_pick')}</button></div></div>
+    </div>
+    <div class="field"><label for="pt-sp">${t('pt_species')}</label><input id="pt-sp" list="pt-sps" value="${esc(spText)}" placeholder="${esc(t('pt_species_ph'))}" maxlength="120"><datalist id="pt-sps">${SP.map(s => `<option value="${esc(spName(s))}">`).join('')}</datalist></div>
+    <div class="field"><label for="pt-memo">${t('pt_memo')}</label><textarea id="pt-memo" rows="3" maxlength="300" placeholder="${esc(t('pt_memo_ph'))}">${esc(p.memo || '')}</textarea></div>
+    <label class="switch"><input type="checkbox" id="pt-pub" ${p.pub ? 'checked' : ''}><span class="sw"></span><span>${t('pt_share')}</span></label>
+    <p class="note" id="pt-pub-note" ${p.pub ? '' : 'hidden'}>${icon('warn')} ${t('pt_share_note')}</p>
+    <p class="err" id="pt-err" hidden></p>
+    <div class="actions"><button class="btn btn-primary" type="submit" id="pt-go">${icon('check')}${t('save')}</button><button class="btn btn-ghost" type="button" data-close>${t('cancel')}</button></div>
+  </form>`, { label: t(old ? 'pt_edit_title' : 'pt_add') });
+  let lat = p.lat, lon = p.lon;
+  $('#pt-pick', w).onclick = () => {
+    const h = GEO.HOME[homeRegion()] || [128, 35];
+    openMapPicker(lon != null ? [lon, lat] : h, pos => { lon = Math.round(pos[0] * 1e4) / 1e4; lat = Math.round(pos[1] * 1e4) / 1e4; $('#pt-loc', w).innerHTML = `${esc(ptWhere({ lat, lon }))} · <span class="mono">${GEO.fmtLL(lat, lon)}</span>`; });
+  };
+  $('#pt-pub', w).onchange = e => { $('#pt-pub-note', w).hidden = !e.target.checked; };
+  $('#pt-form', w).addEventListener('submit', async e => {
+    e.preventDefault();
+    const err = $('#pt-err', w); err.hidden = true;
+    const name = $('#pt-name', w).value.replace(/\s+/g, ' ').trim();
+    if ([...name].length < 2 || /https?:|www\./i.test(name)) { err.textContent = t('pt_err_name'); err.hidden = false; $('#pt-name', w).focus(); return; }
+    if (lat == null || lon == null) { err.textContent = t('pt_err_where'); err.hidden = false; return; }
+    // species: names from the list become ids, anything else stays as typed (at most 5)
+    const byName = new Map(); for (const s of SP) for (const n of s.n) byName.set(n.toLowerCase(), s.id);
+    const sp = [...new Set($('#pt-sp', w).value.split(/[,，、]/).map(x => x.trim()).filter(Boolean).map(x => byName.get(x.toLowerCase()) || x.slice(0, 20)))].slice(0, PT_MAX_SP);
+    const memo = $('#pt-memo', w).value.trim().slice(0, 300);
+    const d = { id: old ? old.id : rid(10), name: name.slice(0, 30), kind: $('#pt-kind', w).value, lat, lon, sp, memo, pub: $('#pt-pub', w).checked, ts: (old && old.ts) || nowMs(), upd: nowMs() };
+    if (old && old.hidden) d.hidden = true;
+    $('#pt-go', w).disabled = true;
+    if (await store.savePoint(d)) { closeModal(w); toast(t(d.pub ? 'pt_saved_shared' : 'pt_saved'), 'ok'); S.ptTab = 'mine'; if (S.route !== 'points') location.hash = 'points'; else rerender(); }
+    else $('#pt-go', w).disabled = false;
+  });
+  setTimeout(() => { const n = $('#pt-name', w); if (n && !n.value) n.focus(); }, 60);
+}
+document.addEventListener('click', e => {
+  if (e.target.closest('.modal-wrap')) return;
+  const nw = e.target.closest('[data-ptnew]'); if (nw) { openPointEdit(null); return; }
+  const pt = e.target.closest('[data-point]'); if (pt) { openPoint(pt.dataset.point); return; }
+  const tb = e.target.closest('[data-pttab]'); if (tb) { S.ptTab = tb.dataset.pttab; rerender(); }
+});
+
 /* ===== Router, global events, boot ===== */
 const QR_PATH = 'M0 0h7v1h-7zM8 0h2v1h-2zM11 0h3v1h-3zM17 0h1v1h-1zM21 0h2v1h-2zM26 0h7v1h-7zM0 1h1v1h-1zM6 1h1v1h-1zM8 1h7v1h-7zM16 1h1v1h-1zM18 1h2v1h-2zM21 1h2v1h-2zM26 1h1v1h-1zM32 1h1v1h-1zM0 2h1v1h-1zM2 2h3v1h-3zM6 2h1v1h-1zM8 2h3v1h-3zM13 2h2v1h-2zM16 2h1v1h-1zM20 2h2v1h-2zM24 2h1v1h-1zM26 2h1v1h-1zM28 2h3v1h-3zM32 2h1v1h-1zM0 3h1v1h-1zM2 3h3v1h-3zM6 3h1v1h-1zM9 3h1v1h-1zM11 3h1v1h-1zM14 3h1v1h-1zM16 3h4v1h-4zM21 3h2v1h-2zM24 3h1v1h-1zM26 3h1v1h-1zM28 3h3v1h-3zM32 3h1v1h-1zM0 4h1v1h-1zM2 4h3v1h-3zM6 4h1v1h-1zM8 4h3v1h-3zM13 4h1v1h-1zM15 4h4v1h-4zM22 4h1v1h-1zM26 4h1v1h-1zM28 4h3v1h-3zM32 4h1v1h-1zM0 5h1v1h-1zM6 5h1v1h-1zM12 5h1v1h-1zM15 5h3v1h-3zM20 5h5v1h-5zM26 5h1v1h-1zM32 5h1v1h-1zM0 6h7v1h-7zM8 6h1v1h-1zM10 6h1v1h-1zM12 6h1v1h-1zM14 6h1v1h-1zM16 6h1v1h-1zM18 6h1v1h-1zM20 6h1v1h-1zM22 6h1v1h-1zM24 6h1v1h-1zM26 6h7v1h-7zM9 7h1v1h-1zM12 7h2v1h-2zM15 7h2v1h-2zM18 7h3v1h-3zM22 7h2v1h-2zM0 8h1v1h-1zM3 8h6v1h-6zM11 8h4v1h-4zM17 8h1v1h-1zM19 8h1v1h-1zM23 8h3v1h-3zM28 8h1v1h-1zM30 8h3v1h-3zM0 9h1v1h-1zM2 9h2v1h-2zM7 9h1v1h-1zM9 9h1v1h-1zM13 9h2v1h-2zM17 9h4v1h-4zM22 9h2v1h-2zM28 9h3v1h-3zM0 10h4v1h-4zM5 10h4v1h-4zM10 10h1v1h-1zM12 10h2v1h-2zM15 10h3v1h-3zM21 10h1v1h-1zM23 10h1v1h-1zM28 10h5v1h-5zM1 11h1v1h-1zM5 11h1v1h-1zM7 11h1v1h-1zM9 11h1v1h-1zM12 11h2v1h-2zM16 11h2v1h-2zM20 11h1v1h-1zM22 11h1v1h-1zM24 11h2v1h-2zM27 11h1v1h-1zM30 11h3v1h-3zM1 12h1v1h-1zM3 12h2v1h-2zM6 12h1v1h-1zM9 12h3v1h-3zM13 12h1v1h-1zM15 12h1v1h-1zM17 12h2v1h-2zM20 12h2v1h-2zM24 12h1v1h-1zM26 12h2v1h-2zM31 12h2v1h-2zM1 13h2v1h-2zM7 13h3v1h-3zM13 13h2v1h-2zM18 13h1v1h-1zM22 13h6v1h-6zM0 14h3v1h-3zM4 14h3v1h-3zM10 14h1v1h-1zM12 14h1v1h-1zM15 14h1v1h-1zM18 14h5v1h-5zM24 14h1v1h-1zM26 14h1v1h-1zM28 14h2v1h-2zM1 15h1v1h-1zM3 15h1v1h-1zM7 15h1v1h-1zM11 15h2v1h-2zM16 15h1v1h-1zM19 15h1v1h-1zM23 15h3v1h-3zM27 15h4v1h-4zM32 15h1v1h-1zM0 16h1v1h-1zM6 16h3v1h-3zM13 16h1v1h-1zM15 16h2v1h-2zM20 16h1v1h-1zM22 16h7v1h-7zM30 16h1v1h-1zM1 17h2v1h-2zM4 17h1v1h-1zM9 17h1v1h-1zM12 17h1v1h-1zM14 17h9v1h-9zM25 17h2v1h-2zM28 17h1v1h-1zM30 17h1v1h-1zM32 17h1v1h-1zM0 18h1v1h-1zM3 18h1v1h-1zM5 18h2v1h-2zM8 18h1v1h-1zM10 18h1v1h-1zM15 18h5v1h-5zM21 18h4v1h-4zM27 18h1v1h-1zM29 18h2v1h-2zM32 18h1v1h-1zM0 19h1v1h-1zM3 19h3v1h-3zM8 19h1v1h-1zM12 19h1v1h-1zM18 19h1v1h-1zM22 19h2v1h-2zM26 19h1v1h-1zM28 19h5v1h-5zM3 20h1v1h-1zM6 20h2v1h-2zM10 20h1v1h-1zM12 20h1v1h-1zM14 20h3v1h-3zM18 20h1v1h-1zM20 20h2v1h-2zM23 20h1v1h-1zM28 20h2v1h-2zM0 21h2v1h-2zM4 21h2v1h-2zM8 21h3v1h-3zM17 21h2v1h-2zM21 21h3v1h-3zM25 21h1v1h-1zM27 21h2v1h-2zM30 21h1v1h-1zM0 22h1v1h-1zM3 22h5v1h-5zM11 22h2v1h-2zM14 22h1v1h-1zM17 22h1v1h-1zM22 22h2v1h-2zM26 22h1v1h-1zM28 22h5v1h-5zM0 23h1v1h-1zM2 23h3v1h-3zM7 23h1v1h-1zM12 23h1v1h-1zM14 23h2v1h-2zM17 23h4v1h-4zM23 23h3v1h-3zM28 23h1v1h-1zM30 23h1v1h-1zM32 23h1v1h-1zM0 24h2v1h-2zM4 24h4v1h-4zM10 24h2v1h-2zM13 24h1v1h-1zM20 24h1v1h-1zM22 24h1v1h-1zM24 24h6v1h-6zM32 24h1v1h-1zM8 25h1v1h-1zM10 25h9v1h-9zM21 25h1v1h-1zM24 25h1v1h-1zM28 25h1v1h-1zM30 25h1v1h-1zM32 25h1v1h-1zM0 26h7v1h-7zM8 26h1v1h-1zM11 26h1v1h-1zM15 26h1v1h-1zM17 26h1v1h-1zM19 26h3v1h-3zM23 26h2v1h-2zM26 26h1v1h-1zM28 26h1v1h-1zM30 26h1v1h-1zM0 27h1v1h-1zM6 27h1v1h-1zM8 27h1v1h-1zM14 27h2v1h-2zM17 27h4v1h-4zM24 27h1v1h-1zM28 27h3v1h-3zM0 28h1v1h-1zM2 28h3v1h-3zM6 28h1v1h-1zM8 28h1v1h-1zM12 28h3v1h-3zM16 28h2v1h-2zM20 28h9v1h-9zM32 28h1v1h-1zM0 29h1v1h-1zM2 29h3v1h-3zM6 29h1v1h-1zM8 29h2v1h-2zM16 29h1v1h-1zM18 29h1v1h-1zM20 29h4v1h-4zM25 29h1v1h-1zM27 29h1v1h-1zM30 29h3v1h-3zM0 30h1v1h-1zM2 30h3v1h-3zM6 30h1v1h-1zM11 30h1v1h-1zM13 30h1v1h-1zM15 30h1v1h-1zM18 30h3v1h-3zM23 30h2v1h-2zM27 30h3v1h-3zM31 30h2v1h-2zM0 31h1v1h-1zM6 31h1v1h-1zM10 31h1v1h-1zM12 31h3v1h-3zM25 31h1v1h-1zM27 31h6v1h-6zM0 32h7v1h-7zM8 32h1v1h-1zM10 32h1v1h-1zM15 32h4v1h-4zM23 32h2v1h-2zM27 32h2v1h-2z';
-const ROUTES = ['home', 'scan', 'past', 'map', 'rank', 'friends', 'board', 'teams', 'sea', 'char', 'dex', 'tackle', 'log', 'help', 'about', 'prefs', 'admin'];
-const LIVE_VIEWS = new Set(['home', 'rank', 'friends', 'board', 'teams', 'sea', 'dex', 'log', 'admin']);
+const ROUTES = ['home', 'scan', 'past', 'map', 'rank', 'friends', 'board', 'teams', 'points', 'sea', 'char', 'dex', 'tackle', 'log', 'help', 'about', 'prefs', 'admin'];
+const LIVE_VIEWS = new Set(['home', 'rank', 'friends', 'board', 'teams', 'points', 'sea', 'dex', 'log', 'admin']);
 const viewOf = r => (r === 'past' ? 'scan' : r);
 
 function updateStatic() {
@@ -8117,10 +8584,13 @@ function updateShell() {
   const chip = $('#me-chip');
   if (chip) {
     if (S.me && S.me.nick) { const r = myRank('KR'); chip.innerHTML = `${avatar(S.me, 34)}<span class="mc-txt">${nickHTML(S.me)}<span class="muted small">${flag(S.me.cc)} ${r ? t('rank_kr') + ' #' + r.rank : t('no_rank_yet')}</span></span>`; }
-    else chip.innerHTML = `${icon('user')}<span class="mc-txt"><b>${t('onb_go')}</b><span class="muted small">${t('onb_card_sub_short')}</span></span>`;
+    else chip.innerHTML = `${icon('user')}<span class="mc-txt"><b>${t(window.APP_RT === 'web' && !S.idOff ? 'auth_chip' : 'onb_go')}</b><span class="muted small">${t('onb_card_sub_short')}</span></span>`;
   }
   const mav = $('#me-mini'); if (mav) mav.innerHTML = S.me && S.me.nick ? avatar(S.me, 30) : icon('user');
+  // no profile yet: the avatar buttons open sign-up / login instead of an empty sea
+  for (const n of [chip, mav]) { if (!n) continue; if (S.me && S.me.nick) { n.setAttribute('href', '#sea'); delete n.dataset.act; } else { n.setAttribute('href', '#'); n.dataset.act = 'onboard'; } }
   $$('.nav-admin').forEach(n => n.hidden = !S.isOwner);
+  $$('.nav-web').forEach(n => n.hidden = window.APP_RT !== 'web');
   const nIn = S.me && S.me.nick ? frLists().inc.length : 0;
   $$('[data-frbadge]').forEach(n => { n.hidden = !nIn; n.textContent = nIn > 9 ? '9+' : String(nIn); });
   const fb = $('#fr-mini'); if (fb) fb.setAttribute('aria-label', t('nav_friends') + (nIn ? ` (${nIn})` : ''));
@@ -8219,8 +8689,10 @@ document.addEventListener('click', e => {
   const act = tgt.closest('[data-act]');
   if (act) {
     const a = act.dataset.act;
+    if (act.tagName === 'A' && act.getAttribute('href') === '#') e.preventDefault();
     if (a === 'donate') openDonate();
     else if (a === 'onboard') openOnboarding();
+    else if (a === 'auth') openAuth('join');
     else if (a === 'more') openMore();
     else if (a === 'lens') openLens();
     else if (a === 'scan-stop') { if (S.scan && S.scan.ctl) S.scan.ctl.abort(); S.scan.phase = 'idle'; renderScanWork(); }
@@ -8249,6 +8721,7 @@ document.addEventListener('click', e => {
   const nm = tgt.closest('[data-news="more"]'); if (nm) { openNews(); return; }
   const idb = tgt.closest('[data-id]'); if (idb) { const k = idb.dataset.id; if (k === 'create') openIdCreate(); else if (k === 'login') openIdLogin(); else if (k === 'password') openIdPassword(); else if (k === 'logout') idLogout(idb); return; }
   const du = tgt.closest('[data-deluser]'); if (du) { adminDeleteUser(du.dataset.deluser, du); return; }
+  const rl = tgt.closest('[data-relink]'); if (rl) { openRelink(rl.dataset.relink); return; }
   const lk = tgt.closest('[data-link]'); if (lk) { const k = lk.dataset.link; if (k === 'make') openLinkMake(); else if (k === 'enter') openLinkEnter(); else if (k === 'leave') linkLeave(lk); return; }
   const bc = tgt.closest('[data-bdcat]'); if (bc) { S.bd = Object.assign(S.bd || {}, { cat: bc.dataset.bdcat }); if (S.route !== 'board') location.hash = 'board'; else VIEWS.board.render($('#v-board')); return; }
   const bs = tgt.closest('[data-bdsort]'); if (bs) { S.bd = Object.assign(S.bd || {}, { sort: bs.dataset.bdsort }); VIEWS.board.render($('#v-board')); return; }
@@ -8299,7 +8772,7 @@ matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', () => { 
   S.unit = lsGet('unit', 'cm');
   S.me = lsGet('me', null);
   onHash();
-  store.init().then(() => { updateStatic(); updateShell(); if (S.route === 'admin' && !S.isOwner) location.hash = 'home'; setTimeout(maybeWhatsNew, 2500); });
+  store.init().then(() => { updateStatic(); updateShell(); if (S.route === 'admin' && !S.isOwner) location.hash = 'home'; setTimeout(maybeWhatsNew, 2500); setTimeout(maybeWelcome, 1800); });
   const idle = window.requestIdleCallback || (f => setTimeout(f, 1200));
   idle(() => { GEO.loadEnv(); });
 })();

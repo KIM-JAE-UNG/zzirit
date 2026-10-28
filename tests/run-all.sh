@@ -8,6 +8,7 @@ cd "$(dirname "$0")"
 (cd .. && python3 build.py) || exit 1
 fail=0
 echo "== database rules"; node db/rules.test.mjs | tail -3; [ "${PIPESTATUS[0]}" = 0 ] || fail=1
+echo "== live database before the reset"; node db/before-reset.test.mjs | tail -1; [ "${PIPESTATUS[0]}" = 0 ] || fail=1
 node web/server.js > out-web-server.log 2>&1 & WS=$!
 node claude/server.js > out-claude-server.log 2>&1 & CS=$!
 trap 'kill $WS $CS 2>/dev/null; rm -f out-web-server.log out-claude-server.log' EXIT

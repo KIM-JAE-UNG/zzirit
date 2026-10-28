@@ -1,7 +1,7 @@
 /* ===== Router, global events, boot ===== */
 const QR_PATH = '__QR_PATH__';
-const ROUTES = ['home', 'scan', 'past', 'map', 'rank', 'friends', 'board', 'teams', 'sea', 'char', 'dex', 'tackle', 'log', 'help', 'about', 'prefs', 'admin'];
-const LIVE_VIEWS = new Set(['home', 'rank', 'friends', 'board', 'teams', 'sea', 'dex', 'log', 'admin']);
+const ROUTES = ['home', 'scan', 'past', 'map', 'rank', 'friends', 'board', 'teams', 'points', 'sea', 'char', 'dex', 'tackle', 'log', 'help', 'about', 'prefs', 'admin'];
+const LIVE_VIEWS = new Set(['home', 'rank', 'friends', 'board', 'teams', 'points', 'sea', 'dex', 'log', 'admin']);
 const viewOf = r => (r === 'past' ? 'scan' : r);
 
 function updateStatic() {
@@ -14,10 +14,13 @@ function updateShell() {
   const chip = $('#me-chip');
   if (chip) {
     if (S.me && S.me.nick) { const r = myRank('KR'); chip.innerHTML = `${avatar(S.me, 34)}<span class="mc-txt">${nickHTML(S.me)}<span class="muted small">${flag(S.me.cc)} ${r ? t('rank_kr') + ' #' + r.rank : t('no_rank_yet')}</span></span>`; }
-    else chip.innerHTML = `${icon('user')}<span class="mc-txt"><b>${t('onb_go')}</b><span class="muted small">${t('onb_card_sub_short')}</span></span>`;
+    else chip.innerHTML = `${icon('user')}<span class="mc-txt"><b>${t(window.APP_RT === 'web' && !S.idOff ? 'auth_chip' : 'onb_go')}</b><span class="muted small">${t('onb_card_sub_short')}</span></span>`;
   }
   const mav = $('#me-mini'); if (mav) mav.innerHTML = S.me && S.me.nick ? avatar(S.me, 30) : icon('user');
+  // no profile yet: the avatar buttons open sign-up / login instead of an empty sea
+  for (const n of [chip, mav]) { if (!n) continue; if (S.me && S.me.nick) { n.setAttribute('href', '#sea'); delete n.dataset.act; } else { n.setAttribute('href', '#'); n.dataset.act = 'onboard'; } }
   $$('.nav-admin').forEach(n => n.hidden = !S.isOwner);
+  $$('.nav-web').forEach(n => n.hidden = window.APP_RT !== 'web');
   const nIn = S.me && S.me.nick ? frLists().inc.length : 0;
   $$('[data-frbadge]').forEach(n => { n.hidden = !nIn; n.textContent = nIn > 9 ? '9+' : String(nIn); });
   const fb = $('#fr-mini'); if (fb) fb.setAttribute('aria-label', t('nav_friends') + (nIn ? ` (${nIn})` : ''));
@@ -116,8 +119,10 @@ document.addEventListener('click', e => {
   const act = tgt.closest('[data-act]');
   if (act) {
     const a = act.dataset.act;
+    if (act.tagName === 'A' && act.getAttribute('href') === '#') e.preventDefault();
     if (a === 'donate') openDonate();
     else if (a === 'onboard') openOnboarding();
+    else if (a === 'auth') openAuth('join');
     else if (a === 'more') openMore();
     else if (a === 'lens') openLens();
     else if (a === 'scan-stop') { if (S.scan && S.scan.ctl) S.scan.ctl.abort(); S.scan.phase = 'idle'; renderScanWork(); }
@@ -146,6 +151,7 @@ document.addEventListener('click', e => {
   const nm = tgt.closest('[data-news="more"]'); if (nm) { openNews(); return; }
   const idb = tgt.closest('[data-id]'); if (idb) { const k = idb.dataset.id; if (k === 'create') openIdCreate(); else if (k === 'login') openIdLogin(); else if (k === 'password') openIdPassword(); else if (k === 'logout') idLogout(idb); return; }
   const du = tgt.closest('[data-deluser]'); if (du) { adminDeleteUser(du.dataset.deluser, du); return; }
+  const rl = tgt.closest('[data-relink]'); if (rl) { openRelink(rl.dataset.relink); return; }
   const lk = tgt.closest('[data-link]'); if (lk) { const k = lk.dataset.link; if (k === 'make') openLinkMake(); else if (k === 'enter') openLinkEnter(); else if (k === 'leave') linkLeave(lk); return; }
   const bc = tgt.closest('[data-bdcat]'); if (bc) { S.bd = Object.assign(S.bd || {}, { cat: bc.dataset.bdcat }); if (S.route !== 'board') location.hash = 'board'; else VIEWS.board.render($('#v-board')); return; }
   const bs = tgt.closest('[data-bdsort]'); if (bs) { S.bd = Object.assign(S.bd || {}, { sort: bs.dataset.bdsort }); VIEWS.board.render($('#v-board')); return; }
@@ -196,7 +202,7 @@ matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', () => { 
   S.unit = lsGet('unit', 'cm');
   S.me = lsGet('me', null);
   onHash();
-  store.init().then(() => { updateStatic(); updateShell(); if (S.route === 'admin' && !S.isOwner) location.hash = 'home'; setTimeout(maybeWhatsNew, 2500); });
+  store.init().then(() => { updateStatic(); updateShell(); if (S.route === 'admin' && !S.isOwner) location.hash = 'home'; setTimeout(maybeWhatsNew, 2500); setTimeout(maybeWelcome, 1800); });
   const idle = window.requestIdleCallback || (f => setTimeout(f, 1200));
   idle(() => { GEO.loadEnv(); });
 })();

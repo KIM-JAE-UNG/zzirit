@@ -3,13 +3,17 @@ const http = require('http'), fs = require('fs'), path = require('path');
 const LIB = p => require.resolve(p, { paths: [require('path').join(__dirname, '..')] });
 const ROOT = path.resolve(__dirname, '..', '..'), LEAFLET = LIB('leaflet/dist/leaflet.js');
 let ver = 1; const events = []; const STATS = { photoSelects: 0 };
-const T = { anglers: {}, photos: {}, labels: {}, orders: {}, suggest: {}, admin_docs: {}, spots: {}, board: {}, teams: {}, news: {} };
+const T = { anglers: {}, photos: {}, labels: {}, orders: {}, suggest: {}, admin_docs: {}, spots: {}, board: {}, teams: {}, news: {}, points: {}, reviews: {} };
+const FEATURES = { del: true }; // admin_delete_user present on the "server" (the live one gets it with the SQL update)
+const isAdmin = uid => !!uid && (admins.has(uid) || admins.has(acct(uid)));
 const admins = new Set(); const links = {}; const codes = {};
 const acct = uid => links[uid] || uid;
 const key = (t, row) => t === 'photos' ? row.angler + '|' + row.cid : row.id;
 const cell = v => (Math.floor(v / 0.25) + 0.5) * 0.25;
 function canWrite(t, row, uid) {
   if (!uid) return false;
+  if (t === 'reviews') return false;
+  if (t === 'points') { const old = T.points[row.id]; return old ? (acct(old.owner) === acct(uid) || isAdmin(uid)) : true; }
   if (t === 'admin_docs') return admins.has(uid) || admins.has(acct(uid));
   if (t === 'news' || t === 'spots') return false;
   if (t === 'photos') return row.angler === acct(uid);
@@ -54,6 +58,8 @@ function guard(row, old) {
   return row;
 }
 function visible(t, row, uid) {
+  if (t === 'points') return !!row.pub || (!!uid && acct(row.owner) === acct(uid)) || isAdmin(uid);
+  if (t === 'reviews') return (!!uid && acct(row.id) === acct(uid)) || isAdmin(uid);
   if (t === 'orders' || t === 'suggest') return row.id === acct(uid) || admins.has(uid) || admins.has(acct(uid));
   if (t === 'spots') return row.uid === acct(uid);
   return true;
@@ -76,6 +82,10 @@ http.createServer(async (req, res) => {
     const k = key(q.table, row); const old = T[q.table][k];
     if (q.table === 'anglers') row = guard(row, old);
     if (q.table === 'orders') row = ordersGuard(row, old);
+    if (q.table === 'points') {
+      if (!/^[a-z0-9]{6,24}$/.test(row.id || '') || JSON.stringify(row.data || {}).length > 4000) return send({ error: { code: '23514', message: 'check constraint' } });
+      row = { id: row.id, owner: old ? old.owner : acct(q.uid), data: row.data, pub: !!(row.data && row.data.pub === true), updated_at: new Date().toISOString() };
+    }
     T[q.table][k] = row;
     push(q.table, old ? 'UPDATE' : 'INSERT', row, old ? { id: old.id } : {});
     return send({ data: null });
@@ -129,14 +139,27 @@ http.createServer(async (req, res) => {
     if (q.name === 'id_password') { const e = Object.entries(logins).find(([, v]) => v.owner === acct(uid)); if (!e) return send({ data: { ok: false, err: 'no_id' } }); if (e[1].pass !== q.args.p_old) return send({ data: { ok: false, err: 'wrong' } }); e[1].pass = q.args.p_new; return send({ data: { ok: true } }); }
     if (q.name === 'admin_id_reset') { if (!(admins.has(uid) || admins.has(acct(uid)))) return send({ error: { message: 'not_admin' } }); const l = logins[String(q.args.p_name || '').toLowerCase()]; if (!l) return send({ data: { ok: false, err: 'no_id' } }); l.pass = q.args.p_new; return send({ data: { ok: true } }); }
     if (q.name === 'admin_delete_user') {
-      if (!(admins.has(uid) || admins.has(acct(uid)))) return send({ error: { message: 'not_admin' } });
-      const target = acct(q.args.p_uid); if (admins.has(target)) return send({ error: { message: 'cannot_delete_admin' } });
-      for (const t of ['anglers', 'labels', 'orders', 'suggest', 'board', 'teams']) if (T[t][target]) { delete T[t][target]; push(t, 'DELETE', {}, { id: target }); }
+      if (!FEATURES.del) return send({ error: { code: 'PGRST202', message: 'Could not find the function public.admin_delete_user(p_uid) in the schema cache' } });
+      if (!isAdmin(uid)) return send({ error: { message: 'not_admin' } });
+      if (!q.args.p_uid) return send({ data: false });
+      const target = acct(q.args.p_uid); if (target === acct(uid)) return send({ error: { message: 'cannot_delete_self' } });
+      for (const t of ['anglers', 'labels', 'orders', 'suggest', 'board', 'teams', 'reviews']) if (T[t][target]) { delete T[t][target]; push(t, 'DELETE', {}, { id: target }); }
       for (const [k, r] of Object.entries(T.photos)) if (r.angler === target) { delete T.photos[k]; push('photos', 'DELETE', {}, { angler: r.angler, cid: r.cid }); }
+      for (const [k, r] of Object.entries(T.points)) if (acct(r.owner) === target) { delete T.points[k]; push('points', 'DELETE', {}, { id: k }); }
       for (const [n, l] of Object.entries(logins)) if (l.owner === target) delete logins[n];
+      for (const a of [...admins]) if (acct(a) === target) admins.delete(a);
       return send({ data: true });
     }
-    return send({ error: { message: 'no such rpc ' + q.name } });
+    if (q.name === 'admin_logins') {
+      if (!isAdmin(uid)) return send({ error: { message: 'not_admin' } });
+      return send({ data: Object.entries(logins).map(([name, l]) => ({ acct: acct(l.owner), name, created_at: new Date().toISOString() })) });
+    }
+    if (q.name === 'admin_link_code') {
+      if (!isAdmin(uid)) return send({ error: { message: 'not_admin' } });
+      const A = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let c = ''; for (let i = 0; i < 8; i++) c += A[Math.floor(Math.random() * 32)];
+      codes[c] = { owner: acct(q.args.p_acct), exp: Date.now() + 1800000 }; return send({ data: c });
+    }
+    return send({ error: { code: 'PGRST202', message: 'Could not find the function public.' + q.name + ' in the schema cache' } });
   }
   if (u.pathname === '/__fn/news') {
     const now = new Date().toISOString();
@@ -145,19 +168,23 @@ http.createServer(async (req, res) => {
     return send({ ok: true, added: items.length });
   }
   if (u.pathname === '/__fn/review') {
-    let n = 0; const v = T.admin_docs.verdicts || (T.admin_docs.verdicts = { id: 'verdicts', data: {} }); const ar = T.admin_docs.autorev || (T.admin_docs.autorev = { id: 'autorev', data: {} });
+    let n = 0; const v = T.admin_docs.verdicts || (T.admin_docs.verdicts = { id: 'verdicts', data: {} }); const touched = new Set();
     for (const [id, a] of Object.entries(T.anglers)) for (const c of (a.data.catches || [])) {
       if (c.st !== 'review' || (v.data[id] && v.data[id][c.id])) continue;
       const hasPhoto = Object.values(T.photos).some(p => p.angler === id && p.cid === c.id);
       const verdict = !hasPhoto ? 'no' : c.sp === 'saba' ? 'no' : 'hold';
       const why = !hasPhoto ? 'no_photo|' : verdict === 'no' ? 'species|Chub mackerel?' : 'unclear|사진이 흐려요';
       v.data[id] = Object.assign({}, v.data[id], { [c.id]: verdict });
-      ar.data[id] = Object.assign({}, ar.data[id], { [c.id]: { v: verdict, why, m: 'fake', at: Date.now() } }); n++;
+      const rv = T.reviews[id] || (T.reviews[id] = { id, data: {} }); rv.data = Object.assign({}, rv.data, { [c.id]: { v: verdict, why, m: 'fake', at: Date.now() } }); touched.add(id); n++;
     }
-    if (n) { push('admin_docs', 'UPDATE', v, { id: 'verdicts' }); push('admin_docs', 'UPDATE', ar, { id: 'autorev' }); }
+    if (n) { push('admin_docs', 'UPDATE', v, { id: 'verdicts' }); for (const id of touched) push('reviews', 'UPDATE', T.reviews[id], { id }); }
     return send({ ok: true, decided: n });
   }
-  if (u.pathname === '/__sb/changes') { const since = +u.searchParams.get('since') || 0; return send({ ver, events: events.filter(e => e.ver > since) }); }
+  if (u.pathname === '/__sb/changes') {
+    const since = +u.searchParams.get('since') || 0, who = u.searchParams.get('uid') || null;
+    return send({ ver, events: events.filter(e => e.ver > since && (e.eventType === 'DELETE' || !['points', 'reviews'].includes(e.table) || visible(e.table, e.new, who))) });
+  }
+  if (u.pathname === '/__sb/feature') { for (const [k, v] of u.searchParams) FEATURES[k] = v === '1'; return send(FEATURES); }
   if (u.pathname === '/__sb/dump') return send({ T, admins: [...admins], links, STATS });
   if (u.pathname === '/__sb/grant') { const q = await body(req); const g = T.admin_docs.grants || (T.admin_docs.grants = { id: 'grants', data: {} }); g.data[q.uid] = Object.assign({}, g.data[q.uid], { [q.oid]: q.v }); push('admin_docs', 'UPDATE', g, { id: 'grants' }); return send({ ok: true }); }
   const f = u.pathname === '/_leaflet_test.js' ? LEAFLET : path.join(ROOT, decodeURIComponent(u.pathname === '/' ? '/index.html' : u.pathname));

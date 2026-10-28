@@ -239,12 +239,13 @@ function ensureProfile(then) {
   if (S.me && S.me.nick) { then && then(); return; }
   openOnboarding(then);
 }
-function profileFormHTML(p) {
+function profileFormHTML(p, afterNick = '') {
   const opts = COUNTRIES.map(c => `<option value="${c}" ${p.cc === c ? 'selected' : ''}>${flag(c)} ${esc(ccName(c))}</option>`).join('');
   const homes = HOMES.map(h => `<option value="${h}" ${p.home === h ? 'selected' : ''}>${esc(regionName(h))}</option>`).join('');
   const styles = Object.keys(METHOD).map(m => `<option value="${m}" ${p.style === m ? 'selected' : ''}>${esc(dict(METHOD[m]))}</option>`).join('');
   return `
   <div class="field"><label for="pf-nick">${t('pf_nick')}</label><input id="pf-nick" maxlength="16" value="${esc(p.nick || '')}" placeholder="${t('pf_nick_ph')}" autocomplete="nickname"></div>
+  ${afterNick}
   <div class="row2">
     <div class="field"><label for="pf-cc">${t('pf_country')}</label><select id="pf-cc">${opts}</select></div>
     <div class="field"><label for="pf-home">${t('pf_home')}</label><select id="pf-home">${homes}</select></div>
@@ -267,7 +268,19 @@ function nickRefused(f, root) {
   toast(t(f.bad), 'warn', 4800); const n = $('#pf-nick', root); if (n) n.focus();
   return true;
 }
+const NEW_ME = () => ({ v: 1, joined: nowMs(), catches: [], decor: { theme: 'th_dawn', items: ['dc_weed', 'dc_rock', 'dc_buoy'], fx: [] }, flair: {} });
+async function saveProfileFrom(w, f) {
+  S.me = Object.assign(NEW_ME(), S.me || {}, f);
+  if (f.lang !== S.lang) setLang(f.lang);
+  await store.saveMe();
+}
+function onbArt(w) { const cv = $('#onb-cv', w); if (cv) { const ctx = cv.getContext('2d'); ['kurodai', 'madai', 'aoriika', 'buri'].forEach((id, i) => FD.draw(ctx, SPI[id], 80 + i * 135, 78 + (i % 2) * 10, i === 2 ? 110 : 120, { still: true, flip: i % 2 === 1 })); } }
 function openOnboarding(then) {
+  // website: sign-up and login in one dialog (once we know the server can do login IDs)
+  if (idSupported()) {
+    if (S.loginId === undefined) { myLoginId().then(() => openOnboarding(then)); return; }
+    if (!S.idOff) { openAuth('join', then); return; }
+  }
   const p = { nick: '', cc: defaultCC(), home: defaultHome(), style: 'float' };
   const w = openModal(`
     <div class="onb">
@@ -276,20 +289,126 @@ function openOnboarding(then) {
       <p class="lede">${t('onb_sub')}</p>
       ${profileFormHTML(p)}
       ${S.mode !== 'shared' ? `<p class="note">${icon('info')} ${t(S.mode === 'local' ? 'mode_local_note' : 'mode_offline_note')}</p>` : ''}
-      <div class="actions"><button class="btn btn-primary btn-lg" id="onb-go">${t('onb_go')}</button>${idSupported() ? `<button class="btn btn-ghost" id="onb-login">${icon('user')}${t('id_have')}</button>` : ''}</div>
+      <div class="actions"><button class="btn btn-primary btn-lg" id="onb-go">${t('onb_go')}</button></div>
     </div>`, { label: t('onb_title') });
-  const lg = $('#onb-login', w); if (lg) lg.onclick = () => { closeModal(w); openIdLogin(); };
-  const cv = $('#onb-cv', w); if (cv) { const ctx = cv.getContext('2d'); ['kurodai', 'madai', 'aoriika', 'buri'].forEach((id, i) => FD.draw(ctx, SPI[id], 80 + i * 135, 78 + (i % 2) * 10, i === 2 ? 110 : 120, { still: true, flip: i % 2 === 1 })); }
+  onbArt(w);
   $('#onb-go', w).onclick = async () => {
     const f = readProfileForm(w);
     if (nickRefused(f, w)) return; delete f.bad;
-    S.me = Object.assign({ v: 1, joined: nowMs(), catches: [], decor: { theme: 'th_dawn', items: ['dc_weed', 'dc_rock', 'dc_buoy'], fx: [] }, flair: {} }, S.me || {}, f);
-    if (f.lang !== S.lang) setLang(f.lang);
-    await store.saveMe();
+    await saveProfileFrom(w, f);
     closeModal(w); toast(t('onb_done', { nick: S.me.nick }));
     rerender(); then && then();
   };
 }
+
+/* ===== Sign up / log in (website). Signing up keeps everything this device already recorded;
+   logging in joins this device to the ID's account, and this device's records come along. ===== */
+function openAuth(tab = 'join', then) {
+  if (!idSupported() || S.idOff) { openOnboarding(then); return; }
+  const hasProfile = !!(S.me && S.me.nick), hasId = !!S.loginId;
+  const p = Object.assign({ nick: '', cc: defaultCC(), home: defaultHome(), style: 'float' }, S.me || {});
+  const local = myCatches().length;
+  const idFields = hasId ? `<p class="note ok">${icon('check')} ${t('id_signed_in', { name: `<b class="mono">${esc(S.loginId)}</b>` })}</p>` : `
+    <div class="field"><label for="au-id">${t('id_name')}</label><input id="au-id" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="20" placeholder="zzirit_fisher"><small class="muted">${t('id_name_hint')}</small></div>
+    <div class="row2">
+      <div class="field"><label for="au-pw">${t('id_pass')}</label><input id="au-pw" type="password" autocomplete="new-password" maxlength="72"><small class="muted">${t('id_pass_hint')}</small></div>
+      <div class="field"><label for="au-pw2">${t('id_pass2')}</label><input id="au-pw2" type="password" autocomplete="new-password" maxlength="72"></div>
+    </div>`;
+  const w = openModal(`
+    <div class="auth">
+      <div class="onb-art" aria-hidden="true"><canvas width="560" height="150" id="onb-cv"></canvas></div>
+      <div class="seg auth-tabs" role="tablist">
+        <button role="tab" data-atab="join" aria-pressed="${tab === 'join'}">${t(hasProfile ? 'auth_tab_id' : 'auth_tab_join')}</button>
+        <button role="tab" data-atab="login" aria-pressed="${tab === 'login'}">${t('auth_tab_login')}</button>
+      </div>
+      <form class="auth-pane" id="au-join" data-pane="join" ${tab === 'join' ? '' : 'hidden'} novalidate>
+        <h2>${t(hasProfile ? 'auth_join_title_me' : 'auth_join_title')}</h2>
+        <p class="lede">${t(hasProfile ? 'auth_join_sub_me' : 'auth_join_sub')}</p>
+        ${hasProfile ? `<div class="field"><label>${t('pf_nick')}</label><p class="auth-me">${avatar(S.me, 30)} <b>${esc(S.me.nick)}</b> <span class="muted small">${t('acct_sum', { n: fmtN(local), pts: fmtN(myPoints()), lv: myLevel() })}</span></p></div>${idFields}`
+          : profileFormHTML(p, idFields)}
+        ${S.mode !== 'shared' ? `<p class="note">${icon('info')} ${t(S.mode === 'local' ? 'mode_local_note' : 'mode_offline_note')}</p>` : ''}
+        <p class="err" id="au-err" hidden></p>
+        <div class="actions"><button class="btn btn-primary btn-lg" type="submit" id="onb-go">${t(hasId ? 'onb_go' : hasProfile ? 'id_create_go' : 'auth_join_go')}</button></div>
+        ${hasProfile || hasId ? '' : `<button class="link small auth-noid" type="button" id="onb-noid">${t('auth_no_id')}</button>`}
+        <p class="hint">${icon('shield')} ${t('auth_pw_note')}</p>
+      </form>
+      <form class="auth-pane" id="au-login" data-pane="login" ${tab === 'login' ? '' : 'hidden'} novalidate>
+        <h2>${t('id_login')}</h2>
+        <p class="lede">${t('auth_login_sub')}</p>
+        <div class="field"><label for="idl-name">${t('id_name')}</label><input id="idl-name" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="20"></div>
+        <div class="field"><label for="idl-pass">${t('id_pass')}</label><input id="idl-pass" type="password" autocomplete="current-password" maxlength="72"></div>
+        ${local ? `<p class="note">${icon('info')} ${t('link_merge_note', { n: local })}</p>` : ''}
+        <p class="err" id="idl-err" hidden></p>
+        <div class="actions"><button class="btn btn-primary btn-lg" type="submit" id="idl-go">${t('id_login_go')}</button></div>
+        <p class="hint">${t('id_forgot')}</p>
+      </form>
+    </div>`, { label: t('auth_tab_join') });
+  onbArt(w);
+  const show = k => { $$('[data-atab]', w).forEach(b => b.setAttribute('aria-pressed', String(b.dataset.atab === k))); $$('[data-pane]', w).forEach(f => { f.hidden = f.dataset.pane !== k; }); const first = $(`[data-pane="${k}"] input`, w); if (first) setTimeout(() => first.focus(), 40); };
+  w.addEventListener('click', e => { const b = e.target.closest('[data-atab]'); if (b) show(b.dataset.atab); });
+  const fail = (box, code) => { box.textContent = idErr(code); box.hidden = false; };
+  // sign up (or add an ID to the profile this device already has)
+  const jf = $('#au-join', w), jerr = $('#au-err', w), jgo = $('#onb-go', w);
+  jf.addEventListener('submit', async e => {
+    e.preventDefault(); jerr.hidden = true;
+    let f = null;
+    if (!hasProfile) { f = readProfileForm(w); if (nickRefused(f, w)) return; delete f.bad; }
+    jgo.disabled = true;
+    try {
+      if (!hasId) {
+        const name = $('#au-id', w).value.trim().toLowerCase(), p1 = $('#au-pw', w).value, p2 = $('#au-pw2', w).value;
+        if (!/^[a-z0-9_]{3,20}$/.test(name)) throw { code: 'bad_name' };
+        if (p1.length < 6) throw { code: 'bad_pass' };
+        if (p1 !== p2) throw { code: 'mismatch' };
+        const r = await window.APP_AUTH.ids.register(name, p1);
+        if (!r || r.ok !== true) throw { code: (r && r.err) || 'fail' };
+        S.loginId = r.name;
+      }
+      if (f) await saveProfileFrom(w, f);
+      closeModal(w);
+      toast(t(hasProfile ? 'id_created' : 'auth_joined', { name: S.loginId, nick: (S.me && S.me.nick) || '' }), 'ok', 6000);
+      rerender(); then && then();
+    } catch (x) { jgo.disabled = false; fail(jerr, x && x.code); }
+  });
+  const noid = $('#onb-noid', w);
+  if (noid) noid.onclick = async () => {
+    const f = readProfileForm(w); if (nickRefused(f, w)) return; delete f.bad;
+    await saveProfileFrom(w, f);
+    closeModal(w); toast(t('onb_done', { nick: S.me.nick }));
+    rerender(); then && then();
+  };
+  // log in with an ID made on another device
+  const lf = $('#au-login', w), lerr = $('#idl-err', w), lgo = $('#idl-go', w);
+  lf.addEventListener('submit', async e => {
+    e.preventDefault(); lerr.hidden = true;
+    const name = $('#idl-name', w).value.trim().toLowerCase(), pw = $('#idl-pass', w).value;
+    if (!name || !pw) { fail(lerr, 'wrong'); return; }
+    lgo.disabled = true;
+    try {
+      const r = await window.APP_AUTH.ids.login(name, pw);
+      if (!r || r.ok !== true) throw { code: (r && r.err) || 'fail' };
+      for (const k of ['me', 'labels', 'orders', 'suggest', 'photos']) lsSet(k, null);
+      try { localStorage.removeItem('eosin.spots'); } catch (x) { }
+      closeModal(w); toast(t('id_login_ok', { name: r.name || name }), 'ok');
+      setTimeout(() => { location.hash = 'sea'; location.reload(); }, 800);
+    } catch (x) { lgo.disabled = false; fail(lerr, x && x.code); }
+  });
+  setTimeout(() => { const first = $(`[data-pane="${tab}"] input`, w); if (first) first.focus(); }, 80);
+  return w;
+}
+/* First visit on the website: show sign-up / login once (people can still close it and look around) */
+function maybeWelcome(tries = 0) {
+  if (window.APP_RT !== 'web' || lsGet('welcomed', 0) || tries > 6) return;
+  if (!S.ready || $('.modal-wrap.in') || S.route === 'admin' || /^#(claim|link=)/.test(location.hash)) { setTimeout(() => maybeWelcome(tries + 1), 3000); return; }
+  if (S.me && S.me.nick) { lsSet('welcomed', 1); return; }
+  myLoginId().then(() => {
+    if ((S.me && S.me.nick) || lsGet('welcomed', 0)) { lsSet('welcomed', 1); return; }
+    if ($('.modal-wrap.in')) { setTimeout(() => maybeWelcome(tries + 1), 3000); return; }
+    lsSet('welcomed', 1);
+    if (idSupported() && !S.idOff) openAuth('join'); else openOnboarding();
+  });
+}
+function myPoints() { return myCatches().filter(c => eligible(c, myId())).reduce((a, c) => a + (c.sc || 0), 0); }
 
 /* ===== Payments: KakaoPay transfer-code link (no bank account shown anywhere) ===== */
 function payLinks(amt) {
@@ -520,7 +639,7 @@ async function myLoginId(force) {
   return S.loginId;
 }
 function idErr(code) {
-  const k = { bad_name: 'name', bad_pass: 'pass', taken: 'taken', wrong: 'wrong', slow_down: 'slow', slow: 'slow', has_id: 'has_id', team_leader: 'leader', no_id: 'no_id', mismatch: 'mismatch' }[code] || 'fail';
+  const k = { bad_name: 'name', bad_pass: 'pass', taken: 'taken', wrong: 'wrong', slow_down: 'slow', slow: 'slow', has_id: 'has_id', team_leader: 'leader', no_id: 'no_id', mismatch: 'mismatch', need_update: 'update', not_signed_in: 'signin', not_admin: 'not_admin' }[code] || 'fail';
   return t('id_err_' + k);
 }
 function idFormModal({ id, title, sub, fields, go, note, onSubmit }) {
@@ -540,40 +659,9 @@ function idFormModal({ id, title, sub, fields, go, note, onSubmit }) {
   return w;
 }
 const idCheck = r => { if (!r || r.ok !== true) throw { code: (r && r.err) || 'fail' }; return r; };
-function openIdCreate() {
-  if (!idSupported()) return;
-  idFormModal({
-    id: 'idc', title: t('id_create'), sub: t('id_create_sub'), go: t('id_create_go'),
-    fields: [{ id: 'idc-name', label: t('id_name'), ac: 'username', max: 20, ph: 'zzirit_fisher', hint: t('id_name_hint') }, { id: 'idc-pass', label: t('id_pass'), type: 'password', ac: 'new-password', hint: t('id_pass_hint') }, { id: 'idc-pass2', label: t('id_pass2'), type: 'password', ac: 'new-password' }],
-    note: `<p class="hint">${icon('info')} ${t('id_forgot')}</p>`,
-    async onSubmit(v, w) {
-      const name = v('idc-name').trim().toLowerCase(), p1 = v('idc-pass'), p2 = v('idc-pass2');
-      if (!/^[a-z0-9_]{3,20}$/.test(name)) throw { code: 'bad_name' };
-      if (p1.length < 6) throw { code: 'bad_pass' };
-      if (p1 !== p2) throw { code: 'mismatch' };
-      const r = idCheck(await window.APP_AUTH.ids.register(name, p1));
-      S.loginId = r.name; closeModal(w); toast(t('id_created', { name: r.name }), 'ok', 6000); rerender();
-    }
-  });
-}
-function openIdLogin() {
-  if (!idSupported()) return;
-  const local = myCatches().length;
-  idFormModal({
-    id: 'idl', title: t('id_login'), sub: t('id_login_sub'), go: t('id_login_go'),
-    fields: [{ id: 'idl-name', label: t('id_name'), ac: 'username', max: 20 }, { id: 'idl-pass', label: t('id_pass'), type: 'password', ac: 'current-password' }],
-    note: (local ? `<p class="note">${icon('info')} ${t('link_merge_note', { n: local })}</p>` : '') + `<p class="hint">${t('id_forgot')}</p>`,
-    async onSubmit(v, w) {
-      const name = v('idl-name').trim().toLowerCase(), p = v('idl-pass');
-      if (!name || !p) throw { code: 'wrong' };
-      const r = idCheck(await window.APP_AUTH.ids.login(name, p));
-      for (const k of ['me', 'labels', 'orders', 'suggest', 'photos']) lsSet(k, null);
-      try { localStorage.removeItem('eosin.spots'); } catch (x) { }
-      closeModal(w); toast(t('id_login_ok', { name: r.name || name }), 'ok');
-      setTimeout(() => { location.hash = 'sea'; location.reload(); }, 800);
-    }
-  });
-}
+// adding an ID and logging in both go through the one sign-up / login dialog
+function openIdCreate() { if (idSupported()) openAuth('join'); }
+function openIdLogin() { if (idSupported()) openAuth('login'); }
 function openIdPassword() {
   if (!idSupported()) return;
   idFormModal({
@@ -597,14 +685,18 @@ async function idLogout(btn) {
   for (const k of ['me', 'labels', 'orders', 'suggest', 'photos', 'payok']) lsSet(k, null);
   toast(t('id_logged_out')); setTimeout(() => { location.hash = 'home'; location.reload(); }, 700);
 }
+function acctSumHTML() {
+  if (!S.me || !S.me.nick) return '';
+  return `<div class="acct-sum">${avatar(S.me, 44)}<div><b>${nickHTML(S.me)}</b> ${lvMini(S.me, myId())}<p class="muted small">${t('acct_sum', { n: fmtN(myCatches().length), pts: fmtN(myPoints()), lv: myLevel() })}</p></div></div>`;
+}
 function idCardHTML() {
-  if (S.loginId === undefined) { myLoginId().then(() => { const c = $('#id-card'); if (c) { if (S.idOff) c.remove(); else c.innerHTML = idCardHTML(); } }); return `<h2 class="h3">${icon('user')}${t('id_title')}</h2><p class="muted">${t('thinking')}</p>`; }
+  if (S.loginId === undefined) { myLoginId().then(() => { const c = $('#id-card'); if (c) { if (S.idOff) c.remove(); else c.innerHTML = idCardHTML(); } }); return `<h2 class="h3">${icon('user')}${t('acct_title')}</h2><p class="muted">${t('thinking')}</p>`; }
   const linked = !!(window.APP_AUTH.link && window.APP_AUTH.link.linked());
   return S.loginId
-    ? `<h2 class="h3">${icon('user')}${t('id_title')}</h2><p>${t('id_signed_in', { name: `<b class="mono">${esc(S.loginId)}</b>` })}</p><p class="muted small">${t('id_signed_in_sub')}</p>
+    ? `<h2 class="h3">${icon('user')}${t('acct_title')}</h2>${acctSumHTML()}<p class="acct-state ok">${icon('check')} ${t('id_signed_in', { name: `<b class="mono">${esc(S.loginId)}</b>` })}</p><p class="muted small">${t('id_signed_in_sub')}</p>
        <div class="actions"><button class="btn btn-line" data-id="password">${t('id_change_pw')}</button><button class="btn btn-ghost" data-id="logout">${t('id_logout')}</button></div>`
-    : `<h2 class="h3">${icon('user')}${t('id_title')}</h2><p class="muted">${t('id_card_sub')}</p>
-       <div class="actions"><button class="btn btn-primary" data-id="create">${t('id_create')}</button><button class="btn btn-line" data-id="login">${t('id_login')}</button>${linked ? `<button class="btn btn-ghost" data-id="logout">${t('id_logout')}</button>` : ''}</div>`;
+    : `<h2 class="h3">${icon('user')}${t('acct_title')}</h2>${acctSumHTML()}<p class="acct-state warn">${icon('warn')} ${t(S.me && S.me.nick ? 'acct_no_id' : 'acct_none')}</p>
+       <div class="actions"><button class="btn btn-primary" data-id="create">${t(S.me && S.me.nick ? 'id_create' : 'auth_tab_join')}</button><button class="btn btn-line" data-id="login">${t('id_login')}</button>${linked ? `<button class="btn btn-ghost" data-id="logout">${t('id_logout')}</button>` : ''}</div>`;
 }
 
 /* ===== Operator: remove an account (with everything it posted) ===== */
@@ -618,7 +710,11 @@ async function adminDeleteUser(uid, btn) {
     S.anglers.delete(uid); S.dataVer++;
     toast(t('ad_deleted', { nick }), 'ok');
     if (/^#sea/.test(location.hash) && location.hash.includes(uid)) location.hash = 'admin'; else rerender();
-  } catch (e) { toast(t(/admin/i.test(String(e && e.message)) ? 'ad_del_admin' : 'ad_del_fail'), 'warn'); }
+  } catch (e) {
+    // say what actually happened (an older version showed "operator accounts can't be deleted" for any error)
+    const k = { need_update: 'ad_need_update', self: 'ad_del_self', not_admin: 'ad_not_admin' }[e && e.code] || 'ad_del_fail';
+    toast(t(k), 'warn', 7000);
+  }
 }
 
 /* ===== PC ↔ phone: one account on several devices (web build) ===== */
@@ -767,7 +863,7 @@ async function openCatch(uid, cid) {
           <div><dt>${t('trust')}</dt><dd><span class="trust-meter"><i style="width:${c.tr || 0}%"></i></span> ${c.tr ?? '—'}</dd></div>
         </dl>
         ${c.memo ? `<blockquote class="memo" id="cd-memo">${esc(c.memo)}</blockquote>${!mine && S.sample ? `<button class="btn btn-ghost btn-sm" id="cd-tr">${icon('globe')} ${t('translate')}</button>` : ''}` : ''}
-        <div class="actions split"><button class="btn btn-line btn-sm" data-share="${esc(uid)}|${esc(c.id)}">${icon('share')} ${t('share_btn')}</button>${mine ? `<button class="btn btn-ghost btn-sm" id="cd-del">${icon('trash')} ${t('delete')}</button>` : ''}</div>
+        <div class="actions split"><button class="btn btn-line btn-sm" data-share="${esc(uid)}|${esc(c.id)}">${icon('share')} ${t('share_btn')}</button>${mine && pointsOn() && c.lat != null ? `<button class="btn btn-line btn-sm" id="cd-pt">${icon('pin')} ${t('pt_from_catch')}</button>` : ''}${mine ? `<button class="btn btn-ghost btn-sm" id="cd-del">${icon('trash')} ${t('delete')}</button>` : ''}</div>
       </div>
     </article>`, { wide: true });
   store.getPhoto(uid, c.id).then(src => { if (src) { const ph = $('#cd-ph', w); if (ph) ph.innerHTML = `<img src="${src}" alt="${esc(nameOf(c.sp))}">`; } });
@@ -777,6 +873,8 @@ async function openCatch(uid, cid) {
     try { const r = await S.sample(`Translate the following fishing note into ${LANG_NAME[S.li]}. Output only the translation.\n\n${c.memo}`, { modelTier: 'quick' }); $('#cd-memo', w).textContent = r.text.trim(); tr.remove(); }
     catch (e) { tr.textContent = aiErrorText(e); }
   };
+  const cpt = $('#cd-pt', w);
+  if (cpt) cpt.onclick = () => { closeModal(w); openPointEdit(null, { lat: Math.round(c.lat * 1e4) / 1e4, lon: Math.round(c.lon * 1e4) / 1e4, sp: SPI[c.sp] ? [c.sp] : [], kind: c.sea ? 'breakwater' : 'river' }); };
   const del = $('#cd-del', w);
   if (del) del.onclick = () => {
     if (del.dataset.armed) { S.me.catches = S.me.catches.filter(x => x.id !== c.id); store.saveMe(); store.deletePhoto(c.id); closeModal(w); toast(t('deleted')); rerender(); }

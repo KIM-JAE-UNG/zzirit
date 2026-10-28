@@ -7,14 +7,25 @@
     const load = () => { try { return JSON.parse(localStorage.getItem(SK) || 'null'); } catch (e) { return null; } };
     let session = load();
     const uid = () => session && session.user.id;
+    const subsAuth = [];
+    const tell = ev => { for (const f of subsAuth) try { f(ev, session); } catch (e) { } };
     const auth = {
       async getSession() { return { data: { session } }; },
       async signInAnonymously() {
         if (ANON_OFF) return { data: {}, error: { message: 'Anonymous sign-ins are disabled', code: 'anonymous_provider_disabled' } };
-        session = { access_token: 'tok-' + Math.random().toString(36).slice(2), user: { id: 'u-' + Math.random().toString(36).slice(2, 10), is_anonymous: true } };
-        localStorage.setItem(SK, JSON.stringify(session)); return { data: { session, user: session.user }, error: null };
+        const id = 'u-' + Math.random().toString(36).slice(2, 10);
+        session = { access_token: 'tok-' + Math.random().toString(36).slice(2), refresh_token: 'rt-' + id, user: { id, is_anonymous: true } };
+        localStorage.setItem(SK, JSON.stringify(session)); tell('SIGNED_IN'); return { data: { session, user: session.user }, error: null };
       },
-      async signOut() { session = null; localStorage.removeItem(SK); return { error: null }; }
+      // like the real client: a saved refresh token brings the same account back (a broken one does not)
+      async setSession({ refresh_token }) {
+        const m = /^rt-(u-[a-z0-9]+)$/.exec(refresh_token || '');
+        if (!m) return { data: { session: null }, error: { message: 'Invalid Refresh Token' } };
+        session = { access_token: 'tok-' + Math.random().toString(36).slice(2), refresh_token, user: { id: m[1], is_anonymous: true } };
+        localStorage.setItem(SK, JSON.stringify(session)); tell('TOKEN_REFRESHED'); return { data: { session }, error: null };
+      },
+      onAuthStateChange(cb) { subsAuth.push(cb); return { data: { subscription: { unsubscribe() { } } } }; },
+      async signOut() { session = null; localStorage.removeItem(SK); tell('SIGNED_OUT'); return { error: null }; }
     };
     function from(table) {
       const st = { table, match: null, in: null, limit: 1000, op: 'select', single: false };
@@ -40,7 +51,7 @@
     const chans = new Set(); let since = 0, polling = false;
     async function poll() {
       if (polling) return; polling = true;
-      try { const r = await fetch('/__sb/changes?since=' + since).then(x => x.json()); if (!since) { since = r.ver; } else { for (const e of r.events) { since = Math.max(since, e.ver); for (const ch of chans) ch._deliver(e); } } } catch (e) { }
+      try { const r = await fetch('/__sb/changes?since=' + since + '&uid=' + encodeURIComponent(uid() || '')).then(x => x.json()); if (!since) { since = r.ver; } else { for (const e of r.events) { since = Math.max(since, e.ver); for (const ch of chans) ch._deliver(e); } } } catch (e) { }
       polling = false;
     }
     setInterval(poll, 250); poll();

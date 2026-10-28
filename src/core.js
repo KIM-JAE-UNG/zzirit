@@ -100,6 +100,7 @@ const S = {
   uid: null, isOwner: false, writable: null, mode: 'boot', ready: false,
   db: null, user: null, sample: null, sampleImages: false,
   me: null, anglers: new Map(), labels: new Map(), board: new Map(), teams: new Map(), news: [],
+  reviews: new Map(), reviewByCid: new Map(), points: new Map(),
   myBoard: null,
   admin: { config: {}, grants: {}, verdicts: {}, mod: {} },
   myOrders: [], myLabels: [], mySuggest: [],
@@ -194,6 +195,16 @@ const store = (() => {
         });
         sub(db.collection('teams').limit(1000), snap => { const m = new Map(); for (const d of snap.docs) if (d.exists) m.set(d.id, d.data()); S.teams = m; S.dataVer++; rerenderSoon(); });
         if (window.APP_RT === 'web') sub(db.collection('news').limit(200), snap => { S.news = snap.docs.filter(d => d.exists).map(d => Object.assign({ id: d.id }, d.data())); S.newsVer = (S.newsVer || 0) + 1; rerenderSoon(); });
+        if (window.APP_RT === 'web') {
+          // the reviewer's notes on my catches (the server only sends mine; the operator gets all), indexed by catch id
+          sub(db.collection('reviews').limit(1000), snap => {
+            const m = new Map(), byCid = new Map();
+            for (const d of snap.docs) if (d.exists) { const v = d.data() || {}; m.set(d.id, v); for (const [cid, note] of Object.entries(v)) byCid.set(cid, note); }
+            S.reviews = m; S.reviewByCid = byCid; S.dataVer++; rerenderSoon();
+          });
+          // fishing points: my own and the ones people share
+          sub(db.collection('points').limit(1000), snap => { const m = new Map(); for (const d of snap.docs) if (d.exists) m.set(d.id, Object.assign({ id: d.id }, d.data())); S.points = m; S.pointsLoaded = true; S.dataVer++; rerenderSoon(); });
+        }
         sub(db.collection('admin'), snap => { for (const d of snap.docs) if (d.exists) S.admin[d.id] = d.data(); S.adminLoaded = true; S.dataVer++; maybeCleanLooks(); payNotify(); rerenderSoon(); });
         if (S.uid && S.writable !== false) {
           S.mode = 'shared';
@@ -236,6 +247,17 @@ const store = (() => {
       if (!uid || uid === 'local') { const ph = lsGet('photos', {}); return ph[cid] || null; }
       if (!S.db) return null;
       return cachedPhoto(key, async () => { const d = await S.db.doc('anglers/' + uid + '/photos/' + cid).get(); return d.exists ? d.data().t : null; });
+    },
+    async savePoint(p) {
+      if (S.mode !== 'shared' || !S.uid || window.APP_RT !== 'web') return false;
+      const d = Object.assign({}, p); const id = d.id; delete d.id; delete d._owner; delete d._upd;
+      S.points.set(id, Object.assign({ id, _owner: S.uid }, d)); S.dataVer++;
+      return safeWrite('points/' + id, d, null);
+    },
+    async deletePoint(id) {
+      if (!S.db) return false;
+      S.points.delete(id); S.dataVer++;
+      try { await S.db.doc('points/' + id).delete(); return true; } catch (e) { console.warn(e); toast(t('toast_write_fail'), 'warn'); return false; }
     },
     async deletePhoto(cid) {
       S.photoCache.delete((S.uid || 'local') + '/' + cid);
@@ -302,7 +324,7 @@ function verdict(uid, cid) { return (S.admin.verdicts && S.admin.verdicts[uid] &
 function catchState(uid, c) { const v = verdict(uid, c.id); return v === 'ok' || v === 'no' || v === 'hold' ? v : c.st; }
 /* The automatic reviewer's note for a catch: { v, code, text, m, at } (code is translated, text is the AI's own words in Korean) */
 function reviewNote(uid, c) {
-  const r = S.admin.autorev && S.admin.autorev[uid] && S.admin.autorev[uid][c.id]; if (!r) return null;
+  const r = S.reviewByCid.get(c.id) || (S.admin.autorev && S.admin.autorev[uid] && S.admin.autorev[uid][c.id]); if (!r) return null;
   const s = String(r.why || ''); const i = s.indexOf('|');
   return { v: r.v, code: i >= 0 ? s.slice(0, i) : s, text: i >= 0 ? s.slice(i + 1) : '', m: r.m, at: r.at };
 }
@@ -370,7 +392,9 @@ function supporter() { const g = grantsOf(myId()); return S.myOrders.some(o => o
 function lookOk(a, uid, id) {
   const it = SHOPI[id]; if (!it) return false;
   if (a === S.me || (uid && uid === myId())) return owned(id);
-  if (it.top || it.pr || it.in) return true;
+  if (it.top) return true;
+  // someone else's premium look: only once the operator has confirmed a payment from them (the public decisions doc)
+  if (it.pr || it.in) return carried(a, id) || (!!uid && Object.values(grantsOf(uid)).includes('ok'));
   return lvInfo(a, uid).L >= (it.lv || 1) || carried(a, id);
 }
 function decorOf(a, uid) {

@@ -13,12 +13,25 @@
   const mkErr = (code, msg) => { const e = new Error(msg || code); e.code = code; return e; };
 
   /* ---- session: one anonymous account per browser ---- */
+  // A copy of the last sign-in: if a token refresh fails during a short server hiccup, supabase-js drops the session,
+  // and starting a new anonymous account would make the person's records vanish from this device. Try the copy first.
+  const BK = 'eosin.auth.bk';
+  const saveBk = s => { try { if (s && s.refresh_token) localStorage.setItem(BK, JSON.stringify({ a: s.access_token, r: s.refresh_token, u: s.user && s.user.id })); } catch (e) { } };
+  const dropBk = () => { try { localStorage.removeItem(BK); } catch (e) { } };
+  try { sb.auth.onAuthStateChange((ev, s) => { if (s) saveBk(s); }); } catch (e) { }
   let sessP = null, authErr = null;
   function session() {
     if (!sessP) sessP = (async () => {
       try {
         const { data } = await sb.auth.getSession();
-        if (data && data.session) return data.session;
+        if (data && data.session) { saveBk(data.session); return data.session; }
+        let bk = null; try { bk = JSON.parse(localStorage.getItem(BK) || 'null'); } catch (e) { bk = null; }
+        if (bk && bk.r) {
+          try {
+            const rs = await sb.auth.setSession({ access_token: bk.a || '', refresh_token: bk.r });
+            if (!rs.error && rs.data && rs.data.session) { console.info('[auth] sign-in restored'); return rs.data.session; }
+          } catch (e) { console.warn('[auth] restore failed', e); }
+        }
         const r = await sb.auth.signInAnonymously();
         if (r.error) { authErr = r.error; console.warn('[auth]', r.error.message); return null; }
         return r.data.session;
@@ -39,10 +52,22 @@
     })();
     return acctP;
   }
+  // what went wrong, as a short code the app can explain (a missing server function means the server update isn't in yet)
+  function rpcCode(error) {
+    const m = String((error && (error.message || error.details)) || '');
+    if ((error && error.code === 'PGRST202') || /could not find the function|schema cache/i.test(m)) return 'need_update';
+    if (/cannot_delete_self/.test(m)) return 'self';
+    if (/not_admin/.test(m)) return 'not_admin';
+    if (/no_account/.test(m)) return 'no_account';
+    if (/team_leader/i.test(m)) return 'team_leader';
+    if (/slow|rate limit/i.test(m)) return 'slow';
+    if (/bad_code|expired/i.test(m)) return 'bad_code';
+    return 'unavailable';
+  }
   async function rpcOrThrow(name, args) {
     const s = await session(); if (!s) throw mkErr('not_granted', 'not signed in');
     const { data, error } = await sb.rpc(name, args || {});
-    if (error) throw mkErr(/slow|rate/i.test(error.message) ? 'slow' : /bad|expired|invalid/i.test(error.message) ? 'bad_code' : /team_leader/i.test(error.message) ? 'team_leader' : 'unavailable', error.message);
+    if (error) throw mkErr(rpcCode(error), error.message);
     return data;
   }
   const link = {
@@ -59,8 +84,14 @@
   const news = { refresh: () => callFn('news') };
   // the automatic reviewer runs on its own every few minutes; a fresh catch just nudges it (it ignores extra nudges)
   const review = { ping: () => callFn('review').catch(() => false) };
-  // operator only (checked on the server): remove an account with everything it posted
-  const admin = { deleteUser: uid => rpcOrThrow('admin_delete_user', { p_uid: uid }) };
+  // operator only (checked on the server): remove an account with everything it posted; which account has which ID;
+  // a one-time code that brings someone back to an account they lost
+  const admin = {
+    deleteUser: uid => rpcOrThrow('admin_delete_user', { p_uid: uid }),
+    async canDelete() { try { await rpcOrThrow('admin_delete_user', { p_uid: null }); return true; } catch (e) { return e.code === 'need_update' ? false : null; } },
+    logins: () => rpcOrThrow('admin_logins'),
+    linkCode: uid => rpcOrThrow('admin_link_code', { p_acct: uid })
+  };
   // login ID + password: the server keeps only a hash; logging in joins this device to that account
   const ids = {
     me: () => rpcOrThrow('id_me'),
@@ -68,7 +99,7 @@
     login: (name, pass) => rpcOrThrow('id_login', { p_name: name, p_pass: pass }),
     password: (o, n) => rpcOrThrow('id_password', { p_old: o, p_new: n }),
     adminReset: (name, pass) => rpcOrThrow('admin_id_reset', { p_name: name, p_new: pass }),
-    async logout() { try { await sb.auth.signOut({ scope: 'local' }); } catch (e) { } }
+    async logout() { dropBk(); try { await sb.auth.signOut({ scope: 'local' }); } catch (e) { } dropBk(); }
   };
   window.APP_AUTH = { sb, session, acct, link, news, review, admin, ids, error: () => authErr };
 
@@ -77,12 +108,13 @@
     const p = String(path).split('/');
     if (p[0] === 'anglers' && p.length === 2) return { t: 'anglers', k: { id: p[1] }, conflict: 'id' };
     if (p[0] === 'anglers' && p[2] === 'photos' && p.length === 4) return { t: 'photos', k: { angler: p[1], cid: p[3] }, conflict: 'angler,cid' };
-    if ((p[0] === 'labels' || p[0] === 'orders' || p[0] === 'suggest' || p[0] === 'board' || p[0] === 'teams') && p.length === 2) return { t: p[0], k: { id: p[1] }, conflict: 'id' };
+    if ((p[0] === 'labels' || p[0] === 'orders' || p[0] === 'suggest' || p[0] === 'board' || p[0] === 'teams' || p[0] === 'points') && p.length === 2) return { t: p[0], k: { id: p[1] }, conflict: 'id' };
+    if (p[0] === 'reviews' && p.length === 2) return { t: 'reviews', k: { id: p[1] }, conflict: 'id', ro: true };
     if (p[0] === 'news' && p.length === 2) return { t: 'news', k: { id: p[1] }, conflict: 'id', ro: true };
     if (p[0] === 'admin' && p.length === 2) return { t: 'admin_docs', k: { id: p[1] }, conflict: 'id' };
     return null;
   }
-  const COLL = { anglers: 'anglers', labels: 'labels', orders: 'orders', suggest: 'suggest', admin: 'admin_docs', board: 'board', teams: 'teams', news: 'news' };
+  const COLL = { anglers: 'anglers', labels: 'labels', orders: 'orders', suggest: 'suggest', admin: 'admin_docs', board: 'board', teams: 'teams', news: 'news', points: 'points', reviews: 'reviews' };
   function dbErr(e) {
     const m = (e && (e.message || e.details)) || String(e);
     if (e && e.code === '42501') return mkErr('not_granted', m);
@@ -118,6 +150,7 @@
 
   function snapOf(table, id, row) {
     let data = row ? (table === 'news' ? { lang: row.lang, title: row.title, link: row.link, source: row.source, pub: row.pub, score: row.score, fetched_at: row.fetched_at } : clone(row.data)) : undefined;
+    if (data && table === 'points') data = Object.assign({}, data, { _owner: row.owner, _upd: row.updated_at });
     if (data && table === 'anglers') data = withSpots(id, data);
     return { id, exists: !!row, data: () => clone(data), metadata: { fromCache: false, hasPendingWrites: false } };
   }

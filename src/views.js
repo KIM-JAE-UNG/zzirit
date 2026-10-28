@@ -521,7 +521,9 @@ VIEWS.map = {
   render(el) {
     S.mp = S.mp || { month: new Date().getMonth(), sp: S.mapSp || '', base: 'day', fold: window.innerWidth < 760, tg: { coast: true, urban: true, roads: true, fresh: true, bathy: true, grid: true, heat: true, labels: true } };
     if (S.mapSp) { S.mp.sp = S.mapSp; S.mapSp = null; }
-    if (this.built && el.querySelector('#map')) { this.refreshPanels(); setTimeout(() => this.map && this.map.invalidateSize(), 60); return; }
+    if (S.mp.tg.points === undefined) S.mp.tg.points = true;
+    const focus = () => { if (S.mapFocus && this.map) { const [lo, la, z] = S.mapFocus; S.mapFocus = null; this.map.setView([la, lo], z); } };
+    if (this.built && el.querySelector('#map')) { this.refreshPanels(); this.drawMine(); setTimeout(() => { if (this.map) { this.map.invalidateSize(); focus(); } }, 60); return; }
     const mp = S.mp;
     el.innerHTML = `
     <div class="map-wrap">
@@ -544,7 +546,9 @@ VIEWS.map = {
     this.vec = new LY.Vec({ toggles: () => Object.assign({ night: S.mp.base === 'night' }, S.mp.tg) }).addTo(map);
     this.labels = MAPX.labelLayer(L, map, () => S.li);
     this.mine = L.layerGroup().addTo(map);
+    this.pts = L.layerGroup().addTo(map);
     this.map = map; this.built = true; this.LY = LY;
+    setTimeout(focus, 120);
     MAPX.load().then(() => { this.labels.refresh(); this.drawMine(); });
     map.on('click', e => this.inspect(e.latlng.lng, e.latlng.lat));
     el.addEventListener('click', e => { const j = e.target.closest('[data-jump]'); if (j) { const [lo, la, z] = j.dataset.jump.split(',').map(Number); map.flyTo([la, lo], z, { duration: .8 }); } });
@@ -583,7 +587,7 @@ VIEWS.map = {
           <div class="chip-row">${[['spring', 3], ['summer', 6], ['autumn', 9], ['winter', 0]].map(([s, mm]) => `<button class="chip chip-tab" aria-pressed="${seasonOf(mp.month) === s}" data-season="${mm}">${t('season_' + s)}</button>`).join('')}</div>
         </div>
         <fieldset class="toggles"><legend class="sr">${t('layers')}</legend>
-          ${['heat', 'coast', 'urban', 'roads', 'fresh', 'bathy', 'grid'].map(k => `<label class="tg"><input type="checkbox" data-tg="${k}" ${tg[k] ? 'checked' : ''}><span>${t('tg_' + k)}</span></label>`).join('')}
+          ${['heat', 'coast', 'urban', 'roads', 'fresh', 'bathy', 'grid'].concat(pointsOn() ? ['points'] : []).map(k => `<label class="tg"><input type="checkbox" data-tg="${k}" ${tg[k] ? 'checked' : ''}><span>${t('tg_' + k)}</span></label>`).join('')}
         </fieldset>
         <p class="hint">${t('map_note_detail')}</p>
       </div>`;
@@ -595,12 +599,20 @@ VIEWS.map = {
     $('#mp-month').onchange = () => { this.refreshPanels(); if (this.last) this.inspect(...this.last); };
     $$('[data-season]', ctl).forEach(b => b.onclick = () => { mp.month = +b.dataset.season; this.redrawHeat(); this.refreshPanels(); if (this.last) this.inspect(...this.last); });
     $$('[data-base]', ctl).forEach(b => b.onclick = () => { mp.base = b.dataset.base; this.sat.options.night = mp.base === 'night'; this.sat.redraw(); this.vec.redraw(); this.refreshPanels(); });
-    $$('[data-tg]', ctl).forEach(c => c.onchange = () => { const k = c.dataset.tg; tg[k] = c.checked; if (k === 'heat') { if (c.checked) this.heat.addTo(this.map); else this.heat.remove(); } else this.vec.redraw(); });
+    $$('[data-tg]', ctl).forEach(c => c.onchange = () => { const k = c.dataset.tg; tg[k] = c.checked; if (k === 'heat') { if (c.checked) this.heat.addTo(this.map); else this.heat.remove(); } else if (k === 'points') this.drawMine(); else this.vec.redraw(); });
   },
   redrawHeatSoon: debounce(function () { VIEWS.map.redrawHeat(); }, 160),
   drawMine() {
     if (!this.mine) return; this.mine.clearLayers();
     for (const c of myCatches()) if (c.lat != null) this.mine.addLayer(L.marker([c.lat, c.lon], { icon: L.divIcon({ className: 'my-pin', html: `<i></i>`, iconSize: [14, 14] }), title: nameOf(c.sp) }).on('click', () => openCatch(S.uid || 'local', c.id)));
+    // fishing points: mine filled, shared ones outlined
+    if (this.pts) {
+      this.pts.clearLayers();
+      if (pointsOn() && S.mp.tg.points) for (const p of S.points.values()) {
+        if (p.lat == null || p.lon == null || !ptVisible(p) || (!p.pub && !ptMine(p))) continue;
+        this.pts.addLayer(L.marker([p.lat, p.lon], { icon: L.divIcon({ className: 'pt-mark' + (ptMine(p) ? ' mine' : ''), html: icon('pin'), iconSize: [26, 26], iconAnchor: [13, 24] }), title: p.name || '' }).on('click', () => openPoint(p.id)));
+      }
+    }
   },
   inspect(lon, lat) {
     this.last = [lon, lat];
@@ -1104,10 +1116,10 @@ VIEWS.prefs = {
     el.innerHTML = `
     <div class="page prefs">
       <header class="page-head"><h1>${t('prefs_title')}</h1></header>
+      ${idSupported() && S.mode === 'shared' ? `<section class="card id-card" id="id-card">${idCardHTML()}</section>` : ''}
       <section class="card"><h2 class="h3">${t('prefs_profile')}</h2>
         ${S.me && S.me.nick ? `<a class="pf-char" href="#char">${avatar(S.me, 48)}<span><b>${t('ch_title')}</b><span class="muted small">${t('pf_char_hint')}</span></span>${icon('gear')}</a>` : ''}
         <div id="pf-box">${profileFormHTML(p)}</div><div class="actions"><button class="btn btn-primary" id="pf-save">${t('save')}</button></div></section>
-      ${idSupported() && S.mode === 'shared' ? `<section class="card id-card" id="id-card">${idCardHTML()}</section>` : ''}
       ${linkSupported() ? `<section class="card link-card"><h2 class="h3">${icon('link')}${t('link_title')}</h2><p class="muted">${t('link_sub')}</p>
         ${window.APP_AUTH.link.linked() ? `<p class="note ok">${icon('check')} ${t('link_linked')}</p>` : ''}
         <div class="actions"><button class="btn btn-primary" data-link="make">${icon('qr')}${t('link_make')}</button><button class="btn btn-line" data-link="enter">${t('link_enter')}</button>${window.APP_AUTH.link.linked() ? `<button class="btn btn-ghost" data-link="leave">${t('link_leave')}</button>` : ''}</div>
@@ -1156,7 +1168,10 @@ VIEWS.admin = {
     }
     const autoLog = []; for (const [uid, m] of Object.entries(S.admin.autorev || {})) for (const [cid, r] of Object.entries(m || {})) { const a = S.anglers.get(uid); const c = a && (a.catches || []).find(x => x.id === cid); if (c) autoLog.push({ uid, a, c, note: reviewNote(uid, c), at: r.at || 0 }); }
     autoLog.sort((x, y) => y.at - x.at);
-    const users = [...S.anglers.entries()].filter(([, a]) => a && a.nick).map(([uid, a]) => ({ uid, a, n: (a.catches || []).length, L: lvInfo(a, uid).L })).sort((x, y) => (y.a.joined || 0) - (x.a.joined || 0));
+    const users = [...S.anglers.entries()].filter(([, a]) => a && a.nick).map(([uid, a]) => ({ uid, a, n: (a.catches || []).length, L: lvInfo(a, uid).L, pts: (a.catches || []).filter(c => eligible(c, uid)).reduce((x, c) => x + (c.sc || 0), 0) })).sort((x, y) => (y.a.joined || 0) - (x.a.joined || 0));
+    adminLoad();
+    const ids = S.adm.logins || new Map(); const uq = (S.adm.q || '').trim().toLowerCase();
+    const shown = uq ? users.filter(u => u.a.nick.toLowerCase().includes(uq) || (ids.get(u.uid) || '').includes(uq) || u.uid.startsWith(uq)) : users;
     const nCatch = [...S.anglers.values()].reduce((s, a) => s + (a.catches || []).length, 0);
     const flagged = [...boardIndex().posts.values()].filter(p => p.reps > 0 || p.hidden).sort((x, y) => (x.hidden - y.hidden) || (y.reps - x.reps) || (y.ts - x.ts)).slice(0, 60);
     el.innerHTML = `
@@ -1184,7 +1199,9 @@ VIEWS.admin = {
         ${autoLog.length ? `<details class="ad-auto"><summary>${t('ad_auto_log', { n: autoLog.length })}</summary><ul class="ad-autolog">${autoLog.slice(0, 40).map(({ uid, a, c, note }) => `<li><span class="chip ${note.v === 'no' ? 'chip-closed' : note.v === 'ok' ? 'chip-ok' : 'chip-wait'}">${t(note.v === 'no' ? 'st_rejected' : note.v === 'ok' ? 'st_ok' : 'st_hold')}</span><button class="link" data-catch="${uid}|${c.id}">${esc(nameOf(c.sp))} ${lenFmt(c.len)}</button><span class="muted small">${esc(a.nick)} · ${esc(reviewReason(note))}</span>${verdict(uid, c.id) !== 'ok' ? `<button class="btn btn-ghost btn-xs" data-verdict="${uid}|${c.id}|ok">${t('approve')}</button>` : `<button class="btn btn-ghost btn-xs" data-verdict="${uid}|${c.id}|no">${t('reject')}</button>`}</li>`).join('')}</ul></details>` : ''}
       </section>
       <section class="card"><h2 class="h3">${icon('users')}${t('ad_users_title')}</h2><p class="hint">${t('ad_users_hint')}</p>
-        ${users.length ? `<ul class="ad-users">${users.slice(0, 300).map(({ uid, a, n, L }) => `<li><button class="fr-who" data-seauid="${esc(uid)}">${avatar(a, 32)}<span class="fr-txt"><span class="fr-name">${nickHTML(a)} <span class="lv-chip">Lv.${L}</span></span><span class="muted small">${t('catches')} ${n} · ${a.joined ? fmtDate(a.joined) : '—'} · <span class="mono">${esc(uid.slice(0, 8))}</span></span></span></button>${uid === myId() ? `<span class="chip">${t('ad_you')}</span>` : `<button class="btn btn-ghost btn-xs" data-deluser="${esc(uid)}">${icon('x')}${t('ad_del_user')}</button>`}</li>`).join('')}</ul>` : `<p class="muted">${t('ad_none')}</p>`}
+        ${S.adm.canDelete === false ? `<p class="note">${icon('info')} ${t('ad_del_needs_update')}</p>` : ''}
+        <input class="search" id="ad-uq" type="search" placeholder="${esc(t('ad_users_search'))}" value="${esc(S.adm.q || '')}" autocomplete="off">
+        ${shown.length ? `<ul class="ad-users">${shown.slice(0, 300).map(({ uid, a, n, L, pts }) => `<li><button class="fr-who" data-seauid="${esc(uid)}">${avatar(a, 32)}<span class="fr-txt"><span class="fr-name">${nickHTML(a)} <span class="lv-chip">Lv.${L}</span>${ids.get(uid) ? ` <span class="chip chip-id mono">${icon('user')}${esc(ids.get(uid))}</span>` : ''}</span><span class="muted small">${t('catches')} ${n} · ${fmtN(pts)} pt · ${a.joined ? fmtDate(a.joined) : '—'} · <span class="mono">${esc(uid.slice(0, 8))}</span></span></span></button><span class="ad-acts">${uid === myId() ? `<span class="chip">${t('ad_you')}</span>` : `${window.APP_RT === 'web' ? `<button class="btn btn-line btn-xs" data-relink="${esc(uid)}">${icon('link')}${t('ad_relink')}</button>` : ''}<button class="btn btn-ghost btn-xs" data-deluser="${esc(uid)}" ${S.adm.canDelete === false ? 'disabled' : ''}>${icon('x')}${t('ad_del_user')}</button>`}</span></li>`).join('')}</ul>` : `<p class="muted">${t('ad_none')}</p>`}
         ${window.APP_RT === 'web' ? `<form class="ad-idreset" id="ad-idreset"><p class="lbl">${t('ad_id_reset')}</p><div class="row2"><div class="field"><input id="ad-idr-name" placeholder="${esc(t('id_name'))}" autocomplete="off" autocapitalize="none" spellcheck="false"></div><div class="field"><input id="ad-idr-pass" placeholder="${esc(t('ad_id_reset_pw'))}" autocomplete="off"></div></div><div class="actions"><button class="btn btn-line btn-sm" type="submit">${t('ad_id_reset_go')}</button></div><p class="hint">${t('ad_id_reset_hint')}</p></form>` : ''}
       </section>
       <section class="card"><h2 class="h3">${icon('board')}${t('ad_reports')}</h2>
@@ -1219,17 +1236,52 @@ VIEWS.admin = {
       e.preventDefault();
       const name = $('#ad-idr-name', el).value.trim().toLowerCase(), pw = $('#ad-idr-pass', el).value.trim();
       if (!name || pw.length < 6) { toast(t('id_err_pass'), 'warn'); return; }
-      try { const r = await window.APP_AUTH.ids.adminReset(name, pw); if (!r || r.ok !== true) throw { code: (r && r.err) || 'fail' }; toast(t('ad_id_reset_ok', { name }), 'ok'); idr.reset(); }
-      catch (x) { toast(idErr(x && x.code), 'warn'); }
+      try { const r = await window.APP_AUTH.ids.adminReset(name, pw); if (!r || r.ok !== true) throw { code: (r && r.err) || 'fail' }; toast(t('ad_id_reset_ok', { name }), 'ok', 6000); idr.reset(); }
+      catch (x) { toast(idErr(x && x.code), 'warn', 6000); }
     };
+    const uqi = $('#ad-uq', el);
+    if (uqi) uqi.addEventListener('input', debounce(() => { S.adm.q = uqi.value; rerender(); }, 200));
   }
 };
 
+/* operator page extras from the server: who has which login ID, and whether deleting accounts is available yet */
+function adminLoad(force) {
+  S.adm = S.adm || {};
+  if (window.APP_RT !== 'web' || !window.APP_AUTH || !window.APP_AUTH.admin) return;
+  if (!force && S.adm.at && nowMs() - S.adm.at < 60000) return;
+  S.adm.at = nowMs();
+  window.APP_AUTH.admin.logins().then(rows => { S.adm.logins = new Map((rows || []).map(r => [r.acct, r.name])); rerenderSoon(); }).catch(e => { console.warn('admin_logins', e); });
+  window.APP_AUTH.admin.canDelete().then(v => { if (S.adm.canDelete !== v) { S.adm.canDelete = v; rerenderSoon(); } });
+}
+/* operator: a one-time code that brings someone back to an account they lost (they type it in Settings) */
+async function openRelink(uid) {
+  if (!S.isOwner || window.APP_RT !== 'web') return;
+  const a = S.anglers.get(uid); const nick = (a && a.nick) || '?';
+  let code;
+  try { code = await window.APP_AUTH.admin.linkCode(uid); }
+  catch (e) { toast(t(e && e.code === 'need_update' ? 'ad_need_update' : 'ad_relink_fail'), 'warn', 6000); return; }
+  const pretty = String(code).replace(/^(.{4})(.{4})$/, '$1-$2');
+  const msg = t('ad_relink_msg', { code: pretty });
+  openModal(`<div class="relink">
+    <h2>${icon('link')} ${t('ad_relink_title', { nick: esc(nick) })}</h2>
+    <p class="lede">${t('ad_relink_sub')}</p>
+    <p class="link-code"><b class="mono">${esc(pretty)}</b> <button class="btn btn-line btn-sm" data-copy="${esc(code)}">${icon('copy')}${t('copy')}</button></p>
+    <div class="field"><label>${t('ad_relink_send')}</label><textarea rows="3" readonly>${esc(msg)}</textarea><button class="btn btn-primary btn-sm" data-copy="${esc(msg)}">${icon('copy')}${t('ad_relink_copy')}</button></div>
+    <p class="hint">${icon('shield')} ${t('ad_relink_note')}</p>
+  </div>`, { label: t('ad_relink_title', { nick }) });
+}
+
 /* ---------- More (mobile) ---------- */
 function openMore() {
-  const items = [['friends', 'users'], ['board', 'board'], ['teams', 'flag'], ['char', 'user'], ['dex', 'book'], ['tackle', 'lure'], ['log', 'log'], ['help', 'chat'], ['about', 'sparkle'], ['prefs', 'gear']];
+  const items = [['friends', 'users'], ['board', 'board'], ['teams', 'flag'], ['points', 'pin'], ['char', 'user'], ['dex', 'book'], ['tackle', 'lure'], ['log', 'log'], ['help', 'chat'], ['about', 'sparkle'], ['prefs', 'gear']];
+  if (window.APP_RT !== 'web') items.splice(3, 1);
   if (S.isOwner) items.push(['admin', 'shield']);
   const nIn = frLists().inc.length;
-  const w = openModal(`<nav class="more"><h2 class="sr">${t('more')}</h2>${items.map(([r, ic]) => `<a href="#${r}" class="more-item">${icon(ic)}<span>${t('nav_' + r)}</span>${r === 'friends' && nIn ? `<i class="badge num">${nIn}</i>` : ''}</a>`).join('')}<button class="more-item heart" data-act="donate">${icon('heart')}<span>${t('donate_btn')}</span></button></nav>`, { sheet: true, label: t('more') });
-  w.addEventListener('click', e => { if (e.target.closest('a,.heart')) closeModal(w); });
+  const acct = idSupported() && !S.idOff ? (S.loginId ? `<a href="#prefs" class="more-acct">${S.me && S.me.nick ? avatar(S.me, 30) : icon('user')}<span><b>${esc((S.me && S.me.nick) || '')}</b><span class="muted small mono">${esc(S.loginId)}</span></span></a>`
+    : `<button class="more-acct" data-act="auth">${icon('user')}<span><b>${t(S.me && S.me.nick ? 'more_acct_keep' : 'more_acct_join')}</b><span class="muted small">${t(S.me && S.me.nick ? 'more_acct_keep_sub' : 'more_acct_join_sub')}</span></span></button>`) : '';
+  const w = openModal(`<nav class="more"><h2 class="sr">${t('more')}</h2>${acct}${items.map(([r, ic]) => `<a href="#${r}" class="more-item">${icon(ic)}<span>${t('nav_' + r)}</span>${r === 'friends' && nIn ? `<i class="badge num">${nIn}</i>` : ''}</a>`).join('')}<button class="more-item heart" data-act="donate">${icon('heart')}<span>${t('donate_btn')}</span></button></nav>`, { sheet: true, label: t('more') });
+  w.addEventListener('click', e => {
+    if (e.target.closest('[data-act="auth"]')) { closeModal(w); openAuth('join'); return; }
+    if (e.target.closest('a,.heart')) closeModal(w);
+  });
 }
