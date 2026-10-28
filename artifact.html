@@ -5887,13 +5887,16 @@ VIEWS.home = {
   }
 };
 /* Catch photos in lists load when they come near the screen (the drawn fish shows until then) */
-const PH_IO = 'IntersectionObserver' in window ? new IntersectionObserver(es => { for (const e of es) if (e.isIntersecting) { PH_IO.unobserve(e.target); loadPh(e.target); } }, { rootMargin: '400px 0px' }) : null;
+const PH_IO = 'IntersectionObserver' in window ? new IntersectionObserver(es => { for (const e of es) if (e.isIntersecting) { PH_IO.unobserve(e.target); PH_WATCH.delete(e.target); loadPh(e.target); } }, { rootMargin: '400px 0px' }) : null;
+const PH_WATCH = new Set();
 function loadPh(n) { const [uid, cid] = n.dataset.ph.split('|'); store.getPhoto(uid, cid).then(src => { if (src && n.isConnected) n.innerHTML = `<img src="${src}" alt="">`; }); }
 function hydratePhotos(root) {
+  // lists are redrawn often: stop watching thumbnails that are no longer on the page
+  if (PH_IO) for (const n of PH_WATCH) if (!n.isConnected) { PH_IO.unobserve(n); PH_WATCH.delete(n); }
   $$('[data-ph]', root).forEach(n => {
     const [uid, cid] = n.dataset.ph.split('|'); const key = uid + '/' + cid;
     if (S.photoCache.has(key)) { const src = S.photoCache.get(key); if (src) n.innerHTML = `<img src="${src}" alt="">`; return; }
-    if (PH_IO) PH_IO.observe(n); else loadPh(n);
+    if (PH_IO) { PH_IO.observe(n); PH_WATCH.add(n); } else loadPh(n);
   });
 }
 
