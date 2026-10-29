@@ -130,6 +130,7 @@ document.addEventListener('click', e => {
     else if (a === 'noti') openNoti();
     else if (a === 'logout') openLogout();
     else if (a === 'install') openInstall();
+    else if (a === 'weekly') openWeekly();
     else if (a === 'more') openMore();
     else if (a === 'lens') openLens();
     else if (a === 'scan-stop') { if (S.scan && S.scan.ctl) S.scan.ctl.abort(); S.scan.phase = 'idle'; renderScanWork(); }
@@ -176,6 +177,7 @@ document.addEventListener('click', e => {
   const to = tgt.closest('[data-tryon]'); if (to) { S.viewUid = null; S.preview = previewFor(to.dataset.tryon); S.seaTab = 'shop'; show('sea'); window.scrollTo({ top: 0 }); toast(t('fr_tryon_toast'), 'info'); return; }
   const sk = tgt.closest('[data-shopkind]'); if (sk) { S.shopKind = sk.dataset.shopkind; rerender(); return; }
   const st = tgt.closest('[data-seatab]'); if (st) { S.seaTab = st.dataset.seatab; rerender(); return; }
+  const lt = tgt.closest('[data-logtab]'); if (lt) { S.logTab = lt.dataset.logtab; rerender(); return; }
   const pv = tgt.closest('[data-preview]'); if (pv) { S.preview = previewFor(pv.dataset.preview); if (S.preview.flair) toast(t('preview_flair'), 'info'); rerender(); const sw = $('.scene-wrap'); if (sw) sw.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
   const by = tgt.closest('[data-buy]'); if (by) { buyItem(by.dataset.buy); return; }
   const tg = tgt.closest('[data-toggle]'); if (tg) { toggleItem(tg.dataset.toggle); return; }
@@ -186,8 +188,8 @@ document.addEventListener('click', e => {
   const cq = tgt.closest('[data-coachq]'); if (cq) { const sp2 = SPI[S.tk.sp] || SPI[inSeasonTop(homeRegion(), new Date().getMonth(), 1)[0].id]; VIEWS.tackle.ask(cq.dataset.coachq, sp2); return; }
   const th = tgt.closest('[data-themeset]'); if (th) { setTheme(th.dataset.themeset); rerender(); return; }
   const un = tgt.closest('[data-unit]'); if (un) { S.unit = un.dataset.unit; lsSet('unit', S.unit); rerender(); return; }
-  const gr = tgt.closest('[data-grant]'); if (gr) { const [uid, oid, v] = gr.dataset.grant.split('|'); const g = Object.assign({}, S.admin.grants); g[uid] = Object.assign({}, g[uid] || {}, { [oid]: v }); store.saveAdmin('grants', g).then(() => rerender()); return; }
-  const vd = tgt.closest('[data-verdict]'); if (vd) { const [uid, cid, v] = vd.dataset.verdict.split('|'); const g = Object.assign({}, S.admin.verdicts); g[uid] = Object.assign({}, g[uid] || {}, { [cid]: v }); store.saveAdmin('verdicts', g).then(() => { S.dataVer++; rerender(); }); return; }
+  const gr = tgt.closest('[data-grant]'); if (gr) { const [uid, oid, v] = gr.dataset.grant.split('|'); const g = Object.assign({}, S.admin.grants); g[uid] = Object.assign({}, g[uid] || {}, { [oid]: v }); store.saveAdmin('grants', g).then(ok => { if (ok && v === 'ok') pushSend('paid', uid + '|' + oid); rerender(); }); return; }
+  const vd = tgt.closest('[data-verdict]'); if (vd) { const [uid, cid, v] = vd.dataset.verdict.split('|'); const g = Object.assign({}, S.admin.verdicts); g[uid] = Object.assign({}, g[uid] || {}, { [cid]: v }); store.saveAdmin('verdicts', g).then(ok => { if (ok && (v === 'ok' || v === 'no')) pushSend('verdict', uid + '|' + cid); S.dataVer++; rerender(); }); return; }
 });
 document.addEventListener('change', e => {
   const id = e.target.id;
@@ -210,7 +212,8 @@ matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', () => { 
   S.unit = lsGet('unit', 'cm');
   S.me = lsGet('me', null);
   onHash();
-  store.init().then(() => { updateStatic(); updateShell(); if (S.route === 'admin' && !S.isOwner) location.hash = 'home'; setTimeout(maybeWhatsNew, 2500); setTimeout(maybeWelcome, 1800); });
+  store.init().then(() => { updateStatic(); updateShell(); if (S.route === 'admin' && !S.isOwner) location.hash = 'home'; setTimeout(maybeWhatsNew, 2500); setTimeout(maybeWelcome, 1800); setTimeout(pushSync, 4000); });
+  if (window.APP_RT === 'web' && 'serviceWorker' in navigator) navigator.serviceWorker.addEventListener('message', e => { const h = e.data && e.data.go; if (typeof h === 'string' && /^#[a-z]+$/.test(h)) location.hash = h.slice(1); });
   const idle = window.requestIdleCallback || (f => setTimeout(f, 1200));
   idle(() => { GEO.loadEnv(); });
   // the website can be installed as an app and opened without a connection (sw.js: pages always come fresh from the network first)

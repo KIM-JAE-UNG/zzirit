@@ -96,6 +96,8 @@ VIEWS.home = {
         <div class="tourney-fish">${feat.map(id => `<button class="tf" data-sp="${id}"><img src="${FD.thumb(SPI[id], 180, 100)}" alt="" width="180" height="100"><span>${esc(nameOf(id))}</span><b>×2</b></button>`).join('')}</div>
       </section>
 
+      ${wkCardHTML()}
+
       <section>
         <div class="sec-head">
           <h2>${t('season_now', { rg: esc(regionName(rg)) })}</h2>
@@ -1007,8 +1009,10 @@ VIEWS.log = {
     <div class="page log">
       <header class="page-head"><h1>${t('log_title')}</h1><p class="lede">${t('log_sub')}</p>
         <div class="hero-cta"><a class="btn btn-primary" href="#scan">${icon('camera')}${t('mode_now')}</a><a class="btn btn-line" href="#past">${icon('clock')}${t('mode_past')}</a></div></header>
+      ${cs.length ? `<div class="seg log-tabs" role="tablist">${['list', 'stats'].map(k => `<button role="tab" aria-pressed="${(S.logTab || 'list') === k}" data-logtab="${k}">${icon(k === 'list' ? 'log' : 'chart')}${t('st_tab_' + k)}</button>`).join('')}</div>` : ''}
+      ${S.logTab === 'stats' && cs.length ? statsHTML() : `
       <div class="stats4 card"><div><span class="num">${fmtN(cs.length)}</span><span>${t('catches')}</span></div><div><span class="num">${fmtN(pts)}</span><span>${t('total_pts')}</span></div><div><span class="num">Lv.${myLevel()}</span><span>${esc(lvInfo(S.me, myId()).title)}</span></div><div><span class="num">${fmtN(cs.filter(c => { const x = catchState(myId(), c); return x === 'review' || x === 'hold'; }).length)}</span><span>${t('st_review')}</span></div></div>
-      ${cs.length ? VIEWS.sea.catchesHTML(cs, null) : `<div class="empty card big"><div class="empty-art"><img src="${FD.thumb(SPI.kurodai, 260, 140)}" alt=""></div><h2>${t('log_empty')}</h2><p class="muted">${t('log_empty_sub')}</p><a class="btn btn-primary" href="#scan">${t('cta_scan')}</a></div>`}
+      ${cs.length ? VIEWS.sea.catchesHTML(cs, null) : `<div class="empty card big"><div class="empty-art"><img src="${FD.thumb(SPI.kurodai, 260, 140)}" alt=""></div><h2>${t('log_empty')}</h2><p class="muted">${t('log_empty_sub')}</p><a class="btn btn-primary" href="#scan">${t('cta_scan')}</a></div>`}`}
       ${S.myOrders.length ? `<section class="card"><h2 class="h3">${icon('heart')}${t('orders_title')}</h2><ul class="orders">${S.myOrders.slice().reverse().map(o => `<li><span>${esc(o.kind === 'item' ? dict(SHOPI[o.ref]?.n) || o.ref : o.kind === 'past' ? t('ord_past_old') : t('donate_title'))}</span><span class="num">${fmtN(o.amt)}${t('won')}</span><span class="mono small">${esc(o.code)}</span><span class="chip ${({ no: 'chip-closed', ok: 'chip-ok', wait: 'chip-wait' })[orderState(o)]}">${t('ord_' + orderState(o))}</span></li>`).join('')}</ul><p class="hint">${t('orders_note')}</p></section>` : ''}
     </div>`;
     hydratePhotos(el);
@@ -1133,6 +1137,7 @@ VIEWS.prefs = {
         </div>
         ${installOn() ? `<div class="inst-row"><div><b>${t('inst_btn')}</b><p class="muted small">${t('inst_row_sub')}</p></div><button class="btn btn-line btn-sm" data-act="install">${icon('download')}${t('inst_btn')}</button></div>` : ''}
       </section>
+      ${window.APP_RT === 'web' && S.mode === 'shared' && S.me && S.me.nick ? `<section class="card push-card"><h2 class="h3">${icon('bell')}${t('push_card')}</h2>${pushRowHTML()}<p class="hint">${t('push_hint')}</p></section>` : ''}
       <section class="card"><h2 class="h3">${t('prefs_privacy')}</h2><p>${t('privacy_text')}</p>
         ${S.me && S.me.nick ? `<label class="switch"><input type="checkbox" id="pf-froff" ${S.me.frOff ? '' : 'checked'}><span class="sw"></span><span>${t('fr_off_pref')}</span></label><p class="hint">${t('fr_off_pref_hint')}</p>` : ''}
       </section>
@@ -1143,6 +1148,7 @@ VIEWS.prefs = {
       </section>
       <section class="card credits"><h2 class="h3">${t('credits_title')}</h2><p class="small">${t('credits_text')}</p>${wxOn() ? `<p class="small">${t('credits_wx')} · <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo.com</a> (CC BY 4.0)</p>` : ''}</section>
     </div>`;
+    pushBind(el);
     const fo = $('#pf-froff', el);
     if (fo) fo.onchange = async () => { S.me.frOff = !fo.checked; await store.saveMe(); toast(t('saved')); };
     $('#pf-save', el).onclick = async () => {
@@ -1226,7 +1232,8 @@ VIEWS.admin = {
     $('#ad-notice-go', el).onclick = async () => {
       const v = $('#ad-notice', el).value.trim().slice(0, 400);
       if (!v) { toast(t('ad_notice_empty'), 'warn'); return; }
-      if (await store.saveAdmin('config', Object.assign({}, S.admin.config || {}, { notice: { id: rid(8), t: v, ts: nowMs() } }))) toast(t('ad_notice_done'));
+      const nt = { id: rid(8), t: v, ts: nowMs() };
+      if (await store.saveAdmin('config', Object.assign({}, S.admin.config || {}, { notice: nt }))) { toast(t('ad_notice_done')); pushSend('notice', nt.id); }
       rerender();
     };
     const wxSw = $('#ad-wx', el);

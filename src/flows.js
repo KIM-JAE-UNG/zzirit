@@ -703,6 +703,7 @@ async function openLogout() {
   </div>`, { label: t('lo_title') });
   $('#lo-go', w).onclick = async () => {
     $('#lo-go', w).disabled = true;
+    try { await pushOff(); } catch (e) { } // this device stops getting the account's notices
     try { await window.APP_AUTH.ids.logout(); } catch (e) { }
     for (const k of ['me', 'labels', 'orders', 'suggest', 'photos', 'payok', 'welcomed', 'noti', 'notiSeen', 'notiInit', 'notiState', 'badges']) lsSet(k, null);
     lsSet('authTab', 'login'); // after reloading, the login dialog opens (to sign in again or with another ID)
@@ -937,6 +938,7 @@ async function friendAction(act, uid, btn) {
   // record the new state first: the db echo can arrive before the write resolves, and my own action shouldn't toast back at me
   const L = frLists(); S._frPrev = { inc: new Set(L.inc.map(x => x.uid)), fr: new Set(L.friends.map(x => x.uid)) };
   await store.saveMe();
+  if (act === 'req' || act === 'acc') pushSend(act === 'req' ? 'freq' : 'facc', uid);
   if (msg) toast(msg, act === 'dec' || act === 'cancel' ? 'info' : 'ok');
   rerender();
 }
@@ -1073,12 +1075,13 @@ function openShareCard(blob, name, text) {
 }
 
 /* ===== What's new: shown once after a big update (website only; needs the matching server update) ===== */
-const WHATS_NEW = '2026-10-29', WN_TS = Date.parse('2026-10-29T03:00:00Z'); // people who joined after this have nothing to catch up on
+const WHATS_NEW = '2026-10-29b', WN_TS = Date.parse('2026-10-29T05:00:00Z'); // people who joined after this have nothing to catch up on
 const BOOT_AT = Date.now();
 /* what each update brought, newest last; people see what came after the last one they saw (at most 6 lines) */
 const WN_ITEMS = [
   ['2026-10-28', 'user', 'wn_id'], ['2026-10-28', 'shield', 'wn_review'], ['2026-10-28', 'heart', 'wn_pay'], ['2026-10-28', 'share', 'wn_share'],
-  ['2026-10-29', 'bell', 'wn_noti'], ['2026-10-29', 'wave', 'wn_wx'], ['2026-10-29', 'medal', 'wn_bdg'], ['2026-10-29', 'download', 'wn_inst'], ['2026-10-29', 'logout', 'wn_out']
+  ['2026-10-29', 'bell', 'wn_noti'], ['2026-10-29', 'wave', 'wn_wx'], ['2026-10-29', 'medal', 'wn_bdg'], ['2026-10-29', 'download', 'wn_inst'], ['2026-10-29', 'logout', 'wn_out'],
+  ['2026-10-29b', 'wave', 'wn_fs'], ['2026-10-29b', 'trophy', 'wn_wk'], ['2026-10-29b', 'chart', 'wn_st'], ['2026-10-29b', 'phone', 'wn_push']
 ];
 function maybeWhatsNew(tries = 0) {
   if (window.APP_RT !== 'web' || lsGet('wn', '') === WHATS_NEW || tries > 6) return;

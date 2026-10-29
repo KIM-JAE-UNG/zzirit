@@ -17,7 +17,8 @@ function keyFrom(envJson: string, legacy: string): string {
   try { const o = JSON.parse(Deno.env.get(envJson) || "{}"); if (o && typeof o.default === "string") return o.default; } catch (_) { /* legacy */ }
   return Deno.env.get(legacy) || "";
 }
-const admin = createClient(env("SUPABASE_URL"), keyFrom("SUPABASE_SECRET_KEYS", "SUPABASE_SERVICE_ROLE_KEY"), { auth: { persistSession: false, autoRefreshToken: false } });
+const SERVER_KEY = keyFrom("SUPABASE_SECRET_KEYS", "SUPABASE_SERVICE_ROLE_KEY");
+const admin = createClient(env("SUPABASE_URL"), SERVER_KEY, { auth: { persistSession: false, autoRefreshToken: false } });
 
 // a better model first (this runs in the background, so a slower answer is fine), then the quick ones
 const MODELS = env("REVIEW_MODELS", "gemini-3.6-flash,gemini-3.5-flash-lite,gemini-flash-latest").split(",").map((s) => s.trim()).filter(Boolean);
@@ -53,6 +54,18 @@ async function gemini(key: string, prompt: string, img: { mime: string; data: st
     } finally { clearTimeout(timer); }
   }
   return null;
+}
+
+// tell the angler on their phone, if they switched notices on (the push function decides); never holds the review up
+async function notify(row: Row, v: NonNullable<Verdict>) {
+  const ctl = new AbortController(); const timer = setTimeout(() => ctl.abort(), 5000);
+  try {
+    await fetch(`${env("SUPABASE_URL")}/functions/v1/push`, {
+      method: "POST", signal: ctl.signal,
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${SERVER_KEY}` },
+      body: JSON.stringify({ op: "send", kind: "review", to: row.uid, ref: `${row.cid}:${v.v}`, v: v.v, code: v.why.split("|")[0], ko: row.ko, en: row.en, sp: row.sp, len: row.len }),
+    });
+  } catch (_) { /* a notice is a bonus */ } finally { clearTimeout(timer); }
 }
 
 const n01 = (v: unknown) => (typeof v === "number" && isFinite(v) ? Math.max(0, Math.min(1, v)) : 0);
@@ -130,6 +143,7 @@ Deno.serve(async (req: Request) => {
     const { error: se } = await admin.rpc("review_set", { p_uid: row.uid, p_cid: row.cid, p_v: verdict.v, p_why: verdict.why, p_model: verdict.model });
     if (se) { console.log(JSON.stringify({ ev: "review-set", err: se.message })); continue; }
     done[verdict.v]++;
+    await notify(row, verdict);
   }
   console.log(JSON.stringify({ ev: "review-run", ms: Date.now() - started, ...done }));
   return json({ ok: true, ...done });

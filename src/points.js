@@ -67,7 +67,12 @@ function openPoint(id) {
       ${S.isOwner && !mine ? `<button class="btn btn-ghost btn-sm" id="pt-hide">${t(p.hidden ? 'bd_unhide' : 'bd_hide')}</button>` : ''}
     </div>
   </article>`, { label: p.name || t('nav_points') });
-  const px = $('#pt-wx', w); if (px) wxFetch(p.lat, p.lon).then(d => { if (px.isConnected) px.innerHTML = d ? wxLine(d) : `<span class="muted small">${t('wx_fail')}</span>`; });
+  const px = $('#pt-wx', w);
+  if (px) wxFetch(p.lat, p.lon).then(d => {
+    if (!px.isConnected) return;
+    const fs = fishScore(d, Object.assign({ id: p.id, lat: p.lat, lon: p.lon, kind: p.kind }, placeRegion(p)));
+    px.innerHTML = d ? `<span class="fs-mini">${t('fs_title')} <b>${fs.total}</b>/100 ${fsChip(fs)}</span>${wxLine(d)}` : `<span class="muted small">${t('wx_fail')}</span>`;
+  });
   const mp = $('#pt-map', w); if (mp) mp.onclick = () => { closeModal(w); S.mapFocus = [p.lon, p.lat, 12]; location.hash = 'map'; };
   const ed = $('#pt-edit', w); if (ed) ed.onclick = () => { closeModal(w); openPointEdit(id); };
   const dl = $('#pt-del', w); if (dl) dl.onclick = async () => { if (!armed(dl, t('delete_confirm'))) return; await store.deletePoint(id); closeModal(w); toast(t('deleted')); rerender(); };

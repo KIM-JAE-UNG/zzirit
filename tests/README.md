@@ -9,6 +9,9 @@ bash tests/run-all.sh
 | 점검 | 파일 | 하는 일 |
 | --- | --- | --- |
 | 서버 규칙 | `db/rules.test.mjs` | 마이그레이션을 PGlite(브라우저용 Postgres)에 올려 결제 확인, 주문 제한, 초기화, AI 검토, 계정 삭제, 아이디 로그인 규칙을 확인 |
+| 지금 서버 | `db/before-reset.test.mjs` | 0001–0007b까지만 올린 지금 서버 상태에서 아이디·복구 코드·포인트가 동작하는지 확인 |
+| 폰 알림 서버 | `db/push.test.mjs` | 0010을 지금 서버 상태 위에 올려 구독, 실제 일어난 일인지 확인, 한 번만 보내기, 보내는 사람 제한, Vault 키, 권한을 확인 |
+| 폰 알림 암호화 | `push/webpush.test.mjs` | RFC 8291 예제를 바이트 하나까지 똑같이 재현하고 VAPID 서명을 공개 키로 검증 |
 | 웹사이트 | `web/run.js` | 가짜 Supabase(`web/server.js`)로 index.html을 실제 브라우저(Playwright)에서 돌려 가입·스캔·등록·게시판·팀·결제·아이디·공지·조과 카드 등을 확인 |
 | Claude 페이지 | `claude/run.js` | 가짜 Claude 런타임(`claude/mock.js`)으로 artifact.html을 확인 |
 

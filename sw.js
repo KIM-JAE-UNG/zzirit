@@ -1,7 +1,8 @@
 /* 찌릿 ZZIRIT service worker.
    Lets the website be installed as an app and still open without a connection.
    The page always comes from the network first, so an update shows up right away; the last good copy is used only
-   when the network fails. Nothing else (data, photos, maps, sign-in) passes through here. */
+   when the network fails. Nothing else (data, photos, maps, sign-in) passes through here.
+   It also shows the phone notifications the server sends, and opens the right screen when one is tapped. */
 const CACHE = 'zzirit-page-v1';
 const SCOPE = new URL(self.registration.scope);
 const PAGE = SCOPE.href; // the app's one page ("./" and "./index.html" are the same page)
@@ -33,5 +34,29 @@ self.addEventListener('fetch', e => {
       const hit = page ? await caches.match(PAGE) : null;
       return hit || new Response(OFFLINE, { headers: { 'content-type': 'text/html; charset=utf-8' } });
     }
+  })());
+});
+
+/* Phone notifications: the server sends { t: title, b: text, u: "#screen", tag } (encrypted for this browser only). */
+self.addEventListener('push', e => {
+  let d = {};
+  try { d = e.data ? e.data.json() : {}; } catch (_) { d = { b: e.data ? e.data.text() : '' }; }
+  const title = String(d.t || '찌릿 ZZIRIT').slice(0, 60);
+  e.waitUntil(self.registration.showNotification(title, {
+    body: String(d.b || '새 소식이 있어요').slice(0, 200),
+    icon: new URL('icon-192.png', SCOPE).href,
+    tag: d.tag ? String(d.tag).slice(0, 60) : undefined,
+    renotify: !!d.tag,
+    data: { u: /^#[a-z]+$/.test(d.u || '') ? d.u : '#home' }
+  }));
+});
+self.addEventListener('notificationclick', e => {
+  e.notification.close();
+  const hash = (e.notification.data && e.notification.data.u) || '#home';
+  e.waitUntil((async () => {
+    const wins = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    const open = wins.find(c => c.url.startsWith(SCOPE.href));
+    if (open) { await open.focus(); open.postMessage({ go: hash }); return; }
+    await self.clients.openWindow(SCOPE.href + hash);
   })());
 });

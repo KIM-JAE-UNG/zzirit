@@ -169,6 +169,7 @@ function openPost(key) {
       if (D.cmts.length >= BD_MAX.cmts) D.cmts.shift();
       D.cmts.push({ id: rid(10), p: key, body: v, ts: nowMs() }); ta.value = '';
       await store.saveBoard(); render();
+      if (!key.startsWith(myId() + '|')) pushSend('cmt', key); // the post's author, on their phone
     };
   };
   S.openPost = { key, w, render };
@@ -278,6 +279,7 @@ async function tmJoin(tid) {
   if (e.members.length >= TEAM_MAX) { toast(t('tm_full'), 'warn'); return; }
   S.me.team = { id: tid, ts: nowMs() };
   await store.saveMe(); S.dataVer++;
+  if (!e.t.open) pushSend('tjoin', tid); // the leader decides
   toast(t(e.t.open ? 'tm_joined' : 'tm_requested', { name: e.t.name }), 'ok', 4200); rerender();
 }
 async function tmLeave() {

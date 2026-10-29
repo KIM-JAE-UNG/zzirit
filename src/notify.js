@@ -50,6 +50,9 @@ function notiScan() {
   if (tm) for (const uid of tm.pending) add('tj:' + uid, 'tjoin', nowMs(), { who: uid });
   // operator notice
   const nt = noticeOf(); if (nt) add('n:' + nt.id, 'notice', nt.ts || nowMs(), { body: nt.t.slice(0, 80) });
+  // weekly contest: my place, once last week is final (top 3)
+  const pw = weekIdx() - 1;
+  if (wkFinal(pw)) { const r = weekBoard(pw).find(x => x.uid === me); if (r && r.rank <= 3) add('wk:' + pw, 'wk', weekStart(pw + 1) + WK_GRACE, { rank: r.rank, sp: r.c.sp, len: r.c.len }); }
   // payments the operator confirmed
   const g = grantsOf(me);
   for (const o of S.myOrders) if (g[o.id] === 'ok') add('p:' + o.id, 'paid', nowMs(), { ref: o.kind === 'item' ? o.ref : 'donate' });
@@ -80,22 +83,24 @@ function notiText(x) {
     case 'tjoin': return t('nt_tjoin', { who });
     case 'notice': return `<b>${t('notice_label')}</b> ${esc(x.body)}`;
     case 'badge': return t('nt_badge', { name: t('bdg_' + x.badge) });
+    case 'wk': return t('nt_wk', { rank: x.rank, fish });
     case 'paid': return t('nt_paid', { item: x.ref === 'donate' ? t('donate_btn') : esc(dict((SHOPI[x.ref] || {}).n) || x.ref) });
     default: return '';
   }
 }
-const NT_ICON = { cmt: 'chat', cmt2: 'chat', like: 'heart', freq: 'user-plus', facc: 'user-check', rok: 'check', rno: 'x', rlog: 'log', rhold: 'clock', tjoin: 'flag', notice: 'megaphone', paid: 'heart', badge: 'medal' };
+const NT_ICON = { cmt: 'chat', cmt2: 'chat', like: 'heart', freq: 'user-plus', facc: 'user-check', rok: 'check', rno: 'x', rlog: 'log', rhold: 'clock', tjoin: 'flag', notice: 'megaphone', paid: 'heart', badge: 'medal', wk: 'trophy' };
 function openNoti() {
   notiScan();
   const seen = lsGet('notiSeen', 0) || 0;
   const list = notiList().slice().sort((a, b) => b.t - a.t).filter(x => notiText(x));
   const w = openModal(`<div class="noti">
     <h2>${icon('bell')} ${t('noti_title')}</h2>
+    ${pushRowHTML()}
     ${list.length ? `<ul class="nt-list">${list.map(x => `<li><button class="nt-item k-${esc(x.k)}${notiNew(x, seen) ? ' unread' : ''}" data-nt="${esc(x.id)}"><span class="nt-ic">${icon(NT_ICON[x.k] || 'bell')}</span><span class="nt-txt"><span class="nt-main">${notiText(x)}</span><span class="muted small">${ago(x.t)}</span></span></button></li>`).join('')}</ul>`
       : `<div class="empty"><p class="muted">${t('noti_empty')}</p></div>`}
     <p class="hint">${t('noti_hint')}</p>
   </div>`, { label: t('noti_title') });
-  lsSet('notiSeen', nowMs()); notiBadge();
+  lsSet('notiSeen', nowMs()); notiBadge(); pushBind(w);
   w.addEventListener('click', e => {
     const b = e.target.closest('[data-nt]'); if (!b) return;
     const x = list.find(y => y.id === b.dataset.nt); if (!x) return;
@@ -107,5 +112,6 @@ function openNoti() {
     else if (x.k === 'notice') location.hash = 'home';
     else if (x.k === 'paid') location.hash = 'sea';
     else if (x.k === 'badge') { S.seaTab = 'badges'; S.viewUid = null; location.hash = 'sea'; }
+    else if (x.k === 'wk') openWeekly();
   });
 }

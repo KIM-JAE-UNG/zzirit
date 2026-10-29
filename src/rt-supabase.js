@@ -82,6 +82,20 @@
     return r.ok;
   };
   const news = { refresh: () => callFn('news') };
+  // phone notifications: the public key, this device's subscription, and "tell them" after something happened
+  const fnPost = async (name, body, asUser) => {
+    const tk = asUser ? await token() : null;
+    const r = await fetch(CFG.url + '/functions/v1/' + name, { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: CFG.key, Authorization: 'Bearer ' + (tk || CFG.key) }, body: JSON.stringify(body) });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) throw mkErr('unavailable', (j && j.error) || String(r.status));
+    return j;
+  };
+  const push = {
+    async key() { const j = await fnPost('push', { op: 'key' }, false); if (!j.key) throw mkErr('unavailable', 'no key'); return j.key; },
+    subscribe: (endpoint, p256dh, auth, lang) => rpcOrThrow('push_subscribe', { p_endpoint: endpoint, p_p256dh: p256dh, p_auth: auth, p_lang: lang }),
+    unsubscribe: endpoint => rpcOrThrow('push_unsubscribe', { p_endpoint: endpoint }),
+    send: (kind, ref) => fnPost('push', { op: 'send', kind, ref }, true)
+  };
   // the automatic reviewer runs on its own every few minutes; a fresh catch just nudges it (it ignores extra nudges)
   const review = { ping: () => callFn('review').catch(() => false) };
   // operator only (checked on the server): remove an account with everything it posted; which account has which ID;
@@ -101,7 +115,7 @@
     adminReset: (name, pass) => rpcOrThrow('admin_id_reset', { p_name: name, p_new: pass }),
     async logout() { dropBk(); try { await sb.auth.signOut({ scope: 'local' }); } catch (e) { } dropBk(); }
   };
-  window.APP_AUTH = { sb, session, acct, link, news, review, admin, ids, error: () => authErr };
+  window.APP_AUTH = { sb, session, acct, link, news, review, admin, ids, push, error: () => authErr };
 
   /* ---- document paths → tables ---- */
   function route(path) {

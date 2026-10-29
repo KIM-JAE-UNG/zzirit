@@ -15,7 +15,8 @@ const AI_FISH = { fish_visible: true, candidates: [{ id: 'kurodai', p: .81 }, { 
 // Open-Meteo: calm weather near Busan (times in the area's local time, like the real service)
 let WXN = 0;
 const wxHours = () => { const out = []; const t0 = Date.now() + 9 * 3600e3; for (let i = -2; i < 30; i++) out.push(new Date(t0 + i * 3600e3).toISOString().slice(0, 13) + ':00'); return out; };
-const WX_F = () => ({ utc_offset_seconds: 32400, current: { temperature_2m: 17.3, weather_code: 1, wind_speed_10m: 4.2, wind_direction_10m: 315, wind_gusts_10m: 7.5 }, hourly: { time: wxHours(), precipitation_probability: wxHours().map((x, i) => (i === 6 ? 40 : 10)) } });
+const wxDays = () => [0, 1].map(i => new Date(Date.now() + 9 * 3600e3 + i * 864e5).toISOString().slice(0, 10));
+const WX_F = () => ({ utc_offset_seconds: 32400, current: { temperature_2m: 17.3, weather_code: 1, wind_speed_10m: 4.2, wind_direction_10m: 315, wind_gusts_10m: 7.5 }, hourly: { time: wxHours(), precipitation_probability: wxHours().map((x, i) => (i === 6 ? 40 : 10)) }, daily: { time: wxDays(), sunrise: wxDays().map(d => d + 'T06:40'), sunset: wxDays().map(d => d + 'T17:35') } });
 const WX_M = { utc_offset_seconds: 32400, current: { wave_height: 0.6, wave_direction: 200, wave_period: 5.4, sea_surface_temperature: 18.6 } };
 const AI_NOFISH = { fish_visible: false, candidates: [], other_en: '', other_sci: '', length_cm: null, screening: { real_photo: .9 }, verdict: 'reject', reasons: ['물고기가 없음'], features: '' };
 (async () => {
@@ -32,6 +33,7 @@ const AI_NOFISH = { fish_visible: false, candidates: [], other_en: '', other_sci
     await ctx.route('https://api.open-meteo.com/**', r => { WXN++; r.fulfill({ contentType: 'application/json', body: JSON.stringify(WX_F()) }); });
     await ctx.route('https://marine-api.open-meteo.com/**', r => { WXN++; r.fulfill({ contentType: 'application/json', body: JSON.stringify(WX_M) }); });
     await ctx.route('https://tnvzckfssjocgtmlxkii.supabase.co/functions/v1/review', async r => { const j = await (await fetch('http://127.0.0.1:8768/__fn/review', { method: 'POST' })).json(); r.fulfill({ contentType: 'application/json', body: JSON.stringify(j) }); });
+    await ctx.route('https://tnvzckfssjocgtmlxkii.supabase.co/functions/v1/push', async r => { const j = await (await fetch('http://127.0.0.1:8768/__fn/push', { method: 'POST', headers: { 'x-auth': r.request().headers()['authorization'] || '' }, body: r.request().postData() || '{}' })).json(); r.fulfill({ contentType: 'application/json', body: JSON.stringify(j) }); });
     await ctx.route('https://tnvzckfssjocgtmlxkii.supabase.co/functions/v1/news', async r => { const j = await (await fetch('http://127.0.0.1:8768/__fn/news', { method: 'POST' })).json(); r.fulfill({ contentType: 'application/json', body: JSON.stringify(j) }); });
     await ctx.route('https://tnvzckfssjocgtmlxkii.supabase.co/functions/v1/ai', async r => {
       const req = r.request(); const body = JSON.parse(req.postData() || '{}');
@@ -166,6 +168,21 @@ const AI_NOFISH = { fish_visible: false, candidates: [], other_en: '', other_sci
   ok(await A.$eval('#wx-card .wx-go', n => /잔잔/.test(n.textContent)).catch(() => false), 'home shows the sea weather with a rough read');
   ok(await A.$eval('#wx-line', n => /4\.2/.test(n.textContent) && /북서풍/.test(n.textContent) && /0\.6/.test(n.textContent) && /18\.6/.test(n.textContent) && /40%/.test(n.textContent)), 'wind, direction, waves, water temperature and rain shown');
   ok(await A.$eval('#wx-card a[href="https://open-meteo.com/"]', n => !!n).catch(() => false), 'the weather credits Open-Meteo');
+  const fsN = await A.$eval('#fs-top .fs-n', n => +n.textContent).catch(() => NaN);
+  ok(fsN >= 0 && fsN <= 100 && await A.$$eval('#fs-top .fs-parts li', ns => ns.length) === 3 && await A.$eval('#fs-top .fs-lvl', n => n.textContent.length > 1).catch(() => false), 'today\'s fishing score with weather, tide and season parts: ' + fsN);
+  ok(await A.$eval('#fs-top', n => /35\s*\/\s*40/.test(n.textContent.replace(/\s+/g, ' '))).catch(() => false), 'calm weather with a 40% chance of rain scores 35 of 40');
+  ok(await A.$eval('#fs-extra', n => /06:10~07:40/.test(n.textContent) && /16:35~18:05/.test(n.textContent)).catch(() => false), 'best times from sunrise and sunset (dawn and dusk windows)');
+  ok(await A.$$eval('#fs-extra .fs-fish [data-sp]', ns => ns.length) === 3, 'three fish biting now, tappable');
+  const fsu = await A.evaluate(() => {
+    const st = { wind: 3, gust: 4, wave: .4, code: 95, rain: 10 };
+    const bad = fishScore(st, { rg: 'KS', fresh: false });
+    const lake = placeRegion({ id: 'x', kind: 'lake', lat: 36.5, lon: 127.6 });
+    const fresh = fishScore({ wind: 2, gust: 3, wave: null, code: 1, rain: 0 }, lake);
+    return { thunder: wxGo(st), cap: bad.total, level: bad.level, lake, freshTide: fresh.ti, freshTotal: fresh.total };
+  });
+  ok(fsu.thunder === 'bad' && fsu.cap <= 30 && fsu.level === 'bad', 'thunder means stay ashore, and the score is capped: ' + JSON.stringify(fsu));
+  ok(fsu.lake.fresh === true && fsu.lake.rg === 'KF' && fsu.freshTide === null && fsu.freshTotal > 0 && fsu.freshTotal <= 100, 'a lake point uses fresh-water fish and leaves the tide out');
+  await shot(A, 'b05b_fishing_score');
   const wxn1 = WXN; await go(A, 'board', 600); await go(A, 'home', 900);
   ok(WXN === wxn1 && await A.$eval('#wx-line', n => /4\.2/.test(n.textContent)), `the weather is kept for a while instead of asked again (${wxn1} → ${WXN})`);
 
@@ -187,7 +204,7 @@ const AI_NOFISH = { fish_visible: false, candidates: [], other_en: '', other_sci
   await A.click('[data-seatab="badges"]'); await A.waitForTimeout(600);
   ok(await A.$$eval('.bdg.got', ns => ns.some(n => /첫 조과/.test(n.textContent))), 'achievements: the first confirmed catch is earned');
   ok(await A.$$eval('.bdg.got', ns => !ns.some(n => /열 마리/.test(n.textContent))) && await A.$$eval('.bdg:not(.got) .bdg-bar', ns => ns.length >= 10), 'goals not reached yet show progress instead');
-  ok(await A.$$eval('.bdg', ns => ns.length) === 20, 'all 20 achievements listed on my own page');
+  ok(await A.$$eval('.bdg', ns => ns.length) === 22, 'all 22 achievements listed on my own page');
   await shot(A, 'd00_badges', true);
   await A.click('[data-seatab="shop"]'); await A.waitForTimeout(800);
   await shot(A, 'd02_decorate', true);
@@ -308,6 +325,7 @@ const AI_NOFISH = { fish_visible: false, candidates: [], other_en: '', other_sci
   await go(A, 'admin', 1200);
   await A.fill('#ad-notice', '오늘 밤 10시부터 30분 동안 점검해요.'); await A.click('#ad-notice-go'); await A.waitForTimeout(1500);
   d = await dump();
+  ok(d.PUSHLOG.some(x => x.op === 'send' && x.kind === 'notice' && x.ref === d.T.admin_docs.config.data.notice.id && /^Bearer tok-/.test(x.auth)), 'a new notice asks the server to tell phones (the server checks it is the operator)');
   ok(d.T.admin_docs.config && d.T.admin_docs.config.data.notice && /점검/.test(d.T.admin_docs.config.data.notice.t), 'notice saved in admin config');
   ok(d.T.admin_docs.config.data.kakaoUrl === undefined || typeof d.T.admin_docs.config.data.kakaoUrl === 'string', 'notice keeps payment settings');
   await go(B, 'home', 1500);
@@ -390,7 +408,7 @@ const AI_NOFISH = { fish_visible: false, candidates: [], other_en: '', other_sci
   await W.waitForTimeout(600); await W.reload(); await W.waitForTimeout(5500);
   ok(!!(await W.$('.wn')), 'an earlier member sees what changed');
   ok(!!(await W.$('#wn-id')), 'update notes offer to create a login ID');
-  ok(await W.$eval('.wn', n => /알림/.test(n.textContent) && /바다 날씨/.test(n.textContent) && /업적/.test(n.textContent) && /로그아웃/.test(n.textContent)), 'update notes list the new features');
+  ok(await W.$eval('.wn', n => /출조 점수/.test(n.textContent) && /주간 대물 대회/.test(n.textContent) && /통계/.test(n.textContent) && /폰 알림/.test(n.textContent) && n.querySelectorAll('.wn-list li').length <= 6), 'update notes list the newest features (at most 6 lines)');
   ok(await W.$eval('.wn', n => !/초기화/.test(n.textContent)), 'update notes do not claim a reset that the server has not done');
   await shot(W, 'q04_whatsnew');
   await W.click('#wn-ok'); await W.waitForTimeout(400); await W.reload(); await W.waitForTimeout(5000);
@@ -530,7 +548,7 @@ const AI_NOFISH = { fish_visible: false, candidates: [], other_en: '', other_sci
   // achievements on someone else's page: their private spots don't count, so that one is left out
   await B.evaluate(id => openSeaOf(id), aId); await B.waitForTimeout(1500);
   await B.click('[data-seatab="badges"]'); await B.waitForTimeout(600);
-  ok(await B.$$eval('.bdg', ns => ns.length === 19 && !ns.some(n => /나만의 포인트/.test(n.textContent)) && ns.some(n => n.classList.contains('got'))), 'someone else\'s achievements (19, earned ones marked)');
+  ok(await B.$$eval('.bdg', ns => ns.length === 21 && !ns.some(n => /나만의 포인트/.test(n.textContent)) && ns.some(n => n.classList.contains('got'))), 'someone else\'s achievements (21, earned ones marked)');
   await B.evaluate(() => { S.viewUid = null; }); await go(B, 'home', 600);
 
   /* ---------- 2026-10-29b: install as an app (iPhone, KakaoTalk), working offline ---------- */
@@ -575,6 +593,71 @@ const AI_NOFISH = { fish_visible: false, candidates: [], other_en: '', other_sci
   await SWp.goto(BASE.replace('index.html', 'nowhere.html')).catch(() => null); await SWp.waitForTimeout(800);
   ok(await SWp.evaluate(() => /인터넷 연결이 없어요/.test(document.body.textContent)).catch(() => false), 'offline: other addresses get a friendly offline page');
   await SWc.setOffline(false); await SWc.close();
+  /* ---------- 2026-10-29c: catch stats, weekly contest, phone notices ---------- */
+  // my catch statistics
+  await go(A, 'log', 1200); await A.click('[data-logtab="stats"]'); await A.waitForTimeout(700);
+  ok(!!(await A.$('.stats')) && (await A.$$('.vz-colchart')).length === 2, 'stats tab: two column charts (by month, by time of day)');
+  ok(await A.$$eval('.vz-colchart', ns => ns[0].querySelectorAll('.vz-col').length === 12 && ns[1].querySelectorAll('.vz-col').length === 6), '12 months and 6 times of day');
+  ok(await A.$$eval('.st-best tbody tr', ns => ns.length >= 2), 'best per species table');
+  ok(await A.$eval('.st-insight', n => /많이 잡았어요/.test(n.textContent)).catch(() => false), 'a one-line takeaway (when I catch most)');
+  const colWithFish = await A.$$('.vz-colchart .vz-col:has(i:not([hidden]))');
+  if (colWithFish[0]) { await colWithFish[0].hover(); await A.waitForTimeout(250); }
+  ok(await A.$eval('.vz-tip', n => n.style.display === 'block' && /\d+마리/.test(n.textContent)).catch(() => false), 'hovering a column shows its number');
+  ok(await A.$$eval('.vz-table', ns => ns.length === 2 && ns[0].querySelectorAll('tr').length === 12), 'every chart has a numbers table');
+  await shot(A, 'w01_stats', true);
+  await A.click('[data-logtab="list"]'); await A.waitForTimeout(500);
+  ok((await A.$$('.catch-card')).length >= 3, 'back to the list');
+  // weekly contest: B's 52 cm black porgy (1.49x its usual size) beats A's 60 cm red seabream (1.33x)
+  const wkNow = Date.now();
+  await B.evaluate(async t0 => { S.me.catches.push({ id: 'wkb1', sp: 'kurodai', len: 52, ts: t0 - 2 * 3600e3, at: t0 - 3600e3, st: 'ok', tk: 'wk-t1', tr: 90, sc: 100 }); await store.saveMe(); }, wkNow);
+  await A.evaluate(async t0 => { S.me.catches.push({ id: 'wka1', sp: 'madai', len: 60, ts: t0 - 3 * 3600e3, at: t0 - 2 * 3600e3, st: 'ok', tk: 'wk-t2', tr: 90, sc: 100 }); await store.saveMe(); }, wkNow);
+  await A.waitForTimeout(1800); await go(A, 'home', 1300);
+  const wkRows = await A.$$eval('.wk-card .wk-row', ns => ns.map(n => n.textContent.replace(/\s+/g, ' ').trim()));
+  ok(wkRows.length >= 2 && /여수바다/.test(wkRows[0]) && /×1\.49/.test(wkRows[0]) && /×1\.33/.test(wkRows[1]), 'weekly contest: size against the species\' usual size decides: ' + JSON.stringify(wkRows.slice(0, 2)));
+  ok(await A.$eval('.wk-card .wk-row.me', n => /부산감성돔/.test(n.textContent)).catch(() => false), 'my own entry is marked');
+  await A.$eval('.wk-card', n => n.scrollIntoView({ block: 'center' })); await A.waitForTimeout(300); await shot(A, 'w02_weekly');
+  await A.click('.wk-card [data-act="weekly"]'); await A.waitForTimeout(600);
+  ok((await A.$$('.wk-modal .wk-row')).length >= 2, 'full standings open');
+  await closeModals(A);
+  const wkU = await A.evaluate(() => {
+    const w = weekIdx(Date.parse('2026-10-29T03:00:00Z')); // a Thursday in Korea
+    const mon = new Date(weekStart(w) + 9 * 3600e3);
+    return { monday: mon.getUTCDay() === 1 && mon.getUTCHours() === 0, len: weekStart(w + 1) - weekStart(w), sun: weekIdx(Date.parse('2026-11-01T14:59:00Z')) === w, nextMon: weekIdx(Date.parse('2026-11-01T15:00:00Z')) === w + 1, pastOut: (() => { const c = { id: 'x', sp: 'kurodai', len: 60, ts: Date.now() - 3600e3, at: Date.now(), st: 'ok', past: true }; S.me.catches.push(c); S.dataVer++; const r = weekBoard(weekIdx()).some(x => x.c.id === 'x'); S.me.catches.pop(); S.dataVer++; return !r; })() };
+  });
+  ok(wkU.monday && wkU.len === 7 * 864e5 && wkU.sun && wkU.nextMon, 'weeks run Monday 00:00 to Sunday 24:00 Korean time');
+  ok(wkU.pastOut, 'earlier-day ("past") registrations stay out of the contest');
+  // phone notices: switching on saves this device's subscription; a reply asks the server to tell the author; logging out switches it off
+  await N.evaluate(() => {
+    const sub = { endpoint: 'https://fcm.googleapis.com/fcm/send/test-device-1', toJSON() { return { endpoint: this.endpoint, keys: { p256dh: 'B' + 'p'.repeat(86), auth: 'a'.repeat(22) } }; }, async unsubscribe() { window.__unsub = (window.__unsub || 0) + 1; reg.sub = null; return true; } };
+    const reg = { sub: null, pushManager: { async getSubscription() { return reg.sub; }, async subscribe(o) { window.__subOpts = { uv: o.userVisibleOnly, keyLen: o.applicationServerKey.length }; reg.sub = sub; return sub; } } };
+    Object.defineProperty(navigator.serviceWorker, 'ready', { get: () => Promise.resolve(reg), configurable: true });
+    navigator.serviceWorker.getRegistration = async () => reg;
+    Notification.requestPermission = async () => 'granted';
+    Object.defineProperty(Notification, 'permission', { get: () => 'granted', configurable: true });
+  });
+  await go(N, 'prefs', 1200);
+  ok(!!(await N.$('.push-card #push-sw')), 'settings: a switch for phone notices');
+  await N.click('.push-card label.switch:has(#push-sw)'); await N.waitForTimeout(1500);
+  d = await dump(); const nSub = d.PUSH['https://fcm.googleapis.com/fcm/send/test-device-1'];
+  ok(nSub && nSub.acct === nId && !nSub.off && nSub.lang === 'ko', 'switching on saves this device for the account: ' + JSON.stringify(nSub));
+  ok(await N.evaluate(() => window.__subOpts && window.__subOpts.uv === true && window.__subOpts.keyLen === 65), 'subscribed with the server\'s public key (visible notices only)');
+  ok(await N.$eval('#push-sw', n => n.checked), 'the switch stays on');
+  await shot(N, 'w03_push_on');
+  const postKey = await N.evaluate(() => [...boardIndex().posts.keys()].find(k => !k.startsWith(myId() + '|')));
+  await N.evaluate(k => openPost(k), postKey); await N.waitForTimeout(800);
+  await N.fill('#pc-body', '저도 다음 주에 가 볼게요!'); await N.click('#pc-form button'); await N.waitForTimeout(1500);
+  d = await dump();
+  ok(d.PUSHLOG.some(x => x.op === 'send' && x.kind === 'cmt' && x.ref === postKey && /^Bearer tok-/.test(x.auth)), 'a reply asks the server to tell the post\'s author (signed in)');
+  await closeModals(N);
+  await N.click('#me-out'); await N.waitForTimeout(500); await N.click('#lo-go'); await N.waitForTimeout(1500);
+  d = await dump();
+  ok(d.PUSH['https://fcm.googleapis.com/fcm/send/test-device-1'].off === true, 'logging out switches this device\'s notices off first');
+  // the bell list offers it too; a browser without push support explains itself
+  await go(A, 'home', 600); await A.click('.rail-ctl .noti-btn'); await A.waitForTimeout(500);
+  ok(!!(await A.$('.noti .push-row')), 'the notification list offers phone notices');
+  await closeModals(A);
+  ok(await I.evaluate(() => pushState()) === 'install', 'iPhone in Safari: notices need the home-screen app first');
+  await go(I, 'prefs', 1000); ok(!!(await I.$('.push-card #push-inst')), 'settings offer to install the app instead');
   // dark mode + english
   const E = await mk('E', { ctx: { colorScheme: 'dark', locale: 'en-US' } });
   await E.evaluate(() => { setLang('en'); rerender(); }); await onboard(E, 'Reeler');

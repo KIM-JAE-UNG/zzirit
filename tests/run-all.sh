@@ -6,9 +6,13 @@ set -u
 cd "$(dirname "$0")"
 [ -d node_modules/@electric-sql/pglite ] && [ -d node_modules/leaflet ] && [ -d node_modules/qrcode-generator ] || npm install --no-audit --no-fund --silent
 (cd .. && python3 build.py) || exit 1
+# both pages must at least parse (a stray quote in a translation once broke the whole website)
+node -e 'const fs=require("fs");let bad=0;for(const f of ["../index.html","../artifact.html"]){const h=fs.readFileSync(f,"utf8");for(const m of h.matchAll(/<script(?![^>]*src)[^>]*>([\s\S]*?)<\/script>/g)){try{new Function(m[1])}catch(e){console.log("SYNTAX ERROR in "+f+": "+e.message);bad=1}}}process.exit(bad)' || { echo "SOME CHECKS FAILED (the built page does not parse)"; exit 1; }
 fail=0
 echo "== database rules"; node db/rules.test.mjs | tail -3; [ "${PIPESTATUS[0]}" = 0 ] || fail=1
 echo "== live database before the reset"; node db/before-reset.test.mjs | tail -1; [ "${PIPESTATUS[0]}" = 0 ] || fail=1
+echo "== phone notices: database"; node db/push.test.mjs | tail -1; [ "${PIPESTATUS[0]}" = 0 ] || fail=1
+echo "== phone notices: encryption (RFC 8291)"; node push/webpush.test.mjs | tail -1; [ "${PIPESTATUS[0]}" = 0 ] || fail=1
 node web/server.js > out-web-server.log 2>&1 & WS=$!
 node claude/server.js > out-claude-server.log 2>&1 & CS=$!
 trap 'kill $WS $CS 2>/dev/null; rm -f out-web-server.log out-claude-server.log' EXIT

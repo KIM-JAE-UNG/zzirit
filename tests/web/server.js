@@ -4,7 +4,8 @@ const LIB = p => require.resolve(p, { paths: [require('path').join(__dirname, '.
 const ROOT = path.resolve(__dirname, '..', '..'), LEAFLET = LIB('leaflet/dist/leaflet.js');
 let ver = 1; const events = []; const STATS = { photoSelects: 0 };
 const T = { anglers: {}, photos: {}, labels: {}, orders: {}, suggest: {}, admin_docs: {}, spots: {}, board: {}, teams: {}, news: {}, points: {}, reviews: {} };
-const FEATURES = { del: true }; // admin_delete_user present on the "server" (the live one gets it with the SQL update)
+const FEATURES = { del: true };
+const PUSH = {}, PUSHLOG = []; // phone notices: subscriptions saved through the RPCs, and what the app asked the push function // admin_delete_user present on the "server" (the live one gets it with the SQL update)
 const isAdmin = uid => !!uid && (admins.has(uid) || admins.has(acct(uid)));
 const admins = new Set(); const links = {}; const codes = {};
 const acct = uid => links[uid] || uid;
@@ -150,6 +151,13 @@ http.createServer(async (req, res) => {
       for (const a of [...admins]) if (acct(a) === target) admins.delete(a);
       return send({ data: true });
     }
+    if (q.name === 'push_subscribe') {
+      if (!uid) return send({ error: { message: 'not_signed_in' } });
+      if (!/^https:\/\/(fcm\.googleapis\.com|web\.push\.apple\.com|updates\.push\.services\.mozilla\.com)\//.test(q.args.p_endpoint || '')) return send({ error: { message: 'bad_endpoint' } });
+      PUSH[q.args.p_endpoint] = { acct: acct(uid), p256dh: q.args.p_p256dh, auth: q.args.p_auth, lang: q.args.p_lang, off: false }; return send({ data: true });
+    }
+    if (q.name === 'push_unsubscribe') { const x = PUSH[q.args.p_endpoint]; if (x && acct(x.acct) === acct(uid)) { x.off = true; return send({ data: true }); } return send({ data: false }); }
+    if (q.name === 'push_is_on') { const x = PUSH[q.args.p_endpoint]; return send({ data: !!(x && !x.off && acct(x.acct) === acct(uid)) }); }
     if (q.name === 'admin_logins') {
       if (!isAdmin(uid)) return send({ error: { message: 'not_admin' } });
       return send({ data: Object.entries(logins).map(([name, l]) => ({ acct: acct(l.owner), name, created_at: new Date().toISOString() })) });
@@ -167,6 +175,7 @@ http.createServer(async (req, res) => {
     items.forEach(([lang, title, source], i) => { const id = 'n' + i; T.news[id] = { id, lang, title, link: 'https://example.com/n' + i, source, pub: new Date(Date.now() - i * 3600e3).toISOString(), score: 40 - i, fetched_at: now }; push('news', 'INSERT', T.news[id]); });
     return send({ ok: true, added: items.length });
   }
+  if (u.pathname === '/__fn/push') { const q = await body(req); PUSHLOG.push(Object.assign({ auth: req.headers['x-auth'] || '' }, q)); return send(q.op === 'key' ? { key: 'B' + 'K'.repeat(86) } : { sent: 0 }); }
   if (u.pathname === '/__fn/review') {
     let n = 0; const v = T.admin_docs.verdicts || (T.admin_docs.verdicts = { id: 'verdicts', data: {} }); const touched = new Set();
     for (const [id, a] of Object.entries(T.anglers)) for (const c of (a.data.catches || [])) {
@@ -185,7 +194,7 @@ http.createServer(async (req, res) => {
     return send({ ver, events: events.filter(e => e.ver > since && (e.eventType === 'DELETE' || !['points', 'reviews'].includes(e.table) || visible(e.table, e.new, who))) });
   }
   if (u.pathname === '/__sb/feature') { for (const [k, v] of u.searchParams) FEATURES[k] = v === '1'; return send(FEATURES); }
-  if (u.pathname === '/__sb/dump') return send({ T, admins: [...admins], links, STATS });
+  if (u.pathname === '/__sb/dump') return send({ T, admins: [...admins], links, STATS, PUSH, PUSHLOG });
   if (u.pathname === '/__sb/grant') { const q = await body(req); const g = T.admin_docs.grants || (T.admin_docs.grants = { id: 'grants', data: {} }); g.data[q.uid] = Object.assign({}, g.data[q.uid], { [q.oid]: q.v }); push('admin_docs', 'UPDATE', g, { id: 'grants' }); return send({ ok: true }); }
   const f = u.pathname === '/_leaflet_test.js' ? LEAFLET : path.join(ROOT, decodeURIComponent(u.pathname === '/' ? '/index.html' : u.pathname));
   fs.readFile(f, (e, buf) => {

@@ -20,7 +20,9 @@ const BADGES = [
   { id: 'pts1k', ic: 'medal', need: s => [s.pts, 1000] },
   { id: 'friends3', ic: 'users', need: s => [s.friends, 3] },
   { id: 'posts3', ic: 'board', need: s => [s.posts, 3] },
-  { id: 'spot1', ic: 'pin', need: s => [s.points, 1] }
+  { id: 'spot1', ic: 'pin', need: s => [s.points, 1] },
+  { id: 'podium', ic: 'trophy', need: s => [s.podium, 1] },
+  { id: 'champ', ic: 'trophy', need: s => [s.champ, 1] }
 ];
 const featMemo = new Map(); // month → that month's featured species (an achievement stays once earned)
 function featuredIn(ts) { const d = new Date(ts); const k = monthKey(d); if (!featMemo.has(k)) featMemo.set(k, featuredSpecies(d)); return featMemo.get(k); }
@@ -40,6 +42,7 @@ function badgeStats(a, uid) {
     s.pts += c.sc || 0;
   }
   s.species = sp.size; s.days = days.size;
+  Object.assign(s, wkPlaces(uid, a)); // weekly contest: top 3 / first
   if (uid === myId()) {
     s.friends = frLists().friends.length;
     s.posts = [...boardIndex().posts.values()].filter(p => p.uid === uid).length;

@@ -50,6 +50,9 @@ const logs = []; const fails = []; const ok = (c, m) => { logs.push((c ? '✓ ' 
     await p.evaluate(() => document.querySelectorAll('.modal-wrap').forEach(w => closeModal(w))); await p.waitForTimeout(400); // the pay window from above
     await go('sea', 1200); await p.click('[data-seatab="badges"]'); await p.waitForTimeout(500);
     ok(await p.$$eval('.bdg.got', ns => ns.some(n => /첫 조과/.test(n.textContent))), 'artifact: achievements tab works');
+    await go('log', 900); await p.click('[data-logtab="stats"]'); await p.waitForTimeout(500);
+    ok((await p.$$('.vz-colchart')).length === 2, 'artifact: catch stats render');
+    await go('home', 900); ok(!!(await p.$('.wk-card')), 'artifact: weekly contest card');
     await p.click('.rail-ctl .noti-btn'); await p.waitForTimeout(500);
     ok(!!(await p.$('.noti')), 'artifact: notifications open');
     await p.evaluate(() => document.querySelectorAll('.modal-wrap').forEach(w => closeModal(w))); await p.waitForTimeout(500);
