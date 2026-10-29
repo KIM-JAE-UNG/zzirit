@@ -1354,6 +1354,177 @@ div.more-acct:hover { filter: none; }
 .more-foot { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
 .more-foot .more-item:only-child { grid-column: 1 / -1; flex-direction: row; justify-content: center; }
 
+/* ---- live chat (전체 채팅 · 1:1) ---- */
+.chat-page .chat-tabs { align-self: flex-start; }
+.chat-tabs .badge { margin-left: 2px; }
+.chat-card { position: relative; display: flex; flex-direction: column; padding: 0; height: min(68vh, 640px); min-height: 380px; overflow: hidden; }
+.chat-log { list-style: none; margin: 0; padding: 14px 14px 6px; flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; overscroll-behavior: contain; }
+.chat-card .chat-empty { justify-content: center; align-items: center; color: var(--ink-3); text-align: center; padding: 40px 12px; font-size: 14px; }
+.cm { display: flex; gap: 9px; align-items: flex-start; }
+.cm-av { flex: none; background: none; border: 0; padding: 0; cursor: pointer; border-radius: 50%; }
+.cm-main { min-width: 0; max-width: min(78%, 560px); display: flex; flex-direction: column; gap: 3px; }
+.cm-head { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-size: 12.5px; line-height: 1.3; }
+.cm-head b { font-weight: 700; }
+.cm-body { width: fit-content; max-width: 100%; background: var(--surface-2); border: 1px solid var(--line-2); padding: 8px 12px; border-radius: 4px 16px 16px 16px; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14.5px; line-height: 1.5; }
+.cm.me { flex-direction: row-reverse; }
+.cm.me .cm-main { align-items: flex-end; }
+.cm.me .cm-head { justify-content: flex-end; }
+.cm.me .cm-body { background: var(--accent); border-color: transparent; color: #fff; border-radius: 16px 4px 16px 16px; }
+.cm-more { background: none; border: 0; padding: 2px 4px; border-radius: 6px; color: var(--ink-3); cursor: pointer; line-height: 0; }
+.cm-more:hover { background: var(--surface-2); color: var(--ink); }
+.cm-more .ic { width: 16px; height: 16px; }
+.chat-newer { position: absolute; left: 50%; bottom: 74px; transform: translateX(-50%); border: 0; border-radius: 99px; padding: 6px 14px; background: var(--ink); color: var(--surface); font-size: 13px; font-weight: 600; box-shadow: var(--shadow); cursor: pointer; z-index: 2; }
+.chat-card .chat-in { padding: 10px 12px; border-top: 1px solid var(--line); background: var(--surface); align-items: center; }
+.chat-card .chat-in .btn span { display: inline; }
+.chat-card .chat-join { justify-content: space-between; font-size: 14px; }
+#chat-note:not(:empty) { padding: 0 14px 10px; color: var(--warn); }
+.chat-safe { margin-top: -8px; display: flex; gap: 6px; align-items: flex-start; }
+.cm-menu .cm-quote { background: var(--surface-2); border-radius: 12px; padding: 10px 12px; font-size: 14px; overflow-wrap: anywhere; margin: 6px 0 4px; }
+.cm-menu .chip-row { display: flex; gap: 6px; flex-wrap: wrap; }
+#dm-box { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+#dm-box > .hint { padding: 0 14px 12px; }
+.dm-list { list-style: none; margin: 0; padding: 6px; display: flex; flex-direction: column; gap: 2px; }
+.dm-row { display: flex; align-items: center; gap: 12px; width: 100%; padding: 10px; border: 0; border-radius: 12px; background: none; text-align: left; cursor: pointer; color: inherit; }
+.dm-row:hover { background: var(--surface-2); }
+.dm-who { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.35; }
+.dm-who b { font-size: 15px; }
+.dm-who .muted { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dm-side { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex: none; }
+.dm-none { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 30px 16px; text-align: center; color: var(--ink-2); }
+.dm-head { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+.dm-who-btn { display: inline-flex; align-items: center; gap: 8px; background: none; border: 0; padding: 4px 6px; border-radius: 10px; cursor: pointer; color: inherit; }
+.dm-who-btn:hover { background: var(--surface-2); }
+.dm-log .cm.cm-dm .cm-main { max-width: 80%; }
+.dm-log .cm.cm-dm:not(.me) .cm-body { border-radius: 16px 16px 16px 4px; }
+.dm-log .cm.cm-dm.me .cm-body { border-radius: 16px 16px 4px 16px; }
+.chat-card > .note { margin: 12px; }
+@media (max-width: 1023px) {
+  .chat-card { height: calc(100dvh - var(--top-h) - var(--tab-h) - env(safe-area-inset-bottom, 0px) - 175px); min-height: 340px; }
+  .chat-card .chat-in .btn span { display: none; }
+}
+
+/* ---- the park (갯바위 공원) ---- */
+.pk-head { flex-direction: row; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px; }
+.pk-rooms { display: flex; gap: 6px; flex-wrap: wrap; }
+.pk-wrap { display: grid; grid-template-columns: minmax(0, 1fr) 250px; grid-template-areas: "stage side" "bar side"; gap: 12px; }
+.pk-stage { grid-area: stage; position: relative; border-radius: var(--r); overflow: hidden; background: #1F77A8; aspect-ratio: 16 / 10; min-height: 340px; border: 1px solid var(--line); }
+.pk-cv { display: block; width: 100%; height: 100%; touch-action: none; cursor: pointer; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; }
+.pk-cv:focus-visible { outline: 3px solid var(--accent); outline-offset: -3px; border-radius: var(--r); }
+.pk-log { position: absolute; left: 10px; top: 10px; list-style: none; margin: 0; padding: 0; max-width: min(60%, 420px); pointer-events: none; display: flex; flex-direction: column; gap: 3px; font-size: 12.5px; color: #fff; }
+.pk-log li { width: fit-content; max-width: 100%; background: rgba(6,20,32,.5); padding: 2px 9px; border-radius: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; backdrop-filter: blur(2px); }
+.pk-log b { font-weight: 700; margin-right: 4px; color: #FFD9C7; }
+.pk-emo { position: absolute; right: 10px; bottom: 10px; display: flex; gap: 2px; background: var(--surface); padding: 6px; border-radius: 16px; box-shadow: var(--shadow); z-index: 3; }
+.pk-emo button { font-size: 22px; line-height: 1; background: none; border: 0; cursor: pointer; padding: 6px 7px; border-radius: 10px; }
+.pk-emo button:hover { background: var(--surface-2); }
+.pk-bar { grid-area: bar; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.pk-act { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); display: flex; justify-content: center; z-index: 2; max-width: calc(100% - 120px); }
+.pk-act:empty { display: none; }
+.pk-act .btn { min-height: 42px; box-shadow: 0 6px 18px rgba(6,20,32,.28); }
+.pk-act .btn-line { background: var(--surface); }
+.pk-act .muted { background: rgba(6,20,32,.55); color: #fff; padding: 4px 12px; border-radius: 99px; text-align: center; backdrop-filter: blur(2px); }
+.pk-say { flex: 1; display: flex; gap: 6px; min-width: 0; }
+.pk-say input { flex: 1; min-width: 0; border: 1px solid var(--line); background: var(--surface); border-radius: 12px; padding: 9px 12px; font-size: 14.5px; }
+.pk-emo-btn { font-size: 18px; padding-inline: 10px; }
+.pk-side { grid-area: side; padding: 14px; align-self: start; max-height: 640px; overflow: auto; }
+.pk-status { font-weight: 700; font-size: 13.5px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+.pk-status::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 0 3px var(--ok-soft); }
+.pk-people { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.pk-person { display: flex; align-items: center; gap: 9px; width: 100%; padding: 6px; border: 0; border-radius: 10px; background: none; color: inherit; text-align: left; cursor: pointer; }
+.pk-person:hover { background: var(--surface-2); }
+.pk-person > span { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 6px; min-width: 0; font-size: 14px; }
+.pk-person > span .muted { flex-basis: 100%; }
+.pk-alone { padding: 8px 4px; }
+@media (max-width: 900px) {
+  .pk-wrap { grid-template-columns: minmax(0, 1fr); grid-template-areas: "stage" "bar" "side"; }
+  .pk-side { max-height: none; }
+}
+@media (max-width: 640px) {
+  .park-page .page-head .lede, .chat-page .page-head .lede { display: none; }
+  .park-page { gap: 12px; padding-top: 14px; }
+  .pk-head { flex-wrap: nowrap; align-items: center; }
+  .pk-head h1 { font-size: 22px; white-space: nowrap; }
+  .pk-rooms { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+  .pk-rooms .chip { padding: 4px 10px; font-size: 12.5px; }
+  .pk-stage { aspect-ratio: auto; height: calc(100dvh - var(--top-h) - var(--tab-h) - env(safe-area-inset-bottom, 0px) - 150px); min-height: 300px; max-height: 620px; }
+  .pk-log { font-size: 11.5px; max-width: 70%; }
+  .pk-log li:nth-last-child(n+4) { display: none; }
+  .pk-act { bottom: 10px; max-width: calc(100% - 20px); }
+  .pk-act .muted { font-size: 11.5px; }
+}
+/* the fishing game panel, over the park */
+.pk-game { position: absolute; top: 12px; right: 12px; width: min(340px, calc(100% - 24px)); background: var(--surface); color: var(--ink); border-radius: 16px; box-shadow: var(--shadow-lg); padding: 12px; display: flex; flex-direction: column; gap: 8px; z-index: 4; }
+.pkg-top { display: flex; align-items: center; gap: 8px; }
+.pkg-top b { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pkg-time { font-size: 18px; color: var(--accent); }
+.pkg-x { background: none; border: 0; padding: 4px; border-radius: 8px; cursor: pointer; color: var(--ink-2); line-height: 0; }
+.pkg-x:hover { background: var(--surface-2); }
+.pkg-score { display: flex; justify-content: space-between; font-size: 13px; color: var(--ink-2); }
+.pkg-score b { font-size: 22px; color: var(--ink); margin-left: 4px; }
+#pkg-cv { display: block; width: 100%; height: 150px; border-radius: 12px; }
+.pkg-meters { display: grid; gap: 6px; }
+.pkg-meter { position: relative; height: 10px; border-radius: 99px; background: var(--surface-2); overflow: hidden; border: 1px solid var(--line); }
+.pkg-meter i { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: var(--sea); border-radius: 99px; transition: width .06s linear; }
+.pkg-meter i.danger { background: var(--poison); }
+.pkg-meter.dist i { background: var(--accent); }
+.pkg-zone { position: absolute; left: 40%; width: 45%; top: 0; bottom: 0; background: color-mix(in srgb, var(--ok) 25%, transparent); }
+.pkg-msg { min-height: 2.8em; font-size: 13.5px; color: var(--ink-2); text-align: center; line-height: 1.4; }
+.pkg-btn { user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; touch-action: manipulation; }
+.pkg-btn.hot { background: var(--poison); animation: pkg-pulse .5s ease-in-out infinite alternate; }
+@keyframes pkg-pulse { from { transform: scale(1); } to { transform: scale(1.04); } }
+.pkg-bag { display: flex; gap: 6px; overflow-x: auto; }
+.pkg-bag:empty { display: none; }
+.pkg-fish { flex: none; display: flex; flex-direction: column; align-items: center; font-size: 11px; color: var(--ink-2); }
+.pkg-fish img { width: 60px; height: auto; }
+@media (max-width: 640px) { .pk-game { top: auto; bottom: 8px; left: 8px; right: 8px; width: auto; } #pkg-cv { height: 110px; } }
+@media (prefers-reduced-motion: reduce) { .pkg-btn.hot { animation: none; } }
+.pk-card-top { display: flex; gap: 12px; align-items: center; }
+.pk-card-top h2 { font-size: 19px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.pk-fr { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+.pk-shop-list, .pk-tank-list { list-style: none; margin: 12px 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.pk-shop-list li { display: flex; gap: 12px; align-items: center; background: var(--surface-2); border-radius: 12px; padding: 8px 10px; }
+.pk-shop-list li > span { display: flex; flex-direction: column; min-width: 0; }
+.pk-shop-list img { width: 96px; height: auto; flex: none; }
+.pk-tank-list li { display: flex; gap: 10px; align-items: center; font-size: 14.5px; }
+.pk-tank-list li > span:last-child { margin-left: auto; color: var(--ink-2); }
+.pk-ask, .pk-result { text-align: center; }
+.pk-ask h2, .pk-result h2 { margin-bottom: 6px; }
+.pk-ask .actions, .pk-result .actions { justify-content: center; }
+.pk-result h2 { font-size: 28px; }
+.pk-result.r-w h2 { color: var(--accent); }
+.pk-result .eyebrow { justify-content: center; text-transform: none; letter-spacing: .01em; }
+.pk-res-score { display: flex; justify-content: center; align-items: center; gap: 22px; margin: 14px 0 6px; }
+.pk-res-score > div { display: flex; flex-direction: column; align-items: center; min-width: 90px; }
+.pk-res-score b { font-size: 40px; line-height: 1.1; }
+.pk-res-score .vs { font-size: 30px; color: var(--ink-3); }
+
+/* ---- leaving, comment editing ---- */
+.btn-danger { background: var(--poison); color: #fff; }
+.btn-danger:hover { filter: brightness(.94); }
+.btn-line.btn-danger { background: transparent; color: var(--poison); border-color: color-mix(in srgb, var(--poison) 45%, transparent); }
+.btn-line.btn-danger:hover { background: var(--poison-soft); }
+.wd-card h2 { color: var(--poison); }
+.wd-list { margin: 8px 0 4px; padding-left: 20px; font-size: 14px; color: var(--ink-2); }
+.wd-list li { margin: 4px 0; }
+.chip-mine .ic { width: 14px; height: 14px; }
+.cmt-edit { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; }
+.cmt-edit textarea { width: 100%; border: 1px solid var(--line); background: var(--surface); border-radius: 10px; padding: 8px 10px; font-size: 14.5px; resize: vertical; }
+.cmt-edit .actions { margin-top: 0; }
+
+/* ---- home: the way into the park and the chat ---- */
+.home-live { display: grid; grid-template-columns: 1.7fr 1fr; gap: 14px; }
+@media (max-width: 760px) { .home-live { grid-template-columns: 1fr; } }
+.hl-card { position: relative; display: flex; align-items: flex-end; gap: 12px; min-height: 160px; border-radius: var(--r); overflow: hidden; padding: 16px 18px; color: #fff; text-decoration: none; background: linear-gradient(165deg, #0B4A73, #1F77A8 58%, #EAD8A4); box-shadow: var(--shadow); transition: transform .15s; }
+.hl-card:hover { text-decoration: none; transform: translateY(-2px); }
+.hl-park .hl-art { position: absolute; inset: 0; background-size: cover; background-position: center 45%; }
+.hl-park::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(6,20,32,0) 25%, rgba(6,20,32,.78)); }
+.hl-chat { background: linear-gradient(160deg, #12324A, #0B2230 70%); min-height: 120px; }
+.hl-ic { position: absolute; right: -10px; top: -14px; width: 120px; height: 120px; opacity: .12; stroke-width: 1.2; }
+.hl-txt { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.hl-txt b { font-size: 20px; display: flex; align-items: center; gap: 6px; }
+.hl-txt > span:not(.hl-tag) { font-size: 13.5px; opacity: .92; }
+.hl-tag { align-self: flex-start; font-size: 11px; font-weight: 800; letter-spacing: .08em; background: #FF3B2F; color: #fff; border-radius: 6px; padding: 1px 7px; }
+.hl-go { position: relative; z-index: 1; margin-left: auto; flex: none; }
+
 </style>
 </head>
 <body>
@@ -1386,6 +1557,8 @@ div.more-acct:hover { filter: none; }
       <div class="nav-grp" data-grp="social">
         <button type="button" class="nav-gh" data-navgrp="social" aria-expanded="false" aria-controls="ng-social"><svg class="ic" aria-hidden="true"><use href="#i-users"/></svg><span data-t="ng_social"></span><i class="nav-dot" aria-hidden="true" hidden></i><svg class="ic chev" aria-hidden="true"><use href="#i-chev"/></svg></button>
         <div class="nav-gb" id="ng-social"><div class="nav-gi">
+          <a href="#park" data-route="park" class="nav-web"><svg class="ic" aria-hidden="true"><use href="#i-wave"/></svg><span data-t="nav_park"></span></a>
+          <a href="#chat" data-route="chat" class="nav-web"><svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg><span data-t="nav_chat"></span><i class="badge num" data-dmbadge hidden></i></a>
           <a href="#rank" data-route="rank"><svg class="ic" aria-hidden="true"><use href="#i-trophy"/></svg><span data-t="nav_rank"></span></a>
           <a href="#friends" data-route="friends"><svg class="ic" aria-hidden="true"><use href="#i-users"/></svg><span data-t="nav_friends"></span><i class="badge num" data-frbadge hidden></i></a>
           <a href="#board" data-route="board"><svg class="ic" aria-hidden="true"><use href="#i-board"/></svg><span data-t="nav_board"></span></a>
@@ -1429,6 +1602,8 @@ div.more-acct:hover { filter: none; }
     <section class="view" id="v-home" hidden></section>
     <section class="view" id="v-scan" hidden></section>
     <section class="view" id="v-map" hidden></section>
+    <section class="view" id="v-park" hidden></section>
+    <section class="view" id="v-chat" hidden></section>
     <section class="view" id="v-rank" hidden></section>
     <section class="view" id="v-friends" hidden></section>
     <section class="view" id="v-board" hidden></section>
@@ -1496,6 +1671,7 @@ div.more-acct:hover { filter: none; }
   <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/></symbol>
   <symbol id="i-stop" viewBox="0 0 24 24"><rect x="6.5" y="6.5" width="11" height="11" rx="2"/></symbol>
   <symbol id="i-dot" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="currentColor"/></symbol>
+  <symbol id="i-dots" viewBox="0 0 24 24"><circle cx="5.5" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="18.5" cy="12" r="1.6" fill="currentColor"/></symbol>
   <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.2 2"/></symbol>
   <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20.5c1.5-4 4.5-6 8-6s6.5 2 8 6"/></symbol>
   <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
@@ -1631,7 +1807,87 @@ div.more-acct:hover { filter: none; }
     adminReset: (name, pass) => rpcOrThrow('admin_id_reset', { p_name: name, p_new: pass }),
     async logout() { dropBk(); try { await sb.auth.signOut({ scope: 'local' }); } catch (e) { } dropBk(); }
   };
-  window.APP_AUTH = { sb, session, acct, link, news, review, admin, ids, push, error: () => authErr };
+  // live chat: the open chat (everyone online) and 1:1 between friends. The server writes who said it and refuses links,
+  // phone numbers, people who are muted and anyone typing too fast; these codes come back for the app to explain.
+  const CHAT_CODES = ['no_profile', 'muted', 'no_links', 'no_phone', 'slow_down', 'not_friends', 'bad_body', 'bad_peer', 'not_signed_in'];
+  function chatErr(error) {
+    const m = String((error && (error.message || error.details)) || '');
+    const k = CHAT_CODES.find(x => m.includes(x));
+    if (k) return mkErr(k, m);
+    if ((error && /PGRST20[25]|42P01/.test(String(error.code))) || /does not exist|could not find the (table|function)|schema cache/i.test(m)) return mkErr('need_update', m);
+    return mkErr('unavailable', m);
+  }
+  const rnd = () => Math.random().toString(36).slice(2, 9);
+  const live = (table, filter, cb) => {
+    const ch = sb.channel('rt-' + table + '-' + rnd());
+    ch.on('postgres_changes', Object.assign({ event: 'INSERT', schema: 'public', table }, filter ? { filter } : {}), p => { try { cb(p.new); } catch (e) { console.warn(e); } });
+    ch.subscribe();
+    return () => { try { sb.removeChannel(ch); } catch (e) { } };
+  };
+  const CHAT_COLS = 'id,room,uid,nick,body,created_at';
+  const chat = {
+    async recent(room, n = 60) {
+      await session();
+      const { data, error } = await sb.from('chat').select(CHAT_COLS).eq('room', room).order('id', { ascending: false }).limit(n);
+      if (error) throw chatErr(error);
+      return (data || []).reverse();
+    },
+    async send(room, body) {
+      const s = await session(); if (!s) throw mkErr('not_signed_in');
+      const { data, error } = await sb.from('chat').insert({ room, body, uid: await acct(), nick: '' }).select(CHAT_COLS).single();
+      if (error) throw chatErr(error);
+      return data;
+    },
+    onNew: (room, cb) => live('chat', 'room=eq.' + room, cb),
+    hide: (id, on) => rpcOrThrow('chat_hide', { p_id: id, p_on: on !== false }),
+    mute: (uid, minutes) => rpcOrThrow('chat_mute', { p_uid: uid, p_minutes: minutes }),
+    mutes: () => rpcOrThrow('chat_mutes'),
+    myMute: () => rpcOrThrow('chat_my_mute')
+  };
+  const DM_COLS = 'id,a,b,sender,body,created_at';
+  const dm = {
+    async list(n = 300) {
+      await session();
+      const { data, error } = await sb.from('dm').select(DM_COLS).order('id', { ascending: false }).limit(n);
+      if (error) throw chatErr(error);
+      return data || [];
+    },
+    async send(peer, body) {
+      const s = await session(); if (!s) throw mkErr('not_signed_in');
+      const me = await acct();
+      const { data, error } = await sb.from('dm').insert({ a: me, b: peer, sender: me, body }).select(DM_COLS).single();
+      if (error) throw chatErr(error);
+      return data;
+    },
+    onNew: cb => live('dm', null, cb) // the server only sends my own conversations
+  };
+  // the park: who is here (presence) and what they do (broadcast), one channel per park room
+  const rt = {
+    room(topic, key, on) {
+      const ch = sb.channel(topic, { config: { presence: { key }, broadcast: { self: false } } });
+      ch.on('presence', { event: 'sync' }, () => { try { on.sync && on.sync(ch.presenceState()); } catch (e) { console.warn(e); } });
+      for (const ev of on.events || []) ch.on('broadcast', { event: ev }, m => { try { on.msg && on.msg(ev, (m && m.payload) || {}); } catch (e) { console.warn(e); } });
+      ch.subscribe(st => { try { on.status && on.status(st); } catch (e) { console.warn(e); } });
+      return {
+        track: p => ch.track(p).catch(() => null),
+        send: (event, payload) => ch.send({ type: 'broadcast', event, payload }).catch(() => null),
+        state: () => ch.presenceState(),
+        leave() { try { ch.untrack(); } catch (e) { } try { sb.removeChannel(ch); } catch (e) { } }
+      };
+    }
+  };
+  // leaving: removes this account (and every linked device) with everything in it, then signs this device out
+  const account = {
+    async remove(pass) {
+      const r = await rpcOrThrow('delete_my_account', { p_pass: pass || null });
+      if (!r || r.ok !== true) throw mkErr((r && r.err) || 'unavailable', (r && r.err) || 'failed');
+      await ids.logout();
+      return true;
+    }
+  };
+  // the operator deletes a board post / comment for good (it lives in its author's document)
+  const board = { adminRemove: (owner, kind, id) => rpcOrThrow('board_admin_remove', { p_owner: owner, p_kind: kind, p_id: id }) };
+  window.APP_AUTH = { sb, session, acct, link, news, review, admin, ids, push, chat, dm, rt, account, board, error: () => authErr };
 
   /* ---- document paths → tables ---- */
   function route(path) {
@@ -2873,11 +3129,180 @@ Object.assign(T, {
   wn_menu_p: ['낚시하기·내 기록·커뮤니티·도움·설정으로 묶었어요. 누르면 펼쳐지고, 지금 보는 화면의 묶음은 열려 있어요.', 'Fishing, My records, Community, Help & settings: tap a group to open it; the one you are in stays open.', '釣り・マイ記録・コミュニティ・ヘルプ・設定にまとめました。押すと開き、今見ている画面のグループは開いたままです。', '分为钓鱼、我的记录、社区、帮助与设置。点击展开，当前页面所在的组保持展开。'],
   wn_push_h: ['폰 알림', 'Phone notifications', 'スマホ通知', '手机通知'],
   wn_push_p: ['종 버튼이나 설정에서 켜면, 앱을 닫아 둬도 댓글·친구 요청·검토 결과를 알려 드려요.', 'Switch them on from the bell or Settings to hear about replies, friend requests and review results even with the app closed.', 'ベルか設定でオンにすると、アプリを閉じていてもコメント・友だち申請・審査結果をお知らせします。', '在铃铛或设置中开启后，即使关闭应用也会通知评论、好友请求和审核结果。'],
+
+  /* live: the park, chat, leaving, board moderation */
+  nav_park: ['갯바위 공원', 'Rock Park', '磯の公園', '矶钓公园'], nav_chat: ['채팅', 'Chat', 'チャット', '聊天'],
+  loading: ['불러오는 중…', 'Loading…', '読み込み中…', '加载中…'], back: ['← 목록', '← Back', '← 戻る', '← 返回'],
+  sgc_report: ['신고', 'Report', '通報', '举报'],
+  nt_dm: ['{who}님의 새 메시지', 'New message from {who}', '{who}さんから新着メッセージ', '{who} 发来新消息'],
+
+  cht_title: ['실시간 채팅', 'Live chat', 'リアルタイムチャット', '实时聊天'],
+  cht_sub: ['지금 접속한 낚시꾼들과 다 같이 이야기하거나, 친구와 1:1로 대화해요.', 'Talk with everyone online, or one-on-one with a friend.', '今接続している釣り人みんなと話したり、友だちと1対1で話したりできます。', '和在线的钓友一起聊天，或与好友一对一聊天。'],
+  cht_all: ['전체 채팅', 'Everyone', '全体チャット', '全体聊天'], cht_dm: ['1:1 대화', '1:1', '1対1', '私聊'],
+  cht_now: ['방금', 'just now', 'たった今', '刚刚'], cht_newer: ['새 메시지 ↓', 'New messages ↓', '新しいメッセージ ↓', '新消息 ↓'],
+  cht_ph: ['메시지 보내기', 'Say something', 'メッセージを送る', '发送消息'],
+  cht_send: ['보내기', 'Send', '送信', '发送'],
+  cht_empty: ['아직 조용해요. 첫 인사를 건네 보세요!', 'Quiet so far. Say hello!', 'まだ静かです。最初のあいさつをどうぞ!', '还很安静，先打个招呼吧！'],
+  cht_need_profile: ['채팅하려면 먼저 닉네임을 만들어 주세요.', 'Create a nickname to chat.', 'チャットするにはニックネームを作ってください。', '请先创建昵称再聊天。'],
+  cht_safety: ['전체 채팅은 최근 3일 치만 보이고(30일 뒤 지워져요), 링크·전화번호는 막혀요. 불쾌한 메시지는 옆의 ⋯ 버튼으로 신고해 주세요. 1:1 대화는 친구끼리만 하고, 앱에서는 두 사람만 볼 수 있어요.', 'The open chat shows the last 3 days (deleted after 30); links and phone numbers are blocked. Report anything unpleasant with the ⋯ button. 1:1 is only between friends, and in the app only the two of you can read it.', '全体チャットは直近3日分だけ表示され(30日後に削除)、リンク・電話番号はブロックされます。不快なメッセージは横の⋯ボタンで通報してください。1対1は友だち同士だけで、アプリでは二人だけが読めます。', '全体聊天只显示最近3天（30天后删除），链接和电话号码会被屏蔽。遇到不适内容请用旁边的⋯按钮举报。私聊仅限好友，在应用中只有你们两人能看到。'],
+  cht_more: ['더보기', 'More', 'その他', '更多'], cht_report: ['신고하기', 'Report', '通報する', '举报'],
+  cht_report_q: ['정말 신고할까요?', 'Report this?', '通報しますか?', '确定举报吗？'],
+  cht_reported: ['신고했어요. 운영자가 확인할게요.', 'Reported. The operator will take a look.', '通報しました。運営者が確認します。', '已举报，运营者会查看。'],
+  cht_hide: ['이 메시지 숨기기', 'Hide this message', 'このメッセージを非表示', '隐藏此消息'],
+  cht_mute: ['채팅 금지', 'Mute', 'チャット禁止', '禁言'],
+  cht_m10: ['10분', '10 min', '10分', '10分钟'], cht_m60: ['1시간', '1 hour', '1時間', '1小时'], cht_m1d: ['하루', '1 day', '1日', '1天'], cht_m0: ['금지 풀기', 'Unmute', '解除', '解除禁言'],
+  cht_muted_done: ['{nick}님은 {until}까지 채팅할 수 없어요.', '{nick} is muted until {until}.', '{nick}さんは{until}までチャットできません。', '{nick} 被禁言至 {until}。'],
+  cht_unmuted_done: ['{nick}님의 채팅 금지를 풀었어요.', '{nick} can chat again.', '{nick}さんのチャット禁止を解除しました。', '已解除 {nick} 的禁言。'],
+  cht_dm_none: ['아직 친구가 없어요. 친구가 되면 1:1로 대화할 수 있어요.', 'No friends yet. Become friends to talk one-on-one.', 'まだ友だちがいません。友だちになると1対1で話せます。', '还没有好友，成为好友后就能私聊。'],
+  cht_dm_find: ['친구 찾기', 'Find friends', '友だちを探す', '找好友'],
+  cht_dm_start: ['대화를 시작해 보세요', 'Start a conversation', '会話を始めましょう', '开始聊天吧'],
+  cht_dm_notfriend: ['친구 아님', 'Not a friend', '友だちではない', '非好友'],
+  cht_dm_rule: ['1:1 대화는 친구끼리만 할 수 있고, 앱에서는 두 사람만 볼 수 있어요. 신고한 메시지만 운영자에게 전달돼요.', '1:1 is only between friends, and in the app only the two of you can read it. Only messages you report are passed to the operator.', '1対1は友だち同士だけで、アプリでは二人だけが読めます。通報したメッセージだけが運営者に届きます。', '私聊仅限好友，在应用中只有你们两人能看到。只有被举报的消息会转给运营者。'],
+  cht_dm_ph: ['{nick}님에게 메시지', 'Message {nick}', '{nick}さんにメッセージ', '给 {nick} 发消息'],
+  cht_dm_empty: ['첫 메시지를 보내 보세요.', 'Send the first message.', '最初のメッセージを送りましょう。', '发送第一条消息吧。'],
+  cht_dm_notfriend_note: ['지금은 친구가 아니라서 메시지를 보낼 수 없어요. 다시 친구가 되면 이어서 대화할 수 있어요.', 'You are not friends now, so you cannot send messages. Become friends again to continue.', '今は友だちではないため送信できません。また友だちになれば続けて話せます。', '你们现在不是好友，无法发送消息。重新成为好友后可以继续聊天。'],
+  cht_web_only: ['웹사이트에서 쓸 수 있어요', 'Available on the website', 'ウェブサイトで使えます', '可在网站上使用'],
+  cht_web_only_sub: ['실시간 기능은 찌릿 웹사이트(kim-jae-ung.github.io/zzirit)에서 쓸 수 있어요.', 'Live features work on the ZZIRIT website (kim-jae-ung.github.io/zzirit).', 'リアルタイム機能は찌릿のウェブサイト(kim-jae-ung.github.io/zzirit)で使えます。', '实时功能可在찌릿网站（kim-jae-ung.github.io/zzirit）上使用。'],
+  cht_err_no_profile: ['먼저 닉네임을 만들어 주세요.', 'Create a nickname first.', '先にニックネームを作ってください。', '请先创建昵称。'],
+  cht_err_muted: ['운영자가 채팅을 잠시 막았어요. {until}부터 다시 쓸 수 있어요.', 'The operator muted you for a while. You can chat again from {until}.', '運営者によりしばらくチャットが制限されています。{until}から再び使えます。', '运营者暂时禁止你发言，{until} 起可再次发言。'],
+  cht_err_no_links: ['전체 채팅에는 링크를 올릴 수 없어요.', 'Links are not allowed in the open chat.', '全体チャットにはリンクを投稿できません。', '全体聊天不能发送链接。'],
+  cht_err_no_phone: ['안전을 위해 전화번호는 보낼 수 없어요.', 'For safety, phone numbers cannot be sent.', '安全のため電話番号は送れません。', '为了安全，不能发送电话号码。'],
+  cht_err_slow_down: ['너무 빨라요. 잠시 후에 다시 보내 주세요.', 'Too fast. Please wait a moment.', '速すぎます。少し待ってから送ってください。', '发得太快了，请稍后再发。'],
+  cht_err_not_friends: ['친구에게만 1:1 메시지를 보낼 수 있어요.', 'You can only message friends.', '1対1メッセージは友だちにだけ送れます。', '只能给好友发私信。'],
+  cht_err_bad_body: ['메시지가 비었거나 너무 길어요.', 'The message is empty or too long.', 'メッセージが空か長すぎます。', '消息为空或过长。'],
+  cht_err_bad_peer: ['이 사람에게는 보낼 수 없어요.', 'This person cannot receive messages.', 'この相手には送れません。', '无法发送给此用户。'],
+  cht_err_not_signed_in: ['연결을 확인한 뒤 다시 시도해 주세요.', 'Check your connection and try again.', '接続を確認してもう一度お試しください。', '请检查网络后重试。'],
+  cht_err_need_update: ['서버를 준비하는 중이에요. 조금 뒤에 다시 시도해 주세요.', 'The server is being updated. Please try again shortly.', 'サーバー準備中です。しばらくしてからお試しください。', '服务器正在准备中，请稍后再试。'],
+  cht_err_unavailable: ['지금은 채팅을 쓸 수 없어요. 잠시 후 다시 시도해 주세요.', 'Chat is unavailable right now. Please try again later.', '現在チャットを使えません。しばらくしてからお試しください。', '聊天暂时不可用，请稍后再试。'],
+
+  pk_title: ['갯바위 공원', 'Rock Park', '磯の公園', '矶钓公园'],
+  pk_sub: ['지금 접속한 낚시꾼들이 모이는 바닷가 공원이에요. 걸어 다니며 인사하고, 포인트에서 낚시하고, 60초 낚시 대결을 신청해 보세요.', 'A seaside park where the anglers online meet. Walk around, say hi, fish at the spots and challenge someone to a 60-second fishing duel.', '今接続している釣り人が集まる海辺の公園です。歩いてあいさつし、ポイントで釣りをして、60秒の釣り対決を申し込んでみましょう。', '在线钓友聚集的海边公园。四处走走打招呼，在钓点钓鱼，还可以发起60秒钓鱼对决。'],
+  pk_need_profile: ['공원에 들어가려면 닉네임과 캐릭터가 필요해요.', 'You need a nickname and a character to enter the park.', '公園に入るにはニックネームとキャラクターが必要です。', '进入公园需要昵称和角色。'],
+  pk_web_only: ['갯바위 공원은 웹사이트에서 열려요', 'The park opens on the website', '公園はウェブサイトで開きます', '公园在网站上开放'],
+  pk_offline: ['지금은 공원에 들어갈 수 없어요', 'The park is not reachable right now', '今は公園に入れません', '暂时无法进入公园'],
+  pk_offline_sub: ['인터넷 연결을 확인한 뒤 다시 열어 주세요.', 'Check your internet connection and open it again.', 'インターネット接続を確認して開き直してください。', '请检查网络连接后重新打开。'],
+  pk_rooms: ['공원 고르기', 'Park rooms', '公園を選ぶ', '选择公园'], pk_room: ['{n}번 공원', 'Park {n}', '公園{n}', '{n}号公园'],
+  pk_canvas: ['갯바위 공원. 바닥을 누르면 걸어가고, 사람을 누르면 대결·친구 신청을 할 수 있어요.', 'The park. Tap the ground to walk; tap someone to duel or add a friend.', '公園。地面をタップで歩き、人をタップすると対決・友だち申請ができます。', '公园。点击地面行走，点击他人可发起对决或加好友。'],
+  pk_emote: ['감정 표현', 'Emotes', 'エモート', '表情'],
+  pk_say_ph: ['말하기 (전체 채팅에도 올라가요)', 'Say something (goes to the open chat too)', '話す(全体チャットにも表示)', '说点什么（也会发到全体聊天）'],
+  pk_side_hint: ['이름을 누르면 대결 신청이나 1:1 대화를 할 수 있어요.', 'Tap a name to duel or talk one-on-one.', '名前をタップすると対決申請や1対1の会話ができます。', '点击名字可发起对决或私聊。'],
+  pk_note: ['공원 낚시와 대결은 재미로 하는 게임이라 랭킹·조과 기록과는 상관없어요. 한 공원에 15명이 차면 다음 공원으로 안내해요.', 'Fishing and duels in the park are a game—they do not count for rankings or your catch log. When a park has 15 people, you are sent to the next one.', '公園の釣りと対決は遊びのゲームなので、ランキングや釣果記録とは関係ありません。1つの公園が15人になると次の公園へ案内します。', '公园钓鱼和对决只是游戏，不计入排行和渔获记录。一个公园满15人后会引导到下一个公园。'],
+  pk_here: ['{room}번 공원 · {n}명 접속 중', 'Park {room} · {n} here', '公園{room} · {n}人', '{room}号公园 · {n}人在线'],
+  pk_joining: ['공원에 들어가는 중…', 'Joining the park…', '公園に入っています…', '正在进入公园…'],
+  pk_reconnect: ['연결이 끊겼어요. 다시 연결하는 중…', 'Connection lost. Reconnecting…', '接続が切れました。再接続中…', '连接已断开，正在重连…'],
+  pk_alone: ['아직 아무도 없어요. 친구를 불러 보세요!', 'Nobody else yet. Invite a friend!', 'まだ誰もいません。友だちを呼んでみましょう!', '还没有其他人，叫上好友吧！'],
+  pk_full: ['{a}번 공원이 꽉 찼어요. {b}번 공원으로 안내할게요.', 'Park {a} is full. Taking you to park {b}.', '公園{a}は満員です。公園{b}へ案内します。', '{a}号公园已满，带你去{b}号公园。'],
+  pk_hint: ['바닥을 눌러 걸어가요. 반짝이는 원에서 낚시할 수 있어요.', 'Tap the ground to walk. Fish at the glowing rings.', '地面をタップして歩きます。光る輪で釣りができます。', '点击地面行走，在发光的圆圈处可以钓鱼。'],
+  pk_fish_here: ['여기서 낚시하기', 'Fish here', 'ここで釣る', '在这里钓鱼'],
+  pk_sit: ['모닥불 앞에 앉기', 'Sit by the fire', '焚き火の前に座る', '坐在篝火旁'], pk_stand: ['일어나기', 'Stand up', '立ち上がる', '站起来'],
+  pk_open_shop: ['낚시점 들어가기', 'Enter the tackle shop', '釣具店に入る', '进入渔具店'],
+  pk_open_board: ['게시판 보기 (주간 대물 대회)', 'Read the board (weekly contest)', '掲示板を見る(週間大物大会)', '查看公告板（每周大物赛）'],
+  pk_open_tank: ['계측대 보기', 'See the measuring board', '計測台を見る', '查看测量台'],
+  pk_open_duel: ['대결하는 법', 'How to duel', '対決のしかた', '如何对决'],
+  pk_open_light: ['등대에서 바다 날씨 보기', 'Sea weather at the lighthouse', '灯台で海の天気を見る', '在灯塔查看海况'],
+  pk_shop: ['낚시점', 'Tackle shop', '釣具店', '渔具店'],
+  pk_shop_sub: ['이번 달 남해 갯바위에서 잘 나오는 물고기와 미끼예요.', 'What bites on the south-coast rocks this month, and what to use.', '今月の南海の磯でよく釣れる魚とエサです。', '本月南海矶钓的常见鱼种和饵料。'],
+  pk_shop_more: ['미끼·루어 추천 더 보기', 'More bait & lure tips', 'エサ・ルアーのおすすめをもっと見る', '查看更多饵料推荐'],
+  pk_board: ['오늘의 대물', 'Big catches', '今日の大物', '今日大物'],
+  pk_tank: ['계측대', 'Measuring board', '計測台', '测量台'],
+  pk_tank_sub: ['지금 이 공원에 있는 사람들의 공원 최고 기록이에요.', 'Park records of the people here now.', '今この公園にいる人の公園最高記録です。', '当前在公园的人的公园最佳记录。'],
+  pk_tank_none: ['아직 기록이 없어요. 포인트에서 한 마리 낚아 보세요!', 'No records yet. Catch one at a spot!', 'まだ記録がありません。ポイントで一匹釣ってみましょう!', '还没有记录，去钓点钓一条吧！'],
+  pk_light: ['빨간 등대', 'Red lighthouse', '赤い灯台', '红色灯塔'],
+  pk_light_sub: ['오늘 바다 날씨를 알려 드려요.', 'Today’s sea weather.', '今日の海の天気をお知らせします。', '告诉你今天的海况。'],
+  pk_light_none: ['지금은 날씨 정보를 볼 수 없어요.', 'Weather is not available right now.', '今は天気情報を見られません。', '暂时无法查看天气。'],
+  pk_duel: ['대결 바위', 'Duel rock', '対決岩', '对决岩'],
+  pk_gate: ['찌릿 갯바위 공원', 'ZZIRIT Rock Park', '찌릿 磯の公園', '찌릿 矶钓公园'],
+  pk_duel_how: ['다른 사람을 누르고 「대결 신청」을 고르세요. 둘 다 똑같은 바다에서 60초 동안 낚시해서 점수가 높은 사람이 이겨요.', 'Tap someone and choose “Challenge to a duel”. You both fish the very same sea for 60 seconds; the higher score wins.', '他の人をタップして「対決を申し込む」を選びます。二人とも同じ海で60秒間釣り、点数の高い人が勝ちです。', '点击他人并选择“发起对决”。双方在完全相同的海里钓60秒，得分高者获胜。'],
+  pk_st_duel: ['대결 중', 'in a duel', '対決中', '对决中'], pk_st_fish: ['낚시 중', 'fishing', '釣り中', '钓鱼中'], pk_st_sit: ['모닥불 앞', 'by the fire', '焚き火の前', '在篝火旁'],
+  pk_card_stats: ['대결 {w}승 {l}패 · 공원 낚시 {n}마리', 'Duels {w}W {l}L · {n} fish in the park', '対決 {w}勝{l}敗 · 公園で{n}匹', '对决 {w}胜{l}负 · 公园钓到{n}条'],
+  pk_card_best: ['최고 {fish}', 'best {fish}', '最高 {fish}', '最佳 {fish}'],
+  pk_duel_ask: ['대결 신청', 'Challenge to a duel', '対決を申し込む', '发起对决'],
+  pk_dm: ['1:1 대화', 'Message', '1対1で話す', '私聊'],
+  pk_see_sea: ['나의 바다 구경하기', 'Visit their sea', 'マイシーを見る', '参观TA的海'],
+  pk_busy: ['지금 다른 대결 중이에요.', 'In another duel right now.', '今ほかの対決中です。', '正在进行其他对决。'],
+  pk_game_note: ['공원 낚시는 재미로 하는 게임이라 내 조과·랭킹에는 들어가지 않아요.', 'Park fishing is a game: it does not go into your catch log or rankings.', '公園の釣りは遊びなので、釣果やランキングには入りません。', '公园钓鱼只是游戏，不计入渔获和排行。'],
+  pk_fishing: ['공원 낚시', 'Park fishing', '公園の釣り', '公园钓鱼'],
+  pk_duel_vs: ['{nick}님과 대결', 'Duel with {nick}', '{nick}さんと対決', '与 {nick} 对决'],
+  pk_me: ['나', 'Me', '自分', '我'], pk_them: ['상대', 'Them', '相手', '对手'],
+  pk_tension: ['낚싯줄 긴장', 'Line tension', 'ライン張力', '鱼线张力'], pk_distance: ['끌어온 거리', 'Reeled in', '寄せた距離', '收线进度'],
+  pk_cast: ['던지기', 'Cast', '投げる', '抛竿'],
+  pk_wait: ['기다리는 중… 찌가 쑥 들어가면 누르기', 'Waiting… press when the float dives', '待っています…ウキが沈んだら押す', '等待中…浮漂下沉时按'],
+  pk_strike: ['지금! 챔질!', 'Now! Strike!', '今だ!アワセ!', '就是现在！扬竿！'],
+  pk_reel: ['꾹 눌러서 감기', 'Hold to reel', '長押しで巻く', '按住收线'],
+  pk_again: ['다시 던지기', 'Cast again', 'もう一度投げる', '再抛一次'], pk_next: ['다음 물고기…', 'Next fish…', '次の魚…', '下一条…'],
+  pk_over: ['끝! 결과를 기다리는 중…', 'Time! Waiting for the result…', '終了!結果待ち…', '时间到！等待结果…'],
+  pk_ready_hint: ['버튼을 눌러 채비를 던져요. (키보드: 스페이스)', 'Press the button to cast. (Keyboard: Space)', 'ボタンを押して仕掛けを投げます。(キーボード:スペース)', '按下按钮抛竿。（键盘：空格）'],
+  pk_wait_hint: ['찌가 톡톡 건드려져도 참으세요. 쑥 들어갈 때가 챔질 타이밍!', 'Ignore the little nibbles. Strike when the float dives!', 'ツンツンは我慢。ウキがスッと沈んだらアワセ!', '轻微的试口别急，浮漂猛地下沉才扬竿！'],
+  pk_bite: ['찌릿! 지금 누르세요!', 'ZZIRIT! Press now!', '찌릿!今押して!', '찌릿！快按！'],
+  pk_fight_hint: ['누르고 있으면 감기면서 긴장이 올라가요. 빨간색이 되기 전에 떼었다가 다시 누르세요. 너무 오래 떼면 빠져요.', 'Holding reels in and raises the tension. Let go before it turns red, then hold again. Let go too long and it slips off.', '押している間は巻けて張力が上がります。赤になる前に離して、また押します。離しすぎると外れます。', '按住会收线并增加张力。变红前松开再按。松开太久鱼会脱钩。'],
+  pk_early: ['너무 빨랐어요! 물고기가 놀랐어요.', 'Too early! You scared it.', '早すぎ!魚が驚きました。', '太早了！鱼被吓跑了。'],
+  pk_missed: ['놓쳤어요… 찌가 들어가면 바로 눌러요.', 'Missed… press as soon as the float dives.', '逃しました…ウキが沈んだらすぐ押して。', '错过了……浮漂下沉就马上按。'],
+  pk_snap: ['줄이 터졌어요! 긴장이 너무 높았어요.', 'The line snapped! Too much tension.', 'ラインが切れました!張力が高すぎました。', '线断了！张力太大了。'],
+  pk_slip: ['바늘이 빠졌어요. 줄을 너무 오래 늦췄어요.', 'It slipped off. The line was slack too long.', '針が外れました。ラインを緩めすぎました。', '鱼脱钩了，鱼线松太久了。'],
+  pk_got: ['{fish} 낚았어요!', 'Caught: {fish}!', '{fish}を釣りました!', '钓到了{fish}！'],
+  pk_got_big: ['대물! {fish}!', 'Trophy! {fish}!', '大物!{fish}!', '大物！{fish}！'],
+  pk_new_best: ['공원 최고 기록!', 'New park best!', '公園の最高記録!', '公园新纪录！'],
+  pk_count: ['{n}초 뒤 시작', 'Starts in {n}', '{n}秒後に開始', '{n}秒后开始'], pk_left: ['{n}초', '{n}s', '{n}秒', '{n}秒'],
+  pk_bag_n: ['{n}마리', '{n} fish', '{n}匹', '{n}条'], pk_zzirit: ['찌릿!', 'ZZIRIT!', '찌릿!', '찌릿!'],
+  pk_duel_asked: ['{nick}님에게 대결을 신청했어요', 'You challenged {nick}', '{nick}さんに対決を申し込みました', '已向 {nick} 发起对决'],
+  pk_duel_wait: ['상대가 받으면 3초 뒤에 시작해요.', 'It starts 3 seconds after they accept.', '相手が受けると3秒後に始まります。', '对方接受后3秒开始。'],
+  pk_duel_noanswer: ['{nick}님이 대답하지 않았어요.', '{nick} did not answer.', '{nick}さんから返事がありませんでした。', '{nick} 没有回应。'],
+  pk_duel_in: ['{nick}님이 대결을 신청했어요!', '{nick} challenges you!', '{nick}さんから対決の申し込み!', '{nick} 向你发起对决！'],
+  pk_duel_rule: ['둘 다 똑같은 바다에서 60초 동안 낚시해요. 큰 물고기일수록 점수가 높아요.', 'You both fish the same sea for 60 seconds. Bigger fish score more.', '二人とも同じ海で60秒間釣ります。大きい魚ほど高得点です。', '双方在相同的海里钓60秒，鱼越大分越高。'],
+  pk_duel_yes: ['좋아요, 대결!', 'Accept', '受けて立つ!', '接受对决！'], pk_duel_no: ['다음에', 'Not now', 'また今度', '下次吧'],
+  pk_duel_left: ['{n}초 안에 대답해 주세요', 'Answer within {n}s', '{n}秒以内に返事してください', '请在{n}秒内回复'],
+  pk_duel_busy: ['{nick}님은 지금 바빠요.', '{nick} is busy right now.', '{nick}さんは今忙しいようです。', '{nick} 现在正忙。'],
+  pk_duel_declined: ['{nick}님이 다음에 하재요.', '{nick} said not now.', '{nick}さんは「また今度」だそうです。', '{nick} 说下次吧。'],
+  pk_duel_cancelled: ['상대가 대결 신청을 취소했어요.', 'They cancelled the challenge.', '相手が申し込みを取り消しました。', '对方取消了对决。'],
+  pk_res_w: ['이겼어요! 🏆', 'You win! 🏆', '勝ち! 🏆', '你赢了！🏆'], pk_res_l: ['아쉽게 졌어요', 'You lost this one', '惜しくも負け', '惜败'], pk_res_d: ['비겼어요', 'A draw', '引き分け', '平局'],
+  pk_res_forfeit: ['{nick}님이 공원을 떠나서 이겼어요.', '{nick} left the park, so you win.', '{nick}さんが公園を離れたので勝ちです。', '{nick} 离开了公园，你获胜。'],
+  pk_score_how: ['점수 = 물고기 길이가 그 어종 평균 크기의 몇 %인지 (평균 크기면 100점). 대결 기록은 재미로만 남아요.', 'Score = each fish’s length as a % of its species’ typical size (typical = 100). Duel records are just for fun.', '点数=魚の長さがその魚種の平均サイズの何%か(平均で100点)。対決記録は遊びとしてだけ残ります。', '得分=鱼长占该鱼种平均大小的百分比（平均=100分）。对决记录仅供娱乐。'],
+
+  home_live_park: ['접속한 낚시꾼들과 만나 걷고, 낚시하고, 60초 대결까지', 'Meet the anglers online: walk, fish and play 60-second duels', '接続中の釣り人と会って、歩いて、釣って、60秒対決', '与在线钓友相遇：散步、钓鱼、60秒对决'],
+  home_live_chat: ['전체 채팅 · 친구와 1:1 대화', 'Open chat · 1:1 with friends', '全体チャット · 友だちと1対1', '全体聊天 · 好友私聊'],
+  home_live_go: ['들어가기', 'Go in', '入る', '进入'],
+  wd_title: ['회원 탈퇴', 'Delete account', '退会', '注销账号'],
+  wd_sub: ['계정과 모든 기록을 지우고 떠나요.', 'Remove your account and everything in it.', 'アカウントとすべての記録を消して退会します。', '删除账号及所有记录。'],
+  wd_lede: ['탈퇴하면 아래 내용이 모두 바로 지워지고, 되돌릴 수 없어요.', 'Leaving deletes all of this right away. It cannot be undone.', '退会すると以下がすべてすぐに削除され、元に戻せません。', '注销后以下内容会立即删除，且无法恢复。'],
+  wd_l1: ['닉네임·캐릭터·프로필 사진, 모든 조과와 사진, 포인트, 랭킹 기록', 'Nickname, character, profile photo, all catches and photos, spots, ranking records', 'ニックネーム・キャラクター・プロフィール写真、すべての釣果と写真、ポイント、ランキング記録', '昵称、角色、头像，所有渔获和照片、钓点、排行记录'],
+  wd_l2: ['게시판 글·댓글, 채팅·1:1 메시지, 공원 기록', 'Board posts and comments, chat and 1:1 messages, park records', '掲示板の投稿・コメント、チャット・1対1メッセージ、公園の記録', '论坛帖子和评论、聊天和私信、公园记录'],
+  wd_l3: ['친구 관계, 팀(내가 만든 팀은 없어져요), 로그인 아이디, 연결된 모든 기기', 'Friends, teams (a team you lead is removed), login ID, every linked device', '友だち、チーム(自分が作ったチームはなくなります)、ログインID、連携したすべての端末', '好友、战队（你创建的战队会被删除）、登录账号、所有关联设备'],
+  wd_l4: ['후원·주문 기록 (영수증이 필요하면 탈퇴 전에 고객센터로 문의해 주세요)', 'Donation and order records (contact support before leaving if you need a receipt)', '応援・注文の記録(領収書が必要な場合は退会前にサポートへご連絡ください)', '打赏和订单记录（如需收据，请在注销前联系客服）'],
+  wd_linked_note: ['이 계정은 여러 기기에 연결되어 있어요. 탈퇴하면 연결된 모든 기기에서 함께 지워져요.', 'This account is linked on several devices. Leaving removes it from all of them.', 'このアカウントは複数の端末で連携しています。退会するとすべての端末から削除されます。', '此账号已在多台设备上关联，注销后会从所有设备上删除。'],
+  wd_pass: ['비밀번호 확인', 'Confirm your password', 'パスワード確認', '确认密码'],
+  wd_no_pass: ['로그인 아이디가 없는 계정이라 비밀번호 없이 진행돼요.', 'This account has no login ID, so no password is needed.', 'ログインIDのないアカウントなので、パスワードなしで進みます。', '此账号没有登录账号，无需密码。'],
+  wd_type: ['확인을 위해 「{w}」라고 입력해 주세요', 'Type “{w}” to confirm', '確認のため「{w}」と入力してください', '请输入「{w}」以确认'],
+  wd_word: ['탈퇴', 'DELETE', '退会', '注销'],
+  wd_go: ['모두 지우고 탈퇴하기', 'Delete everything and leave', 'すべて削除して退会', '全部删除并注销'],
+  wd_done: ['탈퇴가 끝났어요. 그동안 함께해 주셔서 고마워요!', 'Your account has been deleted. Thank you for fishing with us!', '退会が完了しました。今までありがとうございました!', '账号已注销，感谢一路相伴！'],
+  wd_err_wrong: ['비밀번호가 맞지 않아요.', 'Wrong password.', 'パスワードが違います。', '密码错误。'],
+  wd_err_admin: ['운영자 계정은 여기서 탈퇴할 수 없어요.', 'The operator account cannot be deleted here.', '運営者アカウントはここでは退会できません。', '运营者账号无法在此注销。'],
+  wd_err_slow_down: ['시도가 너무 많아요. 한 시간 뒤에 다시 해 주세요.', 'Too many tries. Please try again in an hour.', '試行回数が多すぎます。1時間後にもう一度お試しください。', '尝试次数过多，请一小时后再试。'],
+  wd_err_need_update: ['탈퇴 기능을 서버에 준비하는 중이에요. 고객센터로 알려 주시면 바로 지워 드릴게요.', 'Account deletion is still being set up on the server. Tell us through Help and we will delete it for you.', '退会機能をサーバーで準備中です。サポートにご連絡いただければすぐ削除します。', '注销功能正在服务器上准备中，请通过客服告诉我们，我们会立即为你删除。'],
+  wd_err_unavailable: ['지금은 탈퇴할 수 없어요. 잠시 후 다시 시도해 주세요.', 'Cannot delete right now. Please try again later.', '今は退会できません。しばらくしてからお試しください。', '暂时无法注销，请稍后再试。'],
+  wd_local: ['이 기기에만 저장된 기록을 모두 지워요. 되돌릴 수 없어요.', 'Deletes everything saved on this device. It cannot be undone.', 'この端末に保存された記録をすべて削除します。元に戻せません。', '删除本设备上保存的所有记录，无法恢复。'],
+  wd_local_go: ['이 기기의 기록 모두 지우기', 'Delete everything on this device', 'この端末の記録をすべて削除', '删除本设备上的所有记录'],
+
+  bd_admin_del: ['완전 삭제', 'Delete for good', '完全削除', '永久删除'],
+  bd_admin_del_q: ['완전히 지울까요? (되돌릴 수 없어요)', 'Delete for good? (cannot be undone)', '完全に削除しますか?(元に戻せません)', '确定永久删除？（无法恢复）'],
+  bd_removed: ['삭제했어요.', 'Deleted.', '削除しました。', '已删除。'],
+  bd_remove_fail: ['삭제하지 못했어요. 잠시 후 다시 시도해 주세요.', 'Could not delete. Please try again shortly.', '削除できませんでした。しばらくしてからお試しください。', '删除失败，请稍后再试。'],
+  bd_mine: ['내 글', 'My posts', '自分の投稿', '我的帖子'],
+  bd_cmt_save: ['저장', 'Save', '保存', '保存'],
+
+  wn_park_h: ['갯바위 공원 개장', 'Rock Park is open', '磯の公園オープン', '矶钓公园开放'],
+  wn_park_p: ['접속한 사람들이 바닷가 공원에서 만나요. 걸어 다니며 인사하고, 포인트에서 낚시하고, 60초 낚시 대결도 할 수 있어요.', 'Meet the anglers online in a seaside park: walk around, say hi, fish at the spots and play 60-second fishing duels.', '接続中の人たちが海辺の公園で会えます。歩いてあいさつし、ポイントで釣り、60秒の釣り対決もできます。', '在线的人们在海边公园相聚：四处走走、打招呼、在钓点钓鱼，还能进行60秒钓鱼对决。'],
+  wn_chat_h: ['실시간 채팅', 'Live chat', 'リアルタイムチャット', '实时聊天'],
+  wn_chat_p: ['접속자 모두와 이야기하는 전체 채팅, 친구와만 하는 1:1 대화가 생겼어요.', 'An open chat with everyone online, and 1:1 conversations with friends.', '接続中の全員と話せる全体チャットと、友だちとの1対1会話ができました。', '新增与所有在线用户的全体聊天，以及与好友的私聊。'],
+  wn_bdmod_h: ['게시판 글·댓글 수정', 'Edit your posts and comments', '投稿・コメントの編集', '编辑帖子和评论'],
+  wn_bdmod_p: ['내 글과 댓글을 고치거나 지울 수 있고, 「내 글」만 모아 볼 수 있어요.', 'Edit or delete your own posts and comments, and see only your posts with “My posts”.', '自分の投稿とコメントを編集・削除でき、「自分の投稿」だけを見ることもできます。', '可以编辑或删除自己的帖子和评论，并用“我的帖子”只看自己的。'],
+  wn_wd_h: ['회원 탈퇴', 'Delete your account', '退会', '注销账号'],
+  wn_wd_p: ['설정의 계정 카드에서 언제든 탈퇴하고 모든 기록을 지울 수 있어요.', 'You can leave and delete everything at any time from the account card in Settings.', '設定のアカウントカードからいつでも退会し、すべての記録を削除できます。', '随时可在设置的账号卡片中注销并删除所有记录。'],
 });
 
 /* ===== Web build only: texts that differ from the Claude artifact version ===== */
 Object.assign(T, {
-  privacy_text: ['정확한 낚시 위치는 나에게만 보이고 공개 통계는 약 25km 격자로만 집계돼요. 사진은 360px 미리보기로 줄여 저장하고, 원본 사진의 위치 정보는 저장하지 않아요. AI 판별과 자동 검토를 쓰면 사진이 Google Gemini(무료 등급)로 전송되고, 무료 등급에서는 구글이 서비스 개선에 쓸 수 있어요. 아이디 비밀번호는 암호화(해시)해서만 보관해요. 바다 날씨는 지역 또는 저장한 포인트의 좌표만 Open-Meteo에 보내서 받아와요(조과 위치는 보내지 않아요). 앱 안의 알림은 이 기기에서 만들고, 폰 알림을 켜면 이 기기의 알림 주소(구글·애플 등의 푸시 서비스)만 서버에 저장해 소식을 보내요. 끄거나 로그아웃하면 멈춰요.', 'Exact spots are visible only to you; public stats use ~25 km cells. Photos are stored as 360 px previews and the original GPS data is not kept. AI identification and automatic review send the photo to Google Gemini (free tier), where Google may use it to improve its services. Login passwords are stored only as a secure hash. Sea weather sends only the coordinates of your area or a saved spot to Open-Meteo (never a catch location). In-app notifications are worked out on this device; if you switch on phone notifications, only this device’s push address (at Google, Apple and the like) is stored on the server to send them. Switching off or logging out stops them.', '正確な釣り場は自分だけに表示され、公開統計は約25kmの格子単位です。写真は360pxのプレビューに縮小して保存し、元写真の位置情報は保存しません。AI判定と自動審査では写真がGoogle Gemini(無料枠)に送信され、無料枠ではGoogleがサービス改善に使う場合があります。IDのパスワードはハッシュ化してのみ保管します。 海の天気は地域または保存したポイントの座標だけをOpen-Meteoに送って取得します(釣果の位置は送りません)。アプリ内のお知らせはこの端末で作られ、スマホ通知をオンにすると、この端末の通知アドレス(GoogleやAppleなどのプッシュサービス)だけをサーバーに保存して送ります。オフにするかログアウトすると止まります。', '精确钓点仅自己可见，公开统计以约25公里网格汇总。照片以360px预览保存，不保存原图位置信息。使用AI识别和自动审核时，照片会发送到Google Gemini（免费层），Google可能将其用于改进服务。登录密码仅以哈希形式保存。海况天气只把所在地区或已保存钓点的坐标发送给Open-Meteo（不发送渔获位置）。应用内通知在本设备上生成；开启手机通知后，服务器只保存此设备的推送地址（Google、Apple等推送服务）用于发送。关闭或退出登录即停止。'],
+  privacy_text: ['정확한 낚시 위치는 나에게만 보이고 공개 통계는 약 25km 격자로만 집계돼요. 사진은 360px 미리보기로 줄여 저장하고, 원본 사진의 위치 정보는 저장하지 않아요. AI 판별과 자동 검토를 쓰면 사진이 Google Gemini(무료 등급)로 전송되고, 무료 등급에서는 구글이 서비스 개선에 쓸 수 있어요. 아이디 비밀번호는 암호화(해시)해서만 보관해요. 바다 날씨는 지역 또는 저장한 포인트의 좌표만 Open-Meteo에 보내서 받아와요(조과 위치는 보내지 않아요). 앱 안의 알림은 이 기기에서 만들고, 폰 알림을 켜면 이 기기의 알림 주소(구글·애플 등의 푸시 서비스)만 서버에 저장해 소식을 보내요. 끄거나 로그아웃하면 멈춰요. 전체 채팅은 닉네임과 함께 저장돼 3일 동안 보이고 30일 뒤 지워져요. 1:1 대화는 친구끼리만 할 수 있고 앱에서는 두 사람만 볼 수 있어요(신고한 메시지만 운영자에게 전달돼요). 갯바위 공원에서는 지금 있는 위치와 동작을 같은 공원 사람들에게만 실시간으로 보내고 저장하지 않아요(대결 승패와 공원 최고 기록만 프로필에 남아요). 설정에서 언제든 탈퇴하면 계정과 모든 기록이 바로 지워져요.', 'Exact spots are visible only to you; public stats use ~25 km cells. Photos are stored as 360 px previews and the original GPS data is not kept. AI identification and automatic review send the photo to Google Gemini (free tier), where Google may use it to improve its services. Login passwords are stored only as a secure hash. Sea weather sends only the coordinates of your area or a saved spot to Open-Meteo (never a catch location). In-app notifications are worked out on this device; if you switch on phone notifications, only this device’s push address (at Google, Apple and the like) is stored on the server to send them. Switching off or logging out stops them. The open chat is stored with your nickname, shown for 3 days and deleted after 30. 1:1 chat is only between friends, and in the app only the two of you can read it (only messages you report reach the operator). In the park, where you stand and what you do is sent live only to the people in the same park and is not stored (only duel wins and losses and your park best stay on your profile). You can delete your account at any time in Settings; the account and all records are removed at once.', '正確な釣り場は自分だけに表示され、公開統計は約25kmの格子単位です。写真は360pxのプレビューに縮小して保存し、元写真の位置情報は保存しません。AI判定と自動審査では写真がGoogle Gemini(無料枠)に送信され、無料枠ではGoogleがサービス改善に使う場合があります。IDのパスワードはハッシュ化してのみ保管します。 海の天気は地域または保存したポイントの座標だけをOpen-Meteoに送って取得します(釣果の位置は送りません)。アプリ内のお知らせはこの端末で作られ、スマホ通知をオンにすると、この端末の通知アドレス(GoogleやAppleなどのプッシュサービス)だけをサーバーに保存して送ります。オフにするかログアウトすると止まります。全体チャットはニックネームとともに保存され、3日間表示されて30日後に削除されます。1対1は友だち同士だけで、アプリでは二人だけが読めます(通報したメッセージだけが運営者に届きます)。磯の公園では、今いる位置と動作を同じ公園の人にだけリアルタイムで送り、保存しません(対決の勝敗と公園の最高記録だけがプロフィールに残ります)。設定からいつでも退会でき、アカウントとすべての記録がすぐに削除されます。', '精确钓点仅自己可见，公开统计以约25公里网格汇总。照片以360px预览保存，不保存原图位置信息。使用AI识别和自动审核时，照片会发送到Google Gemini（免费层），Google可能将其用于改进服务。登录密码仅以哈希形式保存。海况天气只把所在地区或已保存钓点的坐标发送给Open-Meteo（不发送渔获位置）。应用内通知在本设备上生成；开启手机通知后，服务器只保存此设备的推送地址（Google、Apple等推送服务）用于发送。关闭或退出登录即停止。全体聊天会与昵称一起保存，显示3天，30天后删除。私聊仅限好友，在应用中只有你们两人能看到（只有被举报的消息会转给运营者）。在矶钓公园里，你所在的位置和动作只实时发送给同一公园的人，不会保存（只有对决胜负和公园最佳记录会留在个人资料中）。可随时在设置中注销，账号和所有记录会立即删除。'],
   mode_local_note: ['지금은 로그인 서버에 연결하지 못해서 기록이 이 기기에만 저장돼요. 잠시 후 새로고침해 보세요.', "Can't reach the sign-in server right now, so records stay on this device. Try refreshing in a moment.", 'ログインサーバーに接続できないため、記録はこの端末にのみ保存されます。しばらくして再読み込みしてください。', '暂时无法连接登录服务器，记录只保存在本机。请稍后刷新。'],
   mode_explain: ['{app_eun} 기록을 서버에 저장해요. 처음 들어오면 이 브라우저에 계정이 자동으로 만들어져요. 아이디를 만들어 두면 휴대폰·PC 어디서든 로그인해서 이어 쓸 수 있어요. 아이디 없이 브라우저 데이터를 지우면 기록에 다시 들어올 수 없어요.', '{app} saves your records on our server. An account is created for this browser automatically. Create a login ID to sign in from any phone or computer. Without an ID, clearing browser data means you cannot get back in.', '{app}は記録をサーバーに保存します。初回アクセスでこのブラウザにアカウントが自動作成されます。IDを作れば、スマホ・PCどこからでもログインして続けられます。IDなしでブラウザのデータを消すと記録に戻れません。', '{app}将记录保存在服务器上。首次访问时会自动为此浏览器创建账号。创建登录ID后，可在任何手机或电脑登录继续使用。没有ID时清除浏览器数据将无法找回记录。'],
   ai_need_images: ['AI 어종 판별을 준비 중이에요. 지금은 직접 어종을 고를 수 있어요.', 'AI identification is being set up. For now you can choose the species yourself.', 'AI判定は準備中です。今は手動で選べます。', 'AI识别正在准备中，目前可手动选择鱼种。'],
@@ -5020,7 +5445,8 @@ const PHDB = (() => {
       lsSet('phk', keys);
       for (const d of drop) req('readwrite', s => s.delete(d));
     },
-    del(k) { req('readwrite', s => s.delete(k)); lsSet('phk', lsGet('phk', []).filter(x => x !== k)); }
+    del(k) { req('readwrite', s => s.delete(k)); lsSet('phk', lsGet('phk', []).filter(x => x !== k)); },
+    clear() { lsSet('phk', null); return req('readwrite', s => s.clear()); }
   };
 })();
 
@@ -6491,6 +6917,64 @@ async function openLogout() {
     setTimeout(() => { location.hash = 'home'; location.reload(); }, 700);
   };
 }
+/* ===== Leaving (회원 탈퇴). On the website the server removes the account with everything in it, on every linked
+   device (a login ID asks for the password again); then this device forgets it all and starts over. Without a server
+   account (records kept only on this device) it simply wipes this device. The operator's own account can't leave here. ===== */
+function wdCardHTML() {
+  if (!S.me || !S.me.nick) return '';
+  const server = window.APP_RT === 'web' && S.mode === 'shared' && !!(window.APP_AUTH && window.APP_AUTH.account);
+  if (!server && S.mode !== 'local') return '';
+  return `<section class="card wd-card"><h2 class="h3">${icon('trash')}${t('wd_title')}</h2><p class="muted">${t(server ? 'wd_sub' : 'wd_local')}</p>
+    <div class="actions"><button class="btn btn-line btn-danger" data-act="withdraw">${server ? t('wd_title') : t('wd_local_go')}</button></div></section>`;
+}
+function wipeDevice() {
+  // language, theme and units stay (they say nothing about the person); everything else of the app goes
+  const keep = new Set(['lang', 'theme', 'unit']);
+  try { for (const k of Object.keys(localStorage)) if (k.startsWith('eosin.') && !keep.has(k.slice(6))) localStorage.removeItem(k); } catch (e) { }
+  try { sessionStorage.clear(); } catch (e) { }
+  return Promise.resolve(PHDB.clear()).catch(() => { });
+}
+async function openWithdraw() {
+  if (!S.me || !S.me.nick) return;
+  const server = window.APP_RT === 'web' && S.mode === 'shared' && !!(window.APP_AUTH && window.APP_AUTH.account);
+  if (!server && S.mode !== 'local') return;
+  const id = server ? await myLoginId(true) : null;
+  const linked = server && !!(window.APP_AUTH.link && window.APP_AUTH.link.linked());
+  const word = t('wd_word');
+  const w = openModal(`<form class="wd" id="wd-form" novalidate>
+    <h2>${icon('trash')} ${t('wd_title')}</h2>
+    ${acctSumHTML()}
+    ${server ? `<p class="acct-state warn">${icon('warn')} ${t('wd_lede')}</p>
+      <ul class="wd-list">${['wd_l1', 'wd_l2', 'wd_l3', 'wd_l4'].map(k => `<li>${t(k)}</li>`).join('')}</ul>
+      ${linked ? `<p class="note">${icon('link')} ${t('wd_linked_note')}</p>` : ''}
+      ${id ? `<div class="field"><label for="wd-pass">${t('wd_pass')} <span class="muted mono">${esc(id)}</span></label><input id="wd-pass" type="password" autocomplete="current-password" maxlength="64"></div>` : `<p class="muted small">${t('wd_no_pass')}</p>`}`
+      : `<p class="acct-state warn">${icon('warn')} ${t('wd_local')}</p>`}
+    <div class="field"><label for="wd-word">${t('wd_type', { w: esc(word) })}</label><input id="wd-word" autocomplete="off" maxlength="20" placeholder="${esc(word)}"></div>
+    <p class="err" id="wd-err" hidden></p>
+    <div class="actions"><button class="btn btn-danger" id="wd-go" type="submit" disabled>${icon('trash')}${server ? t('wd_go') : t('wd_local_go')}</button><button class="btn btn-ghost" type="button" data-close>${t('cancel')}</button></div>
+  </form>`, { label: t('wd_title') });
+  const go = $('#wd-go', w), inp = $('#wd-word', w), err = $('#wd-err', w);
+  const ok = () => inp.value.trim().toLowerCase() === word.toLowerCase();
+  inp.addEventListener('input', () => { go.disabled = !ok(); });
+  $('#wd-form', w).onsubmit = async e => {
+    e.preventDefault(); if (!ok() || go.disabled) return;
+    err.hidden = true; go.disabled = true;
+    if (server) {
+      const pass = $('#wd-pass', w) ? $('#wd-pass', w).value : null;
+      if (id && !pass) { err.textContent = t('wd_err_wrong'); err.hidden = false; go.disabled = false; $('#wd-pass', w).focus(); return; }
+      try { await pushOff(); } catch (x) { } // this browser stops getting notices before the account goes
+      try { await window.APP_AUTH.account.remove(pass); }
+      catch (x) {
+        const c = (x && x.code) || 'unavailable'; const k = 'wd_err_' + c; const msg = t(k);
+        err.textContent = msg === k ? t('wd_err_unavailable') : msg; err.hidden = false; go.disabled = false; return;
+      }
+    }
+    try { pkStop(); } catch (x) { }
+    await wipeDevice();
+    closeModal(w); toast(t('wd_done'), 'ok', 6000);
+    setTimeout(() => { location.hash = 'home'; location.reload(); }, 1600);
+  };
+}
 function acctSumHTML() {
   if (!S.me || !S.me.nick) return '';
   return `<div class="acct-sum">${avatar(S.me, 44)}<div><b>${nickHTML(S.me)}</b> ${lvMini(S.me, myId())}<p class="muted small">${t('acct_sum', { n: fmtN(myCatches().length), pts: fmtN(myPoints()), lv: myLevel() })}</p></div></div>`;
@@ -6855,14 +7339,15 @@ function openShareCard(blob, name, text) {
 }
 
 /* ===== What's new: shown once after a big update (website only; needs the matching server update) ===== */
-const WHATS_NEW = '2026-10-29c', WN_TS = Date.parse('2026-10-29T05:30:00Z'); // people who joined after this have nothing to catch up on
+const WHATS_NEW = '2026-10-29d', WN_TS = Date.parse('2026-10-29T09:30:00Z'); // people who joined after this have nothing to catch up on
 const BOOT_AT = Date.now();
 /* what each update brought, newest last; people see what came after the last one they saw (at most 6 lines) */
 const WN_ITEMS = [
   ['2026-10-28', 'user', 'wn_id'], ['2026-10-28', 'shield', 'wn_review'], ['2026-10-28', 'heart', 'wn_pay'], ['2026-10-28', 'share', 'wn_share'],
   ['2026-10-29', 'bell', 'wn_noti'], ['2026-10-29', 'wave', 'wn_wx'], ['2026-10-29', 'medal', 'wn_bdg'], ['2026-10-29', 'download', 'wn_inst'], ['2026-10-29', 'logout', 'wn_out'],
   ['2026-10-29b', 'wave', 'wn_fs'], ['2026-10-29b', 'trophy', 'wn_wk'], ['2026-10-29b', 'chart', 'wn_st'], ['2026-10-29b', 'phone', 'wn_push'],
-  ['2026-10-29c', 'camera', 'wn_fix'], ['2026-10-29c', 'menu', 'wn_menu']
+  ['2026-10-29c', 'camera', 'wn_fix'], ['2026-10-29c', 'menu', 'wn_menu'],
+  ['2026-10-29d', 'wave', 'wn_park'], ['2026-10-29d', 'chat', 'wn_chat'], ['2026-10-29d', 'board', 'wn_bdmod'], ['2026-10-29d', 'user', 'wn_wd']
 ];
 function maybeWhatsNew(tries = 0) {
   if (window.APP_RT !== 'web' || lsGet('wn', '') === WHATS_NEW || tries > 6) return;
@@ -7067,6 +7552,8 @@ VIEWS.home = {
             </button></li>`).join('')}</ul>` : S.feedF === 'fr' ? `<div class="empty"><p>${t('feed_fr_empty')}</p><a class="btn btn-line btn-sm" href="#friends">${t('fr_manage')}</a></div>` : `<div class="empty"><p>${t('feed_empty')}</p><a class="btn btn-line btn-sm" href="#scan">${t('feed_empty_cta')}</a></div>`}
         </section>
       </div>
+
+      ${homeLiveHTML()}
 
       <section class="card home-board">
         <div class="sec-head tight"><h2 class="h3">${icon('board')}${t('home_board_title')}</h2><div class="hb-links"><a class="link" href="#teams">${icon('flag')}${myTm && myTm.ok ? esc(myTm.t.name) : t('nav_teams')}</a><a class="link" href="#board">${t('home_board_more')}</a></div></div>
@@ -8087,6 +8574,7 @@ VIEWS.prefs = {
         <p class="hint">${t('mode_explain')}</p>
         ${window.APP_RT === 'web' && !S.isOwner ? `<p class="hint"><a href="#claim">${icon('shield')} ${t('claim_title')}</a></p>` : ''}
       </section>
+      ${wdCardHTML()}
       <section class="card credits"><h2 class="h3">${t('credits_title')}</h2><p class="small">${t('credits_text')}</p>${wxOn() ? `<p class="small">${t('credits_wx')} · <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo.com</a> (CC BY 4.0)</p>` : ''}</section>
     </div>`;
     pushBind(el);
@@ -8231,7 +8719,7 @@ async function openRelink(uid) {
 }
 
 /* ---------- More (mobile) ---------- */
-const NAV_ICON = { home: 'home', scan: 'scan', map: 'map', points: 'pin', dex: 'book', tackle: 'lure', log: 'log', sea: 'sea', char: 'user', rank: 'trophy', friends: 'users', board: 'board', teams: 'flag', help: 'chat', about: 'sparkle', prefs: 'gear', admin: 'shield' };
+const NAV_ICON = { home: 'home', park: 'wave', chat: 'chat', scan: 'scan', map: 'map', points: 'pin', dex: 'book', tackle: 'lure', log: 'log', sea: 'sea', char: 'user', rank: 'trophy', friends: 'users', board: 'board', teams: 'flag', help: 'chat', about: 'sparkle', prefs: 'gear', admin: 'shield' };
 function openMore() {
   const nIn = S.me && S.me.nick ? frLists().inc.length : 0;
   // the account first: who is signed in, with a way to sign out (only when there is a way back in: a login ID or a linked device)
@@ -8244,11 +8732,12 @@ function openMore() {
   // the four groups; the one with the page on screen starts open, one open at a time so the sheet stays short
   const cur = navGroupOf(S.route) || 'fish';
   const grp = NAV_GROUPS.map(([id, gic, routes]) => {
-    const list = routes.filter(r => (r !== 'points' || window.APP_RT === 'web') && (r !== 'admin' || S.isOwner));
-    const on = id === cur, dot = list.includes('friends') && nIn;
+    const list = routes.filter(r => ((r !== 'points' && r !== 'park' && r !== 'chat') || window.APP_RT === 'web') && (r !== 'admin' || S.isOwner));
+    const nDm = window.APP_RT === 'web' && typeof dmUnread === 'function' ? dmUnread() : 0;
+    const on = id === cur, dot = (list.includes('friends') && nIn) || (list.includes('chat') && nDm);
     return `<section class="more-grp${on ? ' open' : ''}" data-mgrp="${id}">
       <button type="button" class="more-gh" aria-expanded="${on}" aria-controls="mg-${id}">${icon(gic)}<span class="more-gt"><b>${t('ng_' + id)}</b><span class="muted small">${list.map(r => esc(t('nav_' + r))).join(' · ')}</span></span>${dot ? `<i class="badge num">${nIn > 9 ? '9+' : nIn}</i>` : ''}${icon('chev')}</button>
-      <div class="more-gb" id="mg-${id}"><div class="more-gi">${list.map(r => `<a href="#${r}" class="more-item${viewOf(S.route) === viewOf(r) ? ' on' : ''}"${viewOf(S.route) === viewOf(r) ? ' aria-current="page"' : ''}>${icon(NAV_ICON[r])}<span>${t('nav_' + r)}</span>${r === 'friends' && nIn ? `<i class="badge num">${nIn > 9 ? '9+' : nIn}</i>` : ''}</a>`).join('')}</div></div>
+      <div class="more-gb" id="mg-${id}"><div class="more-gi">${list.map(r => `<a href="#${r}" class="more-item${viewOf(S.route) === viewOf(r) ? ' on' : ''}"${viewOf(S.route) === viewOf(r) ? ' aria-current="page"' : ''}>${icon(NAV_ICON[r])}<span>${t('nav_' + r)}</span>${r === 'friends' && nIn ? `<i class="badge num">${nIn > 9 ? '9+' : nIn}</i>` : ''}${r === 'chat' && nDm ? `<i class="badge num">${nDm > 9 ? '9+' : nDm}</i>` : ''}</a>`).join('')}</div></div>
     </section>`;
   }).join('');
   const w = openModal(`<nav class="more"><h2 class="sr">${t('more')}</h2>${acct}<div class="more-grps">${grp}</div><div class="more-foot">${inst}<button class="more-item heart" data-act="donate">${icon('heart')}<span>${t('donate_btn')}</span></button></div></nav>`, { sheet: true, label: t('more') });
@@ -8671,7 +9160,7 @@ VIEWS.board = {
       ${shared ? '' : `<p class="note">${icon('info')} ${t('bd_local_note')}</p>`}
       ${noticeCardHTML()}
       <div class="bd-bar">
-        <div class="chip-row" role="group" aria-label="${esc(t('bd_f_cat'))}">${['all', ...BD_CATS].map(c => `<button class="chip chip-tab" aria-pressed="${bd.cat === c}" data-bdcat="${c}">${t('bdc_' + c)}</button>`).join('')}</div>
+        <div class="chip-row" role="group" aria-label="${esc(t('bd_f_cat'))}">${['all', ...BD_CATS].map(c => `<button class="chip chip-tab" aria-pressed="${bd.cat === c}" data-bdcat="${c}">${t('bdc_' + c)}</button>`).join('')}${S.me && S.me.nick ? `<button class="chip chip-tab chip-mine" aria-pressed="${!!bd.mine}" data-bdmine>${icon('user')}${t('bd_mine')}</button>` : ''}</div>
         <div class="bd-tools">
           <div class="seg seg-sm" role="group">${['new', 'hot'].map(s => `<button aria-pressed="${bd.sort === s}" data-bdsort="${s}">${t('bd_sort_' + s)}</button>`).join('')}</div>
           <input class="search" id="bd-q" type="search" placeholder="${esc(t('bd_search'))}" value="${esc(bd.q)}" autocomplete="off">
@@ -8685,9 +9174,9 @@ VIEWS.board = {
   },
   renderList(el) {
     const box = $('#bd-list', el); if (!box) return;
-    const list = boardList(S.bd);
+    const list = boardList(Object.assign({}, S.bd, { mineOnly: !!S.bd.mine && !!(S.me && S.me.nick) }));
     box.innerHTML = list.length ? `<ul class="bd-list">${list.slice(0, 120).map(bdCard).join('')}</ul>` : `
-      <div class="empty card big">${icon('board', 'big')}<h2>${t(S.bd.q || S.bd.cat !== 'all' ? 'bd_none_found' : 'bd_empty')}</h2><p class="muted">${t('bd_empty_sub')}</p><button class="btn btn-primary" data-bd="write">${icon('plus')}${t('bd_write')}</button></div>`;
+      <div class="empty card big">${icon('board', 'big')}<h2>${t(S.bd.q || S.bd.cat !== 'all' || S.bd.mine ? 'bd_none_found' : 'bd_empty')}</h2><p class="muted">${t('bd_empty_sub')}</p><button class="btn btn-primary" data-bd="write">${icon('plus')}${t('bd_write')}</button></div>`;
     hydratePhotos(box);
   }
 };
@@ -8742,6 +9231,8 @@ function openPost(key) {
     const c = p.ref ? catchOf(p.uid, p.ref) : null;
     const cmts = p.cmts.filter(x => !x.hidden || S.isOwner || x.uid === myId());
     const draft = $('#pc-body', w) ? $('#pc-body', w).value : '';
+    const editId = S.openPost && S.openPost.key === key ? S.openPost.edit : null;
+    const eta = $('.cmt-edit-ta', w); const editDraft = eta ? eta.value : null; // what is being typed survives a refresh
     box.innerHTML = `
       <p class="eyebrow"><span class="chip chip-cat cat-${esc(p.cat)}">${t('bdc_' + p.cat)}</span> ${fmtDT(p.ts)}${p.upd && p.upd > p.ts + 60000 ? ' · ' + t('bd_edited') : ''}</p>
       <h2>${esc(p.title)}</h2>
@@ -8752,11 +9243,11 @@ function openPost(key) {
       <div class="post-acts">
         <button class="btn btn-sm ${liked ? 'btn-primary' : 'btn-line'}" id="pl-like" aria-pressed="${liked}">${icon('heart')}${t('bd_like')} ${p.likes.size}</button>
         ${mine ? `<button class="btn btn-ghost btn-sm" id="pl-edit">${t('bd_edit')}</button><button class="btn btn-ghost btn-sm" id="pl-del">${icon('trash')}${t('delete')}</button>` : `<button class="btn btn-ghost btn-sm" id="pl-rep">${icon('warn')}${t('bd_report')}</button>`}
-        ${S.isOwner ? `<button class="btn btn-ghost btn-sm" id="pl-hide">${t(p.hidden ? 'bd_unhide' : 'bd_hide')}</button>` : ''}
+        ${S.isOwner ? `<button class="btn btn-ghost btn-sm" id="pl-hide">${t(p.hidden ? 'bd_unhide' : 'bd_hide')}</button>${mine ? '' : `<button class="btn btn-ghost btn-sm" id="pl-adel">${icon('trash')}${t('bd_admin_del')}</button>`}` : ''}
       </div>
       <section class="cmts">
         <h3 class="h4">${icon('chat')}${t('bd_cmts', { n: cmts.filter(x => !x.hidden).length })}</h3>
-        ${cmts.length ? `<ul class="cmt-list">${cmts.map(x => { const ca = anglerOf(x.uid) || { nick: '?' }; return `<li class="${x.hidden ? 'is-hidden' : ''}"><button class="cmt-who" data-seauid="${esc(x.uid)}">${avatar(ca, 26)}</button><div><p class="cmt-head">${nickHTML(ca)}${lvMini(ca, x.uid)}${teamTag(x.uid)} <span class="muted small">${ago(x.ts)}</span>${x.uid === myId() ? `<button class="link small" data-cmtdel="${esc(x.id)}">${t('delete')}</button>` : ''}${S.isOwner ? `<button class="link small" data-cmthide="${esc(x.key)}">${t(x.hidden ? 'bd_unhide' : 'bd_hide')}</button>` : ''}</p><p class="cmt-body">${esc(x.body)}</p></div></li>`; }).join('')}</ul>` : `<p class="muted small">${t('bd_cmt_empty')}</p>`}
+        ${cmts.length ? `<ul class="cmt-list">${cmts.map(x => { const ca = anglerOf(x.uid) || { nick: '?' }; const own = x.uid === myId(); const editing = own && editId === x.id; return `<li class="${x.hidden ? 'is-hidden' : ''}"><button class="cmt-who" data-seauid="${esc(x.uid)}">${avatar(ca, 26)}</button><div><p class="cmt-head">${nickHTML(ca)}${lvMini(ca, x.uid)}${teamTag(x.uid)} <span class="muted small">${ago(x.ts)}${x.upd ? ' · ' + t('bd_edited') : ''}</span>${own && !editing ? `<button class="link small" data-cmtedit="${esc(x.id)}">${t('bd_edit')}</button><button class="link small" data-cmtdel="${esc(x.id)}">${t('delete')}</button>` : ''}${S.isOwner ? `<button class="link small" data-cmthide="${esc(x.key)}">${t(x.hidden ? 'bd_unhide' : 'bd_hide')}</button>${own ? '' : `<button class="link small" data-cmtadel="${esc(x.key)}">${t('bd_admin_del')}</button>`}` : ''}</p>${editing ? `<form class="cmt-edit" data-cmteditf="${esc(x.id)}"><textarea class="cmt-edit-ta" rows="2" maxlength="${BD_MAX.cmt}">${esc(editDraft != null ? editDraft : x.body)}</textarea><div class="actions"><button class="btn btn-primary btn-sm" type="submit">${t('bd_cmt_save')}</button><button class="btn btn-ghost btn-sm" type="button" data-cmtcancel>${t('cancel')}</button></div></form>` : `<p class="cmt-body">${esc(x.body)}</p>`}</div></li>`; }).join('')}</ul>` : `<p class="muted small">${t('bd_cmt_empty')}</p>`}
         <form class="cmt-form" id="pc-form" novalidate><textarea id="pc-body" rows="2" maxlength="${BD_MAX.cmt}" placeholder="${esc(t('bd_cmt_ph'))}">${esc(draft)}</textarea><button class="btn btn-primary btn-sm" type="submit">${icon('send')}${t('bd_cmt_send')}</button></form>
       </section>`;
     hydratePhotos(box);
@@ -8781,6 +9272,20 @@ function openPost(key) {
       await store.saveBoard(); toast(t('bd_reported')); render();
     };
     const hide = $('#pl-hide', box); if (hide) hide.onclick = () => modToggle('hp', key).then(render);
+    const adel = $('#pl-adel', box); if (adel) adel.onclick = async () => {
+      if (!armed(adel, t('bd_admin_del_q'))) return;
+      if (await bdAdminRemove('post', key)) { closeModal(w); rerender(); }
+    };
+    $$('[data-cmtadel]', box).forEach(b => b.onclick = async () => { if (!armed(b, t('bd_admin_del_q'))) return; if (await bdAdminRemove('cmt', b.dataset.cmtadel)) render(); });
+    $$('[data-cmtedit]', box).forEach(b => b.onclick = () => { S.openPost.edit = b.dataset.cmtedit; render(); const ta = $('.cmt-edit-ta', box); if (ta) { ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); } });
+    $$('[data-cmtcancel]', box).forEach(b => b.onclick = () => { S.openPost.edit = null; const ta = $('.cmt-edit-ta', box); if (ta) ta.value = ''; render(); });
+    $$('[data-cmteditf]', box).forEach(f => f.onsubmit = async e => {
+      e.preventDefault();
+      const v = $('.cmt-edit-ta', f).value.trim().slice(0, BD_MAX.cmt); if (!v) return;
+      const c = B().cmts.find(x => x.id === f.dataset.cmteditf); if (!c) return;
+      if (c.body !== v) { c.body = v; c.upd = nowMs(); await store.saveBoard(); toast(t('bd_updated')); }
+      S.openPost.edit = null; $('.cmt-edit-ta', f).remove(); render();
+    });
     $$('[data-cmthide]', box).forEach(b => b.onclick = () => modToggle('hc', b.dataset.cmthide).then(render));
     $$('[data-cmtdel]', box).forEach(b => b.onclick = async () => {
       if (!armed(b, t('bd_del_confirm'))) return;
@@ -8799,6 +9304,24 @@ function openPost(key) {
   };
   S.openPost = { key, w, render };
   render();
+}
+/* the operator deletes a post or a comment for good: gone from its author's board on the server, and also marked hidden
+   (so an old copy on the author's device, if it ever came back, stays out of sight) */
+async function bdAdminRemove(kind, key) {
+  if (!S.isOwner) return false;
+  const i = key.indexOf('|'); const owner = key.slice(0, i), id = key.slice(i + 1);
+  if (window.APP_AUTH && window.APP_AUTH.board) {
+    try { await window.APP_AUTH.board.adminRemove(owner, kind, id); }
+    catch (e) { toast(t(e && e.code === 'need_update' ? 'cht_err_need_update' : 'bd_remove_fail'), 'warn', 4800); return false; }
+  }
+  const mod = Object.assign({ hp: {}, hc: {}, av: {} }, JSON.parse(JSON.stringify(S.admin.mod || {})));
+  const m = kind === 'post' ? 'hp' : 'hc'; mod[m] = mod[m] || {}; mod[m][key] = nowMs();
+  await store.saveAdmin('mod', mod);
+  const col = kind === 'post' ? 'posts' : 'cmts';
+  const d = S.board.get(owner); if (d && Array.isArray(d[col])) S.board.set(owner, Object.assign({}, d, { [col]: d[col].filter(x => x.id !== id) }));
+  if (owner === S.uid && S.myBoard && Array.isArray(S.myBoard[col])) S.myBoard[col] = S.myBoard[col].filter(x => x.id !== id);
+  S.dataVer++; toast(t('bd_removed'));
+  return true;
 }
 async function modToggle(kind, key) {
   if (!S.isOwner) return;
@@ -9184,7 +9707,7 @@ document.addEventListener('click', e => {
 });
 
 /* ===== Notifications (알림): replies and likes on my posts, friend requests, review results, team requests,
-   operator notices, confirmed payments. Worked out on this device from what the app already loads; nothing extra is
+   operator notices, confirmed payments, unread 1:1 messages. Worked out on this device from what the app already loads; nothing extra is
    stored on the server. The first scan only records what is already there, so nobody gets a flood of old news. ===== */
 const NOTI_MAX = 80;
 function notiOn() { return S.mode === 'shared' && !!(S.me && S.me.nick); }
@@ -9241,6 +9764,9 @@ function notiScan() {
   // payments the operator confirmed
   const g = grantsOf(me);
   for (const o of S.myOrders) if (g[o.id] === 'ok') add('p:' + o.id, 'paid', nowMs(), { ref: o.kind === 'item' ? o.ref : 'donate' });
+  // 1:1 messages not read yet: one line per friend, for their latest message
+  // (one line per friend until it is read: the line belongs to the read mark it started from)
+  if (typeof DMS !== 'undefined' && DMS.loaded) { const rd = dmReads(); for (const th of dmThreads().values()) if (th.unread && th.last && th.last.sender !== me) add('dm:' + th.peer + ':' + (rd[th.peer] || 0), 'dm', Date.parse(th.last.created_at) || nowMs(), { who: th.peer, body: String(th.last.body || '').slice(0, 60) }); }
   if (first) { lsSet('notiInit', 1); changed = true; }
   lsSet('notiState', st);
   if (changed) { list.sort((a, b) => a.t - b.t); lsSet('noti', list.slice(-NOTI_MAX)); }
@@ -9270,10 +9796,11 @@ function notiText(x) {
     case 'badge': return t('nt_badge', { name: t('bdg_' + x.badge) });
     case 'wk': return t('nt_wk', { rank: x.rank, fish });
     case 'paid': return t('nt_paid', { item: x.ref === 'donate' ? t('donate_btn') : esc(dict((SHOPI[x.ref] || {}).n) || x.ref) });
+    case 'dm': return t('nt_dm', { who }) + (x.body ? `<span class="nt-q">${esc(chatClean(x.body))}</span>` : '');
     default: return '';
   }
 }
-const NT_ICON = { cmt: 'chat', cmt2: 'chat', like: 'heart', freq: 'user-plus', facc: 'user-check', rok: 'check', rno: 'x', rlog: 'log', rhold: 'clock', tjoin: 'flag', notice: 'megaphone', paid: 'heart', badge: 'medal', wk: 'trophy' };
+const NT_ICON = { dm: 'chat', cmt: 'chat', cmt2: 'chat', like: 'heart', freq: 'user-plus', facc: 'user-check', rok: 'check', rno: 'x', rlog: 'log', rhold: 'clock', tjoin: 'flag', notice: 'megaphone', paid: 'heart', badge: 'medal', wk: 'trophy' };
 function openNoti() {
   notiScan();
   const seen = lsGet('notiSeen', 0) || 0;
@@ -9298,6 +9825,7 @@ function openNoti() {
     else if (x.k === 'paid') location.hash = 'sea';
     else if (x.k === 'badge') { S.seaTab = 'badges'; S.viewUid = null; location.hash = 'sea'; }
     else if (x.k === 'wk') openWeekly();
+    else if (x.k === 'dm') dmOpen(x.who);
   });
 }
 
@@ -9776,10 +10304,1107 @@ function pushBind(root) {
   const ib = $('#push-inst', root); if (ib) ib.onclick = () => { const m = ib.closest('.modal-wrap'); if (m) closeModal(m); openInstall(); };
 }
 
+/* ===== Live chat (채팅, website): the open chat for everyone online and 1:1 between friends.
+   The server keeps the messages (the open chat is shown for 3 days), writes who said each one, refuses links and phone
+   numbers in the open chat, keeps muted people quiet and slows floods down. 1:1 is only between friends and only the
+   two of them can read it. The open chat is live only while the chat page or the park is open; 1:1 is live all along
+   (for the unread count), and only my own conversations ever reach this device. ===== */
+const CHAT = { msgs: [], loaded: false, err: null, refs: 0, stop: null, hooks: new Set(), mute: null };
+const DMS = { rows: new Map(), loaded: false, stop: null, err: null, started: false };
+function chatOn() { return window.APP_RT === 'web' && !!(window.APP_AUTH && window.APP_AUTH.chat); }
+const CHAT_BAD = /(씨발|시발|ㅅㅂ|ㅆㅂ|병신|ㅂㅅ|좆|존나|개새끼|개새|지랄|미친놈|미친년|닥쳐|fuck|shit|bitch)/gi;
+function chatClean(s) { return String(s || '').replace(CHAT_BAD, m => '*'.repeat([...m].length)); }
+function chatHidden(id) { const hm = (S.admin.mod && S.admin.mod.hm) || {}; return !!hm[id]; }
+function chatTime(iso) { const ms = Date.parse(iso) || nowMs(); return nowMs() - ms < 60e3 ? t('cht_now') : ago(ms); }
+function chatErrText(e) { const c = (e && e.code) || 'unavailable'; const k = 'cht_err_' + c; const s = t(k, { until: CHAT.mute ? fmtDT(Date.parse(CHAT.mute)) : '' }); return s === k ? t('cht_err_unavailable') : s; }
+
+/* ---- the open chat: joined while someone looks (chat page, park), with hooks for the park's speech bubbles ---- */
+function chatJoin(hook) {
+  if (!chatOn()) return () => { };
+  if (hook) CHAT.hooks.add(hook);
+  CHAT.refs++;
+  if (!CHAT.stop) { CHAT.stop = APP_AUTH.chat.onNew('all', chatAdd); chatLoad(); }
+  let done = false;
+  return () => {
+    if (done) return; done = true;
+    if (hook) CHAT.hooks.delete(hook);
+    if (--CHAT.refs <= 0) { CHAT.refs = 0; if (CHAT.stop) { CHAT.stop(); CHAT.stop = null; } CHAT.loaded = false; }
+  };
+}
+async function chatLoad() {
+  try {
+    const rows = await APP_AUTH.chat.recent('all', 80);
+    const have = new Set(rows.map(m => m.id));
+    CHAT.msgs = rows.concat(CHAT.msgs.filter(m => !have.has(m.id))).sort((a, b) => a.id - b.id).slice(-200);
+    CHAT.loaded = true; CHAT.err = null;
+  } catch (e) { CHAT.err = (e && e.code) || 'unavailable'; }
+  try { CHAT.mute = S.me && S.me.nick ? await APP_AUTH.chat.myMute() : null; } catch (e) { CHAT.mute = null; }
+  chatPaint(true);
+}
+function chatAdd(m) {
+  if (!m || !m.id || CHAT.msgs.some(x => x.id === m.id)) return;
+  CHAT.msgs.push(m); CHAT.msgs.sort((a, b) => a.id - b.id);
+  if (CHAT.msgs.length > 200) CHAT.msgs.splice(0, CHAT.msgs.length - 200);
+  for (const h of CHAT.hooks) { try { h(m); } catch (e) { console.warn(e); } }
+  chatPaint(false);
+}
+async function chatSend(text) {
+  const v = String(text || '').replace(/\s+/g, ' ').trim().slice(0, 200);
+  if (!v) return false;
+  if (!S.me || !S.me.nick) { ensureProfile(); return false; }
+  try { const m = await APP_AUTH.chat.send('all', v); if (CHAT.mute) CHAT.mute = null; chatAdd(m); return true; }
+  catch (e) { if (e && e.code === 'muted') { try { CHAT.mute = await APP_AUTH.chat.myMute(); } catch (x) { } chatPaint(false); } toast(chatErrText(e), 'warn', 4800); return false; }
+}
+function chatRow(m) {
+  const a = S.anglers.get(m.uid) || null; const mine = m.uid === myId();
+  const nick = (a && a.nick) || m.nick || '?';
+  return `<li class="cm${mine ? ' me' : ''}" data-cm="${m.id}">
+    <button class="cm-av" data-seauid="${esc(m.uid)}" aria-label="${esc(nick)}">${avatar(a || { nick }, 30)}</button>
+    <div class="cm-main"><p class="cm-head"><b>${esc(nick)}</b>${a ? lvMini(a, m.uid) + teamTag(m.uid) : ''}<span class="muted small">${chatTime(m.created_at)}</span>${mine && !S.isOwner ? '' : `<button class="cm-more" data-cmmore="${m.id}" aria-label="${esc(t('cht_more'))}">${icon('dots')}</button>`}</p>
+    <p class="cm-body">${esc(chatClean(m.body))}</p></div></li>`;
+}
+/* paint the open chat where it is shown: keeps the scroll where it is unless the reader is already at the bottom */
+function chatPaint(jump) {
+  if (typeof pkLog === 'function') pkLog(); // the park shows the last few lines too
+  const log = $('#chat-log'); if (!log) return;
+  const near = log.scrollHeight - log.scrollTop - log.clientHeight < 80;
+  const list = CHAT.msgs.filter(m => !chatHidden(m.id));
+  if (CHAT.err && !list.length) { log.innerHTML = `<li class="chat-empty">${icon('warn')} ${esc(chatErrText({ code: CHAT.err }))}</li>`; return; }
+  log.innerHTML = list.length ? list.map(chatRow).join('') : `<li class="chat-empty">${CHAT.loaded ? t('cht_empty') : t('loading')}</li>`;
+  if (jump || near) log.scrollTop = log.scrollHeight; else { const nb = $('#chat-newer'); if (nb) nb.hidden = false; }
+  const note = $('#chat-note'); if (note) note.textContent = CHAT.mute ? t('cht_err_muted', { until: fmtDT(Date.parse(CHAT.mute)) }) : '';
+}
+/* a message's menu: report it (others), or — for the operator — hide it and keep its author out for a while */
+function chatMore(id) {
+  const m = CHAT.msgs.find(x => x.id === +id); if (!m) return;
+  const mine = m.uid === myId(); const a = S.anglers.get(m.uid); const nick = (a && a.nick) || m.nick;
+  const w = openModal(`<div class="cm-menu">
+    <p class="cm-quote"><b>${esc(nick)}</b> ${esc(chatClean(m.body))}</p>
+    <div class="actions col">
+      ${mine ? '' : `<button class="btn btn-line btn-block" data-cma="report">${icon('warn')}${t('cht_report')}</button>`}
+      ${S.isOwner ? `<button class="btn btn-line btn-block" data-cma="hide">${icon('eye')}${t(chatHidden(m.id) ? 'bd_unhide' : 'cht_hide')}</button>
+        ${mine ? '' : `<p class="lbl">${t('cht_mute')}</p><div class="chip-row">${[[10, 'cht_m10'], [60, 'cht_m60'], [1440, 'cht_m1d'], [0, 'cht_m0']].map(([n, k]) => `<button class="chip chip-tab" data-cmute="${n}">${t(k)}</button>`).join('')}</div>`}` : ''}
+    </div></div>`, { label: t('cht_more') });
+  w.addEventListener('click', async e => {
+    const b = e.target.closest('[data-cma],[data-cmute]'); if (!b) return;
+    if (b.dataset.cma === 'report') {
+      if (!S.me || !S.me.nick) { closeModal(w); ensureProfile(); return; }
+      await store.addSuggestion({ id: rid(8), cat: 'report', text: `[${t('cht_title')}] ${nick}: ${String(m.body).slice(0, 200)} (#${m.id})`, ts: nowMs(), nick: S.me.nick, ref: 'chat:' + m.id, about: m.uid });
+      closeModal(w); toast(t('cht_reported')); return;
+    }
+    if (b.dataset.cma === 'hide') { closeModal(w); await chatHideToggle(m.id); return; }
+    if (b.dataset.cmute != null) {
+      try { const until = await APP_AUTH.chat.mute(m.uid, +b.dataset.cmute); closeModal(w); toast(+b.dataset.cmute ? t('cht_muted_done', { nick, until: fmtDT(Date.parse(until)) }) : t('cht_unmuted_done', { nick })); }
+      catch (x) { toast(chatErrText(x), 'warn'); }
+    }
+  });
+}
+async function chatHideToggle(id) {
+  if (!S.isOwner) return;
+  const mod = Object.assign({ hp: {}, hc: {}, av: {}, hm: {} }, JSON.parse(JSON.stringify(S.admin.mod || {})));
+  mod.hm = mod.hm || {};
+  const on = !mod.hm[id];
+  try { await APP_AUTH.chat.hide(id, on); } catch (e) { toast(chatErrText(e), 'warn'); return; }
+  if (on) mod.hm[id] = nowMs(); else delete mod.hm[id];
+  // the readable list stays short: notes older than 3 days are of no use (the server stops serving those messages)
+  for (const [k, v] of Object.entries(mod.hm)) if (nowMs() - v > 3 * 864e5) delete mod.hm[k];
+  await store.saveAdmin('mod', mod); S.dataVer++;
+  toast(t(on ? 'bd_hidden_done' : 'bd_unhidden_done')); chatPaint(false);
+}
+
+/* ---- 1:1 between friends ---- */
+function dmPeerOf(r) { const me = myId(); return r.a === me ? r.b : r.a; }
+function dmStart() {
+  if (!chatOn() || DMS.started || !S.uid || S.mode !== 'shared') return;
+  DMS.started = true;
+  DMS.stop = APP_AUTH.dm.onNew(r => { if (r && r.id) { const fresh = !DMS.rows.has(r.id); DMS.rows.set(r.id, r); if (fresh) dmChanged(r); } });
+  APP_AUTH.dm.list(300).then(rows => { for (const r of rows) DMS.rows.set(r.id, r); DMS.loaded = true; DMS.err = null; dmChanged(null); })
+    .catch(e => { DMS.err = (e && e.code) || 'unavailable'; DMS.loaded = true; dmChanged(null); });
+}
+function dmReads() { const v = lsGet('dmRead', {}); return v && typeof v === 'object' ? v : {}; }
+function dmThreads() {
+  const me = myId(); const by = new Map();
+  for (const r of DMS.rows.values()) {
+    const peer = dmPeerOf(r); if (!peer || peer === me) continue;
+    const th = by.get(peer) || { peer, msgs: [], last: null, unread: 0 };
+    th.msgs.push(r); by.set(peer, th);
+  }
+  const read = dmReads();
+  for (const th of by.values()) {
+    th.msgs.sort((a, b) => a.id - b.id); th.last = th.msgs[th.msgs.length - 1];
+    th.unread = th.msgs.filter(r => r.sender !== me && r.id > (read[th.peer] || 0)).length;
+  }
+  return by;
+}
+function dmUnread() { let n = 0; for (const th of dmThreads().values()) n += th.unread; return n; }
+function dmMarkRead(peer) {
+  const th = dmThreads().get(peer); if (!th || !th.last) return;
+  const read = dmReads(); if ((read[peer] || 0) >= th.last.id) return;
+  read[peer] = th.last.id; lsSet('dmRead', read); dmBadge();
+}
+function dmBadge() {
+  const n = dmUnread();
+  $$('[data-dmbadge]').forEach(b => { b.hidden = !n; b.textContent = n > 9 ? '9+' : String(n); });
+  try { navDots(); } catch (e) { }
+}
+function dmChanged(r) {
+  // a new message in the open conversation is read at once; anything else waits in the count (and the bell)
+  if (r && S.route === 'chat' && S.chatTab === 'dm' && S.dmPeer === dmPeerOf(r) && !document.hidden) dmMarkRead(S.dmPeer);
+  dmBadge(); dmPaint();
+  if (r && r.sender !== myId()) { try { notiScan(); } catch (e) { } }
+}
+async function dmSend(peer, text) {
+  const v = String(text || '').trim().slice(0, 500); if (!v) return false;
+  try {
+    const r = await APP_AUTH.dm.send(peer, v); DMS.rows.set(r.id, r); dmMarkRead(peer); dmPaint();
+    pushSend('dm', String(r.id)); // the friend's phone, if they switched notices on
+    return true;
+  } catch (e) { toast(chatErrText(e), 'warn', 4800); return false; }
+}
+function dmOpen(peer) { S.chatTab = 'dm'; S.dmPeer = peer || null; if (S.route !== 'chat') location.hash = 'chat'; else show('chat'); }
+function dmListHTML() {
+  const th = dmThreads(); const fr = frLists().friends;
+  const peers = new Set([...fr.map(f => f.uid), ...th.keys()]);
+  const rows = [...peers].map(uid => ({ uid, a: S.anglers.get(uid), th: th.get(uid), friend: relation(uid) === 'friend' }))
+    .filter(x => x.a && x.a.nick)
+    .sort((x, y) => ((y.th && y.th.last ? y.th.last.id : 0) - (x.th && x.th.last ? x.th.last.id : 0)) || x.a.nick.localeCompare(y.a.nick));
+  if (!rows.length) return `<div class="dm-none">${icon('users', 'big')}<p>${t('cht_dm_none')}</p><a class="btn btn-primary" href="#friends">${icon('user-plus')}${t('cht_dm_find')}</a></div>`;
+  return `<ul class="dm-list">${rows.map(x => `<li><button class="dm-row" data-dmpeer="${esc(x.uid)}">${avatar(x.a, 40)}
+    <span class="dm-who"><b>${esc(x.a.nick)}</b>${lvMini(x.a, x.uid)}<span class="muted small">${x.th && x.th.last ? esc(chatClean(x.th.last.body).slice(0, 60)) : t('cht_dm_start')}</span></span>
+    <span class="dm-side">${x.th && x.th.last ? `<span class="muted small">${chatTime(x.th.last.created_at)}</span>` : ''}${x.th && x.th.unread ? `<i class="badge num">${x.th.unread > 9 ? '9+' : x.th.unread}</i>` : ''}${x.friend ? '' : `<span class="chip">${t('cht_dm_notfriend')}</span>`}</span>
+  </button></li>`).join('')}</ul><p class="hint">${icon('shield')} ${t('cht_dm_rule')}</p>`;
+}
+function dmThreadHTML(peer) {
+  const a = S.anglers.get(peer) || { nick: '?' }; const friend = relation(peer) === 'friend';
+  return `<div class="dm-head"><button class="btn btn-ghost btn-sm" data-dmback>${t('back')}</button><button class="dm-who-btn" data-seauid="${esc(peer)}">${avatar(a, 32)}<b>${esc(a.nick)}</b>${lvMini(a, peer)}</button></div>
+    <ol class="chat-log dm-log" id="dm-log" aria-live="polite"></ol>
+    ${friend ? `<form class="chat-in" id="dm-form"><input id="dm-text" maxlength="500" autocomplete="off" placeholder="${esc(t('cht_dm_ph', { nick: a.nick }))}"><button class="btn btn-primary" type="submit">${icon('send')}<span>${t('cht_send')}</span></button></form>`
+      : `<p class="note">${icon('info')} ${t('cht_dm_notfriend_note')}</p>`}`;
+}
+function dmPaint() {
+  const card = $('#chat-card'); if (!card || S.route !== 'chat' || S.chatTab !== 'dm') return;
+  if (!S.dmPeer) { const box = $('#dm-box', card); if (box) box.innerHTML = DMS.err && !DMS.rows.size ? `<p class="note">${icon('warn')} ${esc(chatErrText({ code: DMS.err }))}</p>` : dmListHTML(); return; }
+  const log = $('#dm-log', card); if (!log) return;
+  const th = dmThreads().get(S.dmPeer); const me = myId();
+  const near = log.scrollHeight - log.scrollTop - log.clientHeight < 80;
+  log.innerHTML = th && th.msgs.length ? th.msgs.map(r => `<li class="cm cm-dm${r.sender === me ? ' me' : ''}"><div class="cm-main"><p class="cm-body">${esc(chatClean(r.body))}</p><p class="cm-head"><span class="muted small">${chatTime(r.created_at)}</span>${r.sender === me ? '' : `<button class="cm-more" data-dmrep="${r.id}" aria-label="${esc(t('cht_report'))}">${icon('warn')}</button>`}</p></div></li>`).join('')
+    : `<li class="chat-empty">${t('cht_dm_empty')}</li>`;
+  if (near || !log.dataset.seen) { log.scrollTop = log.scrollHeight; log.dataset.seen = '1'; }
+  dmMarkRead(S.dmPeer);
+}
+
+/* ---- the page ---- */
+VIEWS.chat = {
+  render(el) {
+    if (!chatOn()) { el.innerHTML = `<div class="page"><div class="empty card big">${icon('chat', 'big')}<h2>${t('cht_web_only')}</h2><p class="muted">${t('cht_web_only_sub')}</p></div></div>`; return; }
+    const tab = S.chatTab === 'dm' ? 'dm' : 'all';
+    const key = tab + '|' + (tab === 'dm' ? S.dmPeer || '' : '') + '|' + (S.me && S.me.nick ? 1 : 0) + '|' + S.lang;
+    if (el.dataset.ck === key && $('#chat-card', el)) { chatPaint(false); dmPaint(); dmBadge(); return; } // keep what is being typed
+    el.dataset.ck = key;
+    const can = !!(S.me && S.me.nick);
+    el.innerHTML = `
+    <div class="page chat-page">
+      <header class="page-head"><h1>${t('cht_title')}</h1><p class="lede">${t('cht_sub')}</p></header>
+      <div class="seg chat-tabs" role="tablist">
+        <button role="tab" data-ctab="all" aria-selected="${tab === 'all'}">${icon('users')}<span>${t('cht_all')}</span></button>
+        <button role="tab" data-ctab="dm" aria-selected="${tab === 'dm'}">${icon('chat')}<span>${t('cht_dm')}</span><i class="badge num" data-dmbadge hidden></i></button>
+      </div>
+      <section class="card chat-card" id="chat-card">
+        ${tab === 'all' ? `
+          <ol class="chat-log" id="chat-log" aria-live="polite"></ol>
+          <button class="chat-newer" id="chat-newer" hidden>${t('cht_newer')}</button>
+          ${can ? `<form class="chat-in" id="chat-form"><input id="chat-text" maxlength="200" autocomplete="off" placeholder="${esc(t('cht_ph'))}"><button class="btn btn-primary" type="submit">${icon('send')}<span>${t('cht_send')}</span></button></form>`
+            : `<div class="chat-in chat-join"><span class="muted">${t('cht_need_profile')}</span><button class="btn btn-primary btn-sm" data-act="onboard">${t('onb_go')}</button></div>`}
+          <p class="small muted" id="chat-note"></p>`
+          : S.dmPeer ? dmThreadHTML(S.dmPeer) : `<div id="dm-box"></div>`}
+      </section>
+      <p class="hint chat-safe">${icon('shield')} ${t('cht_safety')}</p>
+    </div>`;
+    if (tab === 'all') { if (!this._stop) this._stop = chatJoin(null); chatPaint(true); }
+    else { if (this._stop) { this._stop(); this._stop = null; } dmPaint(); }
+    dmBadge();
+    el.onclick = e => {
+      const tb = e.target.closest('[data-ctab]'); if (tb) { S.chatTab = tb.dataset.ctab; S.dmPeer = null; this.render(el); return; }
+      const mo = e.target.closest('[data-cmmore]'); if (mo) { chatMore(mo.dataset.cmmore); return; }
+      const pr = e.target.closest('[data-dmpeer]'); if (pr) { S.dmPeer = pr.dataset.dmpeer; this.render(el); return; }
+      if (e.target.closest('[data-dmback]')) { S.dmPeer = null; this.render(el); return; }
+      const nb = e.target.closest('#chat-newer'); if (nb) { nb.hidden = true; const log = $('#chat-log'); if (log) log.scrollTop = log.scrollHeight; return; }
+      const rp = e.target.closest('[data-dmrep]'); if (rp) {
+        const r = DMS.rows.get(+rp.dataset.dmrep); if (!r) return;
+        if (!armed(rp, t('cht_report_q'))) return;
+        const a = S.anglers.get(r.sender) || {};
+        store.addSuggestion({ id: rid(8), cat: 'report', text: `[${t('cht_dm')}] ${a.nick || '?'}: ${String(r.body).slice(0, 300)} (#${r.id})`, ts: nowMs(), nick: (S.me && S.me.nick) || '', ref: 'dm:' + r.id, about: r.sender }).then(() => toast(t('cht_reported')));
+      }
+    };
+    const f = $('#chat-form', el);
+    if (f) f.onsubmit = async e => { e.preventDefault(); const inp = $('#chat-text', el); const b = f.querySelector('button'); b.disabled = true; if (await chatSend(inp.value)) inp.value = ''; b.disabled = false; inp.focus(); };
+    const df = $('#dm-form', el);
+    if (df) df.onsubmit = async e => { e.preventDefault(); const inp = $('#dm-text', el); const b = df.querySelector('button'); b.disabled = true; if (await dmSend(S.dmPeer, inp.value)) inp.value = ''; b.disabled = false; inp.focus(); };
+  },
+  leave() { if (this._stop) { this._stop(); this._stop = null; } const el = $('#v-chat'); if (el) delete el.dataset.ck; }
+};
+
+/* ===== 갯바위 공원 (the park, website): walk around with the anglers who are online, fish at the spots, challenge
+   someone to a 60-second fishing duel, talk (the open chat shows as speech bubbles), wave with an emote.
+   Live through Supabase Realtime, sparingly (the free plan counts every message): presence says who is here and where
+   they stopped; a tap sends one "walking to" message that everyone animates on their own; duels send a few messages.
+   Rooms of 15; a full one sends you on to the next. The fish in the park are a game, not records. ===== */
+const PK = {
+  W: 1600, H: 1000, ROOMS: 5, CAP: 15, SPEED: 165, SPAWN: [800, 790], AV: 66, DUEL: 60000,
+  WALK: [
+    [[0, 1000], [1600, 1000], [1600, 600], [1330, 600], [1330, 560], [1190, 560], [1185, 470], [1060, 446], [900, 432], [760, 440], [620, 470], [560, 520], [0, 560]],
+    [[20, 600], [50, 430], [140, 335], [260, 285], [385, 300], [480, 352], [548, 430], [570, 540], [300, 620]],
+    [[1200, 600], [1200, 150], [1320, 150], [1320, 600]]
+  ],
+  SPOTS: [
+    { id: 'r1', x: 150, y: 356, dx: -0.2, dy: -1 }, { id: 'r2', x: 300, y: 304, dx: 0, dy: -1 }, { id: 'r3', x: 455, y: 378, dx: 0.5, dy: -1 },
+    { id: 'b1', x: 1214, y: 282, dx: -1, dy: 0 }, { id: 'b2', x: 1306, y: 362, dx: 1, dy: 0 }, { id: 'b3', x: 1260, y: 176, dx: 0, dy: -1 },
+    { id: 's1', x: 900, y: 456, dx: 0, dy: -1 }
+  ],
+  PROPS: [
+    { id: 'shop', x: 300, y: 800, r: 95 }, { id: 'board', x: 720, y: 660, r: 75 }, { id: 'fire', x: 1010, y: 830, r: 85 },
+    { id: 'tank', x: 1400, y: 735, r: 75 }, { id: 'duel', x: 560, y: 655, r: 65 }, { id: 'light', x: 1260, y: 142, r: 70 }
+  ],
+  LAMPS: [[180, 680], [520, 905], [1105, 650], [1500, 905], [1260, 590]],
+  EMO: ['👋', '😆', '👍', '🎣', '🐟', '❤️'],
+  EVENTS: ['mv', 'em', 'di', 'da', 'df', 'de', 'dx']
+};
+let PK_POOL = { m: -1, list: [] };
+function pkWeb() { return window.APP_RT === 'web' && !!(window.APP_AUTH && window.APP_AUTH.rt); }
+function pkKst() { const d = new Date(Date.now() + 9 * 3600e3); return { h: d.getUTCHours() + d.getUTCMinutes() / 60, m: d.getUTCMonth() }; }
+
+/* ---------- the ground: where you can walk (rocks, beach, plaza, breakwater) ---------- */
+function pkIn(x, y) { for (const poly of PK.WALK) if (GEO.pip(x, y, poly)) return true; return false; }
+// walk in a straight line, stopping at the water's edge
+function pkReach(x0, y0, x1, y1) {
+  const d = Math.hypot(x1 - x0, y1 - y0); const n = Math.max(1, Math.ceil(d / 8));
+  let lx = x0, ly = y0;
+  for (let i = 1; i <= n; i++) { const x = x0 + (x1 - x0) * i / n, y = y0 + (y1 - y0) * i / n; if (!pkIn(x, y)) break; lx = x; ly = y; }
+  return [lx, ly];
+}
+// a way around the water: a coarse grid of land (20 px), the shortest path through it, then straightened wherever a
+// straight line stays on land (from the plaza to the lighthouse goes over the boardwalk, not across the sea)
+const PK_CELL = 20; let PK_LAND = null;
+function pkLand() {
+  if (PK_LAND) return PK_LAND;
+  const W = Math.ceil(PK.W / PK_CELL), H = Math.ceil(PK.H / PK_CELL), a = new Uint8Array(W * H);
+  for (let j = 0; j < H; j++) for (let i = 0; i < W; i++) a[j * W + i] = pkIn(i * PK_CELL + PK_CELL / 2, j * PK_CELL + PK_CELL / 2) ? 1 : 0;
+  return (PK_LAND = { W, H, a });
+}
+function pkClear(x0, y0, x1, y1) { const n = Math.max(1, Math.ceil(Math.hypot(x1 - x0, y1 - y0) / 8)); for (let i = 1; i <= n; i++) if (!pkIn(x0 + (x1 - x0) * i / n, y0 + (y1 - y0) * i / n)) return false; return true; }
+function pkPath(x0, y0, x1, y1) {
+  if (pkClear(x0, y0, x1, y1)) return [[x1, y1]];
+  const G = pkLand(), C = PK_CELL;
+  const cellOf = (x, y) => [clamp(Math.floor(x / C), 0, G.W - 1), clamp(Math.floor(y / C), 0, G.H - 1)];
+  const mid = (i, j) => [i * C + C / 2, j * C + C / 2];
+  let [ti, tj] = cellOf(x1, y1);
+  if (!G.a[tj * G.W + ti]) { // a tap on the water: the nearest land to it
+    let best = null, bd = Infinity;
+    for (let j = 0; j < G.H; j++) for (let i = 0; i < G.W; i++) if (G.a[j * G.W + i]) { const d = (i - ti) ** 2 + (j - tj) ** 2; if (d < bd) { bd = d; best = [i, j]; } }
+    if (!best) return [pkReach(x0, y0, x1, y1)];
+    [ti, tj] = best; [x1, y1] = mid(ti, tj);
+    if (pkClear(x0, y0, x1, y1)) return [[x1, y1]];
+  }
+  const [si, sj] = cellOf(x0, y0), start = sj * G.W + si, goal = tj * G.W + ti;
+  const prev = new Int32Array(G.W * G.H).fill(-1); prev[start] = start; const q = [start];
+  const D8 = [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]];
+  for (let h = 0; h < q.length && prev[goal] === -1; h++) {
+    const c = q[h], ci = c % G.W, cj = (c - ci) / G.W;
+    for (const [di, dj] of D8) {
+      const ni = ci + di, nj = cj + dj; if (ni < 0 || nj < 0 || ni >= G.W || nj >= G.H) continue;
+      const n = nj * G.W + ni; if (prev[n] !== -1 || !G.a[n]) continue;
+      if (di && dj && (!G.a[cj * G.W + ni] || !G.a[nj * G.W + ci])) continue; // no cutting corners over the water
+      prev[n] = c; q.push(n);
+    }
+  }
+  if (prev[goal] === -1) return [pkReach(x0, y0, x1, y1)];
+  const pts = []; for (let c = goal; c !== start; c = prev[c]) { const i = c % G.W; pts.push(mid(i, (c - i) / G.W)); }
+  pts.reverse(); pts[pts.length - 1] = [x1, y1];
+  const out = []; let cx = x0, cy = y0, k = 0;
+  while (k < pts.length) { let far = k; for (let m = pts.length - 1; m > k; m--) if (pkClear(cx, cy, pts[m][0], pts[m][1])) { far = m; break; } out.push(pts[far]); [cx, cy] = pts[far]; k = far + 1; }
+  return out;
+}
+// start walking somebody along a path (each device works out the same path from where it sees them)
+function pkGo(p, x, y) { const path = pkPath(p.x, p.y, x, y); const first = path.shift(); p.tx = first[0]; p.ty = first[1]; p.path = path; const last = path.length ? path[path.length - 1] : first; p.gx = last[0]; p.gy = last[1]; }
+function pkNearProp(x, y) { let best = null, bd = Infinity; for (const p of PK.PROPS) { const d = Math.hypot(p.x - x, p.y - y); if (d < p.r + 30 && d < bd) { bd = d; best = p; } } return best; }
+function pkNear(list, x, y, r) { let best = null, bd = r; for (const s of list) { const d = Math.hypot(s.x - x, s.y - y); if (d < bd) { bd = d; best = s; } } return best; }
+
+/* ---------- drawing: the ground once (into a picture), the moving things every frame ---------- */
+function pkBg() {
+  const c = document.createElement('canvas'); c.width = PK.W; c.height = PK.H;
+  const g = c.getContext('2d'); const R = FD.seeded(20261029);
+  const sea = g.createLinearGradient(0, 0, 0, 640); sea.addColorStop(0, '#0B4A73'); sea.addColorStop(.55, '#1F77A8'); sea.addColorStop(1, '#3FA2C8');
+  g.fillStyle = sea; g.fillRect(0, 0, PK.W, PK.H);
+  // far islands
+  g.fillStyle = 'rgba(20,70,98,.75)';
+  for (const [x, w, h] of [[120, 260, 34], [520, 180, 22], [980, 320, 40], [1420, 220, 28]]) { g.beginPath(); g.moveTo(x - w / 2, 92); g.quadraticCurveTo(x - w / 4, 92 - h, x, 92 - h * .9); g.quadraticCurveTo(x + w / 4, 92 - h * 1.1, x + w / 2, 92); g.closePath(); g.fill(); }
+  g.fillStyle = 'rgba(255,255,255,.06)'; g.fillRect(0, 92, PK.W, 3);
+  const poly = (pts, fill, stroke) => { g.beginPath(); pts.forEach(([x, y], i) => (i ? g.lineTo(x, y) : g.moveTo(x, y))); g.closePath(); g.fillStyle = fill; g.fill(); if (stroke) { g.strokeStyle = stroke; g.lineWidth = 3; g.stroke(); } };
+  // shallow water rim around the land
+  g.save(); g.filter = 'blur(10px)'; poly(PK.WALK[0].map(([x, y]) => [x, y - 14]), 'rgba(120,210,220,.55)'); poly(PK.WALK[1].map(([x, y]) => [x, y - 12]), 'rgba(120,210,220,.45)'); g.restore();
+  // beach + plaza
+  poly(PK.WALK[0], '#EAD8A4');
+  for (let i = 0; i < 900; i++) { const x = R() * PK.W, y = 430 + R() * 220; if (pkIn(x, y) && y < 650) { g.fillStyle = R() < .5 ? 'rgba(170,140,90,.25)' : 'rgba(255,255,255,.35)'; g.fillRect(x, y, 2, 2); } }
+  const pv = g.createLinearGradient(0, 610, 0, 660); pv.addColorStop(0, 'rgba(216,207,191,0)'); pv.addColorStop(1, '#D8CFBF');
+  g.fillStyle = pv; g.fillRect(0, 610, PK.W, 50); g.fillStyle = '#D8CFBF'; g.fillRect(0, 660, PK.W, 340);
+  // paving stones and a round plaza in the middle
+  g.strokeStyle = 'rgba(120,105,85,.18)'; g.lineWidth = 2;
+  for (let y = 680; y < 1000; y += 40) { const off = ((y / 40) % 2) * 30; for (let x = -60 + off; x < PK.W; x += 60) g.strokeRect(x, y, 60, 40); }
+  g.fillStyle = '#E6DED0'; g.beginPath(); g.ellipse(800, 800, 190, 105, 0, 0, Math.PI * 2); g.fill();
+  g.strokeStyle = 'rgba(120,105,85,.25)'; g.lineWidth = 3; g.beginPath(); g.ellipse(800, 800, 190, 105, 0, 0, Math.PI * 2); g.stroke();
+  g.beginPath(); g.ellipse(800, 800, 120, 64, 0, 0, Math.PI * 2); g.stroke();
+  // wooden boardwalk from the plaza to the breakwater
+  g.fillStyle = '#B98A57'; g.fillRect(1180, 560, 160, 110);
+  g.strokeStyle = 'rgba(80,50,25,.35)'; g.lineWidth = 2; for (let x = 1180; x < 1340; x += 16) { g.beginPath(); g.moveTo(x, 560); g.lineTo(x, 670); g.stroke(); }
+  // rocks (갯바위): a dark base, boulders, tide pools, barnacles
+  poly(PK.WALK[1], '#4E4943');
+  for (let i = 0; i < 46; i++) {
+    const x = 40 + R() * 520, y = 300 + R() * 300; if (!GEO.pip(x, y, PK.WALK[1])) continue;
+    const rw = 26 + R() * 44, rh = 16 + R() * 26, tone = 70 + Math.floor(R() * 40);
+    g.fillStyle = `rgb(${tone},${tone - 6},${tone - 12})`; g.beginPath(); g.ellipse(x, y, rw, rh, R() * Math.PI, 0, Math.PI * 2); g.fill();
+    g.fillStyle = 'rgba(255,255,255,.10)'; g.beginPath(); g.ellipse(x - rw * .2, y - rh * .3, rw * .55, rh * .35, 0, 0, Math.PI * 2); g.fill();
+  }
+  for (let i = 0; i < 7; i++) { const x = 90 + R() * 420, y = 380 + R() * 180; if (!GEO.pip(x, y, PK.WALK[1])) continue; g.fillStyle = 'rgba(47,134,179,.85)'; g.beginPath(); g.ellipse(x, y, 16 + R() * 18, 7 + R() * 7, R(), 0, Math.PI * 2); g.fill(); g.fillStyle = 'rgba(255,255,255,.35)'; g.fillRect(x - 5, y - 2, 6, 2); }
+  for (let i = 0; i < 260; i++) { const x = 40 + R() * 520, y = 280 + R() * 330; if (!GEO.pip(x, y, PK.WALK[1])) continue; g.fillStyle = 'rgba(230,226,215,.55)'; g.fillRect(x, y, 2, 2); }
+  // breakwater: tetrapods in the water, then the concrete top
+  const tetra = (x, y, s) => { g.fillStyle = '#9CA3A7'; g.strokeStyle = '#6E767B'; g.lineWidth = 2; for (let k = 0; k < 3; k++) { const a = k * 2.094 + .5; g.beginPath(); g.ellipse(x + Math.cos(a) * s * .5, y + Math.sin(a) * s * .35, s * .45, s * .22, a, 0, Math.PI * 2); g.fill(); g.stroke(); } g.beginPath(); g.arc(x, y, s * .28, 0, Math.PI * 2); g.fill(); g.stroke(); };
+  for (let y = 175; y < 560; y += 34) { tetra(1186, y + (y % 68 ? 8 : 0), 30); tetra(1334, y + (y % 68 ? 0 : 10), 30); }
+  g.fillStyle = '#8E9497'; g.fillRect(1196, 146, 128, 456); g.fillStyle = '#C6CACC'; g.fillRect(1204, 146, 112, 456);
+  g.strokeStyle = 'rgba(0,0,0,.08)'; for (let y = 170; y < 600; y += 46) { g.beginPath(); g.moveTo(1204, y); g.lineTo(1316, y); g.stroke(); }
+  g.fillStyle = '#F2C94C'; for (let y = 160; y < 600; y += 60) { g.fillRect(1206, y, 6, 22); g.fillRect(1308, y + 30, 6, 22); }
+  // grass and bushes along the bottom
+  g.fillStyle = '#86B862'; g.fillRect(0, 968, PK.W, 32);
+  for (let i = 0; i < 70; i++) { const x = R() * PK.W, s = 14 + R() * 18; g.fillStyle = R() < .5 ? '#6E9E4C' : '#7DAF57'; g.beginPath(); g.arc(x, 978 + R() * 10, s, 0, Math.PI * 2); g.fill(); }
+  return c;
+}
+function pkSay(g, txt, x, y, o = {}) { // a short label on the ground (signs): drawn at screen size by the UI pass
+  (PKS.labels || (PKS.labels = [])).push({ txt, x, y, o });
+}
+function pkDrawProps(g, t, night) {
+  const out = [];
+  // the lighthouse (빨간 등대) at the end of the breakwater
+  out.push({ y: 142, d() {
+    const x = 1260, y = 142;
+    g.fillStyle = 'rgba(0,0,0,.18)'; g.beginPath(); g.ellipse(x, y + 4, 34, 9, 0, 0, Math.PI * 2); g.fill();
+    for (let i = 0; i < 6; i++) { const y0 = y - i * 20, w0 = 46 - i * 2.6, w1 = 46 - (i + 1) * 2.6; g.fillStyle = i % 2 ? '#F7F3EC' : '#D8412F'; g.beginPath(); g.moveTo(x - w0 / 2, y0); g.lineTo(x + w0 / 2, y0); g.lineTo(x + w1 / 2, y0 - 20); g.lineTo(x - w1 / 2, y0 - 20); g.closePath(); g.fill(); }
+    g.fillStyle = '#2A3440'; g.fillRect(x - 20, y - 126, 40, 8);
+    const on = (Math.sin(t * 2.2) + 1) / 2;
+    g.fillStyle = night ? `rgba(255,236,150,${.65 + on * .35})` : '#FFE9A6'; g.fillRect(x - 13, y - 146, 26, 20);
+    g.fillStyle = '#2A3440'; g.beginPath(); g.moveTo(x - 17, y - 146); g.lineTo(x, y - 162); g.lineTo(x + 17, y - 146); g.closePath(); g.fill();
+    pkSay(g, t_('pk_light'), x, y + 22, { small: true });
+  } });
+  // tackle shop (낚시점)
+  out.push({ y: 800, d() {
+    const x = 300, y = 800;
+    g.fillStyle = 'rgba(0,0,0,.16)'; g.beginPath(); g.ellipse(x, y + 4, 92, 14, 0, 0, Math.PI * 2); g.fill();
+    g.fillStyle = '#FBF7EF'; g.fillRect(x - 76, y - 92, 152, 92); g.strokeStyle = '#2B2433'; g.lineWidth = 2; g.strokeRect(x - 76, y - 92, 152, 92);
+    g.fillStyle = '#2F6FB5'; g.fillRect(x - 76, y - 38, 152, 38); g.strokeRect(x - 76, y - 38, 152, 38);
+    for (let i = 0; i < 8; i++) { g.fillStyle = i % 2 ? '#FFFFFF' : '#D8412F'; g.beginPath(); g.moveTo(x - 86 + i * 21.5, y - 124); g.lineTo(x - 86 + (i + 1) * 21.5, y - 124); g.lineTo(x - 86 + (i + 1) * 21.5, y - 96); g.arc(x - 86 + i * 21.5 + 10.75, y - 96, 10.75, 0, Math.PI); g.closePath(); g.fill(); }
+    g.fillStyle = '#0B2230'; g.fillRect(x - 54, y - 152, 108, 26);
+    g.strokeStyle = '#B98A57'; g.lineWidth = 3; for (let i = 0; i < 4; i++) { g.beginPath(); g.moveTo(x + 86 + i * 8, y); g.lineTo(x + 96 + i * 10, y - 120 + i * 6); g.stroke(); }
+    g.fillStyle = '#F2C94C'; g.fillRect(x - 64, y - 70, 18, 18); g.fillStyle = '#5BB6C9'; g.fillRect(x - 40, y - 74, 14, 22); g.fillStyle = '#FF5A1F'; g.fillRect(x + 30, y - 72, 20, 20);
+    pkSay(g, t_('pk_shop'), x, y - 139, { light: true });
+  } });
+  // notice board (오늘의 대물)
+  out.push({ y: 660, d() {
+    const x = 720, y = 660;
+    g.fillStyle = '#7A5230'; g.fillRect(x - 58, y - 92, 8, 92); g.fillRect(x + 50, y - 92, 8, 92);
+    g.fillStyle = '#B07A45'; g.fillRect(x - 66, y - 118, 132, 72); g.strokeStyle = '#5E3E22'; g.lineWidth = 3; g.strokeRect(x - 66, y - 118, 132, 72);
+    g.fillStyle = '#FFFDF5'; g.fillRect(x - 56, y - 108, 50, 34); g.fillRect(x + 2, y - 104, 52, 28); g.fillStyle = '#FFE38A'; g.fillRect(x - 20, y - 70, 40, 18);
+    g.fillStyle = '#D8412F'; g.beginPath(); g.arc(x - 31, y - 106, 3, 0, 7); g.fill(); g.beginPath(); g.arc(x + 28, y - 102, 3, 0, 7); g.fill();
+    pkSay(g, t_('pk_board'), x, y - 124);
+  } });
+  // campfire with log benches
+  out.push({ y: 830, d() {
+    const x = 1010, y = 830;
+    for (const [bx, by, w] of [[-92, 6, 70], [92, 6, 70], [0, 62, 90]]) { g.fillStyle = '#8B5A33'; g.beginPath(); g.ellipse(x + bx, y + by, w / 2, 11, 0, 0, Math.PI * 2); g.fill(); g.fillStyle = '#A8723F'; g.beginPath(); g.ellipse(x + bx, y + by - 4, w / 2, 8, 0, 0, Math.PI * 2); g.fill(); }
+    g.fillStyle = '#7C7F84'; for (let i = 0; i < 10; i++) { const a = i / 10 * Math.PI * 2; g.beginPath(); g.arc(x + Math.cos(a) * 30, y + Math.sin(a) * 13, 7, 0, 7); g.fill(); }
+    g.strokeStyle = '#5E3E22'; g.lineWidth = 7; g.beginPath(); g.moveTo(x - 20, y + 5); g.lineTo(x + 20, y - 5); g.moveTo(x - 20, y - 5); g.lineTo(x + 20, y + 5); g.stroke();
+    for (let i = 0; i < 3; i++) { const f = Math.sin(t * 9 + i * 2) * 4, h = 34 + Math.sin(t * 7 + i) * 6 - i * 7; g.fillStyle = ['#FF8A1F', '#FFB52E', '#FFE27A'][i]; g.beginPath(); g.moveTo(x - 14 + i * 4, y); g.quadraticCurveTo(x - 10 + f, y - h * .6, x + f * .5, y - h); g.quadraticCurveTo(x + 10 + f, y - h * .6, x + 14 - i * 4, y); g.closePath(); g.fill(); }
+  } });
+  // measuring board with a little tank (계측대)
+  out.push({ y: 735, d() {
+    const x = 1400, y = 735;
+    g.fillStyle = '#5E6A73'; g.fillRect(x - 52, y - 40, 8, 40); g.fillRect(x + 44, y - 40, 8, 40);
+    g.fillStyle = 'rgba(130,210,235,.55)'; g.fillRect(x - 62, y - 108, 124, 70); g.strokeStyle = '#E8F4F8'; g.lineWidth = 3; g.strokeRect(x - 62, y - 108, 124, 70);
+    g.fillStyle = '#E9D9AA'; g.fillRect(x - 60, y - 48, 120, 9);
+    const sp = SPI[(PKS.best && PKS.best.sp) || 'madai'] || SPI.madai;
+    if (sp) { g.save(); g.beginPath(); g.rect(x - 60, y - 106, 120, 66); g.clip(); FD.draw(g, sp, x + Math.sin(t * .8) * 34, y - 74 + Math.sin(t * 1.7) * 4, 64, { t, flip: Math.cos(t * .8) < 0 }); g.restore(); }
+    g.fillStyle = '#F2F0EA'; g.fillRect(x - 62, y - 30, 124, 14); g.fillStyle = '#2B2433'; for (let i = 0; i <= 12; i++) g.fillRect(x - 60 + i * 10, y - 30, 1.5, i % 5 ? 6 : 10);
+    pkSay(g, t_('pk_tank'), x, y - 114);
+  } });
+  // the duel rocks (대결 바위)
+  out.push({ y: 655, d() {
+    const x = 560, y = 655;
+    for (const dx of [-30, 30]) { g.fillStyle = '#6E6862'; g.beginPath(); g.ellipse(x + dx, y, 26, 12, 0, 0, 7); g.fill(); g.fillStyle = '#8A847D'; g.beginPath(); g.ellipse(x + dx, y - 4, 22, 8, 0, 0, 7); g.fill(); }
+    g.strokeStyle = '#5E3E22'; g.lineWidth = 4; g.beginPath(); g.moveTo(x, y - 6); g.lineTo(x, y - 70); g.stroke();
+    g.fillStyle = '#FF5A1F'; g.beginPath(); g.moveTo(x, y - 70); g.lineTo(x + 34, y - 60); g.lineTo(x, y - 50); g.closePath(); g.fill();
+    pkSay(g, t_('pk_duel'), x, y + 22, { small: true });
+  } });
+  // lamp posts
+  for (const [lx, ly] of PK.LAMPS) out.push({ y: ly, d() { g.fillStyle = '#2E3A46'; g.fillRect(lx - 3, ly - 76, 6, 76); g.fillRect(lx - 9, ly - 4, 18, 6); g.fillStyle = night ? '#FFE9A6' : '#E8EEF2'; g.beginPath(); g.arc(lx, ly - 82, 9, 0, 7); g.fill(); } });
+  // the entrance sign
+  out.push({ y: 975, d() { const x = 800, y = 975; g.fillStyle = '#7A5230'; g.fillRect(x - 96, y - 66, 8, 66); g.fillRect(x + 88, y - 66, 8, 66); g.fillStyle = '#B07A45'; g.fillRect(x - 104, y - 86, 208, 30); g.strokeStyle = '#5E3E22'; g.lineWidth = 3; g.strokeRect(x - 104, y - 86, 208, 30); pkSay(g, t_('pk_gate'), x, y - 71, { light: true }); } });
+  return out;
+}
+const t_ = k => t(k);
+function pkWater(g, t, night) {
+  // glints moving across the sea, foam at the beach, a boat on the horizon, a moored boat, gulls
+  const R = FD.seeded(7);
+  for (let i = 0; i < 60; i++) { const bx = R() * PK.W, y = 110 + R() * 330, sp = 6 + R() * 10; const x = (bx + t * sp) % PK.W; if (pkIn(x, y)) continue; g.fillStyle = `rgba(255,255,255,${.12 + .2 * Math.abs(Math.sin(t * 1.3 + i))})`; g.fillRect(x, y, 10 + R() * 12, 2); }
+  g.strokeStyle = 'rgba(255,255,255,.55)'; g.lineWidth = 3; g.beginPath();
+  const edge = PK.WALK[0].slice(5, 12);
+  edge.forEach(([x, y], i) => { const yy = y - 6 + Math.sin(t * 1.6 + x / 60) * 3; if (i) g.lineTo(x, yy); else g.moveTo(x, yy); }); g.stroke();
+  const bx = ((t * 18) % (PK.W + 300)) - 150;
+  g.fillStyle = 'rgba(245,245,240,.85)'; g.beginPath(); g.moveTo(bx - 20, 102); g.lineTo(bx + 20, 102); g.lineTo(bx + 14, 109); g.lineTo(bx - 14, 109); g.closePath(); g.fill();
+  g.fillStyle = 'rgba(255,255,255,.9)'; g.beginPath(); g.moveTo(bx, 100); g.lineTo(bx, 78); g.lineTo(bx + 14, 98); g.closePath(); g.fill();
+  const my = 395 + Math.sin(t * 1.4) * 2.5;
+  g.fillStyle = '#E9EEF2'; g.beginPath(); g.moveTo(1052, my); g.lineTo(1148, my); g.lineTo(1136, my + 18); g.lineTo(1064, my + 18); g.closePath(); g.fill();
+  g.fillStyle = '#2F6FB5'; g.fillRect(1064, my + 10, 72, 6); g.fillStyle = '#F7F3EC'; g.fillRect(1084, my - 20, 30, 20); g.fillStyle = '#5BB6C9'; g.fillRect(1090, my - 15, 8, 8); g.fillRect(1102, my - 15, 8, 8);
+  g.strokeStyle = 'rgba(40,40,40,.7)'; g.lineWidth = 2;
+  for (let i = 0; i < 3; i++) { const x = 420 + Math.cos(t * .21 + i * 2.1) * 330, y = 170 + Math.sin(t * .33 + i) * 55, w = 9 + Math.sin(t * 6 + i) * 2; g.beginPath(); g.moveTo(x - w, y); g.quadraticCurveTo(x - w / 2, y - 6, x, y); g.quadraticCurveTo(x + w / 2, y - 6, x + w, y); g.stroke(); }
+}
+
+/* ---------- people ---------- */
+const PKS = { on: false }; // the live state of the park on this device
+function pkPerson(uid) { return uid === myId() ? PKS.me : PKS.people.get(uid); }
+function pkDrawPerson(g, p, t) {
+  const a = p.uid === myId() ? S.me : S.anglers.get(p.uid); if (!a) return;
+  const img = CH.image(charOf(a, p.uid), 'full'); const h = PK.AV, w = h * 112 / 130;
+  const bob = p.moving ? Math.abs(Math.sin(t * 11)) * 3 : 0;
+  g.fillStyle = 'rgba(0,0,0,.18)'; g.beginPath(); g.ellipse(p.x, p.y, 15, 5, 0, 0, Math.PI * 2); g.fill();
+  if (img.complete && img.naturalWidth) {
+    g.save(); g.translate(p.x, p.y - bob + (p.act === 'sit' ? 10 : 0)); if (p.dir < 0) g.scale(-1, 1);
+    g.drawImage(img, -.375 * w, -.95 * h, w, h); g.restore();
+  }
+  // the line and float only from a fishing spot (in a duel away from the water, the ⚔️ above the head says it all)
+  const sp = (p.act === 'fish' || p.act === 'duel') && PK.SPOTS.find(s => s.id === p.spot);
+  if (sp && Math.hypot(sp.x - p.x, sp.y - p.y) < 150) {
+    const tipX = p.x + (.9375 - .375) * w * (p.dir < 0 ? -1 : 1), tipY = p.y - .95 * h + .046 * h;
+    const bx = (sp ? sp.x + sp.dx * 130 : p.x + 120 * p.dir), by = (sp ? sp.y + sp.dy * 130 : p.y - 120) + Math.sin(t * 3 + p.x) * 2;
+    g.strokeStyle = 'rgba(255,255,255,.75)'; g.lineWidth = 1; g.beginPath(); g.moveTo(tipX, tipY); g.quadraticCurveTo((tipX + bx) / 2, Math.max(tipY, by) + 18, bx, by); g.stroke();
+    g.fillStyle = '#FF3B2F'; g.beginPath(); g.arc(bx, by - 2, 3.5, Math.PI, 0); g.fill(); g.fillStyle = '#FFF'; g.beginPath(); g.arc(bx, by - 2, 3.5, 0, Math.PI); g.fill();
+  }
+}
+function pkSend(ev, payload) { if (PKS.room) PKS.room.send(ev, payload); }
+function pkMyPresence() { const m = PKS.me; return { u: myId(), x: Math.round(m.x), y: Math.round(m.y), d: m.dir, a: m.act || '', s: m.spot || '', b: PKS.best ? PKS.best.sp + '|' + PKS.best.len : '' }; }
+const pkTrackSoon = debounce(() => { if (PKS.on && PKS.room && PKS.subscribed) { PKS.lastTrack = nowMs(); PKS.room.track(pkMyPresence()); } }, 900);
+function pkSync(state) {
+  const me = myId(); const here = new Set();
+  for (const [key, metas] of Object.entries(state || {})) {
+    const m = metas && metas[metas.length - 1]; if (!m || !m.u || key === me || m.u === me) continue;
+    here.add(m.u);
+    let p = PKS.people.get(m.u);
+    if (!p) { p = { uid: m.u, x: m.x, y: m.y, tx: m.x, ty: m.y, dir: m.d || 1, act: m.a || '', spot: m.s || '', moving: false, since: nowMs() }; PKS.people.set(m.u, p); }
+    p.act = m.a || ''; p.spot = m.s || ''; p.best = m.b || ''; p.dir = m.d || p.dir;
+    if (!p.moving && Math.hypot(p.x - m.x, p.y - m.y) > 40) { p.x = m.x; p.y = m.y; p.tx = m.x; p.ty = m.y; p.path = []; }
+  }
+  for (const uid of [...PKS.people.keys()]) if (!here.has(uid)) {
+    PKS.people.delete(uid);
+    if (PKS.duel && PKS.duel.peer === uid && PKS.duel.state !== 'done') pkDuelGone();
+  }
+  if (!PKS.synced) {
+    PKS.synced = true;
+    // a full room: on to the next one
+    if (PKS.people.size >= PK.CAP && PKS.roomNo < PK.ROOMS) { const next = PKS.roomNo + 1; toast(t('pk_full', { a: PKS.roomNo, b: next }), 'info'); setTimeout(() => pkJoin(next), 50); return; }
+  }
+  pkPanel();
+}
+function pkMsg(ev, p) {
+  if (!p || p.u === myId()) return;
+  if (ev === 'mv') {
+    let q = PKS.people.get(p.u);
+    if (!q) { q = { uid: p.u, x: p.x, y: p.y, tx: p.x, ty: p.y, dir: 1, act: '', moving: false, since: nowMs() }; PKS.people.set(p.u, q); }
+    if (Math.hypot(q.x - p.x, q.y - p.y) > 90) { q.x = p.x; q.y = p.y; }
+    pkGo(q, p.tx, p.ty); q.act = ''; return;
+  }
+  if (ev === 'em') { const q = PKS.people.get(p.u); if (q && PK.EMO[p.e]) q.emote = { e: PK.EMO[p.e], until: nowMs() + 2600 }; return; }
+  pkDuelMsg(ev, p);
+}
+
+/* ---------- joining and leaving a room ---------- */
+function pkJoin(no) {
+  if (PKS.room) { try { PKS.room.leave(); } catch (e) { } PKS.room = null; }
+  PKS.roomNo = clamp(no || 1, 1, PK.ROOMS); lsSet('pkRoom', PKS.roomNo);
+  PKS.people = new Map(); PKS.synced = false; PKS.subscribed = false;
+  PKS.room = APP_AUTH.rt.room('zz-park-' + PKS.roomNo, myId(), {
+    events: PK.EVENTS,
+    sync: pkSync, msg: pkMsg,
+    status: st => {
+      PKS.subscribed = st === 'SUBSCRIBED'; PKS.status = st;
+      if (st === 'SUBSCRIBED') PKS.room.track(pkMyPresence());
+      pkPanel();
+    }
+  });
+  pkPanel();
+}
+function pkStart(el) {
+  PKS.on = true; PKS.people = new Map(); PKS.labels = []; PKS.font = null; PKS.paused = false;
+  const m = S.me && S.me.park; PKS.best = m && m.best ? m.best : null; PKS.stats = Object.assign({ n: 0, w: 0, l: 0, d: 0 }, (m && m.st) || {});
+  PKS.me = { uid: myId(), x: PK.SPAWN[0] + (Math.random() * 80 - 40), y: PK.SPAWN[1] - Math.random() * 30, tx: 0, ty: 0, dir: 1, act: '', moving: false };
+  PKS.me.tx = PKS.me.x; PKS.me.ty = PKS.me.y;
+  PKS.cam = { x: PKS.me.x, y: PKS.me.y }; PKS.tapAt = null;
+  PKS.bgImg = PKS.bgImg || pkBg();
+  PKS.chatStop = chatJoin(m2 => { const p = pkPerson(m2.uid); if (p) p.bubble = { txt: chatClean(m2.body), until: nowMs() + 6500 }; pkLog(); });
+  pkJoin(lsGet('pkRoom', 1));
+  PKS.last = performance.now(); PKS.raf = requestAnimationFrame(pkFrame);
+}
+function pkStop() {
+  if (!PKS.on) return;
+  if (PKS.duel && PKS.duel.state !== 'done') pkDuelAbort(true);
+  if (PKS.game) pkGameClose(true);
+  PKS.on = false; cancelAnimationFrame(PKS.raf);
+  if (PKS.room) { try { PKS.room.leave(); } catch (e) { } PKS.room = null; }
+  if (PKS.chatStop) { PKS.chatStop(); PKS.chatStop = null; }
+  pkSaveStats(true);
+}
+function pkSaveStats(now) {
+  if (!PKS.dirty || !S.me || !S.me.nick) return;
+  if (!now && nowMs() - (PKS.savedAt || 0) < 60e3) return;
+  PKS.dirty = false; PKS.savedAt = nowMs();
+  S.me.park = { best: PKS.best || null, st: PKS.stats };
+  store.saveMe();
+}
+
+/* ---------- the frame: move people, follow me with the camera, draw ---------- */
+function pkFrame(ts) {
+  if (!PKS.on) return;
+  PKS.raf = requestAnimationFrame(pkFrame);
+  const cv = PKS.cv; if (!cv || !cv.isConnected || document.hidden) { PKS.last = ts; return; }
+  const dt = Math.min(.05, (ts - PKS.last) / 1000); PKS.last = ts; const t = ts / 1000;
+  const step = p => {
+    const dx = p.tx - p.x, dy = p.ty - p.y, d = Math.hypot(dx, dy);
+    if (d > 1.5) { const s = Math.min(d, PK.SPEED * dt); p.x += dx / d * s; p.y += dy / d * s; p.moving = true; if (Math.abs(dx) > 2) p.dir = dx > 0 ? 1 : -1; }
+    else if (p.path && p.path.length) { const n = p.path.shift(); p.tx = n[0]; p.ty = n[1]; }
+    else if (p.moving) { p.x = p.tx; p.y = p.ty; p.moving = false; if (p === PKS.me) pkArrived(); }
+  };
+  step(PKS.me); for (const p of PKS.people.values()) step(p);
+  if (PKS.keys && PKS.keys.size) pkKeyWalk();
+  // camera
+  const r = cv.getBoundingClientRect(); const cw = r.width, ch = r.height; if (!cw || !ch) return;
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  if (cv.width !== Math.round(cw * dpr) || cv.height !== Math.round(ch * dpr)) { cv.width = Math.round(cw * dpr); cv.height = Math.round(ch * dpr); }
+  const zoom = PKS.zoom = clamp(Math.min(cw / 1100, ch / 690), .55, 1.1);
+  const hw = cw / 2 / zoom, hh = ch / 2 / zoom;
+  const cx = hw * 2 >= PK.W ? PK.W / 2 : clamp(PKS.me.x, hw, PK.W - hw), cy = hh * 2 >= PK.H ? PK.H / 2 : clamp(PKS.me.y - 40, hh, PK.H - hh);
+  PKS.cam.x += (cx - PKS.cam.x) * Math.min(1, dt * 5); PKS.cam.y += (cy - PKS.cam.y) * Math.min(1, dt * 5);
+  const g = PKS.ctx;
+  g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = '#0B4A73'; g.fillRect(0, 0, cv.width, cv.height / 2); g.fillStyle = '#7DAF57'; g.fillRect(0, cv.height / 2, cv.width, cv.height / 2);
+  g.setTransform(dpr * zoom, 0, 0, dpr * zoom, (cw / 2 - PKS.cam.x * zoom) * dpr, (ch / 2 - PKS.cam.y * zoom) * dpr);
+  g.drawImage(PKS.bgImg, 0, 0);
+  const { h } = pkKst(); const night = h >= 19.5 || h < 5.3, dusk = !night && (h >= 17 || h < 6.5);
+  pkWater(g, t, night);
+  // spots: a ring, brighter when I am close
+  const nearSpot = PKS.me.act ? null : pkNear(PK.SPOTS, PKS.me.x, PKS.me.y, 46);
+  for (const s of PK.SPOTS) { const busy = [...PKS.people.values()].some(p => p.spot === s.id && (p.act === 'fish' || p.act === 'duel')); g.strokeStyle = s === nearSpot ? `rgba(255,214,90,${.6 + .4 * Math.sin(t * 5)})` : busy ? 'rgba(255,255,255,.18)' : 'rgba(255,255,255,.45)'; g.lineWidth = 3; g.beginPath(); g.ellipse(s.x, s.y + 2, 20, 8, 0, 0, Math.PI * 2); g.stroke(); }
+  PKS.labels = [];
+  const items = pkDrawProps(g, t, night);
+  for (const p of [PKS.me, ...PKS.people.values()]) items.push({ y: p.y, d: () => pkDrawPerson(g, p, t) });
+  items.sort((a, b) => a.y - b.y); for (const it of items) it.d();
+  if (PKS.tapAt && nowMs() - PKS.tapAt.at < 700) { const k = (nowMs() - PKS.tapAt.at) / 700; g.strokeStyle = `rgba(255,255,255,${1 - k})`; g.lineWidth = 2; g.beginPath(); g.ellipse(PKS.tapAt.x, PKS.tapAt.y, 10 + k * 14, 4 + k * 6, 0, 0, Math.PI * 2); g.stroke(); }
+  // time of day (Korean time): dusk glow, night with the lamps, the fire and the lighthouse beam
+  g.setTransform(dpr, 0, 0, dpr, 0, 0);
+  if (night || dusk) {
+    g.fillStyle = night ? 'rgba(6,16,44,.46)' : 'rgba(255,128,60,.12)'; g.fillRect(0, 0, cw, ch);
+    if (night) {
+      g.globalCompositeOperation = 'lighter';
+      const glow = (x, y, rr, col) => { const sx = (x - PKS.cam.x) * zoom + cw / 2, sy = (y - PKS.cam.y) * zoom + ch / 2; const gr = g.createRadialGradient(sx, sy, 0, sx, sy, rr * zoom); gr.addColorStop(0, col); gr.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = gr; g.fillRect(sx - rr * zoom, sy - rr * zoom, rr * 2 * zoom, rr * 2 * zoom); };
+      for (const [lx, ly] of PK.LAMPS) glow(lx, ly - 82, 110, 'rgba(255,214,140,.30)');
+      glow(1010, 815, 150 + Math.sin(t * 9) * 8, 'rgba(255,150,60,.42)');
+      glow(1260, 6, 120, 'rgba(255,236,150,.45)');
+      const sx = (1260 - PKS.cam.x) * zoom + cw / 2, sy = (6 - PKS.cam.y) * zoom + ch / 2, a = t * .9;
+      g.fillStyle = 'rgba(255,240,170,.10)'; g.beginPath(); g.moveTo(sx, sy); g.arc(sx, sy, 900 * zoom, a - .12, a + .12); g.closePath(); g.fill();
+      g.globalCompositeOperation = 'source-over';
+    }
+  }
+  pkUI(g, cw, ch, zoom, t);
+  pkActBar(nearSpot);
+  if (PKS.game) pkGameStep(dt, t);
+  pkSaveStats(false);
+}
+/* names, speech bubbles, emotes and sign labels at screen size (readable at any zoom) */
+function pkFont() { return PKS.font || (PKS.font = getComputedStyle(document.body).fontFamily || 'sans-serif'); }
+function pkUI(g, cw, ch, zoom, t) {
+  const font = pkFont();
+  const sx = x => (x - PKS.cam.x) * zoom + cw / 2, sy = y => (y - PKS.cam.y) * zoom + ch / 2;
+  g.textAlign = 'center'; g.textBaseline = 'middle';
+  for (const L of PKS.labels) {
+    g.font = `700 ${L.o.small ? 11 : 12}px ${font}`; const w = g.measureText(L.txt).width + 12;
+    const x = sx(L.x), y = sy(L.y);
+    if (!L.o.light) { g.fillStyle = 'rgba(11,34,48,.72)'; pkRound(g, x - w / 2, y - 9, w, 18, 9); g.fill(); }
+    g.fillStyle = '#FFFFFF'; g.fillText(L.txt, x, y + .5);
+  }
+  const now = nowMs();
+  for (const p of [...PKS.people.values(), PKS.me]) {
+    const a = p.uid === myId() ? S.me : S.anglers.get(p.uid); if (!a) continue;
+    const x = sx(p.x), headY = sy(p.y - PK.AV - (p.act === 'sit' ? -10 : 0));
+    g.font = `700 12px ${font}`;
+    const nm = a.nick + '  Lv.' + lvInfo(a, p.uid).L; const w = g.measureText(nm).width + 14;
+    g.fillStyle = p.uid === myId() ? 'rgba(255,90,31,.92)' : 'rgba(11,34,48,.70)'; pkRound(g, x - w / 2, sy(p.y) + 6, w, 18, 9); g.fill();
+    g.fillStyle = '#FFF'; g.fillText(nm, x, sy(p.y) + 15.5);
+    let top = headY - 8;
+    if (p.act === 'duel') { g.font = `18px ${font}`; g.fillText('⚔️', x, top - 8); top -= 22; }
+    else if (p.act === 'fish') { g.font = `16px ${font}`; g.fillText('🎣', x, top - 8); top -= 20; }
+    if (p.emote && p.emote.until > now) { const k = 1 - Math.max(0, (p.emote.until - now - 2200) / 400); g.font = `${Math.round(26 * Math.min(1, .5 + k))}px ${font}`; g.fillText(p.emote.e, x, top - 14); top -= 34; }
+    if (p.bubble && p.bubble.until > now) {
+      const alpha = Math.min(1, (p.bubble.until - now) / 500);
+      g.font = `500 13px ${font}`; const lines = pkWrap(g, p.bubble.txt, 180).slice(0, 3);
+      const bw = Math.max(...lines.map(l => g.measureText(l).width)) + 18, bh = lines.length * 17 + 12;
+      g.globalAlpha = alpha; g.fillStyle = '#FFFFFF'; pkRound(g, x - bw / 2, top - bh - 8, bw, bh, 10); g.fill();
+      g.beginPath(); g.moveTo(x - 6, top - 9); g.lineTo(x + 6, top - 9); g.lineTo(x, top - 1); g.closePath(); g.fill();
+      g.strokeStyle = 'rgba(11,34,48,.15)'; g.lineWidth = 1; pkRound(g, x - bw / 2, top - bh - 8, bw, bh, 10); g.stroke();
+      g.fillStyle = '#0B2230'; lines.forEach((l, i) => g.fillText(l, x, top - bh - 8 + 14 + i * 17)); g.globalAlpha = 1;
+    }
+  }
+}
+function pkRound(g, x, y, w, h, r) { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); }
+function pkWrap(g, s, max) { const out = []; let line = ''; for (const ch of [...String(s)]) { if (g.measureText(line + ch).width > max && line) { out.push(line); line = ch; } else line += ch; } if (line) out.push(line); return out; }
+
+/* ---------- moving: tap to walk, arrows / WASD on a keyboard ---------- */
+let pkSentAt = 0, pkSendTimer = null;
+function pkWalk(x, y) {
+  const me = PKS.me; if (me.act === 'duel') return;
+  if (me.act) { me.act = ''; me.spot = ''; pkTrackSoon(); }
+  pkGo(me, x, y);
+  // one message per tap at most every 250 ms (the latest wins): where I am and where I am going
+  const send = () => { pkSendTimer = null; pkSentAt = nowMs(); pkSend('mv', { u: myId(), x: Math.round(me.x), y: Math.round(me.y), tx: Math.round(me.gx), ty: Math.round(me.gy) }); };
+  clearTimeout(pkSendTimer); const wait = 250 - (nowMs() - pkSentAt); if (wait <= 0) send(); else pkSendTimer = setTimeout(send, wait);
+}
+function pkArrived() {
+  pkTrackSoon();
+  const pend = PKS.pending; PKS.pending = null;
+  if (pend && Math.hypot(PKS.me.x - pend.x, PKS.me.y - pend.y) < pend.r + 60) pkProp(pend.id);
+}
+function pkKeyWalk() {
+  if (nowMs() - (PKS.keyAt || 0) < 200) return; PKS.keyAt = nowMs();
+  let dx = 0, dy = 0; for (const k of PKS.keys) { if (k === 'ArrowLeft' || k === 'a') dx--; if (k === 'ArrowRight' || k === 'd') dx++; if (k === 'ArrowUp' || k === 'w') dy--; if (k === 'ArrowDown' || k === 's') dy++; }
+  if (dx || dy) { const n = Math.hypot(dx, dy); pkWalk(PKS.me.x + dx / n * 70, PKS.me.y + dy / n * 70); }
+}
+function pkTap(e) {
+  const cv = PKS.cv; const r = cv.getBoundingClientRect(); const z = PKS.zoom || 1;
+  const wx = (e.clientX - r.left - r.width / 2) / z + PKS.cam.x, wy = (e.clientY - r.top - r.height / 2) / z + PKS.cam.y;
+  // someone: their card; a prop: open it when close, walk there first when not; anywhere else: walk
+  for (const p of PKS.people.values()) if (Math.abs(wx - p.x) < 24 && wy > p.y - PK.AV - 6 && wy < p.y + 8) { pkCard(p.uid); return; }
+  if (Math.abs(wx - PKS.me.x) < 24 && wy > PKS.me.y - PK.AV - 6 && wy < PKS.me.y + 8) { pkEmotes(); return; }
+  for (const pr of PK.PROPS) if (Math.hypot(wx - pr.x, wy - (pr.y - 50)) < pr.r) {
+    if (Math.hypot(PKS.me.x - pr.x, PKS.me.y - pr.y) < pr.r + 60) { pkProp(pr.id); return; }
+    PKS.pending = pr; pkWalk(pr.x + (PKS.me.x < pr.x ? -pr.r * .7 : pr.r * .7), pr.y + 26); return;
+  }
+  PKS.tapAt = { x: wx, y: wy, at: nowMs() }; pkWalk(wx, wy);
+}
+
+/* ---------- the bar under the park: what I can do here, emotes, saying something ---------- */
+function pkActBar(nearSpot) {
+  const bar = $('#pk-act'); if (!bar) return;
+  const k = PKS.game ? 'game' : nearSpot ? 'spot:' + nearSpot.id : PKS.me.act === 'sit' ? 'sit' : (pkNearProp(PKS.me.x, PKS.me.y) || {}).id || '';
+  if (bar.dataset.k === k) return; bar.dataset.k = k;
+  if (k === 'game') { bar.innerHTML = ''; return; }
+  if (k.startsWith('spot:')) { bar.innerHTML = `<button class="btn btn-primary" data-pk="fish" data-spot="${k.slice(5)}">${icon('fish')}${t('pk_fish_here')}</button>`; return; }
+  if (k === 'fire') { bar.innerHTML = `<button class="btn btn-line" data-pk="sit">${t('pk_sit')}</button>`; return; }
+  if (k === 'sit') { bar.innerHTML = `<button class="btn btn-line" data-pk="stand">${t('pk_stand')}</button>`; return; }
+  bar.innerHTML = k ? `<button class="btn btn-line" data-pk="prop" data-prop="${k}">${t('pk_open_' + k)}</button>` : `<span class="muted small">${t('pk_hint')}</span>`;
+}
+function pkEmotes() {
+  const box = $('#pk-emo'); if (!box) return;
+  box.hidden = !box.hidden;
+}
+function pkEmote(i) {
+  if (!PK.EMO[i]) return; PKS.me.emote = { e: PK.EMO[i], until: nowMs() + 2600 };
+  if (nowMs() - (PKS.emoAt || 0) > 900) { PKS.emoAt = nowMs(); pkSend('em', { u: myId(), e: i }); }
+  const box = $('#pk-emo'); if (box) box.hidden = true;
+}
+function pkLog() {
+  const box = $('#pk-log'); if (!box) return;
+  const list = CHAT.msgs.filter(m => !chatHidden(m.id)).slice(-4);
+  box.innerHTML = list.map(m => { const a = S.anglers.get(m.uid); return `<li><b>${esc((a && a.nick) || m.nick)}</b> ${esc(chatClean(m.body))}</li>`; }).join('');
+}
+/* who is here (also the way to reach someone without tapping the picture) */
+function pkPanel() {
+  const box = $('#pk-people'); if (!box || !PKS.on) return;
+  const st = $('#pk-status');
+  if (st) st.textContent = PKS.subscribed ? t('pk_here', { n: PKS.people.size + 1, room: PKS.roomNo }) : PKS.status === 'CHANNEL_ERROR' || PKS.status === 'TIMED_OUT' ? t('pk_reconnect') : t('pk_joining');
+  $$('[data-pkroom]').forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.pkroom === PKS.roomNo)));
+  const rows = [...PKS.people.values()].map(p => ({ p, a: S.anglers.get(p.uid) })).filter(x => x.a && x.a.nick);
+  box.innerHTML = rows.length ? rows.map(({ p, a }) => `<li><button class="pk-person" data-pkwho="${esc(p.uid)}">${avatar(a, 28)}<span><b>${esc(a.nick)}</b>${lvMini(a, p.uid)}<span class="muted small">${p.act === 'duel' ? t('pk_st_duel') : p.act === 'fish' ? t('pk_st_fish') : p.act === 'sit' ? t('pk_st_sit') : ''}</span></span></button></li>`).join('')
+    : `<li class="muted small pk-alone">${t('pk_alone')}</li>`;
+}
+function pkCard(uid) {
+  const a = S.anglers.get(uid); if (!a) return;
+  const p = PKS.people.get(uid); const rel = relation(uid); const pk = a.park || {}; const st = pk.st || {};
+  const busy = !p || p.act === 'duel' || !!PKS.duel || !!PKS.game;
+  const w = openModal(`<div class="pk-card">
+    <div class="pk-card-top">${avatar(a, 56)}<div><h2>${esc(a.nick)} ${lvMini(a, uid)}${teamTag(uid)}</h2>
+      <p class="muted small">${t('pk_card_stats', { w: st.w || 0, l: st.l || 0, n: st.n || 0 })}${pk.best && SPI[pk.best.sp] ? ` · ${t('pk_card_best', { fish: `${esc(nameOf(pk.best.sp))} ${lenFmt(pk.best.len)}` })}` : ''}</p></div></div>
+    <div class="actions col">
+      <button class="btn btn-primary btn-block" data-pkc="duel" ${busy ? 'disabled' : ''}>⚔️ ${t('pk_duel_ask')}</button>
+      ${rel === 'friend' ? `<button class="btn btn-line btn-block" data-pkc="dm">${icon('chat')}${t('pk_dm')}</button>` : `<div class="pk-fr">${frBtns(uid, rel)}</div>`}
+      <button class="btn btn-ghost btn-block" data-pkc="sea">${icon('sea')}${t('pk_see_sea')}</button>
+    </div>
+    ${busy && p && p.act === 'duel' ? `<p class="hint">${t('pk_busy')}</p>` : ''}
+  </div>`, { label: a.nick });
+  w.addEventListener('click', e => {
+    const b = e.target.closest('[data-pkc]'); if (!b) return;
+    if (b.dataset.pkc === 'duel') { closeModal(w); pkDuelAsk(uid); }
+    else if (b.dataset.pkc === 'dm') { closeModal(w); dmOpen(uid); }
+    else if (b.dataset.pkc === 'sea') { closeModal(w); openSeaOf(uid); }
+  });
+}
+function pkProp(id) {
+  if (id === 'board') { openWeekly(); return; }
+  if (id === 'shop') { pkShop(); return; }
+  if (id === 'fire') { pkSit(true); return; }
+  if (id === 'light') { pkLight(); return; }
+  if (id === 'tank') { pkTank(); return; }
+  if (id === 'duel') { toast(t('pk_duel_how'), 'info', 5200); }
+}
+function pkSit(on) { PKS.me.act = on ? 'sit' : ''; PKS.me.spot = ''; pkTrackSoon(); }
+function pkShop() {
+  const m = pkKst().m; const top = pkPool(m).slice(0, 4);
+  openModal(`<div class="pk-shop"><h2>${icon('lure')} ${t('pk_shop')}</h2><p class="lede">${t('pk_shop_sub')}</p>
+    <ul class="pk-shop-list">${top.map(x => { const sp = SPI[x.id]; const baits = [...(sp.b || []).map(b => dict(BAIT[b])), ...(sp.lu || []).map(l => dict(LURE[l]))].slice(0, 3); return `<li><img src="${FD.thumb(sp, 120, 66)}" alt=""><span><b>${esc(spName(sp))}</b><span class="muted small">${esc(baits.join(' · '))}</span></span></li>`; }).join('')}</ul>
+    <a class="btn btn-line" href="#tackle">${t('pk_shop_more')}</a></div>`, { label: t('pk_shop') });
+}
+function pkLight() {
+  const w = openModal(`<div class="pk-light"><h2>${t('pk_light')}</h2><p class="lede">${t('pk_light_sub')}</p>${typeof wxCardHTML === 'function' && wxOn() ? wxCardHTML() : `<p class="muted">${t('pk_light_none')}</p>`}</div>`, { wide: true, label: t('pk_light') });
+  try { if (typeof wxHydrate === 'function') wxHydrate(w); } catch (e) { }
+}
+function pkTank() {
+  const rows = [...PKS.people.values()].map(p => ({ uid: p.uid, b: p.best })).concat([{ uid: myId(), b: PKS.best ? PKS.best.sp + '|' + PKS.best.len : '' }])
+    .map(x => { const [sp, len] = String(x.b || '').split('|'); return { uid: x.uid, sp, len: +len, r: SPI[sp] ? +len / SPI[sp].L : 0 }; }).filter(x => x.r > 0).sort((a, b) => b.r - a.r).slice(0, 8);
+  openModal(`<div class="pk-tank"><h2>${t('pk_tank')}</h2><p class="lede">${t('pk_tank_sub')}</p>
+    ${rows.length ? `<ol class="pk-tank-list">${rows.map((x, i) => { const a = x.uid === myId() ? S.me : S.anglers.get(x.uid); return `<li><span class="wk-rank r${i + 1}">${i + 1}</span>${avatar(a, 28)}<b>${esc((a && a.nick) || '?')}</b><span>${esc(nameOf(x.sp))} ${lenFmt(x.len)}</span></li>`; }).join('')}</ol>` : `<p class="muted">${t('pk_tank_none')}</p>`}
+    <p class="hint">${t('pk_game_note')}</p></div>`, { label: t('pk_tank') });
+}
+
+/* ---------- the fishing game: cast, wait for the float to dip (찌릿!), strike, then reel without snapping the line ---------- */
+function pkPool(m) {
+  if (PK_POOL.m === m) return PK_POOL.list;
+  const list = GEO.regionPrior('KS', m).filter(x => SPI[x.id] && SPI[x.id].w !== 'F' && SPI[x.id].L > 0 && SPI[x.id].X > 0).slice(0, 18);
+  let tot = 0; for (const x of list) tot += x.p;
+  PK_POOL = { m, list: list.map(x => ({ id: x.id, p: x.p / (tot || 1) })) };
+  return PK_POOL.list;
+}
+// the same seed gives the same fish in the same order: in a duel both players get exactly the same sea
+function pkFish(seed, idx, m) {
+  const R = FD.seeded((seed ^ Math.imul(idx + 1, 2654435761)) >>> 0);
+  const pool = pkPool(m); let r = R(), sp = pool.length ? pool[0].id : 'madai';
+  for (const x of pool) { r -= x.p; if (r <= 0) { sp = x.id; break; } }
+  const s0 = SPI[sp]; const trophy = R() < .07;
+  let len = trophy ? s0.L * (1.15 + .35 * R()) : s0.L * (.55 + .5 * R() + .25 * R() * R());
+  len = Math.round(Math.max(8, Math.min(s0.X * .97, len)) * 10) / 10;
+  const q = len / s0.L, wait = 1.6 + R() * 4.2;
+  const nibs = []; for (let i = Math.floor(R() * 3); i > 0; i--) nibs.push(.5 + R() * Math.max(.2, wait - 1));
+  const win = clamp(1.05 - .25 * (q - 1), .55, 1.1);
+  const pulls = []; let at = .8 + R() * 1.2; while (at < 40) { const d = .5 + R() * .5; pulls.push([at, at + d]); at += d + .9 + R() * 1.6 / Math.max(.6, q); }
+  return { sp, len, q, wait, nibs, win, pulls, trophy };
+}
+function pkGameOpen(mode, opts = {}) {
+  const box = $('#pk-game'); if (!box) return;
+  const spot = PK.SPOTS.find(s => s.id === opts.spot) || pkNear(PK.SPOTS, PKS.me.x, PKS.me.y, 80) || null; // a duel can start anywhere
+  PKS.game = { mode, seed: (opts.seed >>> 0) || ((Math.random() * 2 ** 32) >>> 0), m: opts.m != null ? opts.m : pkKst().m, idx: 0, phase: mode === 'duel' ? 'wait' : 'ready', pt: 0, f: null, T: 35, D: 100, slack: 0, hold: false, bag: [], score: 0, msg: '', spot };
+  if (mode === 'duel') PKS.game.f = pkFish(PKS.game.seed, 0, PKS.game.m);
+  if (PKS.me.moving || (PKS.me.path && PKS.me.path.length)) pkWalk(PKS.me.x, PKS.me.y); // stop where I am (and tell the others)
+  PKS.me.act = mode === 'duel' ? 'duel' : 'fish'; PKS.me.spot = spot ? spot.id : ''; if (spot && spot.dx) PKS.me.dir = spot.dx < 0 ? -1 : 1; pkTrackSoon();
+  box.hidden = false; box.className = 'pk-game mode-' + mode;
+  box.innerHTML = `<div class="pkg-top"><b id="pkg-title">${mode === 'duel' ? '⚔️ ' + t('pk_duel_vs', { nick: esc((S.anglers.get(PKS.duel.peer) || {}).nick || '?') }) : '🎣 ' + t('pk_fishing')}</b><span class="pkg-time num" id="pkg-time"></span>${mode === 'duel' ? '' : `<button class="pkg-x" data-pkg="quit" aria-label="${esc(t('close'))}">${icon('close')}</button>`}</div>
+    ${mode === 'duel' ? `<div class="pkg-score"><span>${t('pk_me')} <b class="num" id="pkg-my">0</b></span><span>${t('pk_them')} <b class="num" id="pkg-op">0</b></span></div>` : ''}
+    <canvas id="pkg-cv" aria-hidden="true"></canvas>
+    <div class="pkg-meters"><div class="pkg-meter" title="${esc(t('pk_tension'))}"><span class="pkg-zone"></span><i id="pkg-t"></i></div><div class="pkg-meter dist" title="${esc(t('pk_distance'))}"><i id="pkg-d"></i></div></div>
+    <p class="pkg-msg" id="pkg-msg" aria-live="polite"></p>
+    <button class="btn btn-primary btn-lg btn-block pkg-btn" id="pkg-btn"></button>
+    <div class="pkg-bag" id="pkg-bag"></div>`;
+  const btn = $('#pkg-btn', box);
+  const down = e => { e.preventDefault(); pkGameInput(true); }, up = e => { e.preventDefault(); pkGameInput(false); };
+  btn.addEventListener('pointerdown', down); btn.addEventListener('pointerup', up); btn.addEventListener('pointerleave', up); btn.addEventListener('pointercancel', up);
+  btn.addEventListener('keydown', e => { if ((e.key === ' ' || e.key === 'Enter') && !e.repeat) { e.preventDefault(); pkGameInput(true); } });
+  btn.addEventListener('keyup', e => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); pkGameInput(false); } });
+  box.querySelector('[data-pkg="quit"]')?.addEventListener('click', () => pkGameClose());
+  pkGameView();
+  setTimeout(() => btn.focus({ preventScroll: true }), 50);
+}
+function pkGameClose(silent) {
+  const box = $('#pk-game'); if (box) { box.hidden = true; box.innerHTML = ''; }
+  PKS.game = null; if (PKS.me) { PKS.me.act = ''; PKS.me.spot = ''; } if (!silent) pkTrackSoon();
+  const bar = $('#pk-act'); if (bar) bar.dataset.k = '';
+}
+function pkGameInput(down) {
+  const G = PKS.game; if (!G) return;
+  if (!down) { G.hold = false; return; }
+  if (G.phase === 'ready') { G.f = pkFish(G.seed, G.idx, G.m); G.phase = 'wait'; G.pt = 0; G.msg = ''; }
+  else if (G.phase === 'wait') { G.phase = 'lost'; G.pt = 0; G.msg = t('pk_early'); G.again = true; } // too soon: the fish swam off (the same fish comes back)
+  else if (G.phase === 'bite') { G.phase = 'fight'; G.pt = 0; G.T = 35; G.D = 100; G.slack = 0; G.hold = true; G.msg = ''; }
+  else if (G.phase === 'fight') G.hold = true;
+  else if ((G.phase === 'got' || G.phase === 'lost') && G.mode === 'solo' && G.pt > .4) { if (G.phase === 'lost' && !G.again) G.idx++; G.again = false; G.f = pkFish(G.seed, G.idx, G.m); G.phase = 'wait'; G.pt = 0; G.msg = ''; }
+  pkGameView();
+}
+function pkGameStep(dt, t) {
+  const G = PKS.game; if (!G) return;
+  const D = PKS.duel;
+  if (G.mode === 'duel') {
+    if (!D || D.state === 'count') { pkGameView(); pkGameDraw(t); return; }
+    if (D.state === 'play' && performance.now() >= D.end) { G.phase = 'over'; G.hold = false; pkDuelFinish(); }
+  }
+  G.pt += dt; const f = G.f;
+  if (G.phase === 'wait' && f && G.pt >= f.wait) { G.phase = 'bite'; G.pt = 0; if (navigator.vibrate) try { navigator.vibrate(60); } catch (e) { } }
+  else if (G.phase === 'bite' && G.pt > f.win) { G.phase = 'lost'; G.pt = 0; G.msg = t_('pk_missed'); G.again = false; }
+  else if (G.phase === 'fight') {
+    const pull = f.pulls.some(([a, b]) => G.pt >= a && G.pt < b);
+    if (G.hold) { G.D -= (24 / (.7 + .5 * f.q)) * (G.T >= 40 && G.T <= 85 ? 1.25 : .8) * dt; G.T += (16 + 10 * f.q + (pull ? 42 : 0)) * dt; }
+    else { G.T -= 34 * dt; G.D += (pull ? 10 : 3) * dt; }
+    G.T = clamp(G.T, 0, 100); G.D = clamp(G.D, 0, 100);
+    G.slack = G.T < 6 ? G.slack + dt : 0;
+    if (G.T >= 100) { G.phase = 'lost'; G.pt = 0; G.msg = t_('pk_snap'); G.again = false; if (navigator.vibrate) try { navigator.vibrate([40, 40, 40]); } catch (e) { } }
+    else if (G.slack > 2.2) { G.phase = 'lost'; G.pt = 0; G.msg = t_('pk_slip'); G.again = false; }
+    else if (G.D <= 0) pkGameGot();
+  }
+  else if (G.mode === 'duel' && (G.phase === 'got' || G.phase === 'lost') && G.pt > (G.phase === 'got' ? 1.1 : .9)) {
+    if (!G.again) G.idx++; G.again = false; G.f = pkFish(G.seed, G.idx, G.m); G.phase = 'wait'; G.pt = 0; G.msg = '';
+  }
+  pkGameView(); pkGameDraw(t);
+}
+function pkGameGot() {
+  const G = PKS.game; const f = G.f; const s0 = SPI[f.sp];
+  const sc = Math.round(100 * f.len / s0.L);
+  G.phase = 'got'; G.pt = 0; G.again = false; G.score += sc; G.bag.push({ sp: f.sp, len: f.len, s: sc });
+  G.msg = t(f.trophy ? 'pk_got_big' : 'pk_got', { fish: `${nameOf(f.sp)} ${lenFmt(f.len)}` });
+  if (G.mode === 'solo') {
+    G.idx++; PKS.stats.n = (PKS.stats.n || 0) + 1; PKS.dirty = true;
+    if (!PKS.best || f.len / s0.L > PKS.best.len / ((SPI[PKS.best.sp] || s0).L)) { PKS.best = { sp: f.sp, len: f.len, at: nowMs() }; G.msg += ' · ' + t('pk_new_best'); pkTrackSoon(); }
+  } else if (PKS.duel) { PKS.duel.my = { n: G.bag.length, s: G.score }; pkSend('df', { id: PKS.duel.id, u: myId(), n: G.bag.length, s: G.score }); }
+}
+function pkGameView() {
+  const G = PKS.game; if (!G) return;
+  const btn = $('#pkg-btn'), msg = $('#pkg-msg'), T = $('#pkg-t'), Dm = $('#pkg-d'), time = $('#pkg-time'), bag = $('#pkg-bag');
+  if (!btn) return;
+  const lab = { ready: t('pk_cast'), wait: t('pk_wait'), bite: t('pk_strike'), fight: t('pk_reel'), got: G.mode === 'solo' ? t('pk_again') : t('pk_next'), lost: G.mode === 'solo' ? t('pk_again') : t('pk_next'), over: t('pk_over') }[G.phase] || '';
+  if (btn.textContent !== lab) btn.textContent = lab;
+  btn.classList.toggle('hot', G.phase === 'bite'); btn.disabled = G.phase === 'over' || (G.mode === 'duel' && PKS.duel && PKS.duel.state === 'count');
+  const hint = G.phase === 'wait' ? t('pk_wait_hint') : G.phase === 'bite' ? t('pk_bite') : G.phase === 'fight' ? t('pk_fight_hint') : G.phase === 'ready' ? t('pk_ready_hint') : '';
+  const text = G.msg || hint; if (msg.textContent !== text) msg.textContent = text;
+  if (T) { T.style.width = (G.phase === 'fight' ? G.T : 0) + '%'; T.classList.toggle('danger', G.T > 85); }
+  if (Dm) Dm.style.width = (G.phase === 'fight' ? 100 - G.D : 0) + '%';
+  if (G.mode === 'duel' && PKS.duel) {
+    const d = PKS.duel; const left = d.state === 'count' ? Math.ceil((d.t0 - performance.now()) / 1000) : Math.max(0, Math.ceil((d.end - performance.now()) / 1000));
+    if (time) time.textContent = d.state === 'count' ? t('pk_count', { n: Math.max(1, left) }) : t('pk_left', { n: left });
+    const my = $('#pkg-my'), op = $('#pkg-op'); if (my) my.textContent = fmtN(G.score); if (op) op.textContent = fmtN((d.op && d.op.s) || 0);
+  } else if (time) time.textContent = G.bag.length ? t('pk_bag_n', { n: G.bag.length }) : '';
+  if (bag && bag.dataset.n !== String(G.bag.length)) { bag.dataset.n = String(G.bag.length); bag.innerHTML = G.bag.slice(-6).reverse().map(x => `<span class="pkg-fish"><img src="${FD.thumb(SPI[x.sp], 90, 50)}" alt=""><span>${esc(nameOf(x.sp))} ${lenFmt(x.len)}</span></span>`).join(''); }
+}
+function pkGameDraw(t) {
+  const G = PKS.game; const cv = $('#pkg-cv'); if (!G || !cv) return;
+  const r = cv.getBoundingClientRect(); const w = r.width, h = r.height; if (!w || !h) return;
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  if (cv.width !== Math.round(w * dpr)) { cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); }
+  const g = cv.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const sky = g.createLinearGradient(0, 0, 0, h); sky.addColorStop(0, '#9ED4EA'); sky.addColorStop(.32, '#9ED4EA'); sky.addColorStop(.33, '#2E8CC0'); sky.addColorStop(1, '#0E4E78');
+  g.fillStyle = sky; g.fillRect(0, 0, w, h);
+  const sea = h * .33;
+  g.strokeStyle = 'rgba(255,255,255,.5)'; g.lineWidth = 2; g.beginPath(); for (let x = 0; x <= w; x += 8) { const y = sea + Math.sin(x / 18 + t * 2) * 2; if (x) g.lineTo(x, y); else g.moveTo(x, y); } g.stroke();
+  const f = G.f; let fx = w / 2, fy = sea;
+  const nib = G.phase === 'wait' && f && f.nibs.some(n => G.pt >= n && G.pt < n + .35);
+  if (G.phase === 'bite') { fy = sea + 14 + Math.sin(t * 30) * 2; g.font = `800 ${Math.round(h * .17)}px ${pkFont()}`; g.textAlign = 'center'; g.fillStyle = '#FF5A1F'; g.fillText(t_('pk_zzirit'), w / 2, sea - 18); for (let i = 0; i < 3; i++) { const rr = ((t * 60 + i * 20) % 60); g.strokeStyle = `rgba(255,255,255,${1 - rr / 60})`; g.beginPath(); g.ellipse(fx, sea + 2, rr, rr * .3, 0, 0, Math.PI * 2); g.stroke(); } }
+  else if (nib) fy = sea + 5 + Math.sin(t * 40) * 2;
+  else if (G.phase === 'wait') fy = sea + Math.sin(t * 2.4) * 2;
+  if (G.phase === 'fight' && f) {
+    // the fish pulls left and right; closer to the surface as it comes in
+    const pull = f.pulls.some(([a, b]) => G.pt >= a && G.pt < b);
+    const fxp = w / 2 + Math.sin(G.pt * (pull ? 4 : 1.6)) * w * .28, fyp = sea + 10 + (G.D / 100) * (h - sea - 26);
+    g.strokeStyle = G.T > 85 ? '#FF6B5A' : 'rgba(255,255,255,.85)'; g.lineWidth = G.T > 85 ? 2 : 1.2; g.beginPath(); g.moveTo(w / 2, 0); g.lineTo(fxp, fyp); g.stroke();
+    const sp = SPI[f.sp]; if (sp) { g.save(); g.globalAlpha = .55 + .45 * (1 - G.D / 100); FD.draw(g, sp, fxp, fyp + 6, Math.min(w * .3, 40 + f.q * 30), { t, flip: Math.cos(G.pt * (pull ? 4 : 1.6)) < 0 }); g.restore(); }
+  } else if (G.phase === 'got' && f && SPI[f.sp]) {
+    FD.draw(g, SPI[f.sp], w / 2, sea + (h - sea) * .45, Math.min(w * .42, 120), { t });
+  } else if (G.phase !== 'ready' && G.phase !== 'over') {
+    g.strokeStyle = 'rgba(255,255,255,.7)'; g.lineWidth = 1; g.beginPath(); g.moveTo(w / 2, 0); g.lineTo(fx, fy - 8); g.stroke();
+    g.fillStyle = '#FF3B2F'; g.beginPath(); g.ellipse(fx, fy - 6, 5, 7, 0, Math.PI, 0); g.fill(); g.fillStyle = '#FFF'; g.beginPath(); g.ellipse(fx, fy - 6, 5, 7, 0, 0, Math.PI); g.fill();
+    g.strokeStyle = '#2B2433'; g.lineWidth = 1; g.beginPath(); g.moveTo(fx, fy - 13); g.lineTo(fx, fy - 18); g.stroke();
+  }
+}
+
+/* ---------- duels: ask, answer, a countdown, 60 seconds with the same fish for both, then the result ---------- */
+function pkDuelAsk(uid) {
+  if (PKS.duel || PKS.game) return;
+  if (!PKS.room || !PKS.subscribed) { toast(t('pk_reconnect'), 'info'); return; }
+  const id = rid(8);
+  PKS.duel = { id, peer: uid, role: 'from', state: 'asking', my: { n: 0, s: 0 }, op: { n: 0, s: 0 } };
+  pkSend('di', { id, u: myId(), to: uid });
+  const nick = (S.anglers.get(uid) || {}).nick || '?';
+  PKS.duelW = openModal(`<div class="pk-ask"><h2>⚔️ ${t('pk_duel_asked', { nick: esc(nick) })}</h2><p class="lede">${t('pk_duel_wait')}</p><div class="actions"><button class="btn btn-ghost" data-pkd="cancel">${t('cancel')}</button></div></div>`, { label: t('pk_duel_ask'), noClose: true });
+  PKS.duelW.querySelector('[data-pkd="cancel"]').onclick = () => pkDuelAbort(false);
+  PKS.duel.timer = setTimeout(() => { if (PKS.duel && PKS.duel.id === id && PKS.duel.state === 'asking') { pkDuelAbort(false); toast(t('pk_duel_noanswer', { nick }), 'info'); } }, 16000);
+}
+function pkDuelMsg(ev, p) {
+  const me = myId(); const d = PKS.duel;
+  if (ev === 'di' && p.to === me) {
+    // someone asks me: only someone who is here, not again right after a no; busy people answer no by themselves
+    if (!PKS.people.has(p.u) || (PKS.diBlock && PKS.diBlock.get(p.u) > nowMs())) return;
+    if (d || PKS.game || !PKS.on) { pkSend('da', { id: p.id, u: me, to: p.u, ok: false, busy: true }); return; }
+    const nick = (S.anglers.get(p.u) || {}).nick || '?';
+    PKS.duel = { id: p.id, peer: p.u, role: 'to', state: 'asked', my: { n: 0, s: 0 }, op: { n: 0, s: 0 } };
+    const w = PKS.duelW = openModal(`<div class="pk-ask"><h2>⚔️ ${t('pk_duel_in', { nick: esc(nick) })}</h2><p class="lede">${t('pk_duel_rule')}</p><p class="muted small" id="pkd-left"></p>
+      <div class="actions"><button class="btn btn-primary" data-pkd="yes">${t('pk_duel_yes')}</button><button class="btn btn-ghost" data-pkd="no">${t('pk_duel_no')}</button></div></div>`, { label: t('pk_duel_ask'), noClose: true });
+    let left = 15; const tick = () => { const el = $('#pkd-left', w); if (el) el.textContent = t('pk_duel_left', { n: left }); };
+    tick(); PKS.duel.timer = setInterval(() => { left--; tick(); if (left <= 0) answer(false); }, 1000);
+    const answer = ok => {
+      const dd = PKS.duel; if (!dd || dd.id !== p.id || dd.state !== 'asked') return;
+      clearInterval(dd.timer); closeModal(w); PKS.duelW = null;
+      if (!ok) { pkSend('da', { id: p.id, u: me, to: p.u, ok: false }); PKS.duel = null; (PKS.diBlock = PKS.diBlock || new Map()).set(p.u, nowMs() + 30000); return; }
+      const seed = (Math.random() * 2 ** 32) >>> 0, m = pkKst().m;
+      pkSend('da', { id: p.id, u: me, to: p.u, ok: true, seed, m });
+      pkDuelStart(seed, m);
+    };
+    w.querySelector('[data-pkd="yes"]').onclick = () => answer(true);
+    w.querySelector('[data-pkd="no"]').onclick = () => answer(false);
+    return;
+  }
+  if (!d || p.id !== d.id || p.u !== d.peer) return;
+  if (ev === 'da' && d.state === 'asking') {
+    clearTimeout(d.timer); if (PKS.duelW) { closeModal(PKS.duelW); PKS.duelW = null; }
+    const nick = (S.anglers.get(d.peer) || {}).nick || '?';
+    if (!p.ok) { PKS.duel = null; toast(t(p.busy ? 'pk_duel_busy' : 'pk_duel_declined', { nick }), 'info'); return; }
+    pkDuelStart(p.seed >>> 0, +p.m);
+  } else if (ev === 'df') { d.op = { n: +p.n || 0, s: +p.s || 0 }; }
+  else if (ev === 'de') { d.op = { n: +p.n || 0, s: +p.s || 0, fin: true }; if (d.state === 'done') pkDuelResult(); }
+  else if (ev === 'dx') { if (d.state === 'asked') { clearInterval(d.timer); if (PKS.duelW) { closeModal(PKS.duelW); PKS.duelW = null; } PKS.duel = null; toast(t('pk_duel_cancelled'), 'info'); } else if (d.state === 'play' || d.state === 'count') pkDuelGone(); }
+}
+function pkDuelStart(seed, m) {
+  const d = PKS.duel; d.state = 'count'; d.t0 = performance.now() + 3000; d.end = d.t0 + PK.DUEL; d.seed = seed;
+  // each fishes where they stand; the sea is the same for both (same seed: the same fish in the same order)
+  pkGameOpen('duel', { seed, m });
+  setTimeout(() => { if (PKS.duel === d && d.state === 'count') { d.state = 'play'; if (PKS.game) { PKS.game.phase = 'wait'; PKS.game.pt = 0; } } }, 3000);
+}
+function pkDuelFinish() {
+  const d = PKS.duel; if (!d || d.state === 'done') return;
+  d.state = 'done'; const G = PKS.game;
+  d.my = { n: G ? G.bag.length : 0, s: G ? G.score : 0 };
+  pkSend('de', { id: d.id, u: myId(), n: d.my.n, s: d.my.s });
+  d.wait = setTimeout(pkDuelResult, 4500); // the other side's final word, or their last score after a few seconds
+  if (d.op.fin) pkDuelResult();
+}
+function pkDuelResult() {
+  const d = PKS.duel; if (!d || d.shown) return; d.shown = true; clearTimeout(d.wait);
+  const res = d.forfeit ? 'w' : d.my.s > d.op.s ? 'w' : d.my.s < d.op.s ? 'l' : 'd';
+  PKS.stats[res] = (PKS.stats[res] || 0) + 1; PKS.dirty = true; pkSaveStats(true);
+  const nick = (S.anglers.get(d.peer) || {}).nick || '?';
+  if (res === 'w') PKS.me.emote = { e: '🏆', until: nowMs() + 4000 };
+  pkGameClose();
+  openModal(`<div class="pk-result r-${res}"><p class="eyebrow">⚔️ ${t('pk_duel_vs', { nick: esc(nick) })}</p><h2>${t('pk_res_' + res)}</h2>
+    ${d.forfeit ? `<p class="lede">${t('pk_res_forfeit', { nick: esc(nick) })}</p>` : `<div class="pk-res-score"><div><span>${t('pk_me')}</span><b class="num">${fmtN(d.my.s)}</b><span class="muted small">${t('pk_bag_n', { n: d.my.n })}</span></div><span class="vs">:</span><div><span>${esc(nick)}</span><b class="num">${fmtN(d.op.s)}</b><span class="muted small">${t('pk_bag_n', { n: d.op.n })}</span></div></div>`}
+    <p class="hint">${t('pk_score_how')}</p>
+    <div class="actions"><button class="btn btn-primary" data-close>${t('ok')}</button></div></div>`, { label: t('pk_duel_ask') });
+  if (res === 'w') pkSend('em', { u: myId(), e: 3 });
+  PKS.duel = null;
+}
+function pkDuelGone() {
+  const d = PKS.duel; if (!d) return;
+  if (d.state === 'asking' || d.state === 'asked') { clearTimeout(d.timer); clearInterval(d.timer); if (PKS.duelW) { closeModal(PKS.duelW); PKS.duelW = null; } PKS.duel = null; return; }
+  if (d.state === 'done') { d.op.fin = true; pkDuelResult(); return; }
+  d.forfeit = true; d.state = 'done'; pkDuelResult();
+}
+function pkDuelAbort(leaving) {
+  const d = PKS.duel; if (!d) return;
+  clearTimeout(d.timer); clearInterval(d.timer); clearTimeout(d.wait);
+  pkSend('dx', { id: d.id, u: myId() });
+  if (PKS.duelW) { closeModal(PKS.duelW); PKS.duelW = null; }
+  if (d.state === 'play' || d.state === 'count') { PKS.stats.l = (PKS.stats.l || 0) + 1; PKS.dirty = true; }
+  PKS.duel = null; if (PKS.game && PKS.game.mode === 'duel') pkGameClose(leaving);
+}
+
+/* ---------- the way in from the home page: the park (a small picture of it) and the chat ---------- */
+let PK_THUMB = null, PK_THUMB_BUSY = false;
+function pkThumb() {
+  if (PK_THUMB || PK_THUMB_BUSY) return PK_THUMB;
+  PK_THUMB_BUSY = true;
+  (window.requestIdleCallback || (f => setTimeout(f, 800)))(() => {
+    try {
+      const big = PKS.bgImg || (PKS.bgImg = pkBg());
+      const c = document.createElement('canvas'); c.width = 640; c.height = 400; const g = c.getContext('2d');
+      g.drawImage(big, 0, 0, PK.W, PK.H, 0, 0, 640, 400);
+      const k = 640 / PK.W; g.save(); g.scale(k, k); for (const it of pkDrawProps(g, 0, false)) it.d(); g.restore(); PKS.labels = [];
+      PK_THUMB = c.toDataURL('image/jpeg', .72);
+      $$('.hl-park .hl-art').forEach(n => { n.style.backgroundImage = `url(${PK_THUMB})`; });
+    } catch (e) { console.warn(e); }
+  });
+  return null;
+}
+function homeLiveHTML() {
+  if (!pkWeb()) return '';
+  const th = pkThumb(); const n = dmUnread();
+  return `<section class="home-live">
+    <a class="hl-card hl-park" href="#park"><span class="hl-art"${th ? ` style="background-image:url(${th})"` : ''}></span>
+      <span class="hl-txt"><span class="hl-tag">LIVE</span><b>${t('pk_title')}</b><span>${t('home_live_park')}</span></span><span class="btn btn-light btn-sm hl-go">${t('home_live_go')}</span></a>
+    <a class="hl-card hl-chat" href="#chat">${icon('chat', 'hl-ic')}
+      <span class="hl-txt"><b>${t('cht_title')}${n ? ` <i class="badge num">${n > 9 ? '9+' : n}</i>` : ''}</b><span>${t('home_live_chat')}</span></span><span class="btn btn-light btn-sm hl-go">${t('home_live_go')}</span></a>
+  </section>`;
+}
+
+/* ---------- the page ---------- */
+VIEWS.park = {
+  render(el) {
+    if (!pkWeb()) { el.innerHTML = `<div class="page"><div class="empty card big">${icon('wave', 'big')}<h2>${t('pk_web_only')}</h2><p class="muted">${t('cht_web_only_sub')}</p></div></div>`; return; }
+    if (!S.me || !S.me.nick) {
+      el.innerHTML = `<div class="page park-page"><header class="page-head"><h1>${t('pk_title')}</h1><p class="lede">${t('pk_sub')}</p></header><div class="empty card big">${icon('wave', 'big')}<h2>${t('pk_need_profile')}</h2><button class="btn btn-primary" data-act="onboard">${t('onb_go')}</button></div></div>`;
+      return;
+    }
+    if (!S.ready) { el.innerHTML = `<div class="page park-page"><div class="empty card big">${icon('wave', 'big')}<p class="muted">${t('loading')}</p></div></div>`; return; }
+    if (S.mode !== 'shared' || !S.uid) { pkStop(); el.innerHTML = `<div class="page park-page"><header class="page-head"><h1>${t('pk_title')}</h1></header><div class="empty card big">${icon('wave', 'big')}<h2>${t('pk_offline')}</h2><p class="muted">${t('pk_offline_sub')}</p></div></div>`; return; }
+    if (PKS.on && el.querySelector('#pk-cv')) { if (el.dataset.lang === S.lang) { pkPanel(); pkLog(); return; } pkStop(); } // already walking around: keep it
+    el.dataset.lang = S.lang;
+    el.innerHTML = `
+    <div class="page park-page">
+      <header class="page-head pk-head"><div><h1>${t('pk_title')}</h1><p class="lede">${t('pk_sub')}</p></div>
+        <div class="pk-rooms" role="group" aria-label="${esc(t('pk_rooms'))}">${Array.from({ length: PK.ROOMS }, (_, i) => `<button class="chip chip-tab" data-pkroom="${i + 1}">${t('pk_room', { n: i + 1 })}</button>`).join('')}</div></header>
+      <div class="pk-wrap">
+        <div class="pk-stage">
+          <canvas id="pk-cv" class="pk-cv" tabindex="0" aria-label="${esc(t('pk_canvas'))}"></canvas>
+          <ol class="pk-log" id="pk-log" aria-hidden="true"></ol>
+          <div class="pk-act" id="pk-act"></div>
+          <div class="pk-game" id="pk-game" hidden></div>
+          <div class="pk-emo" id="pk-emo" hidden>${PK.EMO.map((e, i) => `<button data-pkemo="${i}" aria-label="${esc(e)}">${e}</button>`).join('')}</div>
+        </div>
+        <div class="pk-bar">
+          <form class="pk-say" id="pk-say"><button type="button" class="btn btn-ghost btn-sm pk-emo-btn" data-pk="emo" aria-label="${esc(t('pk_emote'))}">😊</button><input id="pk-text" maxlength="200" autocomplete="off" placeholder="${esc(t('pk_say_ph'))}"><button class="btn btn-primary btn-sm" type="submit">${icon('send')}</button></form>
+        </div>
+        <aside class="pk-side card"><p class="pk-status" id="pk-status"></p><ul class="pk-people" id="pk-people"></ul><p class="hint">${t('pk_side_hint')}</p></aside>
+      </div>
+      <p class="hint">${icon('info')} ${t('pk_note')}</p>
+    </div>`;
+    PKS.cv = $('#pk-cv', el); PKS.ctx = PKS.cv.getContext('2d');
+    PKS.cv.addEventListener('pointerdown', e => { if (e.button === 0 || e.pointerType !== 'mouse') pkTap(e); });
+    PKS.keys = new Set();
+    PKS.cv.addEventListener('keydown', e => { const k = e.key.length === 1 ? e.key.toLowerCase() : e.key; if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'a', 'd', 'w', 's'].includes(k)) { e.preventDefault(); PKS.keys.add(k); } });
+    PKS.cv.addEventListener('keyup', e => { const k = e.key.length === 1 ? e.key.toLowerCase() : e.key; PKS.keys.delete(k); });
+    PKS.cv.addEventListener('blur', () => PKS.keys.clear());
+    el.onclick = e => {
+      const rb = e.target.closest('[data-pkroom]'); if (rb) { if (+rb.dataset.pkroom !== PKS.roomNo && !PKS.duel) { pkGameClose(true); pkJoin(+rb.dataset.pkroom); } return; }
+      const em = e.target.closest('[data-pkemo]'); if (em) { pkEmote(+em.dataset.pkemo); return; }
+      const who = e.target.closest('[data-pkwho]'); if (who) { pkCard(who.dataset.pkwho); return; }
+      const b = e.target.closest('[data-pk]'); if (!b) return;
+      const k = b.dataset.pk;
+      if (k === 'fish') pkGameOpen('solo', { spot: b.dataset.spot });
+      else if (k === 'sit') pkSit(true);
+      else if (k === 'stand') pkSit(false);
+      else if (k === 'prop') pkProp(b.dataset.prop);
+      else if (k === 'emo') pkEmotes();
+    };
+    $('#pk-say', el).onsubmit = async e => { e.preventDefault(); const inp = $('#pk-text', el); if (await chatSend(inp.value)) { inp.value = ''; } };
+    pkStart(el);
+    pkPanel(); pkLog();
+  },
+  leave() { pkStop(); }
+};
+window.addEventListener('pagehide', () => { try { pkStop(); } catch (e) { } });
+// a hidden tab leaves the room after a minute (nobody stands around frozen) and comes back when shown again
+document.addEventListener('visibilitychange', () => {
+  if (!PKS.on) return;
+  clearTimeout(PKS.hideT);
+  if (document.hidden) PKS.hideT = setTimeout(() => { if (!document.hidden && PKS.on) return; if (PKS.duel) pkDuelAbort(false); if (PKS.game) pkGameClose(true); if (PKS.room) { try { PKS.room.leave(); } catch (e) { } PKS.room = null; } PKS.people = new Map(); PKS.subscribed = false; PKS.paused = true; }, 60000);
+  else if (PKS.paused) { PKS.paused = false; pkJoin(PKS.roomNo); }
+});
+
 /* ===== Router, global events, boot ===== */
 const QR_PATH = 'M0 0h7v1h-7zM8 0h2v1h-2zM11 0h3v1h-3zM17 0h1v1h-1zM21 0h2v1h-2zM26 0h7v1h-7zM0 1h1v1h-1zM6 1h1v1h-1zM8 1h7v1h-7zM16 1h1v1h-1zM18 1h2v1h-2zM21 1h2v1h-2zM26 1h1v1h-1zM32 1h1v1h-1zM0 2h1v1h-1zM2 2h3v1h-3zM6 2h1v1h-1zM8 2h3v1h-3zM13 2h2v1h-2zM16 2h1v1h-1zM20 2h2v1h-2zM24 2h1v1h-1zM26 2h1v1h-1zM28 2h3v1h-3zM32 2h1v1h-1zM0 3h1v1h-1zM2 3h3v1h-3zM6 3h1v1h-1zM9 3h1v1h-1zM11 3h1v1h-1zM14 3h1v1h-1zM16 3h4v1h-4zM21 3h2v1h-2zM24 3h1v1h-1zM26 3h1v1h-1zM28 3h3v1h-3zM32 3h1v1h-1zM0 4h1v1h-1zM2 4h3v1h-3zM6 4h1v1h-1zM8 4h3v1h-3zM13 4h1v1h-1zM15 4h4v1h-4zM22 4h1v1h-1zM26 4h1v1h-1zM28 4h3v1h-3zM32 4h1v1h-1zM0 5h1v1h-1zM6 5h1v1h-1zM12 5h1v1h-1zM15 5h3v1h-3zM20 5h5v1h-5zM26 5h1v1h-1zM32 5h1v1h-1zM0 6h7v1h-7zM8 6h1v1h-1zM10 6h1v1h-1zM12 6h1v1h-1zM14 6h1v1h-1zM16 6h1v1h-1zM18 6h1v1h-1zM20 6h1v1h-1zM22 6h1v1h-1zM24 6h1v1h-1zM26 6h7v1h-7zM9 7h1v1h-1zM12 7h2v1h-2zM15 7h2v1h-2zM18 7h3v1h-3zM22 7h2v1h-2zM0 8h1v1h-1zM3 8h6v1h-6zM11 8h4v1h-4zM17 8h1v1h-1zM19 8h1v1h-1zM23 8h3v1h-3zM28 8h1v1h-1zM30 8h3v1h-3zM0 9h1v1h-1zM2 9h2v1h-2zM7 9h1v1h-1zM9 9h1v1h-1zM13 9h2v1h-2zM17 9h4v1h-4zM22 9h2v1h-2zM28 9h3v1h-3zM0 10h4v1h-4zM5 10h4v1h-4zM10 10h1v1h-1zM12 10h2v1h-2zM15 10h3v1h-3zM21 10h1v1h-1zM23 10h1v1h-1zM28 10h5v1h-5zM1 11h1v1h-1zM5 11h1v1h-1zM7 11h1v1h-1zM9 11h1v1h-1zM12 11h2v1h-2zM16 11h2v1h-2zM20 11h1v1h-1zM22 11h1v1h-1zM24 11h2v1h-2zM27 11h1v1h-1zM30 11h3v1h-3zM1 12h1v1h-1zM3 12h2v1h-2zM6 12h1v1h-1zM9 12h3v1h-3zM13 12h1v1h-1zM15 12h1v1h-1zM17 12h2v1h-2zM20 12h2v1h-2zM24 12h1v1h-1zM26 12h2v1h-2zM31 12h2v1h-2zM1 13h2v1h-2zM7 13h3v1h-3zM13 13h2v1h-2zM18 13h1v1h-1zM22 13h6v1h-6zM0 14h3v1h-3zM4 14h3v1h-3zM10 14h1v1h-1zM12 14h1v1h-1zM15 14h1v1h-1zM18 14h5v1h-5zM24 14h1v1h-1zM26 14h1v1h-1zM28 14h2v1h-2zM1 15h1v1h-1zM3 15h1v1h-1zM7 15h1v1h-1zM11 15h2v1h-2zM16 15h1v1h-1zM19 15h1v1h-1zM23 15h3v1h-3zM27 15h4v1h-4zM32 15h1v1h-1zM0 16h1v1h-1zM6 16h3v1h-3zM13 16h1v1h-1zM15 16h2v1h-2zM20 16h1v1h-1zM22 16h7v1h-7zM30 16h1v1h-1zM1 17h2v1h-2zM4 17h1v1h-1zM9 17h1v1h-1zM12 17h1v1h-1zM14 17h9v1h-9zM25 17h2v1h-2zM28 17h1v1h-1zM30 17h1v1h-1zM32 17h1v1h-1zM0 18h1v1h-1zM3 18h1v1h-1zM5 18h2v1h-2zM8 18h1v1h-1zM10 18h1v1h-1zM15 18h5v1h-5zM21 18h4v1h-4zM27 18h1v1h-1zM29 18h2v1h-2zM32 18h1v1h-1zM0 19h1v1h-1zM3 19h3v1h-3zM8 19h1v1h-1zM12 19h1v1h-1zM18 19h1v1h-1zM22 19h2v1h-2zM26 19h1v1h-1zM28 19h5v1h-5zM3 20h1v1h-1zM6 20h2v1h-2zM10 20h1v1h-1zM12 20h1v1h-1zM14 20h3v1h-3zM18 20h1v1h-1zM20 20h2v1h-2zM23 20h1v1h-1zM28 20h2v1h-2zM0 21h2v1h-2zM4 21h2v1h-2zM8 21h3v1h-3zM17 21h2v1h-2zM21 21h3v1h-3zM25 21h1v1h-1zM27 21h2v1h-2zM30 21h1v1h-1zM0 22h1v1h-1zM3 22h5v1h-5zM11 22h2v1h-2zM14 22h1v1h-1zM17 22h1v1h-1zM22 22h2v1h-2zM26 22h1v1h-1zM28 22h5v1h-5zM0 23h1v1h-1zM2 23h3v1h-3zM7 23h1v1h-1zM12 23h1v1h-1zM14 23h2v1h-2zM17 23h4v1h-4zM23 23h3v1h-3zM28 23h1v1h-1zM30 23h1v1h-1zM32 23h1v1h-1zM0 24h2v1h-2zM4 24h4v1h-4zM10 24h2v1h-2zM13 24h1v1h-1zM20 24h1v1h-1zM22 24h1v1h-1zM24 24h6v1h-6zM32 24h1v1h-1zM8 25h1v1h-1zM10 25h9v1h-9zM21 25h1v1h-1zM24 25h1v1h-1zM28 25h1v1h-1zM30 25h1v1h-1zM32 25h1v1h-1zM0 26h7v1h-7zM8 26h1v1h-1zM11 26h1v1h-1zM15 26h1v1h-1zM17 26h1v1h-1zM19 26h3v1h-3zM23 26h2v1h-2zM26 26h1v1h-1zM28 26h1v1h-1zM30 26h1v1h-1zM0 27h1v1h-1zM6 27h1v1h-1zM8 27h1v1h-1zM14 27h2v1h-2zM17 27h4v1h-4zM24 27h1v1h-1zM28 27h3v1h-3zM0 28h1v1h-1zM2 28h3v1h-3zM6 28h1v1h-1zM8 28h1v1h-1zM12 28h3v1h-3zM16 28h2v1h-2zM20 28h9v1h-9zM32 28h1v1h-1zM0 29h1v1h-1zM2 29h3v1h-3zM6 29h1v1h-1zM8 29h2v1h-2zM16 29h1v1h-1zM18 29h1v1h-1zM20 29h4v1h-4zM25 29h1v1h-1zM27 29h1v1h-1zM30 29h3v1h-3zM0 30h1v1h-1zM2 30h3v1h-3zM6 30h1v1h-1zM11 30h1v1h-1zM13 30h1v1h-1zM15 30h1v1h-1zM18 30h3v1h-3zM23 30h2v1h-2zM27 30h3v1h-3zM31 30h2v1h-2zM0 31h1v1h-1zM6 31h1v1h-1zM10 31h1v1h-1zM12 31h3v1h-3zM25 31h1v1h-1zM27 31h6v1h-6zM0 32h7v1h-7zM8 32h1v1h-1zM10 32h1v1h-1zM15 32h4v1h-4zM23 32h2v1h-2zM27 32h2v1h-2z';
-const ROUTES = ['home', 'scan', 'past', 'map', 'rank', 'friends', 'board', 'teams', 'points', 'sea', 'char', 'dex', 'tackle', 'log', 'help', 'about', 'prefs', 'admin'];
-const LIVE_VIEWS = new Set(['home', 'rank', 'friends', 'board', 'teams', 'points', 'sea', 'dex', 'log', 'admin']);
+const ROUTES = ['home', 'scan', 'past', 'map', 'park', 'chat', 'rank', 'friends', 'board', 'teams', 'points', 'sea', 'char', 'dex', 'tackle', 'log', 'help', 'about', 'prefs', 'admin'];
+const LIVE_VIEWS = new Set(['home', 'park', 'chat', 'rank', 'friends', 'board', 'teams', 'points', 'sea', 'dex', 'log', 'admin']);
 const viewOf = r => (r === 'past' ? 'scan' : r);
 
 function updateStatic() {
@@ -9807,6 +11432,7 @@ function updateShell() {
   // log out next to my name (website, once there is a login ID or a linked device)
   const out = $('#me-out'); if (out) out.hidden = !(idSupported() && S.me && S.me.nick && (S.loginId || (window.APP_AUTH && window.APP_AUTH.link && window.APP_AUTH.link.linked())));
   notiBadge();
+  if (typeof dmBadge === 'function') dmBadge();
   navDots();
 }
 /* ===== The menu in four groups that open and close (side menu and the phone's "more" sheet). The group of the page
@@ -9815,7 +11441,7 @@ function updateShell() {
 const NAV_GROUPS = [
   ['fish', 'fish', ['scan', 'map', 'points', 'dex', 'tackle']],
   ['mine', 'chart', ['log', 'sea', 'char']],
-  ['social', 'users', ['rank', 'friends', 'board', 'teams']],
+  ['social', 'users', ['park', 'chat', 'rank', 'friends', 'board', 'teams']],
   ['help', 'info', ['help', 'about', 'prefs', 'admin']]
 ];
 function navGroupOf(route) { const r = viewOf(route || ''); const g = NAV_GROUPS.find(x => x[2].includes(r)); return g ? g[0] : null; }
@@ -9854,6 +11480,8 @@ function setLang(l) {
 }
 function show(route) {
   const vid = viewOf(route);
+  if (S.viewOn && S.viewOn !== vid && VIEWS[S.viewOn] && VIEWS[S.viewOn].leave) { try { VIEWS[S.viewOn].leave(); } catch (e) { console.warn(e); } }
+  S.viewOn = vid;
   $$('.view').forEach(v => { v.hidden = v.id !== 'v-' + vid; });
   $$('[data-route]').forEach(a => { const on = (a.dataset.route === route && !(route === 'sea' && S.viewUid)) || (route === 'past' && a.dataset.route === 'scan'); a.classList.toggle('on', on); if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
   document.body.dataset.route = vid;
@@ -9871,6 +11499,7 @@ function onHash() {
   if (/^link=/.test(h)) { const code = decodeURIComponent(h.slice(5)).toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 8); h = 'prefs'; try { history.replaceState(null, '', '#prefs'); } catch (e) { } setTimeout(() => openLinkEnter(code), 400); }
   if (/^add=/.test(h)) { S.frQ = decodeURIComponent(h.slice(4)).toUpperCase().slice(0, 12); h = 'friends'; try { history.replaceState(null, '', '#friends'); } catch (e) { } }
   if (h === 'shop') { S.seaTab = 'shop'; h = 'sea'; }
+  if (h === 'dm') { S.chatTab = 'dm'; S.dmPeer = null; h = 'chat'; try { history.replaceState(null, '', '#chat'); } catch (e) { } } // a 1:1 notice opens the conversations
   if (!ROUTES.includes(h)) h = 'home';
   if (h === 'admin' && !S.isOwner && S.ready) h = 'home';
   if (h !== 'sea' && S.route === 'sea') { S.preview = null; }
@@ -9909,7 +11538,7 @@ const rerenderSoon = debounce(() => {
   if (vid === 'map') { VIEWS.map.onData(); updateShell(); return; }
   if (LIVE_VIEWS.has(vid)) rerender(); else updateShell();
   // an open post keeps up with new comments and likes (unless someone is typing a comment)
-  if (S.openPost && S.openPost.w.isConnected) { const ae = document.activeElement; if (!(ae && ae.id === 'pc-body')) S.openPost.render(); }
+  if (S.openPost && S.openPost.w.isConnected) { const ae = document.activeElement; if (!(ae && (ae.id === 'pc-body' || ae.classList.contains('cmt-edit-ta')))) S.openPost.render(); }
 }, 300);
 
 function openSeaOf(u) {
@@ -9948,6 +11577,7 @@ document.addEventListener('click', e => {
     else if (a === 'auth') openAuth('join');
     else if (a === 'noti') openNoti();
     else if (a === 'logout') openLogout();
+    else if (a === 'withdraw') openWithdraw();
     else if (a === 'install') openInstall();
     else if (a === 'weekly') openWeekly();
     else if (a === 'more') openMore();
@@ -9982,6 +11612,7 @@ document.addEventListener('click', e => {
   const rl = tgt.closest('[data-relink]'); if (rl) { openRelink(rl.dataset.relink); return; }
   const lk = tgt.closest('[data-link]'); if (lk) { const k = lk.dataset.link; if (k === 'make') openLinkMake(); else if (k === 'enter') openLinkEnter(); else if (k === 'leave') linkLeave(lk); return; }
   const bc = tgt.closest('[data-bdcat]'); if (bc) { S.bd = Object.assign(S.bd || {}, { cat: bc.dataset.bdcat }); if (S.route !== 'board') location.hash = 'board'; else VIEWS.board.render($('#v-board')); return; }
+  const bm = tgt.closest('[data-bdmine]'); if (bm) { S.bd = Object.assign(S.bd || {}, { mine: !(S.bd && S.bd.mine) }); VIEWS.board.render($('#v-board')); return; }
   const bs = tgt.closest('[data-bdsort]'); if (bs) { S.bd = Object.assign(S.bd || {}, { sort: bs.dataset.bdsort }); VIEWS.board.render($('#v-board')); return; }
   const tmv = tgt.closest('[data-team]'); if (tmv) { openTeam(tmv.dataset.team); return; }
   const tj = tgt.closest('[data-tmjoin]'); if (tj) { tmJoin(tj.dataset.tmjoin); return; }
@@ -10031,7 +11662,7 @@ matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', () => { 
   S.unit = lsGet('unit', 'cm');
   S.me = lsGet('me', null);
   onHash();
-  store.init().then(() => { updateStatic(); updateShell(); if (S.route === 'admin' && !S.isOwner) location.hash = 'home'; setTimeout(maybeWhatsNew, 2500); setTimeout(maybeWelcome, 1800); setTimeout(pushSync, 4000); });
+  store.init().then(() => { updateStatic(); updateShell(); try { dmStart(); } catch (e) { console.warn(e); } if (S.route === 'admin' && !S.isOwner) location.hash = 'home'; setTimeout(maybeWhatsNew, 2500); setTimeout(maybeWelcome, 1800); setTimeout(pushSync, 4000); });
   if (window.APP_RT === 'web' && 'serviceWorker' in navigator) navigator.serviceWorker.addEventListener('message', e => { const h = e.data && e.data.go; if (typeof h === 'string' && /^#[a-z]+$/.test(h)) location.hash = h.slice(1); });
   const idle = window.requestIdleCallback || (f => setTimeout(f, 1200));
   idle(() => { GEO.loadEnv(); });

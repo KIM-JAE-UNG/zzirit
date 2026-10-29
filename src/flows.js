@@ -749,6 +749,64 @@ async function openLogout() {
     setTimeout(() => { location.hash = 'home'; location.reload(); }, 700);
   };
 }
+/* ===== Leaving (회원 탈퇴). On the website the server removes the account with everything in it, on every linked
+   device (a login ID asks for the password again); then this device forgets it all and starts over. Without a server
+   account (records kept only on this device) it simply wipes this device. The operator's own account can't leave here. ===== */
+function wdCardHTML() {
+  if (!S.me || !S.me.nick) return '';
+  const server = window.APP_RT === 'web' && S.mode === 'shared' && !!(window.APP_AUTH && window.APP_AUTH.account);
+  if (!server && S.mode !== 'local') return '';
+  return `<section class="card wd-card"><h2 class="h3">${icon('trash')}${t('wd_title')}</h2><p class="muted">${t(server ? 'wd_sub' : 'wd_local')}</p>
+    <div class="actions"><button class="btn btn-line btn-danger" data-act="withdraw">${server ? t('wd_title') : t('wd_local_go')}</button></div></section>`;
+}
+function wipeDevice() {
+  // language, theme and units stay (they say nothing about the person); everything else of the app goes
+  const keep = new Set(['lang', 'theme', 'unit']);
+  try { for (const k of Object.keys(localStorage)) if (k.startsWith('eosin.') && !keep.has(k.slice(6))) localStorage.removeItem(k); } catch (e) { }
+  try { sessionStorage.clear(); } catch (e) { }
+  return Promise.resolve(PHDB.clear()).catch(() => { });
+}
+async function openWithdraw() {
+  if (!S.me || !S.me.nick) return;
+  const server = window.APP_RT === 'web' && S.mode === 'shared' && !!(window.APP_AUTH && window.APP_AUTH.account);
+  if (!server && S.mode !== 'local') return;
+  const id = server ? await myLoginId(true) : null;
+  const linked = server && !!(window.APP_AUTH.link && window.APP_AUTH.link.linked());
+  const word = t('wd_word');
+  const w = openModal(`<form class="wd" id="wd-form" novalidate>
+    <h2>${icon('trash')} ${t('wd_title')}</h2>
+    ${acctSumHTML()}
+    ${server ? `<p class="acct-state warn">${icon('warn')} ${t('wd_lede')}</p>
+      <ul class="wd-list">${['wd_l1', 'wd_l2', 'wd_l3', 'wd_l4'].map(k => `<li>${t(k)}</li>`).join('')}</ul>
+      ${linked ? `<p class="note">${icon('link')} ${t('wd_linked_note')}</p>` : ''}
+      ${id ? `<div class="field"><label for="wd-pass">${t('wd_pass')} <span class="muted mono">${esc(id)}</span></label><input id="wd-pass" type="password" autocomplete="current-password" maxlength="64"></div>` : `<p class="muted small">${t('wd_no_pass')}</p>`}`
+      : `<p class="acct-state warn">${icon('warn')} ${t('wd_local')}</p>`}
+    <div class="field"><label for="wd-word">${t('wd_type', { w: esc(word) })}</label><input id="wd-word" autocomplete="off" maxlength="20" placeholder="${esc(word)}"></div>
+    <p class="err" id="wd-err" hidden></p>
+    <div class="actions"><button class="btn btn-danger" id="wd-go" type="submit" disabled>${icon('trash')}${server ? t('wd_go') : t('wd_local_go')}</button><button class="btn btn-ghost" type="button" data-close>${t('cancel')}</button></div>
+  </form>`, { label: t('wd_title') });
+  const go = $('#wd-go', w), inp = $('#wd-word', w), err = $('#wd-err', w);
+  const ok = () => inp.value.trim().toLowerCase() === word.toLowerCase();
+  inp.addEventListener('input', () => { go.disabled = !ok(); });
+  $('#wd-form', w).onsubmit = async e => {
+    e.preventDefault(); if (!ok() || go.disabled) return;
+    err.hidden = true; go.disabled = true;
+    if (server) {
+      const pass = $('#wd-pass', w) ? $('#wd-pass', w).value : null;
+      if (id && !pass) { err.textContent = t('wd_err_wrong'); err.hidden = false; go.disabled = false; $('#wd-pass', w).focus(); return; }
+      try { await pushOff(); } catch (x) { } // this browser stops getting notices before the account goes
+      try { await window.APP_AUTH.account.remove(pass); }
+      catch (x) {
+        const c = (x && x.code) || 'unavailable'; const k = 'wd_err_' + c; const msg = t(k);
+        err.textContent = msg === k ? t('wd_err_unavailable') : msg; err.hidden = false; go.disabled = false; return;
+      }
+    }
+    try { pkStop(); } catch (x) { }
+    await wipeDevice();
+    closeModal(w); toast(t('wd_done'), 'ok', 6000);
+    setTimeout(() => { location.hash = 'home'; location.reload(); }, 1600);
+  };
+}
 function acctSumHTML() {
   if (!S.me || !S.me.nick) return '';
   return `<div class="acct-sum">${avatar(S.me, 44)}<div><b>${nickHTML(S.me)}</b> ${lvMini(S.me, myId())}<p class="muted small">${t('acct_sum', { n: fmtN(myCatches().length), pts: fmtN(myPoints()), lv: myLevel() })}</p></div></div>`;
@@ -1113,14 +1171,15 @@ function openShareCard(blob, name, text) {
 }
 
 /* ===== What's new: shown once after a big update (website only; needs the matching server update) ===== */
-const WHATS_NEW = '2026-10-29c', WN_TS = Date.parse('2026-10-29T05:30:00Z'); // people who joined after this have nothing to catch up on
+const WHATS_NEW = '2026-10-29d', WN_TS = Date.parse('2026-10-29T09:30:00Z'); // people who joined after this have nothing to catch up on
 const BOOT_AT = Date.now();
 /* what each update brought, newest last; people see what came after the last one they saw (at most 6 lines) */
 const WN_ITEMS = [
   ['2026-10-28', 'user', 'wn_id'], ['2026-10-28', 'shield', 'wn_review'], ['2026-10-28', 'heart', 'wn_pay'], ['2026-10-28', 'share', 'wn_share'],
   ['2026-10-29', 'bell', 'wn_noti'], ['2026-10-29', 'wave', 'wn_wx'], ['2026-10-29', 'medal', 'wn_bdg'], ['2026-10-29', 'download', 'wn_inst'], ['2026-10-29', 'logout', 'wn_out'],
   ['2026-10-29b', 'wave', 'wn_fs'], ['2026-10-29b', 'trophy', 'wn_wk'], ['2026-10-29b', 'chart', 'wn_st'], ['2026-10-29b', 'phone', 'wn_push'],
-  ['2026-10-29c', 'camera', 'wn_fix'], ['2026-10-29c', 'menu', 'wn_menu']
+  ['2026-10-29c', 'camera', 'wn_fix'], ['2026-10-29c', 'menu', 'wn_menu'],
+  ['2026-10-29d', 'wave', 'wn_park'], ['2026-10-29d', 'chat', 'wn_chat'], ['2026-10-29d', 'board', 'wn_bdmod'], ['2026-10-29d', 'user', 'wn_wd']
 ];
 function maybeWhatsNew(tries = 0) {
   if (window.APP_RT !== 'web' || lsGet('wn', '') === WHATS_NEW || tries > 6) return;

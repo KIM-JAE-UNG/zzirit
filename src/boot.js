@@ -1,7 +1,7 @@
 /* ===== Router, global events, boot ===== */
 const QR_PATH = '__QR_PATH__';
-const ROUTES = ['home', 'scan', 'past', 'map', 'rank', 'friends', 'board', 'teams', 'points', 'sea', 'char', 'dex', 'tackle', 'log', 'help', 'about', 'prefs', 'admin'];
-const LIVE_VIEWS = new Set(['home', 'rank', 'friends', 'board', 'teams', 'points', 'sea', 'dex', 'log', 'admin']);
+const ROUTES = ['home', 'scan', 'past', 'map', 'park', 'chat', 'rank', 'friends', 'board', 'teams', 'points', 'sea', 'char', 'dex', 'tackle', 'log', 'help', 'about', 'prefs', 'admin'];
+const LIVE_VIEWS = new Set(['home', 'park', 'chat', 'rank', 'friends', 'board', 'teams', 'points', 'sea', 'dex', 'log', 'admin']);
 const viewOf = r => (r === 'past' ? 'scan' : r);
 
 function updateStatic() {
@@ -29,6 +29,7 @@ function updateShell() {
   // log out next to my name (website, once there is a login ID or a linked device)
   const out = $('#me-out'); if (out) out.hidden = !(idSupported() && S.me && S.me.nick && (S.loginId || (window.APP_AUTH && window.APP_AUTH.link && window.APP_AUTH.link.linked())));
   notiBadge();
+  if (typeof dmBadge === 'function') dmBadge();
   navDots();
 }
 /* ===== The menu in four groups that open and close (side menu and the phone's "more" sheet). The group of the page
@@ -37,7 +38,7 @@ function updateShell() {
 const NAV_GROUPS = [
   ['fish', 'fish', ['scan', 'map', 'points', 'dex', 'tackle']],
   ['mine', 'chart', ['log', 'sea', 'char']],
-  ['social', 'users', ['rank', 'friends', 'board', 'teams']],
+  ['social', 'users', ['park', 'chat', 'rank', 'friends', 'board', 'teams']],
   ['help', 'info', ['help', 'about', 'prefs', 'admin']]
 ];
 function navGroupOf(route) { const r = viewOf(route || ''); const g = NAV_GROUPS.find(x => x[2].includes(r)); return g ? g[0] : null; }
@@ -76,6 +77,8 @@ function setLang(l) {
 }
 function show(route) {
   const vid = viewOf(route);
+  if (S.viewOn && S.viewOn !== vid && VIEWS[S.viewOn] && VIEWS[S.viewOn].leave) { try { VIEWS[S.viewOn].leave(); } catch (e) { console.warn(e); } }
+  S.viewOn = vid;
   $$('.view').forEach(v => { v.hidden = v.id !== 'v-' + vid; });
   $$('[data-route]').forEach(a => { const on = (a.dataset.route === route && !(route === 'sea' && S.viewUid)) || (route === 'past' && a.dataset.route === 'scan'); a.classList.toggle('on', on); if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
   document.body.dataset.route = vid;
@@ -93,6 +96,7 @@ function onHash() {
   if (/^link=/.test(h)) { const code = decodeURIComponent(h.slice(5)).toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 8); h = 'prefs'; try { history.replaceState(null, '', '#prefs'); } catch (e) { } setTimeout(() => openLinkEnter(code), 400); }
   if (/^add=/.test(h)) { S.frQ = decodeURIComponent(h.slice(4)).toUpperCase().slice(0, 12); h = 'friends'; try { history.replaceState(null, '', '#friends'); } catch (e) { } }
   if (h === 'shop') { S.seaTab = 'shop'; h = 'sea'; }
+  if (h === 'dm') { S.chatTab = 'dm'; S.dmPeer = null; h = 'chat'; try { history.replaceState(null, '', '#chat'); } catch (e) { } } // a 1:1 notice opens the conversations
   if (!ROUTES.includes(h)) h = 'home';
   if (h === 'admin' && !S.isOwner && S.ready) h = 'home';
   if (h !== 'sea' && S.route === 'sea') { S.preview = null; }
@@ -131,7 +135,7 @@ const rerenderSoon = debounce(() => {
   if (vid === 'map') { VIEWS.map.onData(); updateShell(); return; }
   if (LIVE_VIEWS.has(vid)) rerender(); else updateShell();
   // an open post keeps up with new comments and likes (unless someone is typing a comment)
-  if (S.openPost && S.openPost.w.isConnected) { const ae = document.activeElement; if (!(ae && ae.id === 'pc-body')) S.openPost.render(); }
+  if (S.openPost && S.openPost.w.isConnected) { const ae = document.activeElement; if (!(ae && (ae.id === 'pc-body' || ae.classList.contains('cmt-edit-ta')))) S.openPost.render(); }
 }, 300);
 
 function openSeaOf(u) {
@@ -170,6 +174,7 @@ document.addEventListener('click', e => {
     else if (a === 'auth') openAuth('join');
     else if (a === 'noti') openNoti();
     else if (a === 'logout') openLogout();
+    else if (a === 'withdraw') openWithdraw();
     else if (a === 'install') openInstall();
     else if (a === 'weekly') openWeekly();
     else if (a === 'more') openMore();
@@ -204,6 +209,7 @@ document.addEventListener('click', e => {
   const rl = tgt.closest('[data-relink]'); if (rl) { openRelink(rl.dataset.relink); return; }
   const lk = tgt.closest('[data-link]'); if (lk) { const k = lk.dataset.link; if (k === 'make') openLinkMake(); else if (k === 'enter') openLinkEnter(); else if (k === 'leave') linkLeave(lk); return; }
   const bc = tgt.closest('[data-bdcat]'); if (bc) { S.bd = Object.assign(S.bd || {}, { cat: bc.dataset.bdcat }); if (S.route !== 'board') location.hash = 'board'; else VIEWS.board.render($('#v-board')); return; }
+  const bm = tgt.closest('[data-bdmine]'); if (bm) { S.bd = Object.assign(S.bd || {}, { mine: !(S.bd && S.bd.mine) }); VIEWS.board.render($('#v-board')); return; }
   const bs = tgt.closest('[data-bdsort]'); if (bs) { S.bd = Object.assign(S.bd || {}, { sort: bs.dataset.bdsort }); VIEWS.board.render($('#v-board')); return; }
   const tmv = tgt.closest('[data-team]'); if (tmv) { openTeam(tmv.dataset.team); return; }
   const tj = tgt.closest('[data-tmjoin]'); if (tj) { tmJoin(tj.dataset.tmjoin); return; }
@@ -253,7 +259,7 @@ matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', () => { 
   S.unit = lsGet('unit', 'cm');
   S.me = lsGet('me', null);
   onHash();
-  store.init().then(() => { updateStatic(); updateShell(); if (S.route === 'admin' && !S.isOwner) location.hash = 'home'; setTimeout(maybeWhatsNew, 2500); setTimeout(maybeWelcome, 1800); setTimeout(pushSync, 4000); });
+  store.init().then(() => { updateStatic(); updateShell(); try { dmStart(); } catch (e) { console.warn(e); } if (S.route === 'admin' && !S.isOwner) location.hash = 'home'; setTimeout(maybeWhatsNew, 2500); setTimeout(maybeWelcome, 1800); setTimeout(pushSync, 4000); });
   if (window.APP_RT === 'web' && 'serviceWorker' in navigator) navigator.serviceWorker.addEventListener('message', e => { const h = e.data && e.data.go; if (typeof h === 'string' && /^#[a-z]+$/.test(h)) location.hash = h.slice(1); });
   const idle = window.requestIdleCallback || (f => setTimeout(f, 1200));
   idle(() => { GEO.loadEnv(); });

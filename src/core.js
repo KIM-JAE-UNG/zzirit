@@ -42,7 +42,8 @@ const PHDB = (() => {
       lsSet('phk', keys);
       for (const d of drop) req('readwrite', s => s.delete(d));
     },
-    del(k) { req('readwrite', s => s.delete(k)); lsSet('phk', lsGet('phk', []).filter(x => x !== k)); }
+    del(k) { req('readwrite', s => s.delete(k)); lsSet('phk', lsGet('phk', []).filter(x => x !== k)); },
+    clear() { lsSet('phk', null); return req('readwrite', s => s.clear()); }
   };
 })();
 

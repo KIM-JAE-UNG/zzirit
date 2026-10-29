@@ -3,8 +3,23 @@ const http = require('http'), fs = require('fs'), path = require('path');
 const LIB = p => require.resolve(p, { paths: [require('path').join(__dirname, '..')] });
 const ROOT = path.resolve(__dirname, '..', '..'), LEAFLET = LIB('leaflet/dist/leaflet.js');
 let ver = 1; const events = []; const STATS = { photoSelects: 0 };
-const T = { anglers: {}, photos: {}, labels: {}, orders: {}, suggest: {}, admin_docs: {}, spots: {}, board: {}, teams: {}, news: {}, points: {}, reviews: {} };
-const FEATURES = { del: true };
+const T = { anglers: {}, photos: {}, labels: {}, orders: {}, suggest: {}, admin_docs: {}, spots: {}, board: {}, teams: {}, news: {}, points: {}, reviews: {}, chat: {}, dm: {} };
+const FEATURES = { del: true, wd: true };
+// live chat: the open chat and 1:1 between friends (the same rules as private.chat_guard / dm_guard), mutes, rate limits
+let seq = 100; const MUTES = {}; const RATE = {};
+function tryOk(k, max, ms) { const now = Date.now(); const a = (RATE[k] || []).filter(x => now - x < ms); if (a.length >= max) { RATE[k] = a; return false; } a.push(now); RATE[k] = a; return true; }
+function areFriends(x, y) {
+  if (!x || !y || x === y) return false;
+  const ax = T.anglers[x], ay = T.anglers[y]; const xy = ax && ax.data.fr && ax.data.fr[y], yx = ay && ay.data.fr && ay.data.fr[x];
+  if (!Array.isArray(xy) || !Array.isArray(yx) || !['r', 'a'].includes(xy[0]) || !['r', 'a'].includes(yx[0])) return false;
+  const tx = +xy[1] || 0, ty = +yx[1] || 0;
+  if (xy[0] === 'a' && yx[0] === 'r') return tx >= ty; if (xy[0] === 'r' && yx[0] === 'a') return ty >= tx; return true;
+}
+// park rooms: who is in each topic (presence) and a queue of messages per client; clients that stop polling drop out
+const RT = {}, RTQ = {}, RTSEEN = {}; const RTSTATS = { sent: 0, delivered: 0 };
+function rtState(topic) { const st = {}; for (const [cid, m] of RT[topic] || []) if (m.payload) (st[m.key] = st[m.key] || []).push(Object.assign({ presence_ref: cid }, m.payload)); return st; }
+function rtSync(topic) { const st = rtState(topic); for (const cid of (RT[topic] || new Map()).keys()) (RTQ[cid] = RTQ[cid] || []).push({ topic, type: 'presence', state: st }); }
+setInterval(() => { const now = Date.now(); for (const [topic, m] of Object.entries(RT)) { let ch = false; for (const cid of [...m.keys()]) if (now - (RTSEEN[cid] || 0) > 3000) { m.delete(cid); ch = true; } if (ch) rtSync(topic); } }, 1000);
 const PUSH = {}, PUSHLOG = []; // phone notices: subscriptions saved through the RPCs, and what the app asked the push function // admin_delete_user present on the "server" (the live one gets it with the SQL update)
 const isAdmin = uid => !!uid && (admins.has(uid) || admins.has(acct(uid)));
 const admins = new Set(); const links = {}; const codes = {};
@@ -59,6 +74,8 @@ function guard(row, old) {
   return row;
 }
 function visible(t, row, uid) {
+  if (t === 'chat') return (!row.hidden || isAdmin(uid)) && Date.now() - Date.parse(row.created_at) < 3 * 864e5;
+  if (t === 'dm') return !!uid && [row.a, row.b].includes(acct(uid));
   if (t === 'points') return !!row.pub || (!!uid && acct(row.owner) === acct(uid)) || isAdmin(uid);
   if (t === 'reviews') return (!!uid && acct(row.id) === acct(uid)) || isAdmin(uid);
   if (t === 'orders' || t === 'suggest') return row.id === acct(uid) || admins.has(uid) || admins.has(acct(uid));
@@ -75,7 +92,45 @@ http.createServer(async (req, res) => {
     const rows = Object.values(T[q.table] || {}).filter(r => visible(q.table, r, q.uid))
       .filter(r => !q.match || Object.entries(q.match).every(([k, v]) => String(r[k]) === String(v)))
       .filter(r => !q.in || q.in.vals.map(String).includes(String(r[q.in.col])));
+    if (q.order) rows.sort((a, b) => ((a[q.order.col] > b[q.order.col]) - (a[q.order.col] < b[q.order.col])) * (q.order.asc ? 1 : -1));
     return send({ data: JSON.parse(JSON.stringify(rows.slice(0, q.limit || 1000))) });
+  }
+  if (u.pathname === '/__sb/insert') {
+    const q = await body(req); const uid = q.uid; const row = q.row || {};
+    const err = m => send({ error: { code: 'P0001', message: m } });
+    if (!uid) return err('not_signed_in');
+    const me = acct(uid);
+    if (q.table === 'chat') {
+      const a = T.anglers[me]; const nick = a && a.data && String(a.data.nick || '').trim(); if (!nick) return err('no_profile');
+      if (MUTES[me] && MUTES[me] > Date.now()) return err('muted');
+      const text = String(row.body || '').replace(/\s+/g, ' ').trim(); if (text.length < 1 || text.length > 200) return err('bad_body');
+      if (/(https?:\/\/|www\.|[a-z0-9-]+\.(com|net|org|kr|io|me|ly|gg|co)(\/|$|[^a-z]))/i.test(text)) return err('no_links');
+      if (/01[016789][ .-]?[0-9]{3,4}[ .-]?[0-9]{4}/.test(text)) return err('no_phone');
+      if (!tryOk('chat:' + me, 6, 15000)) return err('slow_down');
+      const r = { id: ++seq, room: /^[a-z0-9]{1,16}$/.test(row.room || '') ? row.room : 'all', uid: me, nick: nick.slice(0, 16), body: text, hidden: false, created_at: new Date().toISOString() };
+      T.chat[r.id] = r; push('chat', 'INSERT', r); return send({ data: r });
+    }
+    if (q.table === 'dm') {
+      const peer = acct((row.a === me || row.a === uid) ? row.b : row.a);
+      if (!peer || peer === me || !T.anglers[peer]) return err('bad_peer');
+      if (!areFriends(me, peer)) return err('not_friends');
+      if (MUTES[me] && MUTES[me] > Date.now()) return err('muted');
+      const text = String(row.body || '').trim(); if (text.length < 1 || text.length > 500) return err('bad_body');
+      if (!tryOk('dm:' + me, 10, 20000)) return err('slow_down');
+      const [a, b] = me < peer ? [me, peer] : [peer, me];
+      const r = { id: ++seq, a, b, sender: me, body: text, created_at: new Date().toISOString() };
+      T.dm[r.id] = r; push('dm', 'INSERT', r); return send({ data: r });
+    }
+    return send({ error: { code: '42501', message: 'permission denied' } });
+  }
+  if (u.pathname.startsWith('/__sb/rt/')) {
+    const q = await body(req); const op = u.pathname.slice(9); RTSEEN[q.cid] = Date.now();
+    if (op === 'poll') { const m = RTQ[q.cid] || []; RTQ[q.cid] = []; RTSTATS.delivered += m.length; return send({ msgs: m }); }
+    if (op === 'join') { (RT[q.topic] = RT[q.topic] || new Map()).set(q.cid, { key: q.key, payload: null }); rtSync(q.topic); return send({ ok: true }); }
+    if (op === 'track') { const m = RT[q.topic] && RT[q.topic].get(q.cid); if (m) { m.payload = q.payload; rtSync(q.topic); } return send({ ok: !!m }); }
+    if (op === 'leave') { if (RT[q.topic]) { RT[q.topic].delete(q.cid); rtSync(q.topic); } return send({ ok: true }); }
+    if (op === 'send') { RTSTATS.sent++; for (const cid of (RT[q.topic] || new Map()).keys()) if (cid !== q.cid) (RTQ[cid] = RTQ[cid] || []).push({ topic: q.topic, type: 'broadcast', event: q.event, payload: q.payload }); return send({ ok: true }); }
+    return send({ error: 'unknown' }, 404);
   }
   if (u.pathname === '/__sb/upsert') {
     const q = await body(req); let row = JSON.parse(JSON.stringify(q.row));
@@ -151,6 +206,42 @@ http.createServer(async (req, res) => {
       for (const a of [...admins]) if (acct(a) === target) admins.delete(a);
       return send({ data: true });
     }
+    if (q.name === 'chat_hide') { if (!isAdmin(uid)) return send({ error: { message: 'not_admin' } }); const r = T.chat[q.args.p_id]; if (!r) return send({ data: false }); r.hidden = q.args.p_on !== false; push('chat', 'UPDATE', r, { id: r.id }); return send({ data: true }); }
+    if (q.name === 'chat_mute') {
+      if (!isAdmin(uid)) return send({ error: { message: 'not_admin' } });
+      const target = acct(q.args.p_uid); if (!target || target === acct(uid)) return send({ error: { message: 'cannot_mute_self' } });
+      const until = new Date(Date.now() + Math.max(0, +q.args.p_minutes || 0) * 60000).toISOString(); MUTES[target] = Date.parse(until); return send({ data: until });
+    }
+    if (q.name === 'chat_mutes') { if (!isAdmin(uid)) return send({ error: { message: 'not_admin' } }); return send({ data: Object.entries(MUTES).filter(([, v]) => v > Date.now()).map(([k, v]) => ({ acct: k, until: new Date(v).toISOString() })) }); }
+    if (q.name === 'chat_my_mute') { const m = MUTES[acct(uid)]; return send({ data: m && m > Date.now() ? new Date(m).toISOString() : null }); }
+    if (q.name === 'board_admin_remove') {
+      if (!isAdmin(uid)) return send({ error: { message: 'not_admin' } });
+      const b = T.board[q.args.p_owner]; const col = q.args.p_kind === 'post' ? 'posts' : q.args.p_kind === 'cmt' ? 'cmts' : null;
+      if (!b || !col || !Array.isArray(b.data[col])) return send({ data: false });
+      const n0 = b.data[col].length; b.data[col] = b.data[col].filter(x => x.id !== q.args.p_id);
+      if (b.data[col].length === n0) return send({ data: false });
+      push('board', 'UPDATE', b, { id: b.id }); return send({ data: true });
+    }
+    if (q.name === 'delete_my_account') {
+      if (!FEATURES.wd) return send({ error: { code: 'PGRST202', message: 'Could not find the function public.delete_my_account(p_pass) in the schema cache' } });
+      if (!uid) return send({ data: { ok: false, err: 'not_signed_in' } });
+      const me = acct(uid);
+      if (isAdmin(uid)) return send({ data: { ok: false, err: 'admin' } });
+      if (!tryOk('del:' + uid, 5, 3600e3)) return send({ data: { ok: false, err: 'slow_down' } });
+      const l = Object.entries(logins).find(([, v]) => v.owner === me);
+      if (l && l[1].pass !== q.args.p_pass) return send({ data: { ok: false, err: 'wrong' } });
+      for (const a of Object.values(T.anglers)) { let ch = false; if (a.data.fr && a.data.fr[me]) { delete a.data.fr[me]; ch = true; } if (a.data.team && a.data.team.id === me) { delete a.data.team; ch = true; } if (ch) push('anglers', 'UPDATE', a, { id: a.id }); }
+      for (const tm of Object.values(T.teams)) if (tm.data.members && tm.data.members[me]) { delete tm.data.members[me]; push('teams', 'UPDATE', tm, { id: tm.id }); }
+      for (const t of ['anglers', 'labels', 'orders', 'suggest', 'board', 'teams', 'reviews']) if (T[t][me]) { delete T[t][me]; push(t, 'DELETE', {}, { id: me }); }
+      for (const [k, r] of Object.entries(T.photos)) if (r.angler === me) { delete T.photos[k]; push('photos', 'DELETE', {}, { angler: r.angler, cid: r.cid }); }
+      for (const [k, r] of Object.entries(T.points)) if (acct(r.owner) === me) { delete T.points[k]; push('points', 'DELETE', {}, { id: k }); }
+      for (const [k, r] of Object.entries(T.chat)) if (r.uid === me) delete T.chat[k];
+      for (const [k, r] of Object.entries(T.dm)) if (r.a === me || r.b === me) delete T.dm[k];
+      for (const [n, x] of Object.entries(logins)) if (x.owner === me) delete logins[n];
+      for (const [ep, x] of Object.entries(PUSH)) if (acct(x.acct) === me) delete PUSH[ep];
+      for (const [dev, own] of Object.entries(links)) if (own === me) delete links[dev];
+      return send({ data: { ok: true } });
+    }
     if (q.name === 'push_subscribe') {
       if (!uid) return send({ error: { message: 'not_signed_in' } });
       if (!/^https:\/\/(fcm\.googleapis\.com|web\.push\.apple\.com|updates\.push\.services\.mozilla\.com)\//.test(q.args.p_endpoint || '')) return send({ error: { message: 'bad_endpoint' } });
@@ -191,10 +282,10 @@ http.createServer(async (req, res) => {
   }
   if (u.pathname === '/__sb/changes') {
     const since = +u.searchParams.get('since') || 0, who = u.searchParams.get('uid') || null;
-    return send({ ver, events: events.filter(e => e.ver > since && (e.eventType === 'DELETE' || !['points', 'reviews'].includes(e.table) || visible(e.table, e.new, who))) });
+    return send({ ver, events: events.filter(e => e.ver > since && (e.eventType === 'DELETE' || !['points', 'reviews', 'dm', 'chat'].includes(e.table) || visible(e.table, e.new, who))) });
   }
   if (u.pathname === '/__sb/feature') { for (const [k, v] of u.searchParams) FEATURES[k] = v === '1'; return send(FEATURES); }
-  if (u.pathname === '/__sb/dump') return send({ T, admins: [...admins], links, STATS, PUSH, PUSHLOG });
+  if (u.pathname === '/__sb/dump') return send({ T, admins: [...admins], links, STATS, PUSH, PUSHLOG, logins: Object.keys(logins), MUTES, RTSTATS, RT: Object.fromEntries(Object.entries(RT).map(([k, m]) => [k, [...m.values()].map(x => x.key)])) });
   if (u.pathname === '/__sb/config') { const q = await body(req); const g = T.admin_docs.config || (T.admin_docs.config = { id: 'config', data: {} }); g.data = Object.assign({}, g.data, q); push('admin_docs', 'UPDATE', g, { id: 'config' }); return send({ ok: true }); }
   if (u.pathname === '/__sb/grant') { const q = await body(req); const g = T.admin_docs.grants || (T.admin_docs.grants = { id: 'grants', data: {} }); g.data[q.uid] = Object.assign({}, g.data[q.uid], { [q.oid]: q.v }); push('admin_docs', 'UPDATE', g, { id: 'grants' }); return send({ ok: true }); }
   const f = u.pathname === '/_leaflet_test.js' ? LEAFLET : path.join(ROOT, decodeURIComponent(u.pathname === '/' ? '/index.html' : u.pathname));

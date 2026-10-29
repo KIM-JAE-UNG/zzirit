@@ -1,4 +1,4 @@
-// Phone notifications (Web Push). The app asks this function to tell someone about something it just did — a reply,
+// Phone notifications (Web Push). The app asks this function to tell someone about something it just did — a reply, a 1:1 message,
 // a friend request, a team request, the operator's notice or a confirmed payment. The database checks that it really
 // happened (push_check), that it goes out only once and that no one sends too many (push_once). The automatic
 // reviewer calls it with the server key to report review results. The VAPID key pair is made here once and kept in
@@ -47,6 +47,7 @@ const W: Record<string, string[]> = {
   r_no: ["{fish} 조과는 확인되지 않았어요. 이유는 앱에서 볼 수 있어요", "Your {fish} catch could not be confirmed — see why in the app", "{fish}の釣果は確認されませんでした。理由はアプリで見られます", "你的{fish}渔获未通过确认，原因可在应用中查看"],
   r_log: ["{fish} 조과는 사진이 없어 기록으로만 남아요", "Your {fish} catch has no photo, so it stays as a log only", "{fish}の釣果は写真がないため記録のみ残ります", "你的{fish}渔获没有照片，仅作记录保留"],
   r_hold: ["{fish} 조과는 운영자가 한 번 더 볼게요", "The operator will take another look at your {fish} catch", "{fish}の釣果は運営者がもう一度確認します", "运营者将再次查看你的{fish}渔获"],
+  dm: ["{nick}님이 메시지를 보냈어요", "{nick} sent you a message", "{nick}さんからメッセージが届きました", "{nick} 给你发了消息"],
 };
 const TITLE = ["찌릿 ZZIRIT", "ZZIRIT", "찌릿 ZZIRIT", "찌릿 ZZIRIT"];
 // a value may differ by language ([ko, en, ja, zh]), like a fish name
@@ -115,6 +116,10 @@ Deno.serve(async (req: Request) => {
       const fish = [ev.ko || ev.en || "", ev.en || ev.ko || "", ev.en || ev.ko || "", ev.en || ev.ko || ""].map((n: string) => n + len);
       const cid = ref.split("|")[1];
       return json(await deliver(String(ev.to), "review", `${cid}:${ev.v}`, null, ev.v === "ok" ? "r_ok" : "r_no", { fish }, "#log", "review:" + cid));
+    }
+    if (kind === "dm") { // a 1:1 message: at most one notice per sender every 2 minutes, replacing the last one; no message text
+      const slot = `${u.user.id}:${Math.floor(Date.now() / 120000)}`;
+      return json(await deliver(String(ev.to), "dm", slot, u.user.id, "dm", { nick: ev.nick || "" }, "#dm", ("dm:" + u.user.id).slice(0, 60)));
     }
     const to = ev.all ? ZERO : String(ev.to);
     return json(await deliver(to, kind, ref, byOperator ? null : u.user.id, kind, { nick: ev.nick || "", title: ev.title || "", body: ev.body || "" }, ev.url || "#home", `${kind}:${ref}`.slice(0, 60)));

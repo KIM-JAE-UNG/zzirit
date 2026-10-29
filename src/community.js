@@ -46,7 +46,7 @@ VIEWS.board = {
       ${shared ? '' : `<p class="note">${icon('info')} ${t('bd_local_note')}</p>`}
       ${noticeCardHTML()}
       <div class="bd-bar">
-        <div class="chip-row" role="group" aria-label="${esc(t('bd_f_cat'))}">${['all', ...BD_CATS].map(c => `<button class="chip chip-tab" aria-pressed="${bd.cat === c}" data-bdcat="${c}">${t('bdc_' + c)}</button>`).join('')}</div>
+        <div class="chip-row" role="group" aria-label="${esc(t('bd_f_cat'))}">${['all', ...BD_CATS].map(c => `<button class="chip chip-tab" aria-pressed="${bd.cat === c}" data-bdcat="${c}">${t('bdc_' + c)}</button>`).join('')}${S.me && S.me.nick ? `<button class="chip chip-tab chip-mine" aria-pressed="${!!bd.mine}" data-bdmine>${icon('user')}${t('bd_mine')}</button>` : ''}</div>
         <div class="bd-tools">
           <div class="seg seg-sm" role="group">${['new', 'hot'].map(s => `<button aria-pressed="${bd.sort === s}" data-bdsort="${s}">${t('bd_sort_' + s)}</button>`).join('')}</div>
           <input class="search" id="bd-q" type="search" placeholder="${esc(t('bd_search'))}" value="${esc(bd.q)}" autocomplete="off">
@@ -60,9 +60,9 @@ VIEWS.board = {
   },
   renderList(el) {
     const box = $('#bd-list', el); if (!box) return;
-    const list = boardList(S.bd);
+    const list = boardList(Object.assign({}, S.bd, { mineOnly: !!S.bd.mine && !!(S.me && S.me.nick) }));
     box.innerHTML = list.length ? `<ul class="bd-list">${list.slice(0, 120).map(bdCard).join('')}</ul>` : `
-      <div class="empty card big">${icon('board', 'big')}<h2>${t(S.bd.q || S.bd.cat !== 'all' ? 'bd_none_found' : 'bd_empty')}</h2><p class="muted">${t('bd_empty_sub')}</p><button class="btn btn-primary" data-bd="write">${icon('plus')}${t('bd_write')}</button></div>`;
+      <div class="empty card big">${icon('board', 'big')}<h2>${t(S.bd.q || S.bd.cat !== 'all' || S.bd.mine ? 'bd_none_found' : 'bd_empty')}</h2><p class="muted">${t('bd_empty_sub')}</p><button class="btn btn-primary" data-bd="write">${icon('plus')}${t('bd_write')}</button></div>`;
     hydratePhotos(box);
   }
 };
@@ -117,6 +117,8 @@ function openPost(key) {
     const c = p.ref ? catchOf(p.uid, p.ref) : null;
     const cmts = p.cmts.filter(x => !x.hidden || S.isOwner || x.uid === myId());
     const draft = $('#pc-body', w) ? $('#pc-body', w).value : '';
+    const editId = S.openPost && S.openPost.key === key ? S.openPost.edit : null;
+    const eta = $('.cmt-edit-ta', w); const editDraft = eta ? eta.value : null; // what is being typed survives a refresh
     box.innerHTML = `
       <p class="eyebrow"><span class="chip chip-cat cat-${esc(p.cat)}">${t('bdc_' + p.cat)}</span> ${fmtDT(p.ts)}${p.upd && p.upd > p.ts + 60000 ? ' · ' + t('bd_edited') : ''}</p>
       <h2>${esc(p.title)}</h2>
@@ -127,11 +129,11 @@ function openPost(key) {
       <div class="post-acts">
         <button class="btn btn-sm ${liked ? 'btn-primary' : 'btn-line'}" id="pl-like" aria-pressed="${liked}">${icon('heart')}${t('bd_like')} ${p.likes.size}</button>
         ${mine ? `<button class="btn btn-ghost btn-sm" id="pl-edit">${t('bd_edit')}</button><button class="btn btn-ghost btn-sm" id="pl-del">${icon('trash')}${t('delete')}</button>` : `<button class="btn btn-ghost btn-sm" id="pl-rep">${icon('warn')}${t('bd_report')}</button>`}
-        ${S.isOwner ? `<button class="btn btn-ghost btn-sm" id="pl-hide">${t(p.hidden ? 'bd_unhide' : 'bd_hide')}</button>` : ''}
+        ${S.isOwner ? `<button class="btn btn-ghost btn-sm" id="pl-hide">${t(p.hidden ? 'bd_unhide' : 'bd_hide')}</button>${mine ? '' : `<button class="btn btn-ghost btn-sm" id="pl-adel">${icon('trash')}${t('bd_admin_del')}</button>`}` : ''}
       </div>
       <section class="cmts">
         <h3 class="h4">${icon('chat')}${t('bd_cmts', { n: cmts.filter(x => !x.hidden).length })}</h3>
-        ${cmts.length ? `<ul class="cmt-list">${cmts.map(x => { const ca = anglerOf(x.uid) || { nick: '?' }; return `<li class="${x.hidden ? 'is-hidden' : ''}"><button class="cmt-who" data-seauid="${esc(x.uid)}">${avatar(ca, 26)}</button><div><p class="cmt-head">${nickHTML(ca)}${lvMini(ca, x.uid)}${teamTag(x.uid)} <span class="muted small">${ago(x.ts)}</span>${x.uid === myId() ? `<button class="link small" data-cmtdel="${esc(x.id)}">${t('delete')}</button>` : ''}${S.isOwner ? `<button class="link small" data-cmthide="${esc(x.key)}">${t(x.hidden ? 'bd_unhide' : 'bd_hide')}</button>` : ''}</p><p class="cmt-body">${esc(x.body)}</p></div></li>`; }).join('')}</ul>` : `<p class="muted small">${t('bd_cmt_empty')}</p>`}
+        ${cmts.length ? `<ul class="cmt-list">${cmts.map(x => { const ca = anglerOf(x.uid) || { nick: '?' }; const own = x.uid === myId(); const editing = own && editId === x.id; return `<li class="${x.hidden ? 'is-hidden' : ''}"><button class="cmt-who" data-seauid="${esc(x.uid)}">${avatar(ca, 26)}</button><div><p class="cmt-head">${nickHTML(ca)}${lvMini(ca, x.uid)}${teamTag(x.uid)} <span class="muted small">${ago(x.ts)}${x.upd ? ' · ' + t('bd_edited') : ''}</span>${own && !editing ? `<button class="link small" data-cmtedit="${esc(x.id)}">${t('bd_edit')}</button><button class="link small" data-cmtdel="${esc(x.id)}">${t('delete')}</button>` : ''}${S.isOwner ? `<button class="link small" data-cmthide="${esc(x.key)}">${t(x.hidden ? 'bd_unhide' : 'bd_hide')}</button>${own ? '' : `<button class="link small" data-cmtadel="${esc(x.key)}">${t('bd_admin_del')}</button>`}` : ''}</p>${editing ? `<form class="cmt-edit" data-cmteditf="${esc(x.id)}"><textarea class="cmt-edit-ta" rows="2" maxlength="${BD_MAX.cmt}">${esc(editDraft != null ? editDraft : x.body)}</textarea><div class="actions"><button class="btn btn-primary btn-sm" type="submit">${t('bd_cmt_save')}</button><button class="btn btn-ghost btn-sm" type="button" data-cmtcancel>${t('cancel')}</button></div></form>` : `<p class="cmt-body">${esc(x.body)}</p>`}</div></li>`; }).join('')}</ul>` : `<p class="muted small">${t('bd_cmt_empty')}</p>`}
         <form class="cmt-form" id="pc-form" novalidate><textarea id="pc-body" rows="2" maxlength="${BD_MAX.cmt}" placeholder="${esc(t('bd_cmt_ph'))}">${esc(draft)}</textarea><button class="btn btn-primary btn-sm" type="submit">${icon('send')}${t('bd_cmt_send')}</button></form>
       </section>`;
     hydratePhotos(box);
@@ -156,6 +158,20 @@ function openPost(key) {
       await store.saveBoard(); toast(t('bd_reported')); render();
     };
     const hide = $('#pl-hide', box); if (hide) hide.onclick = () => modToggle('hp', key).then(render);
+    const adel = $('#pl-adel', box); if (adel) adel.onclick = async () => {
+      if (!armed(adel, t('bd_admin_del_q'))) return;
+      if (await bdAdminRemove('post', key)) { closeModal(w); rerender(); }
+    };
+    $$('[data-cmtadel]', box).forEach(b => b.onclick = async () => { if (!armed(b, t('bd_admin_del_q'))) return; if (await bdAdminRemove('cmt', b.dataset.cmtadel)) render(); });
+    $$('[data-cmtedit]', box).forEach(b => b.onclick = () => { S.openPost.edit = b.dataset.cmtedit; render(); const ta = $('.cmt-edit-ta', box); if (ta) { ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); } });
+    $$('[data-cmtcancel]', box).forEach(b => b.onclick = () => { S.openPost.edit = null; const ta = $('.cmt-edit-ta', box); if (ta) ta.value = ''; render(); });
+    $$('[data-cmteditf]', box).forEach(f => f.onsubmit = async e => {
+      e.preventDefault();
+      const v = $('.cmt-edit-ta', f).value.trim().slice(0, BD_MAX.cmt); if (!v) return;
+      const c = B().cmts.find(x => x.id === f.dataset.cmteditf); if (!c) return;
+      if (c.body !== v) { c.body = v; c.upd = nowMs(); await store.saveBoard(); toast(t('bd_updated')); }
+      S.openPost.edit = null; $('.cmt-edit-ta', f).remove(); render();
+    });
     $$('[data-cmthide]', box).forEach(b => b.onclick = () => modToggle('hc', b.dataset.cmthide).then(render));
     $$('[data-cmtdel]', box).forEach(b => b.onclick = async () => {
       if (!armed(b, t('bd_del_confirm'))) return;
@@ -174,6 +190,24 @@ function openPost(key) {
   };
   S.openPost = { key, w, render };
   render();
+}
+/* the operator deletes a post or a comment for good: gone from its author's board on the server, and also marked hidden
+   (so an old copy on the author's device, if it ever came back, stays out of sight) */
+async function bdAdminRemove(kind, key) {
+  if (!S.isOwner) return false;
+  const i = key.indexOf('|'); const owner = key.slice(0, i), id = key.slice(i + 1);
+  if (window.APP_AUTH && window.APP_AUTH.board) {
+    try { await window.APP_AUTH.board.adminRemove(owner, kind, id); }
+    catch (e) { toast(t(e && e.code === 'need_update' ? 'cht_err_need_update' : 'bd_remove_fail'), 'warn', 4800); return false; }
+  }
+  const mod = Object.assign({ hp: {}, hc: {}, av: {} }, JSON.parse(JSON.stringify(S.admin.mod || {})));
+  const m = kind === 'post' ? 'hp' : 'hc'; mod[m] = mod[m] || {}; mod[m][key] = nowMs();
+  await store.saveAdmin('mod', mod);
+  const col = kind === 'post' ? 'posts' : 'cmts';
+  const d = S.board.get(owner); if (d && Array.isArray(d[col])) S.board.set(owner, Object.assign({}, d, { [col]: d[col].filter(x => x.id !== id) }));
+  if (owner === S.uid && S.myBoard && Array.isArray(S.myBoard[col])) S.myBoard[col] = S.myBoard[col].filter(x => x.id !== id);
+  S.dataVer++; toast(t('bd_removed'));
+  return true;
 }
 async function modToggle(kind, key) {
   if (!S.isOwner) return;

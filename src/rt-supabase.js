@@ -115,7 +115,87 @@
     adminReset: (name, pass) => rpcOrThrow('admin_id_reset', { p_name: name, p_new: pass }),
     async logout() { dropBk(); try { await sb.auth.signOut({ scope: 'local' }); } catch (e) { } dropBk(); }
   };
-  window.APP_AUTH = { sb, session, acct, link, news, review, admin, ids, push, error: () => authErr };
+  // live chat: the open chat (everyone online) and 1:1 between friends. The server writes who said it and refuses links,
+  // phone numbers, people who are muted and anyone typing too fast; these codes come back for the app to explain.
+  const CHAT_CODES = ['no_profile', 'muted', 'no_links', 'no_phone', 'slow_down', 'not_friends', 'bad_body', 'bad_peer', 'not_signed_in'];
+  function chatErr(error) {
+    const m = String((error && (error.message || error.details)) || '');
+    const k = CHAT_CODES.find(x => m.includes(x));
+    if (k) return mkErr(k, m);
+    if ((error && /PGRST20[25]|42P01/.test(String(error.code))) || /does not exist|could not find the (table|function)|schema cache/i.test(m)) return mkErr('need_update', m);
+    return mkErr('unavailable', m);
+  }
+  const rnd = () => Math.random().toString(36).slice(2, 9);
+  const live = (table, filter, cb) => {
+    const ch = sb.channel('rt-' + table + '-' + rnd());
+    ch.on('postgres_changes', Object.assign({ event: 'INSERT', schema: 'public', table }, filter ? { filter } : {}), p => { try { cb(p.new); } catch (e) { console.warn(e); } });
+    ch.subscribe();
+    return () => { try { sb.removeChannel(ch); } catch (e) { } };
+  };
+  const CHAT_COLS = 'id,room,uid,nick,body,created_at';
+  const chat = {
+    async recent(room, n = 60) {
+      await session();
+      const { data, error } = await sb.from('chat').select(CHAT_COLS).eq('room', room).order('id', { ascending: false }).limit(n);
+      if (error) throw chatErr(error);
+      return (data || []).reverse();
+    },
+    async send(room, body) {
+      const s = await session(); if (!s) throw mkErr('not_signed_in');
+      const { data, error } = await sb.from('chat').insert({ room, body, uid: await acct(), nick: '' }).select(CHAT_COLS).single();
+      if (error) throw chatErr(error);
+      return data;
+    },
+    onNew: (room, cb) => live('chat', 'room=eq.' + room, cb),
+    hide: (id, on) => rpcOrThrow('chat_hide', { p_id: id, p_on: on !== false }),
+    mute: (uid, minutes) => rpcOrThrow('chat_mute', { p_uid: uid, p_minutes: minutes }),
+    mutes: () => rpcOrThrow('chat_mutes'),
+    myMute: () => rpcOrThrow('chat_my_mute')
+  };
+  const DM_COLS = 'id,a,b,sender,body,created_at';
+  const dm = {
+    async list(n = 300) {
+      await session();
+      const { data, error } = await sb.from('dm').select(DM_COLS).order('id', { ascending: false }).limit(n);
+      if (error) throw chatErr(error);
+      return data || [];
+    },
+    async send(peer, body) {
+      const s = await session(); if (!s) throw mkErr('not_signed_in');
+      const me = await acct();
+      const { data, error } = await sb.from('dm').insert({ a: me, b: peer, sender: me, body }).select(DM_COLS).single();
+      if (error) throw chatErr(error);
+      return data;
+    },
+    onNew: cb => live('dm', null, cb) // the server only sends my own conversations
+  };
+  // the park: who is here (presence) and what they do (broadcast), one channel per park room
+  const rt = {
+    room(topic, key, on) {
+      const ch = sb.channel(topic, { config: { presence: { key }, broadcast: { self: false } } });
+      ch.on('presence', { event: 'sync' }, () => { try { on.sync && on.sync(ch.presenceState()); } catch (e) { console.warn(e); } });
+      for (const ev of on.events || []) ch.on('broadcast', { event: ev }, m => { try { on.msg && on.msg(ev, (m && m.payload) || {}); } catch (e) { console.warn(e); } });
+      ch.subscribe(st => { try { on.status && on.status(st); } catch (e) { console.warn(e); } });
+      return {
+        track: p => ch.track(p).catch(() => null),
+        send: (event, payload) => ch.send({ type: 'broadcast', event, payload }).catch(() => null),
+        state: () => ch.presenceState(),
+        leave() { try { ch.untrack(); } catch (e) { } try { sb.removeChannel(ch); } catch (e) { } }
+      };
+    }
+  };
+  // leaving: removes this account (and every linked device) with everything in it, then signs this device out
+  const account = {
+    async remove(pass) {
+      const r = await rpcOrThrow('delete_my_account', { p_pass: pass || null });
+      if (!r || r.ok !== true) throw mkErr((r && r.err) || 'unavailable', (r && r.err) || 'failed');
+      await ids.logout();
+      return true;
+    }
+  };
+  // the operator deletes a board post / comment for good (it lives in its author's document)
+  const board = { adminRemove: (owner, kind, id) => rpcOrThrow('board_admin_remove', { p_owner: owner, p_kind: kind, p_id: id }) };
+  window.APP_AUTH = { sb, session, acct, link, news, review, admin, ids, push, chat, dm, rt, account, board, error: () => authErr };
 
   /* ---- document paths → tables ---- */
   function route(path) {

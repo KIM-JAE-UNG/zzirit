@@ -127,6 +127,8 @@ VIEWS.home = {
         </section>
       </div>
 
+      ${homeLiveHTML()}
+
       <section class="card home-board">
         <div class="sec-head tight"><h2 class="h3">${icon('board')}${t('home_board_title')}</h2><div class="hb-links"><a class="link" href="#teams">${icon('flag')}${myTm && myTm.ok ? esc(myTm.t.name) : t('nav_teams')}</a><a class="link" href="#board">${t('home_board_more')}</a></div></div>
         ${hot.length ? `<ul class="hb-list">${hot.map(p => { const a = anglerOf(p.uid) || { nick: '?' }; return `<li><button class="hb-item" data-post="${esc(p.key)}"><span class="chip chip-cat cat-${esc(p.cat)}">${t('bdc_' + p.cat)}</span><b class="hb-title">${esc(p.title)}</b><span class="muted small hb-meta">${esc(a.nick)} · ${icon('heart')}${p.likes.size} ${icon('chat')}${p.cmts.filter(x => !x.hidden).length}</span></button></li>`; }).join('')}</ul>` : `<div class="empty"><p>${t('home_board_empty')}</p><button class="btn btn-line btn-sm" data-bd="write">${icon('plus')}${t('bd_write')}</button></div>`}
@@ -1146,6 +1148,7 @@ VIEWS.prefs = {
         <p class="hint">${t('mode_explain')}</p>
         ${window.APP_RT === 'web' && !S.isOwner ? `<p class="hint"><a href="#claim">${icon('shield')} ${t('claim_title')}</a></p>` : ''}
       </section>
+      ${wdCardHTML()}
       <section class="card credits"><h2 class="h3">${t('credits_title')}</h2><p class="small">${t('credits_text')}</p>${wxOn() ? `<p class="small">${t('credits_wx')} · <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo.com</a> (CC BY 4.0)</p>` : ''}</section>
     </div>`;
     pushBind(el);
@@ -1290,7 +1293,7 @@ async function openRelink(uid) {
 }
 
 /* ---------- More (mobile) ---------- */
-const NAV_ICON = { home: 'home', scan: 'scan', map: 'map', points: 'pin', dex: 'book', tackle: 'lure', log: 'log', sea: 'sea', char: 'user', rank: 'trophy', friends: 'users', board: 'board', teams: 'flag', help: 'chat', about: 'sparkle', prefs: 'gear', admin: 'shield' };
+const NAV_ICON = { home: 'home', park: 'wave', chat: 'chat', scan: 'scan', map: 'map', points: 'pin', dex: 'book', tackle: 'lure', log: 'log', sea: 'sea', char: 'user', rank: 'trophy', friends: 'users', board: 'board', teams: 'flag', help: 'chat', about: 'sparkle', prefs: 'gear', admin: 'shield' };
 function openMore() {
   const nIn = S.me && S.me.nick ? frLists().inc.length : 0;
   // the account first: who is signed in, with a way to sign out (only when there is a way back in: a login ID or a linked device)
@@ -1303,11 +1306,12 @@ function openMore() {
   // the four groups; the one with the page on screen starts open, one open at a time so the sheet stays short
   const cur = navGroupOf(S.route) || 'fish';
   const grp = NAV_GROUPS.map(([id, gic, routes]) => {
-    const list = routes.filter(r => (r !== 'points' || window.APP_RT === 'web') && (r !== 'admin' || S.isOwner));
-    const on = id === cur, dot = list.includes('friends') && nIn;
+    const list = routes.filter(r => ((r !== 'points' && r !== 'park' && r !== 'chat') || window.APP_RT === 'web') && (r !== 'admin' || S.isOwner));
+    const nDm = window.APP_RT === 'web' && typeof dmUnread === 'function' ? dmUnread() : 0;
+    const on = id === cur, dot = (list.includes('friends') && nIn) || (list.includes('chat') && nDm);
     return `<section class="more-grp${on ? ' open' : ''}" data-mgrp="${id}">
       <button type="button" class="more-gh" aria-expanded="${on}" aria-controls="mg-${id}">${icon(gic)}<span class="more-gt"><b>${t('ng_' + id)}</b><span class="muted small">${list.map(r => esc(t('nav_' + r))).join(' · ')}</span></span>${dot ? `<i class="badge num">${nIn > 9 ? '9+' : nIn}</i>` : ''}${icon('chev')}</button>
-      <div class="more-gb" id="mg-${id}"><div class="more-gi">${list.map(r => `<a href="#${r}" class="more-item${viewOf(S.route) === viewOf(r) ? ' on' : ''}"${viewOf(S.route) === viewOf(r) ? ' aria-current="page"' : ''}>${icon(NAV_ICON[r])}<span>${t('nav_' + r)}</span>${r === 'friends' && nIn ? `<i class="badge num">${nIn > 9 ? '9+' : nIn}</i>` : ''}</a>`).join('')}</div></div>
+      <div class="more-gb" id="mg-${id}"><div class="more-gi">${list.map(r => `<a href="#${r}" class="more-item${viewOf(S.route) === viewOf(r) ? ' on' : ''}"${viewOf(S.route) === viewOf(r) ? ' aria-current="page"' : ''}>${icon(NAV_ICON[r])}<span>${t('nav_' + r)}</span>${r === 'friends' && nIn ? `<i class="badge num">${nIn > 9 ? '9+' : nIn}</i>` : ''}${r === 'chat' && nDm ? `<i class="badge num">${nDm > 9 ? '9+' : nDm}</i>` : ''}</a>`).join('')}</div></div>
     </section>`;
   }).join('');
   const w = openModal(`<nav class="more"><h2 class="sr">${t('more')}</h2>${acct}<div class="more-grps">${grp}</div><div class="more-foot">${inst}<button class="more-item heart" data-act="donate">${icon('heart')}<span>${t('donate_btn')}</span></button></div></nav>`, { sheet: true, label: t('more') });

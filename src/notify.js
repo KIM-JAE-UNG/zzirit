@@ -1,5 +1,5 @@
 /* ===== Notifications (알림): replies and likes on my posts, friend requests, review results, team requests,
-   operator notices, confirmed payments. Worked out on this device from what the app already loads; nothing extra is
+   operator notices, confirmed payments, unread 1:1 messages. Worked out on this device from what the app already loads; nothing extra is
    stored on the server. The first scan only records what is already there, so nobody gets a flood of old news. ===== */
 const NOTI_MAX = 80;
 function notiOn() { return S.mode === 'shared' && !!(S.me && S.me.nick); }
@@ -56,6 +56,9 @@ function notiScan() {
   // payments the operator confirmed
   const g = grantsOf(me);
   for (const o of S.myOrders) if (g[o.id] === 'ok') add('p:' + o.id, 'paid', nowMs(), { ref: o.kind === 'item' ? o.ref : 'donate' });
+  // 1:1 messages not read yet: one line per friend, for their latest message
+  // (one line per friend until it is read: the line belongs to the read mark it started from)
+  if (typeof DMS !== 'undefined' && DMS.loaded) { const rd = dmReads(); for (const th of dmThreads().values()) if (th.unread && th.last && th.last.sender !== me) add('dm:' + th.peer + ':' + (rd[th.peer] || 0), 'dm', Date.parse(th.last.created_at) || nowMs(), { who: th.peer, body: String(th.last.body || '').slice(0, 60) }); }
   if (first) { lsSet('notiInit', 1); changed = true; }
   lsSet('notiState', st);
   if (changed) { list.sort((a, b) => a.t - b.t); lsSet('noti', list.slice(-NOTI_MAX)); }
@@ -85,10 +88,11 @@ function notiText(x) {
     case 'badge': return t('nt_badge', { name: t('bdg_' + x.badge) });
     case 'wk': return t('nt_wk', { rank: x.rank, fish });
     case 'paid': return t('nt_paid', { item: x.ref === 'donate' ? t('donate_btn') : esc(dict((SHOPI[x.ref] || {}).n) || x.ref) });
+    case 'dm': return t('nt_dm', { who }) + (x.body ? `<span class="nt-q">${esc(chatClean(x.body))}</span>` : '');
     default: return '';
   }
 }
-const NT_ICON = { cmt: 'chat', cmt2: 'chat', like: 'heart', freq: 'user-plus', facc: 'user-check', rok: 'check', rno: 'x', rlog: 'log', rhold: 'clock', tjoin: 'flag', notice: 'megaphone', paid: 'heart', badge: 'medal', wk: 'trophy' };
+const NT_ICON = { dm: 'chat', cmt: 'chat', cmt2: 'chat', like: 'heart', freq: 'user-plus', facc: 'user-check', rok: 'check', rno: 'x', rlog: 'log', rhold: 'clock', tjoin: 'flag', notice: 'megaphone', paid: 'heart', badge: 'medal', wk: 'trophy' };
 function openNoti() {
   notiScan();
   const seen = lsGet('notiSeen', 0) || 0;
@@ -113,5 +117,6 @@ function openNoti() {
     else if (x.k === 'paid') location.hash = 'sea';
     else if (x.k === 'badge') { S.seaTab = 'badges'; S.viewUid = null; location.hash = 'sea'; }
     else if (x.k === 'wk') openWeekly();
+    else if (x.k === 'dm') dmOpen(x.who);
   });
 }

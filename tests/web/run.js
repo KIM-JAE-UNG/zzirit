@@ -408,7 +408,7 @@ const AI_NOFISH = { fish_visible: false, candidates: [], other_en: '', other_sci
   await W.waitForTimeout(600); await W.reload(); await W.waitForTimeout(5500);
   ok(!!(await W.$('.wn')), 'an earlier member sees what changed');
   ok(!!(await W.$('#wn-id')), 'update notes offer to create a login ID');
-  ok(await W.$eval('.wn', n => /메뉴/.test(n.textContent) && /조과 등록/.test(n.textContent) && /출조 점수/.test(n.textContent) && /주간 대물 대회/.test(n.textContent) && n.querySelectorAll('.wn-list li').length <= 6), 'update notes list the newest features (at most 6 lines)');
+  ok(await W.$eval('.wn', n => /갯바위 공원/.test(n.textContent) && /실시간 채팅/.test(n.textContent) && /글·댓글/.test(n.textContent) && /탈퇴/.test(n.textContent) && n.querySelectorAll('.wn-list li').length <= 6), 'update notes list the newest features (at most 6 lines)');
   ok(await W.$eval('.wn', n => !/초기화/.test(n.textContent)), 'update notes do not claim a reset that the server has not done');
   await shot(W, 'q04_whatsnew');
   await W.click('#wn-ok'); await W.waitForTimeout(400); await W.reload(); await W.waitForTimeout(5000);
