@@ -14,6 +14,7 @@ bash tests/run-all.sh
 | 폰 알림 암호화 | `push/webpush.test.mjs` | RFC 8291 예제를 바이트 하나까지 똑같이 재현하고 VAPID 서명을 공개 키로 검증 |
 | 웹사이트 | `web/run.js` | 가짜 Supabase(`web/server.js`)로 index.html을 실제 브라우저(Playwright)에서 돌려 가입·스캔·등록·게시판·팀·결제·아이디·공지·조과 카드 등을 확인 |
 | Claude 페이지 | `claude/run.js` | 가짜 Claude 런타임(`claude/mock.js`)으로 artifact.html을 확인 |
+| 폰 조과 등록 | `web/phone-scan.js` | 아이폰 크기·터치로 사진 → "맞나요?" → 길이 → 등록을 손가락으로 누르듯 진행. 등록 중 가입, 등록 중 아이디 로그인(새로 고침 후 이어서), 로그인한 폰에서 다음 물고기까지. 버튼이 화면 안에 있고 다른 것에 가려지지 않는지도 확인 (새 가짜 서버에서 실행) |
 
 - 필요한 것: Node 18+, Python 3, Playwright + Chromium. 처음 실행하면 `npm install`로 PGlite·Leaflet·QR 라이브러리를 받습니다.
 - 화면 사진과 결과는 `tests/out/`에 남습니다 (저장소에는 올리지 않음).

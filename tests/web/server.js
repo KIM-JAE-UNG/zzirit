@@ -195,6 +195,7 @@ http.createServer(async (req, res) => {
   }
   if (u.pathname === '/__sb/feature') { for (const [k, v] of u.searchParams) FEATURES[k] = v === '1'; return send(FEATURES); }
   if (u.pathname === '/__sb/dump') return send({ T, admins: [...admins], links, STATS, PUSH, PUSHLOG });
+  if (u.pathname === '/__sb/config') { const q = await body(req); const g = T.admin_docs.config || (T.admin_docs.config = { id: 'config', data: {} }); g.data = Object.assign({}, g.data, q); push('admin_docs', 'UPDATE', g, { id: 'config' }); return send({ ok: true }); }
   if (u.pathname === '/__sb/grant') { const q = await body(req); const g = T.admin_docs.grants || (T.admin_docs.grants = { id: 'grants', data: {} }); g.data[q.uid] = Object.assign({}, g.data[q.uid], { [q.oid]: q.v }); push('admin_docs', 'UPDATE', g, { id: 'grants' }); return send({ ok: true }); }
   const f = u.pathname === '/_leaflet_test.js' ? LEAFLET : path.join(ROOT, decodeURIComponent(u.pathname === '/' ? '/index.html' : u.pathname));
   fs.readFile(f, (e, buf) => {

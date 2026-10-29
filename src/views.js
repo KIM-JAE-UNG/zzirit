@@ -172,7 +172,7 @@ function hydratePhotos(root) {
 /* ---------- SCAN ---------- */
 VIEWS.scan = {
   render(el) {
-    S.scan = S.scan || { mode: 'now', phase: 'idle' };
+    S.scan = S.scan || scanRestore() || { mode: 'now', phase: 'idle' };
     if (S.route === 'past') S.scan.mode = 'past';
     const sc = S.scan;
     const ls = learnStats();
@@ -1175,7 +1175,11 @@ VIEWS.admin = {
       const v = verdict(uid, c.id);
       if (c.st === 'review' && (v === 'hold' || (!v && nowMs() - (c.at || c.ts || 0) > 3600e3))) reviews.push({ uid, a, c, note: reviewNote(uid, c) });
     }
-    const autoLog = []; for (const [uid, m] of Object.entries(S.admin.autorev || {})) for (const [cid, r] of Object.entries(m || {})) { const a = S.anglers.get(uid); const c = a && (a.catches || []).find(x => x.id === cid); if (c) autoLog.push({ uid, a, c, note: reviewNote(uid, c), at: r.at || 0 }); }
+    // the reviewer's notes live in reviews (older ones in admin_docs 'autorev'); each catch once
+    const autoLog = [], logSeen = new Set();
+    const addLog = (uid, m) => { for (const [cid, r] of Object.entries(m || {})) { if (logSeen.has(uid + '|' + cid)) continue; logSeen.add(uid + '|' + cid); const a = S.anglers.get(uid); const c = a && (a.catches || []).find(x => x.id === cid); if (c) autoLog.push({ uid, a, c, note: reviewNote(uid, c), at: (r && r.at) || 0 }); } };
+    for (const [uid, m] of S.reviews || []) addLog(uid, m);
+    for (const [uid, m] of Object.entries(S.admin.autorev || {})) addLog(uid, m);
     autoLog.sort((x, y) => y.at - x.at);
     const users = [...S.anglers.entries()].filter(([, a]) => a && a.nick).map(([uid, a]) => ({ uid, a, n: (a.catches || []).length, L: lvInfo(a, uid).L, pts: (a.catches || []).filter(c => eligible(c, uid)).reduce((x, c) => x + (c.sc || 0), 0) })).sort((x, y) => (y.a.joined || 0) - (x.a.joined || 0));
     adminLoad();
@@ -1223,7 +1227,8 @@ VIEWS.admin = {
     </div>`;
     hydratePhotos(el);
     $('#ad-save', el).onclick = async () => {
-      const toss = $('#ad-toss', el).value.trim().replace(/^https?:\/\/toss\.me\//, '').replace(/\/.*$/, '');
+      // "toss.me/abc", "https://toss.me/abc/500" or just "abc" all become "abc"
+      const toss = $('#ad-toss', el).value.trim().replace(/^(https?:\/\/)?(www\.)?toss\.me\//i, '').replace(/[/?#\s].*$/, '');
       const kakao = $('#ad-kakao', el).value.trim();
       if (kakao && !/^https:\/\/qr\.kakaopay\.com\//.test(kakao)) { toast(t('ad_kakao_bad'), 'warn'); return; }
       await store.saveAdmin('config', Object.assign({}, S.admin.config || {}, { tossId: toss, kakaoUrl: kakao, kakaoAmt: $('#ad-kamt', el).checked }));
@@ -1285,11 +1290,9 @@ async function openRelink(uid) {
 }
 
 /* ---------- More (mobile) ---------- */
+const NAV_ICON = { home: 'home', scan: 'scan', map: 'map', points: 'pin', dex: 'book', tackle: 'lure', log: 'log', sea: 'sea', char: 'user', rank: 'trophy', friends: 'users', board: 'board', teams: 'flag', help: 'chat', about: 'sparkle', prefs: 'gear', admin: 'shield' };
 function openMore() {
-  const items = [['friends', 'users'], ['board', 'board'], ['teams', 'flag'], ['points', 'pin'], ['char', 'user'], ['dex', 'book'], ['tackle', 'lure'], ['log', 'log'], ['help', 'chat'], ['about', 'sparkle'], ['prefs', 'gear']];
-  if (window.APP_RT !== 'web') items.splice(3, 1);
-  if (S.isOwner) items.push(['admin', 'shield']);
-  const nIn = frLists().inc.length;
+  const nIn = S.me && S.me.nick ? frLists().inc.length : 0;
   // the account first: who is signed in, with a way to sign out (only when there is a way back in: a login ID or a linked device)
   const linked = !!(window.APP_AUTH && window.APP_AUTH.link && window.APP_AUTH.link.linked());
   const inAcct = !!(S.me && S.me.nick) && (!!S.loginId || linked);
@@ -1297,8 +1300,24 @@ function openMore() {
     ? `<div class="more-acct"><a href="#prefs" class="more-acct-main">${avatar(S.me, 30)}<span><b>${esc(S.me.nick)}</b><span class="muted small${S.loginId ? ' mono' : ''}">${esc(S.loginId || t('more_linked'))}</span></span></a><button class="more-out" data-act="logout">${icon('logout')}<span>${t('lo_title')}</span></button></div>`
     : `<button class="more-acct" data-act="auth">${icon('user')}<span><b>${t(S.me && S.me.nick ? 'more_acct_keep' : 'more_acct_join')}</b><span class="muted small">${t(S.me && S.me.nick ? 'more_acct_keep_sub' : 'more_acct_join_sub')}</span></span></button>`) : '';
   const inst = installOn() ? `<button class="more-item" data-act="install">${icon('download')}<span>${t('inst_btn')}</span></button>` : '';
-  const w = openModal(`<nav class="more"><h2 class="sr">${t('more')}</h2>${acct}${items.map(([r, ic]) => `<a href="#${r}" class="more-item">${icon(ic)}<span>${t('nav_' + r)}</span>${r === 'friends' && nIn ? `<i class="badge num">${nIn}</i>` : ''}</a>`).join('')}${inst}<button class="more-item heart" data-act="donate">${icon('heart')}<span>${t('donate_btn')}</span></button></nav>`, { sheet: true, label: t('more') });
+  // the four groups; the one with the page on screen starts open, one open at a time so the sheet stays short
+  const cur = navGroupOf(S.route) || 'fish';
+  const grp = NAV_GROUPS.map(([id, gic, routes]) => {
+    const list = routes.filter(r => (r !== 'points' || window.APP_RT === 'web') && (r !== 'admin' || S.isOwner));
+    const on = id === cur, dot = list.includes('friends') && nIn;
+    return `<section class="more-grp${on ? ' open' : ''}" data-mgrp="${id}">
+      <button type="button" class="more-gh" aria-expanded="${on}" aria-controls="mg-${id}">${icon(gic)}<span class="more-gt"><b>${t('ng_' + id)}</b><span class="muted small">${list.map(r => esc(t('nav_' + r))).join(' · ')}</span></span>${dot ? `<i class="badge num">${nIn > 9 ? '9+' : nIn}</i>` : ''}${icon('chev')}</button>
+      <div class="more-gb" id="mg-${id}"><div class="more-gi">${list.map(r => `<a href="#${r}" class="more-item${viewOf(S.route) === viewOf(r) ? ' on' : ''}"${viewOf(S.route) === viewOf(r) ? ' aria-current="page"' : ''}>${icon(NAV_ICON[r])}<span>${t('nav_' + r)}</span>${r === 'friends' && nIn ? `<i class="badge num">${nIn > 9 ? '9+' : nIn}</i>` : ''}</a>`).join('')}</div></div>
+    </section>`;
+  }).join('');
+  const w = openModal(`<nav class="more"><h2 class="sr">${t('more')}</h2>${acct}<div class="more-grps">${grp}</div><div class="more-foot">${inst}<button class="more-item heart" data-act="donate">${icon('heart')}<span>${t('donate_btn')}</span></button></div></nav>`, { sheet: true, label: t('more') });
   w.addEventListener('click', e => {
+    const gh = e.target.closest('.more-gh');
+    if (gh) {
+      const g = gh.closest('.more-grp'), open = !g.classList.contains('open');
+      $$('.more-grp', w).forEach(x => { const on = x === g && open; x.classList.toggle('open', on); $('.more-gh', x).setAttribute('aria-expanded', String(on)); });
+      return;
+    }
     if (e.target.closest('[data-act="auth"]')) { closeModal(w); openAuth('join'); return; }
     if (e.target.closest('[data-act="logout"]')) { closeModal(w); openLogout(); return; }
     if (e.target.closest('[data-act="install"]')) { closeModal(w); openInstall(); return; }

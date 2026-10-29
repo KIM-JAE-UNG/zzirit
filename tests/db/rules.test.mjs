@@ -57,6 +57,8 @@ await q(`insert into public.ai_tickets (nonce, uid, verdict) values (gen_random_
 /* ---------- the migrations ---------- */
 await apply('0008_paid_confirm_reset.sql');
 await apply('0009_review_admin_ids.sql');
+await apply('0011_restore_functions.sql');   // the same code again (put back on the live server after an old copy ran)
+await apply('0012_restore_link_redeem.sql');
 await grants();
 await q(`insert into public.app_admins (uid) values ($1), ($2)`, [ADM, ADM2]);
 let r;
@@ -73,6 +75,7 @@ check(r.rows[0].l === 0 && r.rows[0].s === 0 && r.rows[0].t === 0, 'labels, spot
 check(r.rows[0].o === 0, 'all orders removed (nobody paid)');
 check(JSON.stringify(await get('admin_docs', 'verdicts')) === '{}' && JSON.stringify(await get('admin_docs', 'grants')) === '{}', 'decisions cleared');
 r = await get('admin_docs', 'config'); check(r && r.notice && /^rs\d{8}$/.test(r.notice.id) && /초기화했어요/.test(r.notice.t) && r.notice.t.length <= 400 && r.notice.ts > 0, 'a notice about the reset is posted once it has really run');
+check(r && typeof r.resetAt === 'number' && Math.abs(r.resetAt - Date.now()) < 600000, 'the reset time is written down (phones do not upload older records again): ' + (r && r.resetAt));
 r = await q(`select count(*)::int n from auth.users where id = $1`, [T]); check(r.rows[0].n === 0, 'test account removed');
 r = await q(`select coalesce(sum(n), 0)::int n from public.ai_usage`); check(r.rows[0].n === 0, 'test usage removed');
 r = await q(`select (select count(*)::int from public.board) b`); check(r.rows[0].b === 1, 'posts kept');

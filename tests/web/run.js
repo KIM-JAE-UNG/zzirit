@@ -408,7 +408,7 @@ const AI_NOFISH = { fish_visible: false, candidates: [], other_en: '', other_sci
   await W.waitForTimeout(600); await W.reload(); await W.waitForTimeout(5500);
   ok(!!(await W.$('.wn')), 'an earlier member sees what changed');
   ok(!!(await W.$('#wn-id')), 'update notes offer to create a login ID');
-  ok(await W.$eval('.wn', n => /출조 점수/.test(n.textContent) && /주간 대물 대회/.test(n.textContent) && /통계/.test(n.textContent) && /폰 알림/.test(n.textContent) && n.querySelectorAll('.wn-list li').length <= 6), 'update notes list the newest features (at most 6 lines)');
+  ok(await W.$eval('.wn', n => /메뉴/.test(n.textContent) && /조과 등록/.test(n.textContent) && /출조 점수/.test(n.textContent) && /주간 대물 대회/.test(n.textContent) && n.querySelectorAll('.wn-list li').length <= 6), 'update notes list the newest features (at most 6 lines)');
   ok(await W.$eval('.wn', n => !/초기화/.test(n.textContent)), 'update notes do not claim a reset that the server has not done');
   await shot(W, 'q04_whatsnew');
   await W.click('#wn-ok'); await W.waitForTimeout(400); await W.reload(); await W.waitForTimeout(5000);
@@ -664,6 +664,64 @@ const AI_NOFISH = { fish_visible: false, candidates: [], other_en: '', other_sci
   await go(E, 'board', 1200); await shot(E, 'e01_board_dark');
   await go(E, 'char', 1000); await shot(E, 'e02_char_dark');
   await go(E, 'sea', 1500); await E.click('[data-seatab="shop"]'); await E.waitForTimeout(800); await shot(E, 'e03_decor_dark', true);
+
+  /* ---------- 2026-10-29d: records kept on a phone do not come back after a reset or a deleted account ---------- */
+  const RESET = Date.now() - 3600e3;
+  await fetch('http://127.0.0.1:8768/__sb/config', { method: 'POST', body: JSON.stringify({ resetAt: RESET }) });
+  const oldMe = (cs, extra) => Object.assign({ v: 1, nick: '옛기록', cc: 'KR', home: 'KS', joined: RESET - 864e5, catches: cs, decor: { theme: 'th_dawn', items: [], fx: [] }, flair: {} }, extra || {});
+  const cOld = { id: 'oldcatch01', sp: 'kurodai', len: 30, ts: RESET - 7200e3, at: RESET - 7200e3, st: 'ok' }, cNew = { id: 'newcatch01', sp: 'kurodai', len: 31, ts: RESET + 60e3, at: RESET + 60e3, st: 'review' };
+  // a phone that only ever kept its profile on itself: uploaded, but without what was registered before the reset
+  const R1c = await b.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, locale: 'ko-KR' });
+  await R1c.addInitScript(([me]) => { if (!sessionStorage.getItem('seeded')) { sessionStorage.setItem('seeded', '1'); localStorage.setItem('eosin.welcomed', '1'); localStorage.setItem('eosin.me', JSON.stringify(me)); } }, [oldMe([cOld, cNew])]);
+  for (const [pat, fn] of [['https://cdn.jsdelivr.net/npm/@supabase/**', r => r.fulfill({ contentType: 'text/javascript', body: FAKE })], ['https://cdnjs.cloudflare.com/**', r => r.fulfill({ contentType: 'text/javascript', body: LEAF })]]) await R1c.route(pat, fn);
+  await R1c.route(/fonts\.(googleapis|gstatic)\.com|open-meteo|functions\/v1/, r => r.abort());
+  const R1 = await R1c.newPage(); await R1.goto(BASE + '#home'); await R1.waitForTimeout(4200);
+  const r1Id = await R1.evaluate(() => S.uid); d = await dump();
+  ok(d.T.anglers[r1Id] && d.T.anglers[r1Id].data.nick === '옛기록' && d.T.anglers[r1Id].data.catches.map(c => c.id).join() === 'newcatch01', 'a profile kept only on the phone goes up, minus records from before the reset: ' + JSON.stringify(d.T.anglers[r1Id] && d.T.anglers[r1Id].data.catches.map(c => c.id)));
+  ok(await R1.evaluate(() => localStorage.getItem('eosin.meOf')) === JSON.stringify(r1Id), 'the phone remembers which account its copy belongs to');
+  // a phone whose account is gone (the operator deleted it): its copy is set aside, nothing comes back by itself
+  const R2c = await b.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, locale: 'ko-KR' });
+  await R2c.addInitScript(([me]) => { if (!sessionStorage.getItem('seeded')) { sessionStorage.setItem('seeded', '1'); localStorage.setItem('eosin.welcomed', '1'); localStorage.setItem('eosin.me', JSON.stringify(me)); localStorage.setItem('eosin.meOf', JSON.stringify('00000000-dead-4000-8000-000000000001')); } }, [oldMe([cNew], { nick: '지워진계정' })]);
+  for (const [pat, fn] of [['https://cdn.jsdelivr.net/npm/@supabase/**', r => r.fulfill({ contentType: 'text/javascript', body: FAKE })], ['https://cdnjs.cloudflare.com/**', r => r.fulfill({ contentType: 'text/javascript', body: LEAF })]]) await R2c.route(pat, fn);
+  await R2c.route(/fonts\.(googleapis|gstatic)\.com|open-meteo|functions\/v1/, r => r.abort());
+  const R2 = await R2c.newPage(); await R2.goto(BASE + '#home'); await R2.waitForTimeout(4200);
+  const r2Id = await R2.evaluate(() => S.uid); d = await dump();
+  ok(!d.T.anglers[r2Id] && await R2.evaluate(() => !S.me && !localStorage.getItem('eosin.me') && !!localStorage.getItem('eosin.meOld')), 'a copy of an account that is gone is set aside, not uploaded');
+  await R1c.close(); await R2c.close();
+
+  /* ---------- 2026-10-29d: a Toss ID comes first in the payment window (no "accept" step for the operator) ---------- */
+  await fetch('http://127.0.0.1:8768/__sb/config', { method: 'POST', body: JSON.stringify({ tossId: 'zzirit_test' }) }); await A.waitForTimeout(600);
+  await closeModals(A); await A.evaluate(() => openDonate()); await A.waitForTimeout(900);
+  ok(await A.$eval('.pay-methods a:first-child', n => n.dataset.pm === 'toss' && n.href === 'https://toss.me/zzirit_test/500').catch(() => false), 'Toss button first, with the amount filled in');
+  ok(!!(await A.$('#pay-qr svg')), 'computer: the QR opens Toss');
+  await shot(A, 'n03_pay_toss');
+  await closeModals(A);
+  await fetch('http://127.0.0.1:8768/__sb/config', { method: 'POST', body: JSON.stringify({ tossId: '' }) });
+
+  /* ---------- 2026-10-29d: the menu in four groups ---------- */
+  const navOpen = p => p.$$eval('.nav-grp.open', ns => ns.map(n => n.dataset.grp).join(','));
+  await A.evaluate(() => { localStorage.removeItem('eosin.navOpen'); }); await go(A, 'board', 900);
+  ok(await A.$$eval('.nav > .nav-grp', ns => ns.length) === 4 && await A.$$eval('.nav > a', ns => ns.map(n => n.dataset.route).join()) === 'home', 'side menu: home + four groups');
+  ok(await navOpen(A) === 'social' && await A.$eval('.nav-grp[data-grp="social"] .nav-gh', n => n.getAttribute('aria-expanded')) === 'true', 'the group of the page on screen is open, the rest closed');
+  ok(!(await A.$('.nav-grp[data-grp="fish"] a[data-route="dex"]').then(n => n.isVisible())), 'links in a closed group are hidden');
+  await A.click('[data-navgrp="fish"]'); await A.waitForTimeout(350);
+  ok(await navOpen(A) === 'fish,social' && await A.$('.nav-grp[data-grp="fish"] a[data-route="dex"]').then(n => n.isVisible()), 'clicking a group opens it');
+  await A.click('[data-navgrp="social"]'); await A.waitForTimeout(350);
+  ok(await navOpen(A) === 'fish' && await A.$eval('.nav-grp[data-grp="social"]', n => n.classList.contains('has-on')), 'the page\'s own group can be closed (still marked as where you are)');
+  await A.click('.nav a[data-route="dex"]'); await A.waitForTimeout(700);
+  await A.reload(); await A.waitForTimeout(1800);
+  ok(await navOpen(A) === 'fish', 'open groups are remembered on this device: ' + await navOpen(A));
+  await go(A, 'log', 700); ok((await navOpen(A)).split(',').sort().join() === 'fish,mine', 'going to a page opens its group');
+  await shot(A, 'n01_menu_groups');
+  // the phone's sheet: groups, one open at a time, the page's group first
+  await go(D, 'teams', 900); await D.click('[data-act="more"]'); await D.waitForTimeout(500);
+  ok(await D.$$eval('.more .more-grp', ns => ns.length) === 4 && await D.$$eval('.more .more-grp.open', ns => ns.map(n => n.dataset.mgrp).join()) === 'social', 'phone menu: four groups, the page\'s group open');
+  ok(!!(await D.$('.more-grp.open .more-item.on[href="#teams"]')), 'phone menu: the page on screen is marked');
+  await D.click('.more-grp[data-mgrp="help"] .more-gh'); await D.waitForTimeout(350);
+  ok(await D.$$eval('.more .more-grp.open', ns => ns.map(n => n.dataset.mgrp).join()) === 'help', 'phone menu: opening a group closes the other');
+  await shot(D, 'n02_phone_menu');
+  await D.click('.more-grp.open a[href="#prefs"]'); await D.waitForTimeout(700);
+  ok(await D.evaluate(() => S.route) === 'prefs' && !(await D.$('.modal-wrap.in .more')), 'phone menu: a link goes there and closes the sheet');
 
   } catch (e) { logs.push('CRASH: ' + e.message.split('\n')[0]); fails.push('crash'); }
   console.log(logs.join('\n'));

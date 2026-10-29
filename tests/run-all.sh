@@ -19,6 +19,10 @@ trap 'kill $WS $CS 2>/dev/null; rm -f out-web-server.log out-claude-server.log' 
 for i in $(seq 1 30); do curl -s -o /dev/null http://127.0.0.1:8768/index.html && curl -s -o /dev/null http://127.0.0.1:8766/_test.html && break; sleep 0.3; done
 echo "== website"; node web/run.js > out-web.txt 2>&1; grep -v 'Failed to load resource' out-web.txt | grep -E '✗|CRASH|PAGEERROR|ALL PASSED|FAILED'; grep -q 'ALL PASSED' out-web.txt || fail=1
 echo "== Claude page"; node claude/run.js > out-claude.txt 2>&1; grep -E '✗|CRASH|PAGEERROR|ALL PASSED|FAILED' out-claude.txt; grep -q 'ALL PASSED' out-claude.txt || fail=1
-mkdir -p out && mv -f out-web.txt out-claude.txt out/ 2>/dev/null
+# registering a catch on a phone (incl. logging in halfway): on a fresh fake server, where these photos are new
+kill $WS 2>/dev/null; sleep 0.3; node web/server.js > out-web-server.log 2>&1 & WS=$!
+for i in $(seq 1 30); do curl -s -o /dev/null http://127.0.0.1:8768/index.html && break; sleep 0.3; done
+echo "== phone: registering a catch"; node web/phone-scan.js > out-phone.txt 2>&1; grep -E '✗|CRASH|PAGEERROR|ALL PASSED|FAILED' out-phone.txt; grep -q 'ALL PASSED' out-phone.txt || fail=1
+mkdir -p out && mv -f out-web.txt out-claude.txt out-phone.txt out/ 2>/dev/null
 [ $fail = 0 ] && echo "ALL CHECKS PASSED" || echo "SOME CHECKS FAILED (details in tests/out/)"
 exit $fail

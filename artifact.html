@@ -1294,6 +1294,47 @@ div.more-acct:hover { filter: none; }
 .noti .push-row { margin: 8px 0 4px; padding: 10px 12px; border-radius: 12px; background: var(--surface-2); }
 .noti .push-row.note { background: var(--sea-soft); }
 .wk-nm .team-tag { margin-left: 0; }
+/* menu groups: side menu */
+.nav-grp { display: flex; flex-direction: column; }
+.nav-gh { display: flex; align-items: center; gap: 12px; width: 100%; padding: 10px 12px; border: 0; border-radius: 10px; background: transparent; color: var(--rail-dim); font: inherit; font-weight: 600; font-size: 14.5px; text-align: left; cursor: pointer; }
+.nav-gh:hover { background: var(--rail-2); color: var(--rail-ink); }
+.nav-gh:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.nav-gh > span { flex: 1; min-width: 0; }
+.nav-gh .chev { width: 16px; height: 16px; flex: none; opacity: .7; transition: transform .2s ease; }
+.nav-grp.open > .nav-gh .chev { transform: rotate(180deg); }
+.nav-grp.has-on > .nav-gh { color: var(--rail-ink); }
+.nav-grp.has-on > .nav-gh > .ic:first-child { color: var(--accent); }
+.nav-grp.has-on:not(.open) > .nav-gh { background: var(--rail-2); color: #fff; }
+.nav-dot { flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+.nav-gb { display: grid; grid-template-rows: 0fr; visibility: hidden; transition: grid-template-rows .22s ease, visibility 0s linear .22s; }
+.nav-grp.open > .nav-gb { grid-template-rows: 1fr; visibility: visible; transition: grid-template-rows .22s ease, visibility 0s; }
+.nav-gi { overflow: hidden; display: flex; flex-direction: column; gap: 2px; margin-left: 20px; padding-left: 8px; border-left: 1px solid rgba(255,255,255,.08); }
+.nav-grp.open > .nav-gb .nav-gi { padding-top: 2px; padding-bottom: 4px; }
+.nav-gi a { padding: 8px 10px; font-size: 14px; }
+@media (min-width: 900px) and (max-height: 980px) { .nav-gh { padding-top: 7px; padding-bottom: 7px; } .nav-gi a { padding-top: 6px; padding-bottom: 6px; } }
+@media (min-width: 900px) and (max-height: 820px) { .nav-gh { padding-top: 5px; padding-bottom: 5px; font-size: 14px; } .nav-gi a { padding-top: 5px; padding-bottom: 5px; } }
+/* menu groups: the phone's "more" sheet */
+.more { display: flex; flex-direction: column; gap: 10px; }
+.more-grps { display: flex; flex-direction: column; gap: 8px; }
+.more-grp { border-radius: 14px; background: var(--surface-2); }
+.more-gh { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 56px; padding: 10px 14px; border: 0; border-radius: 14px; background: transparent; color: var(--ink); font: inherit; text-align: left; cursor: pointer; }
+.more-gh:focus-visible { outline: 2px solid var(--sea); outline-offset: -2px; }
+.more-gh > .ic:first-child { width: 24px; height: 24px; flex: none; color: var(--sea); }
+.more-gt { display: flex; flex-direction: column; gap: 1px; flex: 1; min-width: 0; }
+.more-gt b { font-size: 15px; }
+.more-gt .small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.more-grp.open .more-gt .small { display: none; }
+.more-gh .badge { flex: none; }
+.more-gh .ic:last-child { width: 18px; height: 18px; flex: none; color: var(--ink-3); transition: transform .2s ease; }
+.more-grp.open .more-gh .ic:last-child { transform: rotate(180deg); }
+.more-gb { display: grid; grid-template-rows: 0fr; visibility: hidden; transition: grid-template-rows .22s ease, visibility 0s linear .22s; }
+.more-grp.open .more-gb { grid-template-rows: 1fr; visibility: visible; transition: grid-template-rows .22s ease, visibility 0s; }
+.more-gi { overflow: hidden; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding: 0 10px; }
+.more-grp.open .more-gi { padding-bottom: 10px; }
+.more-gi .more-item { background: var(--surface); text-align: center; }
+.more-gi .more-item.on { box-shadow: inset 0 0 0 2px var(--sea); }
+.more-foot { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.more-foot .more-item:only-child { grid-column: 1 / -1; flex-direction: row; justify-content: center; }
 
 </style>
 <div class="app">
@@ -1304,23 +1345,42 @@ div.more-acct:hover { filter: none; }
     </a>
     <nav class="nav" aria-label="Main">
       <a href="#home" data-route="home"><svg class="ic" aria-hidden="true"><use href="#i-home"/></svg><span data-t="nav_home"></span></a>
-      <a href="#scan" data-route="scan"><svg class="ic" aria-hidden="true"><use href="#i-scan"/></svg><span data-t="nav_scan"></span></a>
-      <a href="#map" data-route="map"><svg class="ic" aria-hidden="true"><use href="#i-map"/></svg><span data-t="nav_map"></span></a>
-      <a href="#rank" data-route="rank"><svg class="ic" aria-hidden="true"><use href="#i-trophy"/></svg><span data-t="nav_rank"></span></a>
-      <a href="#friends" data-route="friends"><svg class="ic" aria-hidden="true"><use href="#i-users"/></svg><span data-t="nav_friends"></span><i class="badge num" data-frbadge hidden></i></a>
-      <a href="#board" data-route="board"><svg class="ic" aria-hidden="true"><use href="#i-board"/></svg><span data-t="nav_board"></span></a>
-      <a href="#teams" data-route="teams"><svg class="ic" aria-hidden="true"><use href="#i-flag"/></svg><span data-t="nav_teams"></span></a>
-      <a href="#points" data-route="points" class="nav-web"><svg class="ic" aria-hidden="true"><use href="#i-pin"/></svg><span data-t="nav_points"></span></a>
-      <a href="#sea" data-route="sea"><svg class="ic" aria-hidden="true"><use href="#i-sea"/></svg><span data-t="nav_sea"></span></a>
-      <a href="#char" data-route="char"><svg class="ic" aria-hidden="true"><use href="#i-user"/></svg><span data-t="nav_char"></span></a>
-      <div class="nav-sep"></div>
-      <a href="#dex" data-route="dex"><svg class="ic" aria-hidden="true"><use href="#i-book"/></svg><span data-t="nav_dex"></span></a>
-      <a href="#tackle" data-route="tackle"><svg class="ic" aria-hidden="true"><use href="#i-lure"/></svg><span data-t="nav_tackle"></span></a>
-      <a href="#log" data-route="log"><svg class="ic" aria-hidden="true"><use href="#i-log"/></svg><span data-t="nav_log"></span></a>
-      <a href="#help" data-route="help"><svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg><span data-t="nav_help"></span></a>
-      <a href="#about" data-route="about"><svg class="ic" aria-hidden="true"><use href="#i-sparkle"/></svg><span data-t="nav_about"></span></a>
-      <a href="#prefs" data-route="prefs"><svg class="ic" aria-hidden="true"><use href="#i-gear"/></svg><span data-t="nav_prefs"></span></a>
-      <a href="#admin" data-route="admin" class="nav-admin" hidden><svg class="ic" aria-hidden="true"><use href="#i-shield"/></svg><span data-t="nav_admin"></span></a>
+      <div class="nav-grp" data-grp="fish">
+        <button type="button" class="nav-gh" data-navgrp="fish" aria-expanded="false" aria-controls="ng-fish"><svg class="ic" aria-hidden="true"><use href="#i-fish"/></svg><span data-t="ng_fish"></span><i class="nav-dot" aria-hidden="true" hidden></i><svg class="ic chev" aria-hidden="true"><use href="#i-chev"/></svg></button>
+        <div class="nav-gb" id="ng-fish"><div class="nav-gi">
+          <a href="#scan" data-route="scan"><svg class="ic" aria-hidden="true"><use href="#i-scan"/></svg><span data-t="nav_scan"></span></a>
+          <a href="#map" data-route="map"><svg class="ic" aria-hidden="true"><use href="#i-map"/></svg><span data-t="nav_map"></span></a>
+          <a href="#points" data-route="points" class="nav-web"><svg class="ic" aria-hidden="true"><use href="#i-pin"/></svg><span data-t="nav_points"></span></a>
+          <a href="#dex" data-route="dex"><svg class="ic" aria-hidden="true"><use href="#i-book"/></svg><span data-t="nav_dex"></span></a>
+          <a href="#tackle" data-route="tackle"><svg class="ic" aria-hidden="true"><use href="#i-lure"/></svg><span data-t="nav_tackle"></span></a>
+        </div></div>
+      </div>
+      <div class="nav-grp" data-grp="mine">
+        <button type="button" class="nav-gh" data-navgrp="mine" aria-expanded="false" aria-controls="ng-mine"><svg class="ic" aria-hidden="true"><use href="#i-chart"/></svg><span data-t="ng_mine"></span><i class="nav-dot" aria-hidden="true" hidden></i><svg class="ic chev" aria-hidden="true"><use href="#i-chev"/></svg></button>
+        <div class="nav-gb" id="ng-mine"><div class="nav-gi">
+          <a href="#log" data-route="log"><svg class="ic" aria-hidden="true"><use href="#i-log"/></svg><span data-t="nav_log"></span></a>
+          <a href="#sea" data-route="sea"><svg class="ic" aria-hidden="true"><use href="#i-sea"/></svg><span data-t="nav_sea"></span></a>
+          <a href="#char" data-route="char"><svg class="ic" aria-hidden="true"><use href="#i-user"/></svg><span data-t="nav_char"></span></a>
+        </div></div>
+      </div>
+      <div class="nav-grp" data-grp="social">
+        <button type="button" class="nav-gh" data-navgrp="social" aria-expanded="false" aria-controls="ng-social"><svg class="ic" aria-hidden="true"><use href="#i-users"/></svg><span data-t="ng_social"></span><i class="nav-dot" aria-hidden="true" hidden></i><svg class="ic chev" aria-hidden="true"><use href="#i-chev"/></svg></button>
+        <div class="nav-gb" id="ng-social"><div class="nav-gi">
+          <a href="#rank" data-route="rank"><svg class="ic" aria-hidden="true"><use href="#i-trophy"/></svg><span data-t="nav_rank"></span></a>
+          <a href="#friends" data-route="friends"><svg class="ic" aria-hidden="true"><use href="#i-users"/></svg><span data-t="nav_friends"></span><i class="badge num" data-frbadge hidden></i></a>
+          <a href="#board" data-route="board"><svg class="ic" aria-hidden="true"><use href="#i-board"/></svg><span data-t="nav_board"></span></a>
+          <a href="#teams" data-route="teams"><svg class="ic" aria-hidden="true"><use href="#i-flag"/></svg><span data-t="nav_teams"></span></a>
+        </div></div>
+      </div>
+      <div class="nav-grp" data-grp="help">
+        <button type="button" class="nav-gh" data-navgrp="help" aria-expanded="false" aria-controls="ng-help"><svg class="ic" aria-hidden="true"><use href="#i-info"/></svg><span data-t="ng_help"></span><i class="nav-dot" aria-hidden="true" hidden></i><svg class="ic chev" aria-hidden="true"><use href="#i-chev"/></svg></button>
+        <div class="nav-gb" id="ng-help"><div class="nav-gi">
+          <a href="#help" data-route="help"><svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg><span data-t="nav_help"></span></a>
+          <a href="#about" data-route="about"><svg class="ic" aria-hidden="true"><use href="#i-sparkle"/></svg><span data-t="nav_about"></span></a>
+          <a href="#prefs" data-route="prefs"><svg class="ic" aria-hidden="true"><use href="#i-gear"/></svg><span data-t="nav_prefs"></span></a>
+          <a href="#admin" data-route="admin" class="nav-admin" hidden><svg class="ic" aria-hidden="true"><use href="#i-shield"/></svg><span data-t="nav_admin"></span></a>
+        </div></div>
+      </div>
     </nav>
     <div class="rail-foot">
       <span class="mode-pill" id="mode-pill" hidden></span>
@@ -1375,6 +1435,7 @@ div.more-acct:hover { filter: none; }
 <div id="modal-root"></div>
 <div id="toast-root" aria-live="polite"></div>
 <svg width="0" height="0" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
+  <symbol id="i-chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
   <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v8.5a1.5 1.5 0 0 1-1.5 1.5H15v-6H9v6H4.5A1.5 1.5 0 0 1 3 19.5z"/></symbol>
   <symbol id="i-scan" viewBox="0 0 24 24"><path d="M4 8V5.5A1.5 1.5 0 0 1 5.5 4H8M16 4h2.5A1.5 1.5 0 0 1 20 5.5V8M20 16v2.5a1.5 1.5 0 0 1-1.5 1.5H16M8 20H5.5A1.5 1.5 0 0 1 4 18.5V16"/><path d="M7 12c2.2-2.6 5.2-3 8-1l2.2-1.6v5.2L15 13c-2.8 2-5.8 1.6-8-1z"/></symbol>
   <symbol id="i-map" viewBox="0 0 24 24"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14"/></symbol>
@@ -1737,7 +1798,7 @@ const T = {
   ad_users: ['참가자', 'Members', '参加者', '参与者'], ad_pending: ['입금 확인 대기', 'Payments pending', '入金確認待ち', '待确认付款'], ad_pay: ['간편결제 링크', 'Payment links', '簡易決済リンク', '支付链接'],
   ad_toss: ['토스아이디 (toss.me/아이디)', 'Toss ID (toss.me/ID)', 'TossID (toss.me/ID)', 'Toss ID (toss.me/ID)'], ad_kakao: ['카카오페이 송금코드 링크', 'KakaoPay transfer-code link', 'カカオペイ送金コードリンク', 'KakaoPay转账码链接'],
   ad_kakao_amt: ['카카오페이 링크에 금액 자동 입력(비공식 방식)', 'Prefill amount in the KakaoPay link (unofficial)', 'カカオペイリンクに金額を自動入力(非公式)', 'KakaoPay链接自动填写金额(非官方)'],
-  ad_pay_hint: ["카카오페이 앱 > 송금 > 송금코드에서 링크(qr.kakaopay.com/…)를 복사해 넣으면, 결제 창에 카카오페이 버튼과 PC용 QR이 바로 연결돼요. 토스아이디는 선택이에요.", "Copy the link (qr.kakaopay.com/…) from KakaoPay > Transfer > Transfer code. The payment window then shows a KakaoPay button and a QR for computers. A Toss ID is optional.", "カカオペイアプリ > 送金 > 送金コードのリンク(qr.kakaopay.com/…)を貼ると、決済画面にカカオペイのボタンとPC用QRが表示されます。TossIDは任意です。", "在KakaoPay应用 > 转账 > 转账码中复制链接(qr.kakaopay.com/…)，付款窗口就会显示KakaoPay按钮和电脑用二维码。Toss ID为可选。"],
+  ad_pay_hint: ["토스아이디를 넣으면 결제 창에 '토스로 보내기'(금액 자동 입력)와 PC용 QR이 먼저 나와요. 토스아이디로 받은 돈은 '받기'를 누르지 않아도 바로 들어와요. 카카오페이 송금코드 링크(qr.kakaopay.com/…)도 같이 쓸 수 있지만, 카카오페이는 받을 때마다 '받기'를 눌러야 해요.", "Add a Toss ID and the payment window shows 'Pay with Toss' (amount filled in) and a QR for computers first. Money sent to a Toss ID arrives without accepting it. A KakaoPay transfer-code link (qr.kakaopay.com/…) also works, but KakaoPay transfers have to be accepted one by one.", "TossIDを入れると、決済画面に「Tossで送る」(金額入り)とPC用QRが先に表示されます。TossIDへの送金は受け取り操作なしで入金されます。カカオペイ送金コードのリンク(qr.kakaopay.com/…)も使えますが、カカオペイは毎回「受け取る」が必要です。", "填写Toss ID后，付款窗口会先显示“用Toss支付”(自动填好金额)和电脑用二维码。转到Toss ID的钱无需手动收款即可到账。也可以同时使用KakaoPay转账码链接(qr.kakaopay.com/…)，但KakaoPay每笔都需要点“收款”。"],
   ad_kakao_bad: ['카카오페이 링크는 https://qr.kakaopay.com/ 으로 시작해야 해요', 'The KakaoPay link must start with https://qr.kakaopay.com/', 'カカオペイのリンクは https://qr.kakaopay.com/ で始まる必要があります', 'KakaoPay链接需以 https://qr.kakaopay.com/ 开头'],
   ad_orders: ['입금 확인', 'Payment confirmations', '入金確認', '到账确认'], ad_item: ['항목', 'Item', '項目', '项目'], ad_amt: ['금액', 'Amount', '金額', '金额'], ad_when: ['시각', 'When', '日時', '时间'],
   approve: ['승인', 'Approve', '承認', '批准'], reject: ['반려', 'Reject', '却下', '驳回'], ad_reviews: ['검토 대기 조과', 'Catches awaiting review', '審査待ち釣果', '待审核渔获'], ad_suggest: ['제안함', 'Suggestion inbox', '提案ボックス', '建议收件箱'], ad_none: ['없음', 'Nothing here', 'なし', '暂无'],
@@ -1946,7 +2007,7 @@ Object.assign(T, {
   pay_eyebrow_item: ['프리미엄 아이템', 'Premium item', 'プレミアムアイテム', '高级道具'],
   pay_step1: ['카카오페이로 보내기', 'Send with KakaoPay', 'カカオペイで送る', '用KakaoPay转账'], pay_step1_pc: ['휴대폰으로 QR을 찍어 보내기', 'Scan the QR with your phone and send', 'スマホでQRを読み取って送る', '用手机扫码转账'],
   pay_step2: ['보냈다면 아래 버튼을 눌러 주세요', 'Sent it? Tap the button below', '送ったら下のボタンを押してください', '转账后请点击下方按钮'],
-  pay_done: ['보냈어요', 'I sent it', '送りました', '已转账'], pay_wait: ['카카오페이를 연 뒤에 누를 수 있어요', 'Available after you open KakaoPay', 'カカオペイを開いた後に押せます', '打开KakaoPay后才能点击'],
+  pay_done: ['보냈어요', 'I sent it', '送りました', '已转账'], pay_wait: ['송금 화면을 연 뒤에 누를 수 있어요', 'Available after you open the payment screen', '送金画面を開いた後に押せます', '打开转账页面后才能点击'],
   pay_fine2: ['입금이 확인되면 적용돼요(보통 하루 안). 메모 칸에 위 코드를 꼭 적어 주세요. 입금하지 않고 "보냈어요"만 누르면 적용되지 않아요. 계좌번호는 공개하지 않아요.', 'It applies once the payment is confirmed (usually within a day). Please put the code above in the memo. Tapping "I sent it" without sending does nothing. We never show a bank account.', '入金が確認されると適用されます(通常1日以内)。メモ欄に上のコードを必ず入れてください。送金せずに「送りました」を押しても適用されません。口座番号は公開しません。', '确认到账后生效（通常一天内）。请务必在备注里填上方的代码。未转账只点"已转账"不会生效。不公开银行账号。'],
   pay_sent: ['알려 주셔서 고마워요! 운영자가 카카오페이 입금(메모 {code})을 확인하면 바로 적용돼요.', 'Thanks! It applies as soon as the operator finds your KakaoPay payment (memo {code}).', 'ありがとうございます!運営者がカカオペイの入金(メモ {code})を確認するとすぐ適用されます。', '谢谢！运营者确认KakaoPay到账（备注 {code}）后立即生效。'],
   pay_dup: ['이미 입금 확인을 기다리는 주문이 있어요 (메모 {code}). 확인되면 바로 적용돼요.', 'An order is already waiting for confirmation (memo {code}). It applies as soon as it is confirmed.', '入金確認待ちの注文がすでにあります(メモ {code})。確認されるとすぐ適用されます。', '已有等待确认的订单（备注 {code}），确认后立即生效。'],
@@ -2016,6 +2077,11 @@ Object.assign(T, {
   id_login_sub: ['다른 기기에서 만든 아이디로 로그인하면 그 계정의 기록을 이어서 써요.', 'Sign in with an ID you made on another device to continue that account here.', '他の端末で作ったIDでログインすると、そのアカウントの記録を続けて使えます。', '用在其他设备创建的ID登录，即可在此继续该账号。'],
   id_login_go: ['로그인', 'Sign in', 'ログイン', '登录'],
   id_login_ok: ['{name} 아이디로 로그인했어요', 'Signed in as {name}', '{name}でログインしました', '已用{name}登录'],
+  pay_step1_both: ['토스나 카카오페이로 보내기', 'Send with Toss or KakaoPay', 'Tossかカカオペイで送る', '用Toss或KakaoPay转账'],
+  pay_qr_hint_toss: ['PC라면 휴대폰 카메라로 이 QR을 찍으세요. 토스 송금 화면이 금액까지 채워져 열려요.', 'On a computer, scan this QR with your phone camera: Toss opens with the amount filled in.', 'PCならスマホのカメラでこのQRを読み取ってください。金額入りでTossの送金画面が開きます。', '在电脑上请用手机相机扫描此二维码，Toss转账页面会带着金额打开。'],
+  ng_fish: ['낚시하기', 'Fishing', '釣り', '钓鱼'], ng_mine: ['내 기록', 'My records', 'マイ記録', '我的记录'],
+  ng_social: ['커뮤니티', 'Community', 'コミュニティ', '社区'], ng_help: ['도움·설정', 'Help & settings', 'ヘルプ・設定', '帮助与设置'],
+  scan_resumed: ['로그인 전에 하던 조과 등록을 이어서 해요', 'Picking up the catch you were registering', 'ログイン前の釣果登録を続けます', '继续登录前未完成的渔获登记'],
   id_have: ['이미 아이디가 있어요', 'I already have an ID', 'IDを持っています', '我已有ID'],
   id_change_pw: ['비밀번호 바꾸기', 'Change password', 'パスワード変更', '修改密码'],
   id_old_pw: ['지금 비밀번호', 'Current password', '現在のパスワード', '当前密码'],
@@ -2425,6 +2491,10 @@ Object.assign(T, {
   wn_wk_p: ['매주 월~일, 어종 보통 크기에 비해 가장 큰 물고기가 1위예요. 3위 안에 들면 알림과 업적이 생겨요.', 'Every Monday to Sunday, the fish that is biggest for its kind wins. Top 3 get a notice and an achievement.', '毎週月〜日、魚種の標準サイズに比べて最も大きい魚が1位。3位以内で通知と実績がもらえます。', '每周一至周日，相对鱼种常见尺寸最大的鱼获胜。前三名会收到通知并获得成就。'],
   wn_st_h: ['내 조과 통계', 'My catch stats', '釣果の統計', '我的渔获统计'],
   wn_st_p: ['내 조과의 ‘통계’ 탭에서 달마다·시간대별 조과, 자주 쓴 미끼, 어종별 최고 기록을 봐요.', 'The new “Stats” tab in My catches: by month and time of day, top baits, best per species.', '「マイ釣果」の「統計」タブで月別・時間帯別の釣果、よく使ったエサ、魚種別の自己ベストを見られます。', '在“我的渔获”的“统计”标签查看每月、各时段渔获、常用饵料和各鱼种最佳记录。'],
+  wn_fix_h: ['폰 조과 등록 고침', 'Registering catches on phones fixed', 'スマホの釣果登録を修正', '修复手机登记渔获'],
+  wn_fix_p: ['아이디로 로그인하거나 로그아웃한 뒤 "네, 맞아요"를 눌러도 다음으로 안 넘어가던 문제를 고쳤어요. 등록 중에 로그인해도 하던 등록이 이어져요.', 'After signing in with an ID or signing out, tapping “Yes” no longer gets stuck, and a catch you were registering carries on after signing in.', 'IDでログイン・ログアウトした後に「はい」を押しても進まない問題を直しました。登録中にログインしても続きから登録できます。', '修复了用ID登录或退出后点“是”无法继续的问题。登记中途登录也能接着登记。'],
+  wn_menu_h: ['메뉴를 4개 묶음으로', 'The menu in four groups', 'メニューを4つのグループに', '菜单分为四组'],
+  wn_menu_p: ['낚시하기·내 기록·커뮤니티·도움·설정으로 묶었어요. 누르면 펼쳐지고, 지금 보는 화면의 묶음은 열려 있어요.', 'Fishing, My records, Community, Help & settings: tap a group to open it; the one you are in stays open.', '釣り・マイ記録・コミュニティ・ヘルプ・設定にまとめました。押すと開き、今見ている画面のグループは開いたままです。', '分为钓鱼、我的记录、社区、帮助与设置。点击展开，当前页面所在的组保持展开。'],
   wn_push_h: ['폰 알림', 'Phone notifications', 'スマホ通知', '手机通知'],
   wn_push_p: ['종 버튼이나 설정에서 켜면, 앱을 닫아 둬도 댓글·친구 요청·검토 결과를 알려 드려요.', 'Switch them on from the bell or Settings to hear about replies, friend requests and review results even with the app closed.', 'ベルか設定でオンにすると、アプリを閉じていてもコメント・友だち申請・審査結果をお知らせします。', '在铃铛或设置中开启后，即使关闭应用也会通知评论、好友请求和审核结果。'],
 });
@@ -4512,8 +4582,9 @@ const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 function escapeHTML(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
 const esc = escapeHTML;
-function lsGet(k, d) { try { const v = localStorage.getItem('eosin.' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } }
-function lsSet(k, v) { try { localStorage.setItem('eosin.' + k, JSON.stringify(v)); } catch (e) { } }
+// a cleared key (set to null) reads back as the default: after logging in or out, my lists start empty, never null
+function lsGet(k, d) { try { const v = localStorage.getItem('eosin.' + k); if (v == null) return d; const x = JSON.parse(v); return x == null ? d : x; } catch (e) { return d; } }
+function lsSet(k, v) { try { if (v == null) localStorage.removeItem('eosin.' + k); else localStorage.setItem('eosin.' + k, JSON.stringify(v)); } catch (e) { } }
 function rid(n = 8) { const a = 'abcdefghijkmnpqrstuvwxyz23456789'; let s = ''; const r = crypto.getRandomValues(new Uint8Array(n)); for (const x of r) s += a[x % a.length]; return s; }
 function debounce(fn, ms) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -4685,6 +4756,7 @@ const store = (() => {
       }
       // local copies first (fast paint)
       S.me = lsGet('me', null); S.myLabels = lsGet('labels', []); S.myOrders = lsGet('orders', []); S.mySuggest = lsGet('suggest', []);
+      for (const k of ['myLabels', 'myOrders', 'mySuggest']) if (!Array.isArray(S[k])) S[k] = [];
       if (db) {
         const sub = (q, fn) => { try { return q.onSnapshot(fn, e => console.warn('snapshot', e)); } catch (e) { console.warn(e); } };
         sub(db.collection('anglers').limit(1000), snap => {
@@ -4695,7 +4767,12 @@ const store = (() => {
           S.anglersLoaded = true; maybeCleanLooks();
           rerenderSoon();
         });
-        sub(db.collection('labels').limit(1000), snap => { const m = new Map(); for (const d of snap.docs) if (d.exists) m.set(d.id, d.data()); S.labels = m; S.dataVer++; rerenderSoon(); });
+        sub(db.collection('labels').limit(1000), snap => {
+          const m = new Map(); for (const d of snap.docs) if (d.exists) m.set(d.id, d.data()); S.labels = m; S.dataVer++;
+          // my account's teaching notes as the server has them (other devices add to them too); a new note is added to this list
+          if (S.uid && S.mode === 'shared' && m.has(S.uid)) { const it = m.get(S.uid).items; if (Array.isArray(it)) S.myLabels = it.slice(); }
+          rerenderSoon();
+        });
         sub(db.collection('board').limit(1000), snap => {
           const m = new Map(); for (const d of snap.docs) if (d.exists) m.set(d.id, d.data());
           S.board = m; S.boardLoaded = true; S.dataVer++;
@@ -4719,14 +4796,23 @@ const store = (() => {
           S.mode = 'shared';
           sub(db.doc('orders/' + S.uid), d => { S.myOrders = d.exists ? (d.data().items || []).slice() : []; S.ordersLoaded = true; maybeCleanLooks(); payNotify(); rerenderSoon(); });
           sub(db.doc('suggest/' + S.uid), d => { if (d.exists) S.mySuggest = (d.data().items || []).slice(); });
-          // first-time: migrate a local profile into the shared store
-          setTimeout(async () => {
+          // first time on this account: a profile kept only on this device goes up to the server. Only once the
+          // server's list has arrived (a slow phone must not overwrite what another device saved), never records
+          // from before a full reset, and never a profile this device kept for an account that is gone (deleted
+          // by the operator, say) — that one is set aside, so it does not come back by itself.
+          const migrate = async (tries = 0) => {
             if (S.mode !== 'shared') return;
-            if (!S.anglers.has(S.uid)) {
-              const local = lsGet('me', null);
-              if (local && local.nick) { S.me = local; await this.saveMe(); }
-            }
-          }, 2500);
+            if (!S.anglersLoaded || !S.adminLoaded) { if (tries < 60) setTimeout(() => migrate(tries + 1), 500); return; }
+            if (S.anglers.has(S.uid)) { lsSet('meOf', S.uid); return; }
+            const local = lsGet('me', null);
+            if (!local || !local.nick) return;
+            const of = lsGet('meOf', null);
+            if (of && of !== S.uid) { lsSet('meOld', local); lsSet('me', null); lsSet('meOf', null); S.me = null; rerender(); return; }
+            const resetAt = +((S.admin.config || {}).resetAt) || 0;
+            if (resetAt && Array.isArray(local.catches)) local.catches = local.catches.filter(c => c && (c.at || c.ts || 0) >= resetAt);
+            S.me = local; await this.saveMe();
+          };
+          setTimeout(() => migrate(), 1500);
         }
         if (S.isOwner) {
           sub(db.collection('orders').limit(1000), snap => { const m = new Map(); for (const d of snap.docs) if (d.exists) m.set(d.id, d.data()); S.allOrders = m; rerenderSoon(); });
@@ -4742,7 +4828,7 @@ const store = (() => {
       S.me.upd = nowMs();
       tagUid(S.me, myId());
       lsSet('me', S.me);
-      if (S.mode === 'shared') { S.anglers.set(S.uid, JSON.parse(JSON.stringify(S.me))); S.dataVer++; }
+      if (S.mode === 'shared') { S.anglers.set(S.uid, JSON.parse(JSON.stringify(S.me))); S.dataVer++; lsSet('meOf', S.uid); }
       await safeWrite('anglers/' + S.uid, S.me, 'me');
     },
     async savePhoto(cid, data) {
@@ -4773,15 +4859,18 @@ const store = (() => {
       if (S.mode === 'shared' && S.db) { PHDB.del(S.uid + '/' + cid); try { await S.db.doc('anglers/' + S.uid + '/photos/' + cid).delete(); } catch (e) { } } else { const ph = lsGet('photos', {}); delete ph[cid]; lsSet('photos', ph); }
     },
     async addLabel(l) {
+      if (!Array.isArray(S.myLabels)) S.myLabels = [];
       S.myLabels.push(l); if (S.myLabels.length > 400) S.myLabels.shift();
       lsSet('labels', S.myLabels);
       if (S.mode === 'shared') { S.labels.set(S.uid, { items: S.myLabels.slice() }); S.dataVer++; await safeWrite('labels/' + S.uid, { items: S.myLabels }, 'labels'); }
     },
     async addOrder(o) {
+      if (!Array.isArray(S.myOrders)) S.myOrders = [];
       S.myOrders.push(o); lsSet('orders', S.myOrders);
       if (S.mode === 'shared') await safeWrite('orders/' + S.uid, { items: S.myOrders }, 'orders');
     },
     async addSuggestion(s) {
+      if (!Array.isArray(S.mySuggest)) S.mySuggest = [];
       S.mySuggest.push(s); lsSet('suggest', S.mySuggest);
       if (S.mode === 'shared') return safeWrite('suggest/' + S.uid, { items: S.mySuggest }, 'suggest');
       return false;
@@ -5641,14 +5730,51 @@ function openAuth(tab = 'join', then) {
     try {
       const r = await window.APP_AUTH.ids.login(name, pw);
       if (!r || r.ok !== true) throw { code: (r && r.err) || 'fail' };
-      for (const k of ['me', 'labels', 'orders', 'suggest', 'photos']) lsSet(k, null);
+      for (const k of ['me', 'meOf', 'labels', 'orders', 'suggest', 'photos']) lsSet(k, null);
       try { localStorage.removeItem('eosin.spots'); } catch (x) { }
+      const back = scanStash(); // a catch that was waiting for this login carries on after the reload
       closeModal(w); toast(t('id_login_ok', { name: r.name || name }), 'ok');
-      setTimeout(() => { location.hash = 'sea'; location.reload(); }, 800);
+      setTimeout(() => { location.hash = back ? (S.scan.mode === 'past' ? 'past' : 'scan') : 'sea'; location.reload(); }, 800);
     } catch (x) { lgo.disabled = false; fail(lerr, x && x.code); }
   });
   setTimeout(() => { const first = $(`[data-pane="${tab}"] input`, w); if (first) first.focus(); }, 80);
   return w;
+}
+/* Logging in switches accounts, so the page reloads. A catch someone was registering when the login came up is kept
+   for this tab (photo, what the AI said and its proof, the chosen fish) and picked up again after the reload, so the
+   photo does not go through the AI twice. Kept at most 30 minutes, only in this tab. */
+const SCAN_KEEP = 'eosin.pendingScan';
+function scanStash() {
+  const sc = S.scan;
+  if (!sc || !sc.im || !(sc.phase === 'result' || sc.phase === 'form') || !(sc.chosen || (sc.fused && sc.fused.list && sc.fused.list.length))) return false;
+  try {
+    const keep = {
+      v: 1, at: nowMs(), big: canvasFrom(sc.im, 1280).toDataURL('image/jpeg', .86), thumb: sc.thumb, ai: sc.ai, tk: (sc.ai && sc.ai.__ticket) || null,
+      fused: sc.fused, chosen: sc.chosen, corrected: !!sc.corrected, exif: sc.exif || null, fname: sc.fname || {}, dup: !!sc.dup, hash: sc.hash,
+      month: sc.month, rg: sc.rg, lon: sc.lon, lat: sc.lat, picked: !!sc.picked, mode: sc.mode, noAI: !!sc.noAI
+    };
+    sessionStorage.setItem(SCAN_KEEP, JSON.stringify(keep));
+    return true;
+  } catch (e) { try { sessionStorage.removeItem(SCAN_KEEP); } catch (x) { } return false; }
+}
+function scanRestore() {
+  let k = null;
+  try { k = JSON.parse(sessionStorage.getItem(SCAN_KEEP) || 'null'); sessionStorage.removeItem(SCAN_KEEP); } catch (e) { return null; }
+  if (!k || k.v !== 1 || !k.big || !(nowMs() - k.at < 30 * 60000)) return null;
+  const im = new Image(); im.src = k.big;
+  if (k.ai && k.tk) Object.defineProperty(k.ai, '__ticket', { value: k.tk, enumerable: false });
+  const sc = Object.assign({}, k, { url: k.big, im, file: null, steps: [], phase: 'result', dup: k.dup ? { again: true } : null });
+  delete sc.big; delete sc.tk; delete sc.v; delete sc.at;
+  // once the account's profile has arrived: straight on to the form (or the "is it this fish?" question)
+  let n = 0;
+  const go = () => {
+    if (S.scan !== sc || sc.phase !== 'result') return;
+    if (!(S.anglersLoaded && S.ready) && n++ < 60) { setTimeout(go, 250); return; }
+    toast(t('scan_resumed'), 'info', 4200);
+    if (sc.chosen) ensureProfile(() => { sc.phase = 'form'; renderScanWork(); }); else openConfirm();
+  };
+  setTimeout(go, 400);
+  return sc;
 }
 /* First visit on the website: show sign-up / login once (people can still close it and look around) */
 function maybeWelcome(tries = 0) {
@@ -5708,12 +5834,12 @@ function openPay({ kind, ref, amt, title, desc, onDone }) {
       <div class="pay-amt"><span class="num">${fmtN(amt)}</span><span>${t('won')}</span></div>
       ${ready ? `
       <ol class="pay-steps">
-        <li><p class="ps-h"><span class="ps-n">1</span>${t(desktop && L.kakao ? 'pay_step1_pc' : 'pay_step1')}</p>
+        <li><p class="ps-h"><span class="ps-n">1</span>${t(desktop ? 'pay_step1_pc' : L.toss && L.kakao ? 'pay_step1_both' : L.toss ? 'pay_toss' : 'pay_step1')}</p>
           <div class="pay-methods">
-            ${L.kakao ? `<a class="btn btn-kpay btn-lg" href="${esc(L.kakao)}" target="_blank" rel="noopener" data-pm="kakao">${t('pay_kakao')}</a>` : ''}
             ${L.toss ? `<a class="btn btn-toss btn-lg" href="${esc(L.toss)}" target="_blank" rel="noopener" data-pm="toss">${t('pay_toss')}</a>` : ''}
+            ${L.kakao ? `<a class="btn btn-kpay btn-lg" href="${esc(L.kakao)}" target="_blank" rel="noopener" data-pm="kakao">${t('pay_kakao')}</a>` : ''}
           </div>
-          ${L.kakao && desktop ? `<div class="pay-qr"><div class="pay-qr-img" id="pay-qr"></div><p class="hint">${t('pay_qr_hint')}</p></div>` : ''}
+          ${desktop ? `<div class="pay-qr"><div class="pay-qr-img" id="pay-qr"></div><p class="hint">${t(L.toss ? 'pay_qr_hint_toss' : 'pay_qr_hint')}</p></div>` : ''}
           <div class="pay-code" data-copybox>
             <div><span class="lbl">${t('pay_memo')}</span><span class="copy-src mono big">${code}</span></div>
             <button class="btn btn-line btn-sm" data-copy="${code}">${icon('copy')} ${t('copy')}</button>
@@ -5727,14 +5853,15 @@ function openPay({ kind, ref, amt, title, desc, onDone }) {
       <p class="note">${icon('info')} ${t('pay_none')}</p>
       <div class="actions"><a class="btn btn-kakao btn-lg btn-block" href="${DEV.kakaoUrl}" target="_blank" rel="noopener">${icon('chat')}${t('kakao_ask')}</a></div>`}
     </div>`, { label: title });
-  const qbox = $('#pay-qr', w); if (qbox) drawQr(qbox, L.kakao);
+  // Toss first: money sent to a Toss ID arrives without the operator having to accept it (KakaoPay needs "받기")
+  const qbox = $('#pay-qr', w); if (qbox) drawQr(qbox, L.toss || L.kakao);
   if (!ready) return;
-  let method = L.kakao ? 'kakao' : 'toss';
+  let method = L.toss ? 'toss' : 'kakao';
   const done = $('#pay-done', w);
   // "I sent it" only wakes up after the payment page was opened (phone) or the QR has been on screen a while (computer)
   const arm = () => { if (!done.isConnected) return; done.disabled = false; const pw = $('#pay-wait', w); if (pw) pw.hidden = true; };
   $$('[data-pm]', w).forEach(a => a.addEventListener('click', () => { method = a.dataset.pm; setTimeout(arm, 1200); }));
-  if (desktop && L.kakao) setTimeout(arm, 9000);
+  if (desktop) setTimeout(arm, 9000);
   done.onclick = async () => {
     if (done.disabled) return;
     done.disabled = true;
@@ -5959,7 +6086,7 @@ async function openLogout() {
     $('#lo-go', w).disabled = true;
     try { await pushOff(); } catch (e) { } // this device stops getting the account's notices
     try { await window.APP_AUTH.ids.logout(); } catch (e) { }
-    for (const k of ['me', 'labels', 'orders', 'suggest', 'photos', 'payok', 'welcomed', 'noti', 'notiSeen', 'notiInit', 'notiState', 'badges']) lsSet(k, null);
+    for (const k of ['me', 'meOf', 'labels', 'orders', 'suggest', 'photos', 'payok', 'welcomed', 'noti', 'notiSeen', 'notiInit', 'notiState', 'badges']) lsSet(k, null);
     lsSet('authTab', 'login'); // after reloading, the login dialog opens (to sign in again or with another ID)
     closeModal(w); toast(t('id_logged_out'));
     setTimeout(() => { location.hash = 'home'; location.reload(); }, 700);
@@ -6014,7 +6141,7 @@ async function openLinkMake() {
     tick();
   } catch (e) { box.innerHTML = `<p class="err">${esc(linkErr(e))}</p>`; }
 }
-function linkErr(e) { const m = String((e && (e.code || e.message)) || ''); return /slow|rate/i.test(m) ? t('link_slow') : /bad|expired|invalid/i.test(m) ? t('link_bad') : /team_leader/i.test(m) ? t('link_err_leader') : t('link_fail'); }
+function linkErr(e) { const m = String((e && (e.code || e.message)) || ''); return /slow|rate/i.test(m) ? t('link_slow') : /bad|expired|invalid/i.test(m) ? t('link_bad') : /team_leader/i.test(m) ? t('link_err_leader') : /has_id/i.test(m) ? t('id_err_has_id') : t('link_fail'); }
 function openLinkEnter(pre) {
   if (!linkSupported()) return;
   const local = myCatches().length;
@@ -6329,13 +6456,14 @@ function openShareCard(blob, name, text) {
 }
 
 /* ===== What's new: shown once after a big update (website only; needs the matching server update) ===== */
-const WHATS_NEW = '2026-10-29b', WN_TS = Date.parse('2026-10-29T05:00:00Z'); // people who joined after this have nothing to catch up on
+const WHATS_NEW = '2026-10-29c', WN_TS = Date.parse('2026-10-29T05:30:00Z'); // people who joined after this have nothing to catch up on
 const BOOT_AT = Date.now();
 /* what each update brought, newest last; people see what came after the last one they saw (at most 6 lines) */
 const WN_ITEMS = [
   ['2026-10-28', 'user', 'wn_id'], ['2026-10-28', 'shield', 'wn_review'], ['2026-10-28', 'heart', 'wn_pay'], ['2026-10-28', 'share', 'wn_share'],
   ['2026-10-29', 'bell', 'wn_noti'], ['2026-10-29', 'wave', 'wn_wx'], ['2026-10-29', 'medal', 'wn_bdg'], ['2026-10-29', 'download', 'wn_inst'], ['2026-10-29', 'logout', 'wn_out'],
-  ['2026-10-29b', 'wave', 'wn_fs'], ['2026-10-29b', 'trophy', 'wn_wk'], ['2026-10-29b', 'chart', 'wn_st'], ['2026-10-29b', 'phone', 'wn_push']
+  ['2026-10-29b', 'wave', 'wn_fs'], ['2026-10-29b', 'trophy', 'wn_wk'], ['2026-10-29b', 'chart', 'wn_st'], ['2026-10-29b', 'phone', 'wn_push'],
+  ['2026-10-29c', 'camera', 'wn_fix'], ['2026-10-29c', 'menu', 'wn_menu']
 ];
 function maybeWhatsNew(tries = 0) {
   if (window.APP_RT !== 'web' || lsGet('wn', '') === WHATS_NEW || tries > 6) return;
@@ -6586,7 +6714,7 @@ function hydratePhotos(root) {
 /* ---------- SCAN ---------- */
 VIEWS.scan = {
   render(el) {
-    S.scan = S.scan || { mode: 'now', phase: 'idle' };
+    S.scan = S.scan || scanRestore() || { mode: 'now', phase: 'idle' };
     if (S.route === 'past') S.scan.mode = 'past';
     const sc = S.scan;
     const ls = learnStats();
@@ -7589,7 +7717,11 @@ VIEWS.admin = {
       const v = verdict(uid, c.id);
       if (c.st === 'review' && (v === 'hold' || (!v && nowMs() - (c.at || c.ts || 0) > 3600e3))) reviews.push({ uid, a, c, note: reviewNote(uid, c) });
     }
-    const autoLog = []; for (const [uid, m] of Object.entries(S.admin.autorev || {})) for (const [cid, r] of Object.entries(m || {})) { const a = S.anglers.get(uid); const c = a && (a.catches || []).find(x => x.id === cid); if (c) autoLog.push({ uid, a, c, note: reviewNote(uid, c), at: r.at || 0 }); }
+    // the reviewer's notes live in reviews (older ones in admin_docs 'autorev'); each catch once
+    const autoLog = [], logSeen = new Set();
+    const addLog = (uid, m) => { for (const [cid, r] of Object.entries(m || {})) { if (logSeen.has(uid + '|' + cid)) continue; logSeen.add(uid + '|' + cid); const a = S.anglers.get(uid); const c = a && (a.catches || []).find(x => x.id === cid); if (c) autoLog.push({ uid, a, c, note: reviewNote(uid, c), at: (r && r.at) || 0 }); } };
+    for (const [uid, m] of S.reviews || []) addLog(uid, m);
+    for (const [uid, m] of Object.entries(S.admin.autorev || {})) addLog(uid, m);
     autoLog.sort((x, y) => y.at - x.at);
     const users = [...S.anglers.entries()].filter(([, a]) => a && a.nick).map(([uid, a]) => ({ uid, a, n: (a.catches || []).length, L: lvInfo(a, uid).L, pts: (a.catches || []).filter(c => eligible(c, uid)).reduce((x, c) => x + (c.sc || 0), 0) })).sort((x, y) => (y.a.joined || 0) - (x.a.joined || 0));
     adminLoad();
@@ -7637,7 +7769,8 @@ VIEWS.admin = {
     </div>`;
     hydratePhotos(el);
     $('#ad-save', el).onclick = async () => {
-      const toss = $('#ad-toss', el).value.trim().replace(/^https?:\/\/toss\.me\//, '').replace(/\/.*$/, '');
+      // "toss.me/abc", "https://toss.me/abc/500" or just "abc" all become "abc"
+      const toss = $('#ad-toss', el).value.trim().replace(/^(https?:\/\/)?(www\.)?toss\.me\//i, '').replace(/[/?#\s].*$/, '');
       const kakao = $('#ad-kakao', el).value.trim();
       if (kakao && !/^https:\/\/qr\.kakaopay\.com\//.test(kakao)) { toast(t('ad_kakao_bad'), 'warn'); return; }
       await store.saveAdmin('config', Object.assign({}, S.admin.config || {}, { tossId: toss, kakaoUrl: kakao, kakaoAmt: $('#ad-kamt', el).checked }));
@@ -7699,11 +7832,9 @@ async function openRelink(uid) {
 }
 
 /* ---------- More (mobile) ---------- */
+const NAV_ICON = { home: 'home', scan: 'scan', map: 'map', points: 'pin', dex: 'book', tackle: 'lure', log: 'log', sea: 'sea', char: 'user', rank: 'trophy', friends: 'users', board: 'board', teams: 'flag', help: 'chat', about: 'sparkle', prefs: 'gear', admin: 'shield' };
 function openMore() {
-  const items = [['friends', 'users'], ['board', 'board'], ['teams', 'flag'], ['points', 'pin'], ['char', 'user'], ['dex', 'book'], ['tackle', 'lure'], ['log', 'log'], ['help', 'chat'], ['about', 'sparkle'], ['prefs', 'gear']];
-  if (window.APP_RT !== 'web') items.splice(3, 1);
-  if (S.isOwner) items.push(['admin', 'shield']);
-  const nIn = frLists().inc.length;
+  const nIn = S.me && S.me.nick ? frLists().inc.length : 0;
   // the account first: who is signed in, with a way to sign out (only when there is a way back in: a login ID or a linked device)
   const linked = !!(window.APP_AUTH && window.APP_AUTH.link && window.APP_AUTH.link.linked());
   const inAcct = !!(S.me && S.me.nick) && (!!S.loginId || linked);
@@ -7711,8 +7842,24 @@ function openMore() {
     ? `<div class="more-acct"><a href="#prefs" class="more-acct-main">${avatar(S.me, 30)}<span><b>${esc(S.me.nick)}</b><span class="muted small${S.loginId ? ' mono' : ''}">${esc(S.loginId || t('more_linked'))}</span></span></a><button class="more-out" data-act="logout">${icon('logout')}<span>${t('lo_title')}</span></button></div>`
     : `<button class="more-acct" data-act="auth">${icon('user')}<span><b>${t(S.me && S.me.nick ? 'more_acct_keep' : 'more_acct_join')}</b><span class="muted small">${t(S.me && S.me.nick ? 'more_acct_keep_sub' : 'more_acct_join_sub')}</span></span></button>`) : '';
   const inst = installOn() ? `<button class="more-item" data-act="install">${icon('download')}<span>${t('inst_btn')}</span></button>` : '';
-  const w = openModal(`<nav class="more"><h2 class="sr">${t('more')}</h2>${acct}${items.map(([r, ic]) => `<a href="#${r}" class="more-item">${icon(ic)}<span>${t('nav_' + r)}</span>${r === 'friends' && nIn ? `<i class="badge num">${nIn}</i>` : ''}</a>`).join('')}${inst}<button class="more-item heart" data-act="donate">${icon('heart')}<span>${t('donate_btn')}</span></button></nav>`, { sheet: true, label: t('more') });
+  // the four groups; the one with the page on screen starts open, one open at a time so the sheet stays short
+  const cur = navGroupOf(S.route) || 'fish';
+  const grp = NAV_GROUPS.map(([id, gic, routes]) => {
+    const list = routes.filter(r => (r !== 'points' || window.APP_RT === 'web') && (r !== 'admin' || S.isOwner));
+    const on = id === cur, dot = list.includes('friends') && nIn;
+    return `<section class="more-grp${on ? ' open' : ''}" data-mgrp="${id}">
+      <button type="button" class="more-gh" aria-expanded="${on}" aria-controls="mg-${id}">${icon(gic)}<span class="more-gt"><b>${t('ng_' + id)}</b><span class="muted small">${list.map(r => esc(t('nav_' + r))).join(' · ')}</span></span>${dot ? `<i class="badge num">${nIn > 9 ? '9+' : nIn}</i>` : ''}${icon('chev')}</button>
+      <div class="more-gb" id="mg-${id}"><div class="more-gi">${list.map(r => `<a href="#${r}" class="more-item${viewOf(S.route) === viewOf(r) ? ' on' : ''}"${viewOf(S.route) === viewOf(r) ? ' aria-current="page"' : ''}>${icon(NAV_ICON[r])}<span>${t('nav_' + r)}</span>${r === 'friends' && nIn ? `<i class="badge num">${nIn > 9 ? '9+' : nIn}</i>` : ''}</a>`).join('')}</div></div>
+    </section>`;
+  }).join('');
+  const w = openModal(`<nav class="more"><h2 class="sr">${t('more')}</h2>${acct}<div class="more-grps">${grp}</div><div class="more-foot">${inst}<button class="more-item heart" data-act="donate">${icon('heart')}<span>${t('donate_btn')}</span></button></div></nav>`, { sheet: true, label: t('more') });
   w.addEventListener('click', e => {
+    const gh = e.target.closest('.more-gh');
+    if (gh) {
+      const g = gh.closest('.more-grp'), open = !g.classList.contains('open');
+      $$('.more-grp', w).forEach(x => { const on = x === g && open; x.classList.toggle('open', on); $('.more-gh', x).setAttribute('aria-expanded', String(on)); });
+      return;
+    }
     if (e.target.closest('[data-act="auth"]')) { closeModal(w); openAuth('join'); return; }
     if (e.target.closest('[data-act="logout"]')) { closeModal(w); openLogout(); return; }
     if (e.target.closest('[data-act="install"]')) { closeModal(w); openInstall(); return; }
@@ -9261,7 +9408,35 @@ function updateShell() {
   // log out next to my name (website, once there is a login ID or a linked device)
   const out = $('#me-out'); if (out) out.hidden = !(idSupported() && S.me && S.me.nick && (S.loginId || (window.APP_AUTH && window.APP_AUTH.link && window.APP_AUTH.link.linked())));
   notiBadge();
+  navDots();
 }
+/* ===== The menu in four groups that open and close (side menu and the phone's "more" sheet). The group of the page
+   on screen is open; others stay as the person left them (remembered on this device). A closed group with something
+   new inside (a friend request) shows a dot. ===== */
+const NAV_GROUPS = [
+  ['fish', 'fish', ['scan', 'map', 'points', 'dex', 'tackle']],
+  ['mine', 'chart', ['log', 'sea', 'char']],
+  ['social', 'users', ['rank', 'friends', 'board', 'teams']],
+  ['help', 'info', ['help', 'about', 'prefs', 'admin']]
+];
+function navGroupOf(route) { const r = viewOf(route || ''); const g = NAV_GROUPS.find(x => x[2].includes(r)); return g ? g[0] : null; }
+function navOpenSet() { const v = lsGet('navOpen', null); return new Set(Array.isArray(v) ? v.filter(x => NAV_GROUPS.some(g => g[0] === x)) : []); }
+function navIsOpen(id, open = navOpenSet()) { return open.has(id) || (id === navGroupOf(S.route) && S.navShut !== id); }
+function navApply() {
+  const open = navOpenSet(), cur = navGroupOf(S.route);
+  $$('.nav-grp').forEach(g => {
+    const id = g.dataset.grp, on = navIsOpen(id, open);
+    g.classList.toggle('open', on); g.classList.toggle('has-on', id === cur);
+    const b = $('.nav-gh', g); if (b) b.setAttribute('aria-expanded', String(on));
+  });
+  navDots();
+}
+function navToggle(id) {
+  const open = navOpenSet(), was = navIsOpen(id, open);
+  if (was) { open.delete(id); if (id === navGroupOf(S.route)) S.navShut = id; } else { open.add(id); if (S.navShut === id) S.navShut = null; }
+  lsSet('navOpen', [...open]); navApply();
+}
+function navDots() { $$('.nav-grp').forEach(g => { const d = $('.nav-dot', g); if (d) d.hidden = g.classList.contains('open') || !$$('.badge', g).some(b => !b.hidden); }); }
 function setTheme(x) {
   S.theme = x; lsSet('theme', x);
   if (x === 'system') document.documentElement.removeAttribute('data-theme'); else document.documentElement.setAttribute('data-theme', x);
@@ -9283,6 +9458,8 @@ function show(route) {
   $$('.view').forEach(v => { v.hidden = v.id !== 'v-' + vid; });
   $$('[data-route]').forEach(a => { const on = (a.dataset.route === route && !(route === 'sea' && S.viewUid)) || (route === 'past' && a.dataset.route === 'scan'); a.classList.toggle('on', on); if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
   document.body.dataset.route = vid;
+  if (navGroupOf(route) !== S.navCur) { S.navCur = navGroupOf(route); S.navShut = null; }
+  navApply();
   const el = $('#v-' + vid);
   try { VIEWS[vid].render(el); } catch (e) { console.error(e); el.innerHTML = `<div class="page"><div class="empty card big"><h2>${t('err_view')}</h2><p class="muted">${esc(e.message || e)}</p></div></div>`; }
   if (S.scene) { if (vid === 'sea') S.scene.start(); else S.scene.stop(); }
@@ -9308,7 +9485,17 @@ function onHash() {
 function rerender() {
   if (!S.route) return;
   const vid = viewOf(S.route);
-  if (vid === 'scan') { const side = $('#v-scan .scan-side'); if (side && (!S.scan || S.scan.phase === 'idle' || S.scan.phase === 'done')) show(S.route); else updateShell(); return; }
+  if (vid === 'scan') {
+    const side = $('#v-scan .scan-side');
+    if (side && (!S.scan || S.scan.phase === 'idle' || S.scan.phase === 'done')) show(S.route);
+    else {
+      // a catch is on screen: leave it (and what is typed) alone, but bring the AI on/off notes up to date
+      if (side) side.innerHTML = scanSideHTML();
+      const bn = $('#v-scan .page-head .beta-note'); if (bn) bn.innerHTML = `${icon('info')} ${t(S.sampleImages ? 'ai_beta_note' : 'ai_free_note')}`;
+      updateShell();
+    }
+    return;
+  }
   const a = document.activeElement;
   const el = $('#v-' + vid);
   if (a && el && el.contains(a) && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName) && a.type !== 'checkbox' && a.type !== 'radio' && a.type !== 'range') {
@@ -9339,6 +9526,7 @@ function previewFor(id) {
 document.addEventListener('click', e => {
   const tgt = e.target;
   const inModal = tgt.closest('.modal-wrap');
+  const ng = tgt.closest('.nav [data-navgrp]'); if (ng) { navToggle(ng.dataset.navgrp); return; }
   const cp = tgt.closest('[data-copy]'); if (cp) { e.preventDefault(); copyText(cp.dataset.copy, cp); return; }
   const sh = tgt.closest('[data-share]'); if (sh) { e.preventDefault(); const i = sh.dataset.share.indexOf('|'); shareCatch(sh.dataset.share.slice(0, i), sh.dataset.share.slice(i + 1), sh); return; }
   const fr = tgt.closest('[data-fr]'); if (fr) { const i = fr.dataset.fr.indexOf('|'); friendAction(fr.dataset.fr.slice(0, i), fr.dataset.fr.slice(i + 1), fr); return; }

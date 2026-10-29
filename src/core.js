@@ -3,8 +3,9 @@ const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 function escapeHTML(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
 const esc = escapeHTML;
-function lsGet(k, d) { try { const v = localStorage.getItem('eosin.' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } }
-function lsSet(k, v) { try { localStorage.setItem('eosin.' + k, JSON.stringify(v)); } catch (e) { } }
+// a cleared key (set to null) reads back as the default: after logging in or out, my lists start empty, never null
+function lsGet(k, d) { try { const v = localStorage.getItem('eosin.' + k); if (v == null) return d; const x = JSON.parse(v); return x == null ? d : x; } catch (e) { return d; } }
+function lsSet(k, v) { try { if (v == null) localStorage.removeItem('eosin.' + k); else localStorage.setItem('eosin.' + k, JSON.stringify(v)); } catch (e) { } }
 function rid(n = 8) { const a = 'abcdefghijkmnpqrstuvwxyz23456789'; let s = ''; const r = crypto.getRandomValues(new Uint8Array(n)); for (const x of r) s += a[x % a.length]; return s; }
 function debounce(fn, ms) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -176,6 +177,7 @@ const store = (() => {
       }
       // local copies first (fast paint)
       S.me = lsGet('me', null); S.myLabels = lsGet('labels', []); S.myOrders = lsGet('orders', []); S.mySuggest = lsGet('suggest', []);
+      for (const k of ['myLabels', 'myOrders', 'mySuggest']) if (!Array.isArray(S[k])) S[k] = [];
       if (db) {
         const sub = (q, fn) => { try { return q.onSnapshot(fn, e => console.warn('snapshot', e)); } catch (e) { console.warn(e); } };
         sub(db.collection('anglers').limit(1000), snap => {
@@ -186,7 +188,12 @@ const store = (() => {
           S.anglersLoaded = true; maybeCleanLooks();
           rerenderSoon();
         });
-        sub(db.collection('labels').limit(1000), snap => { const m = new Map(); for (const d of snap.docs) if (d.exists) m.set(d.id, d.data()); S.labels = m; S.dataVer++; rerenderSoon(); });
+        sub(db.collection('labels').limit(1000), snap => {
+          const m = new Map(); for (const d of snap.docs) if (d.exists) m.set(d.id, d.data()); S.labels = m; S.dataVer++;
+          // my account's teaching notes as the server has them (other devices add to them too); a new note is added to this list
+          if (S.uid && S.mode === 'shared' && m.has(S.uid)) { const it = m.get(S.uid).items; if (Array.isArray(it)) S.myLabels = it.slice(); }
+          rerenderSoon();
+        });
         sub(db.collection('board').limit(1000), snap => {
           const m = new Map(); for (const d of snap.docs) if (d.exists) m.set(d.id, d.data());
           S.board = m; S.boardLoaded = true; S.dataVer++;
@@ -210,14 +217,23 @@ const store = (() => {
           S.mode = 'shared';
           sub(db.doc('orders/' + S.uid), d => { S.myOrders = d.exists ? (d.data().items || []).slice() : []; S.ordersLoaded = true; maybeCleanLooks(); payNotify(); rerenderSoon(); });
           sub(db.doc('suggest/' + S.uid), d => { if (d.exists) S.mySuggest = (d.data().items || []).slice(); });
-          // first-time: migrate a local profile into the shared store
-          setTimeout(async () => {
+          // first time on this account: a profile kept only on this device goes up to the server. Only once the
+          // server's list has arrived (a slow phone must not overwrite what another device saved), never records
+          // from before a full reset, and never a profile this device kept for an account that is gone (deleted
+          // by the operator, say) — that one is set aside, so it does not come back by itself.
+          const migrate = async (tries = 0) => {
             if (S.mode !== 'shared') return;
-            if (!S.anglers.has(S.uid)) {
-              const local = lsGet('me', null);
-              if (local && local.nick) { S.me = local; await this.saveMe(); }
-            }
-          }, 2500);
+            if (!S.anglersLoaded || !S.adminLoaded) { if (tries < 60) setTimeout(() => migrate(tries + 1), 500); return; }
+            if (S.anglers.has(S.uid)) { lsSet('meOf', S.uid); return; }
+            const local = lsGet('me', null);
+            if (!local || !local.nick) return;
+            const of = lsGet('meOf', null);
+            if (of && of !== S.uid) { lsSet('meOld', local); lsSet('me', null); lsSet('meOf', null); S.me = null; rerender(); return; }
+            const resetAt = +((S.admin.config || {}).resetAt) || 0;
+            if (resetAt && Array.isArray(local.catches)) local.catches = local.catches.filter(c => c && (c.at || c.ts || 0) >= resetAt);
+            S.me = local; await this.saveMe();
+          };
+          setTimeout(() => migrate(), 1500);
         }
         if (S.isOwner) {
           sub(db.collection('orders').limit(1000), snap => { const m = new Map(); for (const d of snap.docs) if (d.exists) m.set(d.id, d.data()); S.allOrders = m; rerenderSoon(); });
@@ -233,7 +249,7 @@ const store = (() => {
       S.me.upd = nowMs();
       tagUid(S.me, myId());
       lsSet('me', S.me);
-      if (S.mode === 'shared') { S.anglers.set(S.uid, JSON.parse(JSON.stringify(S.me))); S.dataVer++; }
+      if (S.mode === 'shared') { S.anglers.set(S.uid, JSON.parse(JSON.stringify(S.me))); S.dataVer++; lsSet('meOf', S.uid); }
       await safeWrite('anglers/' + S.uid, S.me, 'me');
     },
     async savePhoto(cid, data) {
@@ -264,15 +280,18 @@ const store = (() => {
       if (S.mode === 'shared' && S.db) { PHDB.del(S.uid + '/' + cid); try { await S.db.doc('anglers/' + S.uid + '/photos/' + cid).delete(); } catch (e) { } } else { const ph = lsGet('photos', {}); delete ph[cid]; lsSet('photos', ph); }
     },
     async addLabel(l) {
+      if (!Array.isArray(S.myLabels)) S.myLabels = [];
       S.myLabels.push(l); if (S.myLabels.length > 400) S.myLabels.shift();
       lsSet('labels', S.myLabels);
       if (S.mode === 'shared') { S.labels.set(S.uid, { items: S.myLabels.slice() }); S.dataVer++; await safeWrite('labels/' + S.uid, { items: S.myLabels }, 'labels'); }
     },
     async addOrder(o) {
+      if (!Array.isArray(S.myOrders)) S.myOrders = [];
       S.myOrders.push(o); lsSet('orders', S.myOrders);
       if (S.mode === 'shared') await safeWrite('orders/' + S.uid, { items: S.myOrders }, 'orders');
     },
     async addSuggestion(s) {
+      if (!Array.isArray(S.mySuggest)) S.mySuggest = [];
       S.mySuggest.push(s); lsSet('suggest', S.mySuggest);
       if (S.mode === 'shared') return safeWrite('suggest/' + S.uid, { items: S.mySuggest }, 'suggest');
       return false;

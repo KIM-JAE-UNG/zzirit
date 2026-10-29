@@ -29,7 +29,35 @@ function updateShell() {
   // log out next to my name (website, once there is a login ID or a linked device)
   const out = $('#me-out'); if (out) out.hidden = !(idSupported() && S.me && S.me.nick && (S.loginId || (window.APP_AUTH && window.APP_AUTH.link && window.APP_AUTH.link.linked())));
   notiBadge();
+  navDots();
 }
+/* ===== The menu in four groups that open and close (side menu and the phone's "more" sheet). The group of the page
+   on screen is open; others stay as the person left them (remembered on this device). A closed group with something
+   new inside (a friend request) shows a dot. ===== */
+const NAV_GROUPS = [
+  ['fish', 'fish', ['scan', 'map', 'points', 'dex', 'tackle']],
+  ['mine', 'chart', ['log', 'sea', 'char']],
+  ['social', 'users', ['rank', 'friends', 'board', 'teams']],
+  ['help', 'info', ['help', 'about', 'prefs', 'admin']]
+];
+function navGroupOf(route) { const r = viewOf(route || ''); const g = NAV_GROUPS.find(x => x[2].includes(r)); return g ? g[0] : null; }
+function navOpenSet() { const v = lsGet('navOpen', null); return new Set(Array.isArray(v) ? v.filter(x => NAV_GROUPS.some(g => g[0] === x)) : []); }
+function navIsOpen(id, open = navOpenSet()) { return open.has(id) || (id === navGroupOf(S.route) && S.navShut !== id); }
+function navApply() {
+  const open = navOpenSet(), cur = navGroupOf(S.route);
+  $$('.nav-grp').forEach(g => {
+    const id = g.dataset.grp, on = navIsOpen(id, open);
+    g.classList.toggle('open', on); g.classList.toggle('has-on', id === cur);
+    const b = $('.nav-gh', g); if (b) b.setAttribute('aria-expanded', String(on));
+  });
+  navDots();
+}
+function navToggle(id) {
+  const open = navOpenSet(), was = navIsOpen(id, open);
+  if (was) { open.delete(id); if (id === navGroupOf(S.route)) S.navShut = id; } else { open.add(id); if (S.navShut === id) S.navShut = null; }
+  lsSet('navOpen', [...open]); navApply();
+}
+function navDots() { $$('.nav-grp').forEach(g => { const d = $('.nav-dot', g); if (d) d.hidden = g.classList.contains('open') || !$$('.badge', g).some(b => !b.hidden); }); }
 function setTheme(x) {
   S.theme = x; lsSet('theme', x);
   if (x === 'system') document.documentElement.removeAttribute('data-theme'); else document.documentElement.setAttribute('data-theme', x);
@@ -51,6 +79,8 @@ function show(route) {
   $$('.view').forEach(v => { v.hidden = v.id !== 'v-' + vid; });
   $$('[data-route]').forEach(a => { const on = (a.dataset.route === route && !(route === 'sea' && S.viewUid)) || (route === 'past' && a.dataset.route === 'scan'); a.classList.toggle('on', on); if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
   document.body.dataset.route = vid;
+  if (navGroupOf(route) !== S.navCur) { S.navCur = navGroupOf(route); S.navShut = null; }
+  navApply();
   const el = $('#v-' + vid);
   try { VIEWS[vid].render(el); } catch (e) { console.error(e); el.innerHTML = `<div class="page"><div class="empty card big"><h2>${t('err_view')}</h2><p class="muted">${esc(e.message || e)}</p></div></div>`; }
   if (S.scene) { if (vid === 'sea') S.scene.start(); else S.scene.stop(); }
@@ -76,7 +106,17 @@ function onHash() {
 function rerender() {
   if (!S.route) return;
   const vid = viewOf(S.route);
-  if (vid === 'scan') { const side = $('#v-scan .scan-side'); if (side && (!S.scan || S.scan.phase === 'idle' || S.scan.phase === 'done')) show(S.route); else updateShell(); return; }
+  if (vid === 'scan') {
+    const side = $('#v-scan .scan-side');
+    if (side && (!S.scan || S.scan.phase === 'idle' || S.scan.phase === 'done')) show(S.route);
+    else {
+      // a catch is on screen: leave it (and what is typed) alone, but bring the AI on/off notes up to date
+      if (side) side.innerHTML = scanSideHTML();
+      const bn = $('#v-scan .page-head .beta-note'); if (bn) bn.innerHTML = `${icon('info')} ${t(S.sampleImages ? 'ai_beta_note' : 'ai_free_note')}`;
+      updateShell();
+    }
+    return;
+  }
   const a = document.activeElement;
   const el = $('#v-' + vid);
   if (a && el && el.contains(a) && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName) && a.type !== 'checkbox' && a.type !== 'radio' && a.type !== 'range') {
@@ -107,6 +147,7 @@ function previewFor(id) {
 document.addEventListener('click', e => {
   const tgt = e.target;
   const inModal = tgt.closest('.modal-wrap');
+  const ng = tgt.closest('.nav [data-navgrp]'); if (ng) { navToggle(ng.dataset.navgrp); return; }
   const cp = tgt.closest('[data-copy]'); if (cp) { e.preventDefault(); copyText(cp.dataset.copy, cp); return; }
   const sh = tgt.closest('[data-share]'); if (sh) { e.preventDefault(); const i = sh.dataset.share.indexOf('|'); shareCatch(sh.dataset.share.slice(0, i), sh.dataset.share.slice(i + 1), sh); return; }
   const fr = tgt.closest('[data-fr]'); if (fr) { const i = fr.dataset.fr.indexOf('|'); friendAction(fr.dataset.fr.slice(0, i), fr.dataset.fr.slice(i + 1), fr); return; }

@@ -387,14 +387,51 @@ function openAuth(tab = 'join', then) {
     try {
       const r = await window.APP_AUTH.ids.login(name, pw);
       if (!r || r.ok !== true) throw { code: (r && r.err) || 'fail' };
-      for (const k of ['me', 'labels', 'orders', 'suggest', 'photos']) lsSet(k, null);
+      for (const k of ['me', 'meOf', 'labels', 'orders', 'suggest', 'photos']) lsSet(k, null);
       try { localStorage.removeItem('eosin.spots'); } catch (x) { }
+      const back = scanStash(); // a catch that was waiting for this login carries on after the reload
       closeModal(w); toast(t('id_login_ok', { name: r.name || name }), 'ok');
-      setTimeout(() => { location.hash = 'sea'; location.reload(); }, 800);
+      setTimeout(() => { location.hash = back ? (S.scan.mode === 'past' ? 'past' : 'scan') : 'sea'; location.reload(); }, 800);
     } catch (x) { lgo.disabled = false; fail(lerr, x && x.code); }
   });
   setTimeout(() => { const first = $(`[data-pane="${tab}"] input`, w); if (first) first.focus(); }, 80);
   return w;
+}
+/* Logging in switches accounts, so the page reloads. A catch someone was registering when the login came up is kept
+   for this tab (photo, what the AI said and its proof, the chosen fish) and picked up again after the reload, so the
+   photo does not go through the AI twice. Kept at most 30 minutes, only in this tab. */
+const SCAN_KEEP = 'eosin.pendingScan';
+function scanStash() {
+  const sc = S.scan;
+  if (!sc || !sc.im || !(sc.phase === 'result' || sc.phase === 'form') || !(sc.chosen || (sc.fused && sc.fused.list && sc.fused.list.length))) return false;
+  try {
+    const keep = {
+      v: 1, at: nowMs(), big: canvasFrom(sc.im, 1280).toDataURL('image/jpeg', .86), thumb: sc.thumb, ai: sc.ai, tk: (sc.ai && sc.ai.__ticket) || null,
+      fused: sc.fused, chosen: sc.chosen, corrected: !!sc.corrected, exif: sc.exif || null, fname: sc.fname || {}, dup: !!sc.dup, hash: sc.hash,
+      month: sc.month, rg: sc.rg, lon: sc.lon, lat: sc.lat, picked: !!sc.picked, mode: sc.mode, noAI: !!sc.noAI
+    };
+    sessionStorage.setItem(SCAN_KEEP, JSON.stringify(keep));
+    return true;
+  } catch (e) { try { sessionStorage.removeItem(SCAN_KEEP); } catch (x) { } return false; }
+}
+function scanRestore() {
+  let k = null;
+  try { k = JSON.parse(sessionStorage.getItem(SCAN_KEEP) || 'null'); sessionStorage.removeItem(SCAN_KEEP); } catch (e) { return null; }
+  if (!k || k.v !== 1 || !k.big || !(nowMs() - k.at < 30 * 60000)) return null;
+  const im = new Image(); im.src = k.big;
+  if (k.ai && k.tk) Object.defineProperty(k.ai, '__ticket', { value: k.tk, enumerable: false });
+  const sc = Object.assign({}, k, { url: k.big, im, file: null, steps: [], phase: 'result', dup: k.dup ? { again: true } : null });
+  delete sc.big; delete sc.tk; delete sc.v; delete sc.at;
+  // once the account's profile has arrived: straight on to the form (or the "is it this fish?" question)
+  let n = 0;
+  const go = () => {
+    if (S.scan !== sc || sc.phase !== 'result') return;
+    if (!(S.anglersLoaded && S.ready) && n++ < 60) { setTimeout(go, 250); return; }
+    toast(t('scan_resumed'), 'info', 4200);
+    if (sc.chosen) ensureProfile(() => { sc.phase = 'form'; renderScanWork(); }); else openConfirm();
+  };
+  setTimeout(go, 400);
+  return sc;
 }
 /* First visit on the website: show sign-up / login once (people can still close it and look around) */
 function maybeWelcome(tries = 0) {
@@ -454,12 +491,12 @@ function openPay({ kind, ref, amt, title, desc, onDone }) {
       <div class="pay-amt"><span class="num">${fmtN(amt)}</span><span>${t('won')}</span></div>
       ${ready ? `
       <ol class="pay-steps">
-        <li><p class="ps-h"><span class="ps-n">1</span>${t(desktop && L.kakao ? 'pay_step1_pc' : 'pay_step1')}</p>
+        <li><p class="ps-h"><span class="ps-n">1</span>${t(desktop ? 'pay_step1_pc' : L.toss && L.kakao ? 'pay_step1_both' : L.toss ? 'pay_toss' : 'pay_step1')}</p>
           <div class="pay-methods">
-            ${L.kakao ? `<a class="btn btn-kpay btn-lg" href="${esc(L.kakao)}" target="_blank" rel="noopener" data-pm="kakao">${t('pay_kakao')}</a>` : ''}
             ${L.toss ? `<a class="btn btn-toss btn-lg" href="${esc(L.toss)}" target="_blank" rel="noopener" data-pm="toss">${t('pay_toss')}</a>` : ''}
+            ${L.kakao ? `<a class="btn btn-kpay btn-lg" href="${esc(L.kakao)}" target="_blank" rel="noopener" data-pm="kakao">${t('pay_kakao')}</a>` : ''}
           </div>
-          ${L.kakao && desktop ? `<div class="pay-qr"><div class="pay-qr-img" id="pay-qr"></div><p class="hint">${t('pay_qr_hint')}</p></div>` : ''}
+          ${desktop ? `<div class="pay-qr"><div class="pay-qr-img" id="pay-qr"></div><p class="hint">${t(L.toss ? 'pay_qr_hint_toss' : 'pay_qr_hint')}</p></div>` : ''}
           <div class="pay-code" data-copybox>
             <div><span class="lbl">${t('pay_memo')}</span><span class="copy-src mono big">${code}</span></div>
             <button class="btn btn-line btn-sm" data-copy="${code}">${icon('copy')} ${t('copy')}</button>
@@ -473,14 +510,15 @@ function openPay({ kind, ref, amt, title, desc, onDone }) {
       <p class="note">${icon('info')} ${t('pay_none')}</p>
       <div class="actions"><a class="btn btn-kakao btn-lg btn-block" href="${DEV.kakaoUrl}" target="_blank" rel="noopener">${icon('chat')}${t('kakao_ask')}</a></div>`}
     </div>`, { label: title });
-  const qbox = $('#pay-qr', w); if (qbox) drawQr(qbox, L.kakao);
+  // Toss first: money sent to a Toss ID arrives without the operator having to accept it (KakaoPay needs "받기")
+  const qbox = $('#pay-qr', w); if (qbox) drawQr(qbox, L.toss || L.kakao);
   if (!ready) return;
-  let method = L.kakao ? 'kakao' : 'toss';
+  let method = L.toss ? 'toss' : 'kakao';
   const done = $('#pay-done', w);
   // "I sent it" only wakes up after the payment page was opened (phone) or the QR has been on screen a while (computer)
   const arm = () => { if (!done.isConnected) return; done.disabled = false; const pw = $('#pay-wait', w); if (pw) pw.hidden = true; };
   $$('[data-pm]', w).forEach(a => a.addEventListener('click', () => { method = a.dataset.pm; setTimeout(arm, 1200); }));
-  if (desktop && L.kakao) setTimeout(arm, 9000);
+  if (desktop) setTimeout(arm, 9000);
   done.onclick = async () => {
     if (done.disabled) return;
     done.disabled = true;
@@ -705,7 +743,7 @@ async function openLogout() {
     $('#lo-go', w).disabled = true;
     try { await pushOff(); } catch (e) { } // this device stops getting the account's notices
     try { await window.APP_AUTH.ids.logout(); } catch (e) { }
-    for (const k of ['me', 'labels', 'orders', 'suggest', 'photos', 'payok', 'welcomed', 'noti', 'notiSeen', 'notiInit', 'notiState', 'badges']) lsSet(k, null);
+    for (const k of ['me', 'meOf', 'labels', 'orders', 'suggest', 'photos', 'payok', 'welcomed', 'noti', 'notiSeen', 'notiInit', 'notiState', 'badges']) lsSet(k, null);
     lsSet('authTab', 'login'); // after reloading, the login dialog opens (to sign in again or with another ID)
     closeModal(w); toast(t('id_logged_out'));
     setTimeout(() => { location.hash = 'home'; location.reload(); }, 700);
@@ -760,7 +798,7 @@ async function openLinkMake() {
     tick();
   } catch (e) { box.innerHTML = `<p class="err">${esc(linkErr(e))}</p>`; }
 }
-function linkErr(e) { const m = String((e && (e.code || e.message)) || ''); return /slow|rate/i.test(m) ? t('link_slow') : /bad|expired|invalid/i.test(m) ? t('link_bad') : /team_leader/i.test(m) ? t('link_err_leader') : t('link_fail'); }
+function linkErr(e) { const m = String((e && (e.code || e.message)) || ''); return /slow|rate/i.test(m) ? t('link_slow') : /bad|expired|invalid/i.test(m) ? t('link_bad') : /team_leader/i.test(m) ? t('link_err_leader') : /has_id/i.test(m) ? t('id_err_has_id') : t('link_fail'); }
 function openLinkEnter(pre) {
   if (!linkSupported()) return;
   const local = myCatches().length;
@@ -1075,13 +1113,14 @@ function openShareCard(blob, name, text) {
 }
 
 /* ===== What's new: shown once after a big update (website only; needs the matching server update) ===== */
-const WHATS_NEW = '2026-10-29b', WN_TS = Date.parse('2026-10-29T05:00:00Z'); // people who joined after this have nothing to catch up on
+const WHATS_NEW = '2026-10-29c', WN_TS = Date.parse('2026-10-29T05:30:00Z'); // people who joined after this have nothing to catch up on
 const BOOT_AT = Date.now();
 /* what each update brought, newest last; people see what came after the last one they saw (at most 6 lines) */
 const WN_ITEMS = [
   ['2026-10-28', 'user', 'wn_id'], ['2026-10-28', 'shield', 'wn_review'], ['2026-10-28', 'heart', 'wn_pay'], ['2026-10-28', 'share', 'wn_share'],
   ['2026-10-29', 'bell', 'wn_noti'], ['2026-10-29', 'wave', 'wn_wx'], ['2026-10-29', 'medal', 'wn_bdg'], ['2026-10-29', 'download', 'wn_inst'], ['2026-10-29', 'logout', 'wn_out'],
-  ['2026-10-29b', 'wave', 'wn_fs'], ['2026-10-29b', 'trophy', 'wn_wk'], ['2026-10-29b', 'chart', 'wn_st'], ['2026-10-29b', 'phone', 'wn_push']
+  ['2026-10-29b', 'wave', 'wn_fs'], ['2026-10-29b', 'trophy', 'wn_wk'], ['2026-10-29b', 'chart', 'wn_st'], ['2026-10-29b', 'phone', 'wn_push'],
+  ['2026-10-29c', 'camera', 'wn_fix'], ['2026-10-29c', 'menu', 'wn_menu']
 ];
 function maybeWhatsNew(tries = 0) {
   if (window.APP_RT !== 'web' || lsGet('wn', '') === WHATS_NEW || tries > 6) return;

@@ -16,23 +16,42 @@
     </a>
     <nav class="nav" aria-label="Main">
       <a href="#home" data-route="home"><svg class="ic" aria-hidden="true"><use href="#i-home"/></svg><span data-t="nav_home"></span></a>
-      <a href="#scan" data-route="scan"><svg class="ic" aria-hidden="true"><use href="#i-scan"/></svg><span data-t="nav_scan"></span></a>
-      <a href="#map" data-route="map"><svg class="ic" aria-hidden="true"><use href="#i-map"/></svg><span data-t="nav_map"></span></a>
-      <a href="#rank" data-route="rank"><svg class="ic" aria-hidden="true"><use href="#i-trophy"/></svg><span data-t="nav_rank"></span></a>
-      <a href="#friends" data-route="friends"><svg class="ic" aria-hidden="true"><use href="#i-users"/></svg><span data-t="nav_friends"></span><i class="badge num" data-frbadge hidden></i></a>
-      <a href="#board" data-route="board"><svg class="ic" aria-hidden="true"><use href="#i-board"/></svg><span data-t="nav_board"></span></a>
-      <a href="#teams" data-route="teams"><svg class="ic" aria-hidden="true"><use href="#i-flag"/></svg><span data-t="nav_teams"></span></a>
-      <a href="#points" data-route="points" class="nav-web"><svg class="ic" aria-hidden="true"><use href="#i-pin"/></svg><span data-t="nav_points"></span></a>
-      <a href="#sea" data-route="sea"><svg class="ic" aria-hidden="true"><use href="#i-sea"/></svg><span data-t="nav_sea"></span></a>
-      <a href="#char" data-route="char"><svg class="ic" aria-hidden="true"><use href="#i-user"/></svg><span data-t="nav_char"></span></a>
-      <div class="nav-sep"></div>
-      <a href="#dex" data-route="dex"><svg class="ic" aria-hidden="true"><use href="#i-book"/></svg><span data-t="nav_dex"></span></a>
-      <a href="#tackle" data-route="tackle"><svg class="ic" aria-hidden="true"><use href="#i-lure"/></svg><span data-t="nav_tackle"></span></a>
-      <a href="#log" data-route="log"><svg class="ic" aria-hidden="true"><use href="#i-log"/></svg><span data-t="nav_log"></span></a>
-      <a href="#help" data-route="help"><svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg><span data-t="nav_help"></span></a>
-      <a href="#about" data-route="about"><svg class="ic" aria-hidden="true"><use href="#i-sparkle"/></svg><span data-t="nav_about"></span></a>
-      <a href="#prefs" data-route="prefs"><svg class="ic" aria-hidden="true"><use href="#i-gear"/></svg><span data-t="nav_prefs"></span></a>
-      <a href="#admin" data-route="admin" class="nav-admin" hidden><svg class="ic" aria-hidden="true"><use href="#i-shield"/></svg><span data-t="nav_admin"></span></a>
+      <div class="nav-grp" data-grp="fish">
+        <button type="button" class="nav-gh" data-navgrp="fish" aria-expanded="false" aria-controls="ng-fish"><svg class="ic" aria-hidden="true"><use href="#i-fish"/></svg><span data-t="ng_fish"></span><i class="nav-dot" aria-hidden="true" hidden></i><svg class="ic chev" aria-hidden="true"><use href="#i-chev"/></svg></button>
+        <div class="nav-gb" id="ng-fish"><div class="nav-gi">
+          <a href="#scan" data-route="scan"><svg class="ic" aria-hidden="true"><use href="#i-scan"/></svg><span data-t="nav_scan"></span></a>
+          <a href="#map" data-route="map"><svg class="ic" aria-hidden="true"><use href="#i-map"/></svg><span data-t="nav_map"></span></a>
+          <a href="#points" data-route="points" class="nav-web"><svg class="ic" aria-hidden="true"><use href="#i-pin"/></svg><span data-t="nav_points"></span></a>
+          <a href="#dex" data-route="dex"><svg class="ic" aria-hidden="true"><use href="#i-book"/></svg><span data-t="nav_dex"></span></a>
+          <a href="#tackle" data-route="tackle"><svg class="ic" aria-hidden="true"><use href="#i-lure"/></svg><span data-t="nav_tackle"></span></a>
+        </div></div>
+      </div>
+      <div class="nav-grp" data-grp="mine">
+        <button type="button" class="nav-gh" data-navgrp="mine" aria-expanded="false" aria-controls="ng-mine"><svg class="ic" aria-hidden="true"><use href="#i-chart"/></svg><span data-t="ng_mine"></span><i class="nav-dot" aria-hidden="true" hidden></i><svg class="ic chev" aria-hidden="true"><use href="#i-chev"/></svg></button>
+        <div class="nav-gb" id="ng-mine"><div class="nav-gi">
+          <a href="#log" data-route="log"><svg class="ic" aria-hidden="true"><use href="#i-log"/></svg><span data-t="nav_log"></span></a>
+          <a href="#sea" data-route="sea"><svg class="ic" aria-hidden="true"><use href="#i-sea"/></svg><span data-t="nav_sea"></span></a>
+          <a href="#char" data-route="char"><svg class="ic" aria-hidden="true"><use href="#i-user"/></svg><span data-t="nav_char"></span></a>
+        </div></div>
+      </div>
+      <div class="nav-grp" data-grp="social">
+        <button type="button" class="nav-gh" data-navgrp="social" aria-expanded="false" aria-controls="ng-social"><svg class="ic" aria-hidden="true"><use href="#i-users"/></svg><span data-t="ng_social"></span><i class="nav-dot" aria-hidden="true" hidden></i><svg class="ic chev" aria-hidden="true"><use href="#i-chev"/></svg></button>
+        <div class="nav-gb" id="ng-social"><div class="nav-gi">
+          <a href="#rank" data-route="rank"><svg class="ic" aria-hidden="true"><use href="#i-trophy"/></svg><span data-t="nav_rank"></span></a>
+          <a href="#friends" data-route="friends"><svg class="ic" aria-hidden="true"><use href="#i-users"/></svg><span data-t="nav_friends"></span><i class="badge num" data-frbadge hidden></i></a>
+          <a href="#board" data-route="board"><svg class="ic" aria-hidden="true"><use href="#i-board"/></svg><span data-t="nav_board"></span></a>
+          <a href="#teams" data-route="teams"><svg class="ic" aria-hidden="true"><use href="#i-flag"/></svg><span data-t="nav_teams"></span></a>
+        </div></div>
+      </div>
+      <div class="nav-grp" data-grp="help">
+        <button type="button" class="nav-gh" data-navgrp="help" aria-expanded="false" aria-controls="ng-help"><svg class="ic" aria-hidden="true"><use href="#i-info"/></svg><span data-t="ng_help"></span><i class="nav-dot" aria-hidden="true" hidden></i><svg class="ic chev" aria-hidden="true"><use href="#i-chev"/></svg></button>
+        <div class="nav-gb" id="ng-help"><div class="nav-gi">
+          <a href="#help" data-route="help"><svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg><span data-t="nav_help"></span></a>
+          <a href="#about" data-route="about"><svg class="ic" aria-hidden="true"><use href="#i-sparkle"/></svg><span data-t="nav_about"></span></a>
+          <a href="#prefs" data-route="prefs"><svg class="ic" aria-hidden="true"><use href="#i-gear"/></svg><span data-t="nav_prefs"></span></a>
+          <a href="#admin" data-route="admin" class="nav-admin" hidden><svg class="ic" aria-hidden="true"><use href="#i-shield"/></svg><span data-t="nav_admin"></span></a>
+        </div></div>
+      </div>
     </nav>
     <div class="rail-foot">
       <span class="mode-pill" id="mode-pill" hidden></span>
@@ -87,6 +106,7 @@
 <div id="modal-root"></div>
 <div id="toast-root" aria-live="polite"></div>
 <svg width="0" height="0" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
+  <symbol id="i-chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
   <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v8.5a1.5 1.5 0 0 1-1.5 1.5H15v-6H9v6H4.5A1.5 1.5 0 0 1 3 19.5z"/></symbol>
   <symbol id="i-scan" viewBox="0 0 24 24"><path d="M4 8V5.5A1.5 1.5 0 0 1 5.5 4H8M16 4h2.5A1.5 1.5 0 0 1 20 5.5V8M20 16v2.5a1.5 1.5 0 0 1-1.5 1.5H16M8 20H5.5A1.5 1.5 0 0 1 4 18.5V16"/><path d="M7 12c2.2-2.6 5.2-3 8-1l2.2-1.6v5.2L15 13c-2.8 2-5.8 1.6-8-1z"/></symbol>
   <symbol id="i-map" viewBox="0 0 24 24"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14"/></symbol>

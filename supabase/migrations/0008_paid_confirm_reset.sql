@@ -261,5 +261,7 @@ update public.admin_docs
          'id', 'rs' || to_char(now() at time zone 'Asia/Seoul', 'MMDDHH24MI'),
          't', to_char(now() at time zone 'Asia/Seoul', 'FMMM"월" FMDD"일"')
               || '에 장난 기록과 결제 오류를 정리하려고 모든 조과·꾸미기·주문을 초기화했어요. 계정·닉네임·아이디·친구·팀·캐릭터·프로필 사진·게시글·낚시 포인트는 그대로예요.',
-         'ts', (extract(epoch from now()) * 1000)::bigint))
+         'ts', (extract(epoch from now()) * 1000)::bigint),
+       -- when the reset ran: a phone that still keeps older records on it does not upload them again
+       'resetAt', (extract(epoch from now()) * 1000)::bigint)
  where id = 'config';
