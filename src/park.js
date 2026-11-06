@@ -17,7 +17,8 @@ const PK = {
   ],
   PROPS: [
     { id: 'shop', x: 300, y: 800, r: 95 }, { id: 'board', x: 720, y: 660, r: 75 }, { id: 'fire', x: 1010, y: 830, r: 85 },
-    { id: 'tank', x: 1400, y: 735, r: 75 }, { id: 'duel', x: 560, y: 655, r: 65 }, { id: 'light', x: 1260, y: 142, r: 70 }
+    { id: 'tank', x: 1400, y: 735, r: 75 }, { id: 'duel', x: 560, y: 655, r: 65 }, { id: 'light', x: 1260, y: 142, r: 70 },
+    { id: 'luck', x: 1235, y: 905, r: 62 }, { id: 'react', x: 440, y: 905, r: 58 }
   ],
   LAMPS: [[180, 680], [520, 905], [1105, 650], [1500, 905], [1260, 590]],
   EMO: ['👋', '😆', '👍', '🎣', '🐟', '❤️'],
@@ -194,6 +195,26 @@ function pkDrawProps(g, t, night) {
     g.strokeStyle = '#5E3E22'; g.lineWidth = 4; g.beginPath(); g.moveTo(x, y - 6); g.lineTo(x, y - 70); g.stroke();
     g.fillStyle = '#FF5A1F'; g.beginPath(); g.moveTo(x, y - 70); g.lineTo(x + 34, y - 60); g.lineTo(x, y - 50); g.closePath(); g.fill();
     pkSay(g, t_('pk_duel'), x, y + 22, { small: true });
+  } });
+  // the fortune stall (운세 뽑기): a striped awning, a counter and a round machine with fish inside
+  out.push({ y: 905, d() {
+    const x = 1235, y = 905;
+    g.fillStyle = 'rgba(0,0,0,.15)'; g.beginPath(); g.ellipse(x, y + 3, 62, 10, 0, 0, 7); g.fill();
+    g.fillStyle = '#7A5230'; g.fillRect(x - 54, y - 92, 6, 92); g.fillRect(x + 48, y - 92, 6, 92);
+    g.fillStyle = '#F2E6CF'; g.fillRect(x - 56, y - 38, 112, 38); g.strokeStyle = '#5E3E22'; g.lineWidth = 2; g.strokeRect(x - 56, y - 38, 112, 38);
+    for (let i = 0; i < 6; i++) { g.fillStyle = i % 2 ? '#FFFFFF' : '#7B4BC4'; g.beginPath(); g.moveTo(x - 62 + i * 20.7, y - 112); g.lineTo(x - 62 + (i + 1) * 20.7, y - 112); g.lineTo(x - 62 + (i + 1) * 20.7, y - 92); g.arc(x - 62 + i * 20.7 + 10.35, y - 92, 10.35, 0, Math.PI); g.closePath(); g.fill(); }
+    g.fillStyle = '#C9302C'; g.fillRect(x - 12, y - 64, 24, 26); g.fillStyle = 'rgba(190,230,245,.85)'; g.beginPath(); g.arc(x, y - 78, 20, 0, 7); g.fill(); g.strokeStyle = '#FFFFFF'; g.lineWidth = 2; g.stroke();
+    const fc = ['#FF8A1F', '#5BB6C9', '#F2C94C', '#E93D82']; for (let i = 0; i < 4; i++) { const a = t * (.6 + i * .15) + i * 1.6; g.fillStyle = fc[i]; g.beginPath(); g.ellipse(x + Math.cos(a) * 9, y - 78 + Math.sin(a) * 8, 5, 3, a, 0, 7); g.fill(); }
+    pkSay(g, t_('pk_luck'), x, y - 124);
+  } });
+  // the strike practice frame (챔질 연습장): a float hanging over a tub of water
+  out.push({ y: 905, d() {
+    const x = 440, y = 905;
+    g.fillStyle = '#3F87B5'; g.beginPath(); g.ellipse(x, y - 6, 40, 12, 0, 0, 7); g.fill(); g.fillStyle = '#7CC6E3'; g.beginPath(); g.ellipse(x, y - 9, 34, 8, 0, 0, 7); g.fill();
+    g.strokeStyle = '#7A5230'; g.lineWidth = 5; g.beginPath(); g.moveTo(x - 46, y - 2); g.lineTo(x - 46, y - 96); g.lineTo(x + 18, y - 96); g.stroke();
+    const bob = Math.sin(t * 3) * 2; g.strokeStyle = 'rgba(40,40,40,.6)'; g.lineWidth = 1; g.beginPath(); g.moveTo(x + 14, y - 96); g.lineTo(x + 14, y - 26 + bob); g.stroke();
+    g.fillStyle = '#FF3B2F'; g.beginPath(); g.ellipse(x + 14, y - 20 + bob, 5, 8, 0, Math.PI, 0); g.fill(); g.fillStyle = '#FFF'; g.beginPath(); g.ellipse(x + 14, y - 20 + bob, 5, 6, 0, 0, Math.PI); g.fill();
+    pkSay(g, t_('pk_react'), x - 6, y - 108);
   } });
   // lamp posts
   for (const [lx, ly] of PK.LAMPS) out.push({ y: ly, d() { g.fillStyle = '#2E3A46'; g.fillRect(lx - 3, ly - 76, 6, 76); g.fillRect(lx - 9, ly - 4, 18, 6); g.fillStyle = night ? '#FFE9A6' : '#E8EEF2'; g.beginPath(); g.arc(lx, ly - 82, 9, 0, 7); g.fill(); } });
@@ -510,6 +531,8 @@ function pkProp(id) {
   if (id === 'light') { pkLight(); return; }
   if (id === 'tank') { pkTank(); return; }
   if (id === 'duel') { toast(t('pk_duel_how'), 'info', 5200); }
+  if (id === 'luck') openFortune();
+  if (id === 'react') openReaction();
 }
 function pkSit(on) { PKS.me.act = on ? 'sit' : ''; PKS.me.spot = ''; pkTrackSoon(); }
 function pkShop() {

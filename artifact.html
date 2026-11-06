@@ -1507,6 +1507,154 @@ div.more-acct:hover { filter: none; }
 .hl-tag { align-self: flex-start; font-size: 11px; font-weight: 800; letter-spacing: .08em; background: #FF3B2F; color: #fff; border-radius: 6px; padding: 1px 7px; }
 .hl-go { position: relative; z-index: 1; margin-left: auto; flex: none; }
 
+/* ---- today's fishing (오늘의 출조), easy to read: a verdict, four tiles, the good hours ---- */
+.fs-card .sec-head { margin-bottom: 12px; }
+.fs-place { display: inline-flex; align-items: center; gap: 4px; font-size: 13.5px; color: var(--ink-2); }
+.fs-place .ic { width: 15px; height: 15px; color: var(--ink-3); }
+.fs-body { display: flex; flex-direction: column; gap: 16px; }
+.fs-main { display: flex; align-items: center; gap: 16px; }
+.fs-badge { flex: none; width: 88px; height: 88px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--surface-2); color: var(--ink-2); }
+.fs-badge .fs-n { font-size: 36px; line-height: 1; font-weight: 800; letter-spacing: -.02em; color: inherit; }
+.fs-badge span { font-size: 12.5px; font-weight: 700; margin-top: 2px; }
+.fs-badge.lvl-great, .fs-badge.lvl-good { background: var(--ok-soft); color: var(--ok); }
+.fs-badge.lvl-ok { background: color-mix(in srgb, var(--sea) 14%, var(--surface)); color: var(--sea); }
+.fs-badge.lvl-low { background: var(--warn-soft); color: var(--warn); }
+.fs-badge.lvl-bad { background: var(--poison-soft); color: var(--poison); }
+.fs-say { min-width: 0; }
+.fs-verdict { margin: 0; font-size: 24px; font-weight: 800; line-height: 1.2; color: var(--ink); }
+.fs-verdict.lvl-great, .fs-verdict.lvl-good { color: var(--ok); }
+.fs-verdict.lvl-low { color: var(--warn); }
+.fs-verdict.lvl-bad { color: var(--poison); }
+.fs-verdict.lvl-none { font-size: 17px; font-weight: 600; color: var(--ink-2); }
+.fs-why { margin: 5px 0 0; font-size: 15px; color: var(--ink-2); line-height: 1.45; }
+.fs-tiles { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.fs-tile { display: flex; flex-direction: column; gap: 3px; min-width: 0; padding: 11px 13px 12px; border-radius: 14px; background: var(--surface-2); border: 1px solid var(--line-2); border-top: 4px solid var(--line); }
+.fs-tile.st-good { border-top-color: var(--ok); }
+.fs-tile.st-ok { border-top-color: var(--sea); }
+.fs-tile.st-meh { border-top-color: var(--ink-3); }
+.fs-tile.st-care { border-top-color: var(--warn); background: color-mix(in srgb, var(--warn) 9%, var(--surface)); }
+.fs-tile.st-bad { border-top-color: var(--poison); background: color-mix(in srgb, var(--poison) 9%, var(--surface)); }
+.ft-k { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--ink-2); }
+.ft-k .ic { width: 16px; height: 16px; color: var(--ink-3); }
+.ft-w { font-size: 19px; font-weight: 800; line-height: 1.25; color: var(--ink); }
+.fs-tile.st-care .ft-w { color: var(--warn); }
+.fs-tile.st-bad .ft-w { color: var(--poison); }
+.ft-s { font-size: 12.5px; color: var(--ink-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.ft-s:empty::before { content: "\00a0"; }
+.fs-rows { display: flex; flex-direction: column; gap: 10px; padding-top: 2px; }
+.fs-row { display: flex; align-items: center; gap: 8px 14px; flex-wrap: wrap; }
+.fs-lbl { flex: none; width: 104px; font-size: 13.5px; font-weight: 700; color: var(--ink-2); }
+.fs-rv { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 18px; font-size: 14px; }
+.fs-tw { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; color: var(--ink-2); }
+.fs-tw .ic { width: 16px; height: 16px; color: var(--ink-3); }
+.fs-tw b { font-size: 15.5px; color: var(--ink); }
+.fs-tw.on b { color: var(--accent); }
+.fs-now { font-style: normal; font-size: 11.5px; font-weight: 800; color: #fff; background: var(--accent); border-radius: 6px; padding: 1px 6px; }
+.fs-rv .chip { font-size: 13.5px; }
+.fs-how { margin-top: 0; }
+.fs-how .fs-parts { margin: 10px 0 6px; max-width: 420px; }
+.fb-it { display: inline-flex; align-items: center; gap: 4px; margin-right: 12px; font-size: 13.5px; white-space: nowrap; }
+.fb-it.st-care b { color: var(--warn); }
+.fb-it.st-bad b { color: var(--poison); }
+@media (max-width: 640px) {
+  .fs-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .fs-badge { width: 74px; height: 74px; }
+  .fs-badge .fs-n { font-size: 30px; }
+  .fs-verdict { font-size: 21px; }
+  .fs-why { font-size: 14px; }
+  .fs-lbl { width: auto; flex-basis: 100%; }
+  .fs-rv { gap: 6px 14px; }
+}
+
+.fs-tw .tw-k { display: inline-flex; align-items: center; gap: 5px; }
+.ft-s { white-space: normal; overflow: visible; line-height: 1.35; }
+@media (max-width: 640px) {
+  .fs-times { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; width: 100%; }
+  .fs-times .fs-tw { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 2px 6px; padding: 9px 11px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--line-2); white-space: normal; }
+  .fs-times .fs-tw .ic { grid-row: span 2; }
+  .fs-times .fs-tw .tw-k { font-size: 12.5px; }
+  .fs-times .fs-tw b { font-size: 15px; }
+}
+
+/* ---- mini games: today's fish fortune, strike reaction ---- */
+.fo-strip { display: flex; align-items: center; gap: 14px; width: 100%; padding: 12px 16px; text-align: left; cursor: pointer; color: inherit; font: inherit; background: linear-gradient(100deg, color-mix(in srgb, #8E4EC6 10%, var(--surface)), var(--surface) 60%); }
+.fo-strip:hover { border-color: color-mix(in srgb, #8E4EC6 35%, var(--line)); }
+.fo-strip-ic { font-size: 28px; line-height: 1; }
+.fo-strip img { width: 84px; height: auto; flex: none; }
+.fo-strip-t { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.fo-strip-t b { font-size: 15.5px; }
+.fo-strip-t .muted { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fo-strip > .ic { color: var(--ink-3); flex: none; transform: rotate(-90deg); }
+.fo-strip .btn { flex: none; }
+.fo-st { color: #D4A72C; letter-spacing: 1px; font-weight: 700; }
+.fo { text-align: center; }
+.fo-back { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 6px 0; }
+.fo-deck { width: 150px; height: 200px; border-radius: 18px; display: grid; place-items: center; margin-bottom: 8px; background: repeating-linear-gradient(45deg, #5B2E9E 0 12px, #7B4BC4 12px 24px); box-shadow: 0 10px 28px rgba(60,20,110,.35), inset 0 0 0 6px rgba(255,255,255,.25); }
+.fo-deck span { font-size: 64px; font-weight: 800; color: #fff; text-shadow: 0 3px 0 rgba(0,0,0,.2); }
+.fo-deck.shake { animation: fo-shake .75s ease-in-out; }
+@keyframes fo-shake { 0%, 100% { transform: rotate(0) scale(1); } 20% { transform: rotate(-8deg) scale(1.04); } 40% { transform: rotate(7deg) scale(1.06); } 60% { transform: rotate(-5deg) scale(1.08); } 80% { transform: rotate(3deg) scale(1.1); } }
+.fo-card { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.fo-card.fo-in { animation: fo-in .5s cubic-bezier(.2,.9,.3,1.2); }
+@keyframes fo-in { from { opacity: 0; transform: rotateY(80deg) scale(.9); } to { opacity: 1; transform: none; } }
+.fo-card .eyebrow { justify-content: center; text-transform: none; letter-spacing: .02em; }
+.fo-pic { width: 100%; max-width: 320px; border-radius: 16px; background: radial-gradient(circle at 50% 60%, color-mix(in srgb, var(--sea) 18%, var(--surface)), var(--surface-2)); }
+.fo-pic img { width: 100%; height: auto; display: block; }
+.fo-name { margin: 2px 0 0; font-size: 26px; }
+.fo-stars { margin: 0; font-size: 24px; color: #D4A72C; letter-spacing: 3px; }
+.fo-msg { margin: 6px 0 4px; font-size: 17px; font-weight: 600; line-height: 1.5; max-width: 30em; }
+.fo-lucky { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; width: 100%; margin: 8px 0 4px; }
+.fo-lucky div { background: var(--surface-2); border-radius: 12px; padding: 9px 8px; min-width: 0; }
+.fo-lucky dt { font-size: 12px; color: var(--ink-3); margin-bottom: 2px; }
+.fo-lucky dd { margin: 0; font-weight: 700; font-size: 14.5px; display: flex; align-items: center; justify-content: center; gap: 5px; overflow-wrap: anywhere; }
+.fo-sw { width: 14px; height: 14px; border-radius: 50%; display: inline-block; flex: none; box-shadow: inset 0 0 0 1px rgba(0,0,0,.15); }
+.fo-card .actions { justify-content: center; }
+@media (max-width: 480px) { .fo-lucky { grid-template-columns: 1fr; } .fo-lucky div { display: flex; justify-content: space-between; align-items: center; } .fo-lucky dt { margin: 0; } }
+.rx-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.rx-top h2 { display: flex; align-items: center; gap: 8px; margin: 0; }
+.rx-round { color: var(--ink-3); font-weight: 700; }
+.rx-stage { position: relative; margin: 12px 0 8px; height: 230px; border-radius: 16px; overflow: hidden; cursor: pointer; touch-action: manipulation; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; }
+.rx-stage:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+#rx-cv { display: block; width: 100%; height: 100%; }
+.rx-big { position: absolute; left: 0; right: 0; bottom: 14px; margin: 0; text-align: center; font-size: 34px; font-weight: 800; color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,.35); pointer-events: none; }
+.rx-big.ok { color: #FFE27A; }
+.rx-big.bad { color: #FFD1CC; }
+.rx-msg { min-height: 1.5em; margin: 0; text-align: center; font-size: 14.5px; color: var(--ink-2); }
+.rx-times { list-style: none; margin: 10px 0 0; padding: 0; display: flex; justify-content: center; flex-wrap: wrap; gap: 6px; }
+.rx-times:empty { display: none; }
+.rx-times li { padding: 3px 10px; border-radius: 99px; background: var(--surface-2); font-size: 13.5px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.rx-times li.miss { color: var(--poison); }
+.rx-end { text-align: center; margin-top: 10px; }
+.rx-grade { margin: 0 0 8px; font-size: 22px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; }
+.rx-sum { display: flex; justify-content: center; gap: 22px; }
+.rx-sum div { display: flex; flex-direction: column; align-items: center; }
+.rx-sum span { font-size: 12.5px; color: var(--ink-3); }
+.rx-sum b { font-size: 22px; }
+.rx .actions { justify-content: center; }
+.gm-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+.gm-card { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; color: inherit; text-decoration: none; }
+.gm-card .muted { margin: 0; line-height: 1.5; }
+.gm-card .btn { margin-top: auto; }
+a.gm-card:hover { text-decoration: none; border-color: color-mix(in srgb, var(--sea) 40%, var(--line)); }
+.gm-art { width: 100%; height: 120px; border-radius: 14px; overflow: hidden; display: grid; place-items: center; margin-bottom: 4px; }
+.gm-art img { width: 100%; height: 100%; object-fit: cover; }
+.fo-art { background: repeating-linear-gradient(45deg, #5B2E9E 0 12px, #7B4BC4 12px 24px); }
+.fo-art span { font-size: 48px; font-weight: 800; color: #fff; }
+.fo-art img { object-fit: contain; background: color-mix(in srgb, var(--sea) 14%, var(--surface)); }
+.rx-art { position: relative; background: linear-gradient(180deg, #9ED4EA 0 42%, #2E8CC0 42% 100%); }
+.rx-float { position: absolute; left: 50%; top: 42%; width: 16px; height: 30px; margin: -26px 0 0 -8px; border-radius: 8px 8px 9px 9px; background: linear-gradient(180deg, #FF3B2F 0 40%, #fff 40% 58%, #FF3B2F 58%); animation: rx-bob 2.4s ease-in-out infinite; }
+@keyframes rx-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(4px); } 80% { transform: translateY(14px); } }
+@media (prefers-reduced-motion: reduce) { .rx-float, .fo-deck.shake, .fo-card.fo-in { animation: none; } }
+.pk-art { background: linear-gradient(165deg, #0B4A73, #1F77A8 58%, #EAD8A4); }
+.gm-mine { margin: 0; font-size: 14px; }
+.rx-rank .rk-list { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.rk-list li { display: flex; align-items: center; gap: 10px; padding: 6px 8px; border-radius: 12px; }
+.rk-list li.me { background: color-mix(in srgb, var(--accent) 9%, var(--surface)); }
+.rk-who { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; background: none; border: 0; padding: 0; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.rk-who b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rk-v { font-weight: 800; font-size: 15px; }
+.rx-top { padding-right: 46px; }
+.fo-pic { max-width: 300px; }
+
 </style>
 <div class="app">
   <aside class="rail">
@@ -1534,10 +1682,16 @@ div.more-acct:hover { filter: none; }
           <a href="#char" data-route="char"><svg class="ic" aria-hidden="true"><use href="#i-user"/></svg><span data-t="nav_char"></span></a>
         </div></div>
       </div>
+      <div class="nav-grp" data-grp="play">
+        <button type="button" class="nav-gh" data-navgrp="play" aria-expanded="false" aria-controls="ng-play"><svg class="ic" aria-hidden="true"><use href="#i-sparkle"/></svg><span data-t="ng_play"></span><i class="nav-dot" aria-hidden="true" hidden></i><svg class="ic chev" aria-hidden="true"><use href="#i-chev"/></svg></button>
+        <div class="nav-gb" id="ng-play"><div class="nav-gi">
+          <a href="#park" data-route="park" class="nav-web"><svg class="ic" aria-hidden="true"><use href="#i-wave"/></svg><span data-t="nav_park"></span></a>
+          <a href="#games" data-route="games"><svg class="ic" aria-hidden="true"><use href="#i-star"/></svg><span data-t="nav_games"></span></a>
+        </div></div>
+      </div>
       <div class="nav-grp" data-grp="social">
         <button type="button" class="nav-gh" data-navgrp="social" aria-expanded="false" aria-controls="ng-social"><svg class="ic" aria-hidden="true"><use href="#i-users"/></svg><span data-t="ng_social"></span><i class="nav-dot" aria-hidden="true" hidden></i><svg class="ic chev" aria-hidden="true"><use href="#i-chev"/></svg></button>
         <div class="nav-gb" id="ng-social"><div class="nav-gi">
-          <a href="#park" data-route="park" class="nav-web"><svg class="ic" aria-hidden="true"><use href="#i-wave"/></svg><span data-t="nav_park"></span></a>
           <a href="#chat" data-route="chat" class="nav-web"><svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg><span data-t="nav_chat"></span><i class="badge num" data-dmbadge hidden></i></a>
           <a href="#rank" data-route="rank"><svg class="ic" aria-hidden="true"><use href="#i-trophy"/></svg><span data-t="nav_rank"></span></a>
           <a href="#friends" data-route="friends"><svg class="ic" aria-hidden="true"><use href="#i-users"/></svg><span data-t="nav_friends"></span><i class="badge num" data-frbadge hidden></i></a>
@@ -1583,6 +1737,7 @@ div.more-acct:hover { filter: none; }
     <section class="view" id="v-scan" hidden></section>
     <section class="view" id="v-map" hidden></section>
     <section class="view" id="v-park" hidden></section>
+    <section class="view" id="v-games" hidden></section>
     <section class="view" id="v-chat" hidden></section>
     <section class="view" id="v-rank" hidden></section>
     <section class="view" id="v-friends" hidden></section>
@@ -2603,7 +2758,7 @@ Object.assign(T, {
   fs_great: ['아주 좋아요', 'Excellent', 'とても良い', '非常好'], fs_good: ['좋아요', 'Good', '良い', '好'], fs_ok: ['보통이에요', 'Fair', 'まずまず', '一般'],
   fs_low: ['아쉬워요', 'Slow', 'いまひとつ', '欠佳'], fs_bad: ['출조 자제', 'Stay ashore', '釣行は控えて', '暂缓出钓'],
   fs_dawn: ['해 뜰 무렵', 'Dawn', '朝マヅメ', '清晨'], fs_dusk: ['해 질 무렵', 'Dusk', '夕マヅメ', '傍晚'],
-  fs_fish: ['지금 잘 잡히는', 'Biting now', '今釣れる', '当下好钓'],
+  fs_fish: ['잘 잡히는 물고기', 'Biting now', '今釣れる魚', '当下好钓的鱼'],
   fs_how_q: ['점수는 어떻게 매기나요?', 'How is this scored?', 'スコアの決め方は?', '分数怎么算？'],
   fs_how: ['날씨 40점(바람·파도가 잔잔하고 비 올 확률이 낮을수록 높아요) + 물때 30점(물살이 너무 세지도 약하지도 않은 중간일수록 높아요) + 제철 30점(이 지역 물고기들이 1년 중 가장 활발한 달일수록 높아요). 바람·파도가 강하거나 천둥이 치면 30점을 넘지 않아요. 민물은 물때를 빼고 계산해요. 해 뜰 무렵과 해 질 무렵은 물고기가 잘 무는 때로 알려져 있어요. 참고용이니 나가기 전에 기상청 특보를 꼭 확인하세요.',
     'Weather 40 (calmer wind and waves and a lower chance of rain score higher) + tide 30 (a current that is neither too strong nor too weak scores higher) + season 30 (higher in the months when the area’s fish are most active). Strong wind or waves, or thunder, cap the score at 30. Fresh water leaves the tide out. Dawn and dusk are known as good biting times. A rough guide only: check official warnings before you go.',
@@ -2805,6 +2960,16 @@ Object.assign(T, {
   home_live_park: ['접속한 낚시꾼들과 만나 걷고, 낚시하고, 60초 대결까지', 'Meet the anglers online: walk, fish and play 60-second duels', '接続中の釣り人と会って、歩いて、釣って、60秒対決', '与在线钓友相遇：散步、钓鱼、60秒对决'],
   home_live_chat: ['전체 채팅 · 친구와 1:1 대화', 'Open chat · 1:1 with friends', '全体チャット · 友だちと1対1', '全体聊天 · 好友私聊'],
   home_live_go: ['들어가기', 'Go in', '入る', '进入'],
+  fs_pts: ['점', 'pts', '点', '分'], fs_loading: ['날씨를 불러오는 중…', 'Loading the weather…', '天気を読み込み中…', '正在加载天气…'],
+  fs_t_wind: ['바람', 'Wind', '風', '风'], fs_t_wave: ['파도', 'Waves', '波', '海浪'], fs_t_sky: ['날씨', 'Sky', '天気', '天气'],
+  fw_calm: ['잔잔해요', 'Calm', '穏やか', '平静'], fw_light: ['약해요', 'Light', '弱い', '微风'], fw_strong: ['강해요', 'Strong', '強い', '较强'], fw_storm: ['매우 강해요', 'Very strong', 'とても強い', '很强'],
+  fv_flat: ['잔잔해요', 'Flat', 'ベタ凪', '平静'], fv_low: ['낮아요', 'Low', '低い', '较低'], fv_mid: ['보통이에요', 'Moderate', '普通', '中等'], fv_high: ['높아요', 'High', '高い', '较高'], fv_huge: ['매우 높아요', 'Very high', 'とても高い', '很高'],
+  ft_strong: ['물살 셈', 'strong current', '潮流が速い', '水流急'], ft_mid: ['물살 보통', 'moderate current', '潮流は普通', '水流适中'], ft_weak: ['물살 약함', 'weak current', '潮流が緩い', '水流缓'],
+  fs_rain: ['비 {n}%', 'rain {n}%', '雨 {n}%', '降雨 {n}%'], fs_when: ['좋은 시간', 'Best times', 'いい時間', '好时段'], fs_now: ['지금', 'now', '今', '现在'],
+  fsr_calm: ['바람·파도 잔잔', 'calm wind and waves', '風・波は穏やか', '风浪平稳'], fsr_care: ['바람·파도 조금 셈', 'some wind and waves', '風・波がやや強い', '风浪稍大'],
+  fsr_tide_good: ['물때 좋음', 'good tide', '潮が良い', '潮汐好'], fsr_tide_ok: ['물때 무난', 'tide is fine', '潮はまずまず', '潮汐一般'], fsr_tide_low: ['물때 아쉬움', 'tide not ideal', '潮がいまひとつ', '潮汐欠佳'],
+  fsr_season_good: ['제철 물고기 많음', 'lots in season', '旬の魚が多い', '应季鱼多'], fsr_season_ok: ['제철 보통', 'some in season', '旬はほどほど', '应季一般'], fsr_season_low: ['제철 물고기 적음', 'few in season', '旬の魚が少ない', '应季鱼少'],
+  fsw_storm: ['천둥·번개 예보가 있어요', 'Thunderstorms are forecast', '雷雨の予報があります', '有雷暴预报'], fsw_wind: ['바람이 너무 강해요', 'The wind is too strong', '風が強すぎます', '风太大'], fsw_wave: ['파도가 너무 높아요', 'The waves are too high', '波が高すぎます', '浪太高'],
   wd_title: ['회원 탈퇴', 'Delete account', '退会', '注销账号'],
   wd_sub: ['계정과 모든 기록을 지우고 떠나요.', 'Remove your account and everything in it.', 'アカウントとすべての記録を消して退会します。', '删除账号及所有记录。'],
   wd_lede: ['탈퇴하면 아래 내용이 모두 바로 지워지고, 되돌릴 수 없어요.', 'Leaving deletes all of this right away. It cannot be undone.', '退会すると以下がすべてすぐに削除され、元に戻せません。', '注销后以下内容会立即删除，且无法恢复。'],
@@ -2842,6 +3007,70 @@ Object.assign(T, {
   wn_bdmod_p: ['내 글과 댓글을 고치거나 지울 수 있고, 「내 글」만 모아 볼 수 있어요.', 'Edit or delete your own posts and comments, and see only your posts with “My posts”.', '自分の投稿とコメントを編集・削除でき、「自分の投稿」だけを見ることもできます。', '可以编辑或删除自己的帖子和评论，并用“我的帖子”只看自己的。'],
   wn_wd_h: ['회원 탈퇴', 'Delete your account', '退会', '注销账号'],
   wn_wd_p: ['설정의 계정 카드에서 언제든 탈퇴하고 모든 기록을 지울 수 있어요.', 'You can leave and delete everything at any time from the account card in Settings.', '設定のアカウントカードからいつでも退会し、すべての記録を削除できます。', '随时可在设置的账号卡片中注销并删除所有记录。'],
+
+  /* mini games: today's fish fortune, strike reaction */
+  nav_games: ['미니게임', 'Mini games', 'ミニゲーム', '小游戏'], ng_play: ['놀이', 'Play', 'あそぶ', '娱乐'],
+  gm_title: ['미니게임', 'Mini games', 'ミニゲーム', '小游戏'],
+  gm_sub: ['짧게 즐기는 낚시 게임이에요. 기록은 재미로만 남고 조과·랭킹과는 상관없어요.', 'Quick fishing games. Records are just for fun and never count for catches or rankings.', '短く楽しめる釣りゲームです。記録は遊び用で、釣果やランキングとは関係ありません。', '轻松的钓鱼小游戏。记录仅供娱乐，与渔获和排行无关。'],
+  gm_play: ['도전하기', 'Play', '挑戦する', '挑战'], gm_fun: ['재미로 보는 순위', 'Just for fun', '遊びのランキング', '仅供娱乐'],
+  gm_park: ['갯바위 공원 낚시·대결', 'Rock Park fishing & duels', '磯の公園で釣り・対決', '矶钓公园钓鱼·对决'],
+  gm_park_sub: ['접속한 사람들과 실시간으로 낚시하고 60초 대결', 'Fish live with the people online and play 60-second duels', '接続中の人とリアルタイムで釣り、60秒対決', '与在线的人实时钓鱼、60秒对决'],
+  fo_title: ['오늘의 물고기 운세', 'Today’s fish fortune', '今日の魚占い', '今日鱼运势'],
+  fo_sub: ['하루에 한 번, 오늘 나와 인연인 물고기를 뽑아요.', 'Once a day, draw the fish that’s meant for you today.', '1日1回、今日のあなたと縁のある魚を引きます。', '每天一次，抽出今天与你有缘的鱼。'],
+  fo_draw: ['운세 뽑기', 'Draw', '占う', '抽签'], fo_open: ['운세 다시 보기', 'See my fortune', '占いをもう一度見る', '查看运势'], fo_today: ['오늘의 물고기', 'Today’s fish', '今日の魚', '今日之鱼'],
+  fo_date: ['{m}월 {d}일', '{m}/{d}', '{m}月{d}日', '{m}月{d}日'], fo_stars: ['5점 중 {n}점', '{n} of 5', '5点中{n}点', '5分中{n}分'],
+  fo_lucky_bait: ['행운의 미끼', 'Lucky bait', 'ラッキーなエサ', '幸运饵料'], fo_lucky_time: ['행운의 시간', 'Lucky time', 'ラッキータイム', '幸运时间'], fo_lucky_color: ['행운의 색', 'Lucky colour', 'ラッキーカラー', '幸运颜色'],
+  fo_note: ['재미로 보는 운세예요. 한국 시간 자정에 바뀌어요.', 'Just for fun. It changes at midnight, Korean time.', '遊びの占いです。韓国時間の0時に変わります。', '仅供娱乐，韩国时间零点更新。'],
+  fo_share: ['공유하기', 'Share', 'シェア', '分享'], fo_see_fish: ['이 물고기 알아보기', 'About this fish', 'この魚を見る', '了解这条鱼'],
+  fo_copied: ['복사했어요. 친구에게 붙여 넣어 보내세요!', 'Copied. Paste it to a friend!', 'コピーしました。友だちに貼り付けて送ってください!', '已复制，粘贴发给好友吧！'],
+  fo_share_text: ['오늘의 물고기 운세: {fish} {stars} — “{msg}”', 'My fish fortune today: {fish} {stars} — “{msg}”', '今日の魚占い:{fish} {stars} —「{msg}」', '今日鱼运势：{fish} {stars} ——“{msg}”'],
+  fo_t0: ['새벽 4~6시', '4–6 am', '早朝4~6時', '凌晨4~6点'], fo_t1: ['아침 6~8시', '6–8 am', '朝6~8時', '早上6~8点'], fo_t2: ['오전 9~11시', '9–11 am', '午前9~11時', '上午9~11点'], fo_t3: ['한낮 12~2시', 'noon–2 pm', '昼12~14時', '中午12~14点'],
+  fo_t4: ['오후 3~5시', '3–5 pm', '午後3~5時', '下午3~5点'], fo_t5: ['해 질 녘 5~7시', 'dusk, 5–7 pm', '夕方5~7時', '傍晚5~7点'], fo_t6: ['밤 8~10시', '8–10 pm', '夜8~10時', '晚上8~10点'], fo_t7: ['한밤 11시~새벽 1시', '11 pm–1 am', '深夜23時~1時', '深夜23点~凌晨1点'],
+  fo_c0: ['빨강', 'Red', '赤', '红色'], fo_c1: ['주황', 'Orange', 'オレンジ', '橙色'], fo_c2: ['노랑 (차트)', 'Chartreuse', '黄色(チャート)', '黄色（荧光）'], fo_c3: ['초록', 'Green', '緑', '绿色'], fo_c4: ['파랑', 'Blue', '青', '蓝色'],
+  fo_c5: ['보라', 'Purple', '紫', '紫色'], fo_c6: ['분홍', 'Pink', 'ピンク', '粉色'], fo_c7: ['하양 (야광)', 'White (glow)', '白(夜光)', '白色（夜光）'], fo_c8: ['은색', 'Silver', 'シルバー', '银色'], fo_c9: ['금색', 'Gold', 'ゴールド', '金色'],
+  fo_m0: ['첫 캐스팅에 기운이 몰려 있어요. 집중!', 'Your luck is in the first cast. Focus!', '最初のキャストに運が集まっています。集中!', '好运都在第一竿，专注！'],
+  fo_m1: ['오늘은 챔질을 한 박자 늦게 해 보세요.', 'Strike half a beat later today.', '今日はアワセを一拍遅らせてみて。', '今天扬竿慢半拍试试。'],
+  fo_m2: ['밑밥은 조금씩 자주. 물고기가 따라와요.', 'Chum a little, often. The fish will follow.', 'コマセは少しずつこまめに。魚がついてきます。', '诱饵少量多次，鱼会跟过来。'],
+  fo_m3: ['옆 사람 채비를 유심히 보면 답이 있어요.', 'The answer is in your neighbour’s rig.', '隣の人の仕掛けに答えがあります。', '答案就在旁边钓友的钓组里。'],
+  fo_m4: ['포인트를 한 번 옮기면 운이 트여요.', 'Move spots once and your luck opens up.', 'ポイントを一度変えると運が開けます。', '换一次钓位，好运就来了。'],
+  fo_m5: ['물때가 바뀌는 순간을 놓치지 마세요.', 'Don’t miss the turn of the tide.', '潮が変わる瞬間を逃さないで。', '别错过潮水转换的时刻。'],
+  fo_m6: ['기다림이 길수록 손맛이 커요.', 'The longer the wait, the bigger the fight.', '待つほど引きが強くなります。', '等得越久，手感越好。'],
+  fo_m7: ['오늘은 바닥층을 노려 보세요.', 'Fish near the bottom today.', '今日は底を狙ってみて。', '今天试试钓底层。'],
+  fo_m8: ['목줄을 한 단계 가늘게 하면 입질이 늘어요.', 'Go one size finer on the leader for more bites.', 'ハリスを一段細くするとアタリが増えます。', '子线细一号，咬口会更多。'],
+  fo_m9: ['철수 직전 마지막 한 마리가 대물일지도!', 'The last fish before packing up could be the big one!', '撤収直前の最後の一匹が大物かも!', '收竿前最后一条可能是大物！'],
+  fo_m10: ['바람을 등지는 자리가 행운의 자리예요.', 'Your lucky spot has the wind at your back.', '風を背にする場所がラッキースポット。', '背风的位置就是幸运钓位。'],
+  fo_m11: ['작은 입질도 가볍게 넘기지 마세요.', 'Don’t ignore the small bites.', '小さなアタリも見逃さないで。', '小咬口也别放过。'],
+  fo_m12: ['미끼를 자주 새것으로 갈아 주세요.', 'Change to fresh bait often.', 'エサはこまめに新しく。', '勤换新鲜饵料。'],
+  fo_m13: ['오늘은 동행과 함께하면 운이 두 배.', 'Fish with a friend today for double luck.', '今日は仲間と一緒なら運も2倍。', '今天和钓友同行，好运翻倍。'],
+  fo_m14: ['밑걸림 조심! 여분 채비를 꼭 챙기세요.', 'Watch for snags—bring spare rigs!', '根掛かりに注意!予備の仕掛けを忘れずに。', '小心挂底！记得带备用钓组。'],
+  fo_m15: ['해 뜰 무렵이 오늘의 승부처예요.', 'Dawn is your moment today.', '今日の勝負どころは朝マヅメ。', '今天的关键在清晨。'],
+  fo_m16: ['조과보다 안전이 먼저! 구명조끼부터 챙겨요.', 'Safety first—life jacket on!', '釣果より安全第一!ライフジャケットを。', '安全第一！先穿好救生衣。'],
+  fo_m17: ['오늘 잡은 물고기는 꼭 사진으로 남겨 두세요.', 'Take a photo of today’s catch.', '今日の釣果は写真に残しましょう。', '今天的渔获记得拍照留念。'],
+  fo_m18: ['물 흐름이 멈추는 곳에 물고기가 모여요.', 'Fish gather where the current slows.', '流れが止まる所に魚が集まります。', '水流放缓的地方鱼会聚集。'],
+  fo_m19: ['평소와 다른 루어 색을 꺼내 보세요.', 'Try a lure colour you never use.', 'いつもと違うルアーの色を試して。', '换个平时不用的拟饵颜色。'],
+  fo_m20: ['손맛은 보장, 욕심은 조금만.', 'A good fight is promised—just don’t be greedy.', '引きは保証、欲張りは少しだけ。', '手感有保证，别太贪心。'],
+  fo_m21: ['쓰레기 하나 주워 오면 운이 따라와요.', 'Pick up one piece of litter and luck follows.', 'ゴミを一つ拾うと運がついてきます。', '捡一件垃圾，好运就跟来。'],
+  fo_m22: ['찌가 찌릿 하면 망설이지 말고 챔질!', 'When the float goes zzirit, strike—no hesitation!', 'ウキが動いたら迷わずアワセ!', '浮漂一动，果断扬竿！'],
+  fo_m23: ['쉬어 가도 좋은 날, 바다 구경도 낚시예요.', 'A good day to take it easy—watching the sea counts too.', '休んでもいい日。海を眺めるのも釣りのうち。', '适合放松的一天，看海也是钓鱼。'],
+  rx_title: ['챔질 반응속도', 'Strike reaction test', 'アワセ反応速度', '扬竿反应速度'],
+  rx_sub: ['찌가 쑥 들어가는 순간 누르세요. 톡톡 건드리는 헛입질에 속지 말고요! 5번 해서 평균을 재요.', 'Tap the moment the float dives—don’t fall for the little nibbles! Five tries, averaged.', 'ウキがスッと沈んだ瞬間に押してください。ツンツンの空アタリにだまされないで!5回の平均を測ります。', '浮漂猛地下沉的瞬间按下，别被轻微的假口骗了！测5次取平均。'],
+  rx_tap: ['찌가 들어가면 여기를 누르세요 (키보드: 스페이스)', 'Tap here when the float dives (keyboard: Space)', 'ウキが沈んだらここをタップ(キーボード:スペース)', '浮漂下沉时点这里（键盘：空格）'],
+  rx_start: ['시작', 'Start', 'スタート', '开始'], rx_again: ['다시 하기', 'Try again', 'もう一度', '再来一次'], rx_wait: ['찌를 보세요…', 'Watch the float…', 'ウキを見て…', '盯住浮漂…'],
+  rx_foul: ['헛챔질! 찌가 쑥 들어갈 때 눌러요', 'Too soon! Wait for the float to dive', '早アワセ!ウキが沈んでから押して', '太早了！等浮漂下沉再按'],
+  rx_toofast: ['너무 빨라요. 미리 누르면 안 돼요', 'Too fast—no guessing ahead', '速すぎます。先読みはだめ', '太快了，不能提前按'],
+  rx_miss: ['놓쳤어요', 'Missed', '逃しました', '错过了'], rx_round: ['{n}/{of}번째', '{n}/{of}', '{n}/{of}回目', '第{n}/{of}次'], rx_ms: ['{n}ms', '{n} ms', '{n}ms', '{n}毫秒'],
+  rx_avg: ['평균', 'Average', '平均', '平均'], rx_best: ['최고', 'Best', 'ベスト', '最佳'], rx_fouls_k: ['헛챔질', 'Early', '早アワセ', '提前'], rx_newrec: ['새 기록', 'New record', '新記録', '新纪录'],
+  rx_g1: ['번개 챔질 ⚡', 'Lightning hands ⚡', '稲妻アワセ ⚡', '闪电扬竿 ⚡'], rx_g2: ['프로 낚시꾼', 'Pro angler', 'プロ級', '职业钓手'], rx_g3: ['고수', 'Expert', '上級者', '高手'], rx_g4: ['보통 낚시꾼', 'Regular angler', 'ふつうの釣り人', '普通钓手'], rx_g5: ['느긋한 낚시꾼', 'Laid-back angler', 'のんびり釣り人', '悠闲钓手'],
+  rx_rank: ['반응속도 순위 (평균)', 'Reaction ranking (average)', '反応速度ランキング(平均)', '反应速度排行（平均）'],
+  rx_rank_none: ['아직 기록이 없어요. 첫 기록을 남겨 보세요!', 'No records yet. Be the first!', 'まだ記録がありません。最初の記録をどうぞ!', '还没有记录，来创造第一个吧！'],
+  rx_mine: ['내 기록', 'My record', '自分の記録', '我的记录'], rx_none_yet: ['아직 없음', 'none yet', 'まだなし', '暂无'],
+  rx_myrank: ['전체 {of}명 중 {n}등', 'Rank {n} of {of}', '{of}人中{n}位', '{of}人中第{n}名'],
+  pk_luck: ['운세 뽑기', 'Fortune stall', '占い屋台', '运势摊'], pk_react: ['챔질 연습장', 'Strike practice', 'アワセ練習場', '扬竿练习场'],
+  pk_open_luck: ['오늘의 물고기 운세 뽑기', 'Draw today’s fish fortune', '今日の魚占いを引く', '抽今日鱼运势'], pk_open_react: ['챔질 반응속도 해 보기', 'Try the strike reaction test', 'アワセ反応速度に挑戦', '试试扬竿反应速度'],
+  wn_games_h: ['미니게임: 오늘의 운세 · 챔질 반응속도', 'Mini games: fish fortune & strike reaction', 'ミニゲーム:魚占い・アワセ反応速度', '小游戏：鱼运势·扬竿反应速度'],
+  wn_games_p: ['하루 한 번 오늘의 물고기를 뽑고, 찌가 들어가는 순간 누르는 반응속도로 순위를 겨뤄 보세요. 메뉴의 「놀이」와 갯바위 공원에 있어요.', 'Draw today’s fish once a day, and race to strike the moment the float dives. Find them under “Play” and in the park.', '1日1回今日の魚を引いて、ウキが沈む瞬間に押す反応速度で順位を競いましょう。メニューの「あそぶ」と公園にあります。', '每天抽一次今日之鱼，用浮漂下沉瞬间的反应速度比拼排名。在菜单“娱乐”和公园里。'],
+  wn_fs2_h: ['오늘의 출조, 한눈에', 'Today’s fishing at a glance', '今日の釣りがひと目で', '今日出钓一目了然'],
+  wn_fs2_p: ['점수 옆에 한 줄 결론, 바람·파도·날씨·물때를 쉬운 말과 색으로 보여 드려요.', 'A one-line verdict next to the score, and wind, waves, sky and tide in plain words and colours.', '点数の横に一言の結論、風・波・天気・潮をやさしい言葉と色で。', '分数旁一句话结论，风、浪、天气、潮汐用简单的话和颜色展示。'],
 });
 
 /* ===== Tackle dictionaries: [ko, en, ja, zh] ===== */
@@ -6860,7 +7089,7 @@ function openShareCard(blob, name, text) {
 }
 
 /* ===== What's new: shown once after a big update (website only; needs the matching server update) ===== */
-const WHATS_NEW = '2026-10-29d', WN_TS = Date.parse('2026-10-29T09:30:00Z'); // people who joined after this have nothing to catch up on
+const WHATS_NEW = '2026-11-06a', WN_TS = Date.parse('2026-11-06T03:00:00Z'); // people who joined after this have nothing to catch up on
 const BOOT_AT = Date.now();
 /* what each update brought, newest last; people see what came after the last one they saw (at most 6 lines) */
 const WN_ITEMS = [
@@ -6868,7 +7097,8 @@ const WN_ITEMS = [
   ['2026-10-29', 'bell', 'wn_noti'], ['2026-10-29', 'wave', 'wn_wx'], ['2026-10-29', 'medal', 'wn_bdg'], ['2026-10-29', 'download', 'wn_inst'], ['2026-10-29', 'logout', 'wn_out'],
   ['2026-10-29b', 'wave', 'wn_fs'], ['2026-10-29b', 'trophy', 'wn_wk'], ['2026-10-29b', 'chart', 'wn_st'], ['2026-10-29b', 'phone', 'wn_push'],
   ['2026-10-29c', 'camera', 'wn_fix'], ['2026-10-29c', 'menu', 'wn_menu'],
-  ['2026-10-29d', 'wave', 'wn_park'], ['2026-10-29d', 'chat', 'wn_chat'], ['2026-10-29d', 'board', 'wn_bdmod'], ['2026-10-29d', 'user', 'wn_wd']
+  ['2026-10-29d', 'wave', 'wn_park'], ['2026-10-29d', 'chat', 'wn_chat'], ['2026-10-29d', 'board', 'wn_bdmod'], ['2026-10-29d', 'user', 'wn_wd'],
+  ['2026-11-06a', 'star', 'wn_games'], ['2026-11-06a', 'wave', 'wn_fs2']
 ];
 function maybeWhatsNew(tries = 0) {
   if (window.APP_RT !== 'web' || lsGet('wn', '') === WHATS_NEW || tries > 6) return;
@@ -7030,6 +7260,7 @@ VIEWS.home = {
       </section>
 
       ${wxCardHTML()}
+      ${foStripHTML()}
       ${idTipHTML() || instTipHTML()}
       ${newsCardHTML()}
 
@@ -8240,7 +8471,7 @@ async function openRelink(uid) {
 }
 
 /* ---------- More (mobile) ---------- */
-const NAV_ICON = { home: 'home', park: 'wave', chat: 'chat', scan: 'scan', map: 'map', points: 'pin', dex: 'book', tackle: 'lure', log: 'log', sea: 'sea', char: 'user', rank: 'trophy', friends: 'users', board: 'board', teams: 'flag', help: 'chat', about: 'sparkle', prefs: 'gear', admin: 'shield' };
+const NAV_ICON = { home: 'home', park: 'wave', games: 'star', chat: 'chat', scan: 'scan', map: 'map', points: 'pin', dex: 'book', tackle: 'lure', log: 'log', sea: 'sea', char: 'user', rank: 'trophy', friends: 'users', board: 'board', teams: 'flag', help: 'chat', about: 'sparkle', prefs: 'gear', admin: 'shield' };
 function openMore() {
   const nIn = S.me && S.me.nick ? frLists().inc.length : 0;
   // the account first: who is signed in, with a way to sign out (only when there is a way back in: a login ID or a linked device)
@@ -9165,7 +9396,7 @@ function openPoint(id) {
   if (px) wxFetch(p.lat, p.lon).then(d => {
     if (!px.isConnected) return;
     const fs = fishScore(d, Object.assign({ id: p.id, lat: p.lat, lon: p.lon, kind: p.kind }, placeRegion(p)));
-    px.innerHTML = d ? `<span class="fs-mini">${t('fs_title')} <b>${fs.total}</b>/100 ${fsChip(fs)}</span>${wxLine(d)}` : `<span class="muted small">${t('wx_fail')}</span>`;
+    px.innerHTML = d ? fsBriefHTML(d, fs) : `<span class="muted small">${t('wx_fail')}</span>`;
   });
   const mp = $('#pt-map', w); if (mp) mp.onclick = () => { closeModal(w); S.mapFocus = [p.lon, p.lat, 12]; location.hash = 'map'; };
   const ed = $('#pt-edit', w); if (ed) ed.onclick = () => { closeModal(w); openPointEdit(id); };
@@ -9407,15 +9638,6 @@ function wxSky(code) {
 }
 function windDir(deg) { if (deg == null) return ''; const i = Math.round(((deg % 360) + 360) % 360 / 45) % 8; return t('wd_' + ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'][i]); }
 const wxF1 = v => (v == null ? '—' : (Math.round(v * 10) / 10).toFixed(1));
-function wxLine(d) {
-  const go = wxGo(d);
-  return `<span class="wx-go wx-${go}">${icon(go === 'good' ? 'check' : 'warn')}${t('wxgo_' + go)}</span>
-    <span class="wx-it">${icon('cloud')}<b>${d.t == null ? '—' : Math.round(d.t) + '°'}</b> ${esc(wxSky(d.code))}</span>
-    <span class="wx-it">${icon('wind')}<b>${wxF1(d.wind)}</b>m/s ${esc(windDir(d.wdir))}${d.gust != null ? ` <span class="muted">${t('wx_gust', { v: wxF1(d.gust) })}</span>` : ''}</span>
-    <span class="wx-it">${icon('wave')}<b>${d.wave == null ? '—' : wxF1(d.wave)}</b>${d.wave == null ? '' : 'm'}${d.wper != null ? ` <span class="muted">${t('wx_period', { v: Math.round(d.wper) })}</span>` : ''}</span>
-    ${d.sst != null ? `<span class="wx-it">${t('wx_sst')} <b>${wxF1(d.sst)}°</b></span>` : ''}
-    ${d.rain != null ? `<span class="wx-it">${t('wx_rain')} <b>${Math.round(d.rain)}%</b></span>` : ''}`;
-}
 /* the places one can pick: the home sea and my saved fishing points (each with its region, sea or fresh water) */
 const FS_FRESH_OF = { KW: 'KF', KS: 'KF', KE: 'KF', KJ: 'KF', JP: 'JF', CN: 'CF', TW: 'CF' };
 function placeRegion(p) {
@@ -9454,23 +9676,71 @@ function fishScore(d, place) {
   if (w != null) total = place.fresh ? Math.round((w + se) * 100 / 70) : w + ti + se;
   const go = d ? wxGo(d) : null;
   if (go === 'bad') total = Math.min(total, 30);
-  const level = total == null ? null : go === 'bad' ? 'bad' : total >= 80 ? 'great' : total >= 62 ? 'good' : total >= 45 ? 'ok' : 'low';
+  let level = total == null ? null : go === 'bad' ? 'bad' : total >= 80 ? 'great' : total >= 62 ? 'good' : total >= 45 ? 'ok' : 'low';
+  if (go === 'care' && (level === 'great' || level === 'good')) level = 'ok'; // strong wind or high waves: never better than "so-so"
   return { total, w, ti, se, st, go, level, fresh: place.fresh };
 }
 const FS_IC = { great: 'check', good: 'check', ok: 'info', low: 'info', bad: 'warn' };
 function fsChip(s) { return s.level ? `<span class="fs-lvl fs-${s.level}">${icon(FS_IC[s.level])}${t('fs_' + s.level)}</span>` : ''; }
-function fsTopHTML(s) {
-  const part = (k, v, max, note) => `<li><span class="fs-k">${t(k)}</span><span class="fs-bar" role="meter" aria-label="${esc(t(k))}" aria-valuemin="0" aria-valuemax="${max}" aria-valuenow="${v == null ? 0 : v}"><i style="width:${v == null ? 0 : Math.round(v / max * 100)}%"></i></span><b class="fs-v">${v == null ? (note || '—') : `${v}<small>/${max}</small>`}</b></li>`;
-  return `<div class="fs-score"><span class="fs-n">${s.total == null ? '—' : s.total}</span><span class="fs-of">/100</span>${fsChip(s)}</div>
-    <ul class="fs-parts">${part('fs_wx', s.w, 40)}${s.fresh ? part('fs_tide', null, 30, t('fs_fresh')) : part('fs_tide', s.ti, 30)}${part('fs_season', s.se, 30)}</ul>`;
-}
 function hmAdd(hm, min) { const [h, m] = hm.split(':').map(Number); const v = ((h * 60 + m + min) % 1440 + 1440) % 1440; return String(Math.floor(v / 60)).padStart(2, '0') + ':' + String(v % 60).padStart(2, '0'); }
-function fsExtraHTML(d, place) {
-  const out = [];
-  if (d && d.sr && d.ss) out.push(`<span class="fs-time">${icon('sun')}${t('fs_dawn')} <b>${hmAdd(d.sr, -30)}~${hmAdd(d.sr, 60)}</b></span><span class="fs-time">${icon('moon')}${t('fs_dusk')} <b>${hmAdd(d.ss, -60)}~${hmAdd(d.ss, 30)}</b></span>`);
+
+/* ----- the card in plain words: one verdict, four tiles (wind, waves, sky, tide), the good hours, what bites;
+   the scoring itself stays folded away under "how is this scored?" ----- */
+function fsWind(d) {
+  if (!d || d.wind == null) return null;
+  const w = d.wind, g = d.gust ?? w;
+  const st = w >= 12 || g >= 17 ? 'bad' : w >= 8 || g >= 12 ? 'care' : 'good';
+  return { st, word: t(w < 4 ? 'fw_calm' : w < 8 ? 'fw_light' : w < 12 ? 'fw_strong' : 'fw_storm'), sub: [`${wxF1(w)} m/s`, windDir(d.wdir), st !== 'good' && d.gust != null ? t('wx_gust', { v: wxF1(d.gust) }) : ''].filter(Boolean).join(' · ') };
+}
+function fsWave(d) {
+  if (!d || d.wave == null) return null;
+  const h = d.wave, st = h >= 2.5 ? 'bad' : h >= 1.5 ? 'care' : 'good';
+  return { st, word: t(h < .5 ? 'fv_flat' : h < 1 ? 'fv_low' : h < 1.5 ? 'fv_mid' : h < 2.5 ? 'fv_high' : 'fv_huge'), sub: [`${wxF1(h)} m`, d.sst != null ? `${t('wx_sst')} ${wxF1(d.sst)}°` : ''].filter(Boolean).join(' · ') };
+}
+function fsSky(d) {
+  if (!d || (d.code == null && d.t == null)) return null;
+  const storm = d.code != null && d.code >= 95, wet = d.rain != null && d.rain >= 70;
+  return { st: storm ? 'bad' : wet ? 'care' : 'good', word: wxSky(d.code) || '—', sub: [d.t != null ? Math.round(d.t) + '°' : '', d.rain != null ? t('fs_rain', { n: Math.round(d.rain) }) : ''].filter(Boolean).join(' · ') };
+}
+function fsTide(s, place) {
+  if (place.fresh) return { st: 'none', word: '—', sub: t('fs_fresh') };
+  const ti = tideInfo(place.rg); const flow = t(s.st >= .75 ? 'ft_strong' : s.st >= .3 ? 'ft_mid' : 'ft_weak');
+  return { st: s.ti >= 24 ? 'good' : s.ti >= 16 ? 'ok' : 'meh', word: ti.kr ? ti.label : flow, sub: ti.kr ? flow : '' };
+}
+function fsSay(s, d, state) {
+  if (s.total == null) return { title: t(state === 'fail' ? 'wx_fail' : 'fs_loading'), why: '' };
+  if (s.go === 'bad') return { title: t('fs_bad'), why: t(d.code != null && d.code >= 95 ? 'fsw_storm' : d.wind >= 12 || (d.gust ?? 0) >= 17 ? 'fsw_wind' : 'fsw_wave') };
+  const bits = [t(s.go === 'good' ? 'fsr_calm' : 'fsr_care')];
+  if (!s.fresh) bits.push(t(s.ti >= 24 ? 'fsr_tide_good' : s.ti >= 16 ? 'fsr_tide_ok' : 'fsr_tide_low'));
+  bits.push(t(s.se >= 24 ? 'fsr_season_good' : s.se >= 16 ? 'fsr_season_ok' : 'fsr_season_low'));
+  return { title: t('fs_' + s.level), why: bits.join(' · ') };
+}
+function fsBodyHTML(d, place, state) {
+  const s = fishScore(d, place); const say = fsSay(s, d, state); const lv = s.level || 'none';
+  const tile = (ic, k, v) => `<li class="fs-tile st-${v ? v.st : 'none'}"><span class="ft-k">${icon(ic)}${t(k)}</span><b class="ft-w">${v ? esc(v.word) : '—'}</b><span class="ft-s">${v ? esc(v.sub) : ''}</span></li>`;
+  const rows = [];
+  if (d && d.sr && d.ss && s.go !== 'bad') { // no "good hours" on a day to stay ashore
+    const now = new Date(); const cur = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+    const win = (ic, k, a, b) => { const on = cur >= a && cur <= b; return `<span class="fs-tw${on ? ' on' : ''}">${icon(ic)}<span class="tw-k">${t(k)}${on ? `<i class="fs-now">${t('fs_now')}</i>` : ''}</span><b class="num">${a}~${b}</b></span>`; };
+    rows.push(`<div class="fs-row"><span class="fs-lbl">${t('fs_when')}</span><span class="fs-rv fs-times">${win('sun', 'fs_dawn', hmAdd(d.sr, -30), hmAdd(d.sr, 60))}${win('moon', 'fs_dusk', hmAdd(d.ss, -60), hmAdd(d.ss, 30))}</span></div>`);
+  }
   const top = inSeasonTop(place.rg, new Date().getMonth(), 3);
-  if (top.length) out.push(`<span class="fs-fish">${t('fs_fish')} ${top.map(x => `<button class="chip chip-tab" data-sp="${esc(x.id)}">${esc(nameOf(x.id))}</button>`).join('')}</span>`);
-  return out.join('');
+  if (top.length) rows.push(`<div class="fs-row"><span class="fs-lbl">${t('fs_fish')}</span><span class="fs-rv">${top.map(x => `<button class="chip chip-tab" data-sp="${esc(x.id)}">${esc(nameOf(x.id))}</button>`).join('')}</span></div>`);
+  const part = (k, v, max, note) => `<li><span class="fs-k">${t(k)}</span><span class="fs-bar" role="meter" aria-label="${esc(t(k))}" aria-valuemin="0" aria-valuemax="${max}" aria-valuenow="${v == null ? 0 : v}"><i style="width:${v == null ? 0 : Math.round(v / max * 100)}%"></i></span><b class="fs-v">${v == null ? (note || '—') : `${v}<small>/${max}</small>`}</b></li>`;
+  return `<div class="fs-main">
+      <div class="fs-badge lvl-${lv}"><b class="fs-n num">${s.total == null ? '—' : s.total}</b><span>${t('fs_pts')}</span></div>
+      <div class="fs-say"><p class="fs-verdict lvl-${lv}">${esc(say.title)}</p>${say.why ? `<p class="fs-why">${esc(say.why)}</p>` : ''}</div>
+    </div>
+    <ul class="fs-tiles">${tile('wind', 'fs_t_wind', fsWind(d))}${tile('wave', 'fs_t_wave', fsWave(d))}${tile('cloud', 'fs_t_sky', fsSky(d))}${tile('moon', 'fs_tide', fsTide(s, place))}</ul>
+    ${rows.length ? `<div class="fs-rows">${rows.join('')}</div>` : ''}
+    <details class="fs-how"><summary>${t('fs_how_q')}</summary>
+      <ul class="fs-parts">${part('fs_wx', s.w, 40)}${s.fresh ? part('fs_tide', null, 30, t('fs_fresh')) : part('fs_tide', s.ti, 30)}${part('fs_season', s.se, 30)}</ul>
+      <p class="small muted">${t('fs_how')}</p></details>`;
+}
+/* a short line for a saved fishing point */
+function fsBriefHTML(d, s) {
+  const bits = [['fs_t_wind', fsWind(d)], ['fs_t_wave', fsWave(d)], ['fs_t_sky', fsSky(d)]].filter(x => x[1]).map(([k, v]) => `<span class="fb-it st-${v.st}">${t(k)} <b>${esc(v.word)}</b> <span class="muted">${esc(v.sub.split(' · ')[0])}</span></span>`);
+  return `<span class="fs-mini">${t('fs_title')} <b class="num">${s.total == null ? '—' : s.total}</b>${t('fs_pts')} ${fsChip(s)}</span>${bits.join('')}`;
 }
 function wxCardHTML() {
   if (!wxOn()) return '';
@@ -9478,29 +9748,26 @@ function wxCardHTML() {
   const d = wxCached(sel.lat, sel.lon);
   return `<section class="card wx-card fs-card" id="wx-card" data-at="${esc(sel.id)}">
     <div class="sec-head tight"><h2 class="h3">${icon('wave')}${t('fs_title')}</h2>
-      ${places.length > 1 ? `<select id="wx-at" aria-label="${esc(t('wx_where'))}">${places.map(x => `<option value="${esc(x.id)}" ${x.id === sel.id ? 'selected' : ''}>${esc(x.name)}</option>`).join('')}</select>` : `<span class="muted small">${esc(sel.name)}</span>`}
+      ${places.length > 1 ? `<select id="wx-at" aria-label="${esc(t('wx_where'))}">${places.map(x => `<option value="${esc(x.id)}" ${x.id === sel.id ? 'selected' : ''}>${esc(x.name)}</option>`).join('')}</select>` : `<span class="fs-place">${icon('pin')}${esc(sel.name)}</span>`}
     </div>
-    <div class="fs-top" id="fs-top">${fsTopHTML(fishScore(d, sel))}</div>
-    <div class="wx-line" id="wx-line">${d ? wxLine(d) : `<span class="muted small">${t('thinking')}</span>`}</div>
-    <p class="fs-extra" id="fs-extra">${fsExtraHTML(d, sel)}</p>
-    <details class="fs-how"><summary>${t('fs_how_q')}</summary><p class="small muted">${t('fs_how')}</p></details>
+    <div class="fs-body" id="fs-body">${fsBodyHTML(d, sel, d ? 'ok' : 'loading')}</div>
     <p class="hint wx-src">${t('wx_note')} · <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo.com</a></p>
   </section>`;
 }
 function wxHydrate(root) {
   const card = $('#wx-card', root); if (!card) return;
   const place = wxPlaces().find(x => x.id === card.dataset.at) || wxPlaces()[0];
-  const line = $('#wx-line', card), top = $('#fs-top', card), extra = $('#fs-extra', card);
+  const body = $('#fs-body', card);
   wxFetch(place.lat, place.lon).then(d => {
-    if (!line.isConnected) return;
-    line.innerHTML = d ? wxLine(d) : `<span class="muted small">${t('wx_fail')}</span>`;
-    top.innerHTML = fsTopHTML(fishScore(d, place)); extra.innerHTML = fsExtraHTML(d, place);
+    if (!body.isConnected || card.dataset.at !== place.id) return;
+    const open = !!$('.fs-how[open]', body);
+    body.innerHTML = fsBodyHTML(d, place, d ? 'ok' : 'fail');
+    if (open) { const h = $('.fs-how', body); if (h) h.open = true; }
   });
   const sel = $('#wx-at', card);
   if (sel) sel.onchange = () => {
     lsSet('wxAt', sel.value); const p = wxPlaces().find(x => x.id === sel.value); if (!p) return;
-    card.dataset.at = p.id; line.innerHTML = `<span class="muted small">${t('thinking')}</span>`;
-    top.innerHTML = fsTopHTML(fishScore(null, p)); extra.innerHTML = fsExtraHTML(null, p); wxHydrate(root);
+    card.dataset.at = p.id; const d = wxCached(p.lat, p.lon); body.innerHTML = fsBodyHTML(d, p, d ? 'ok' : 'loading'); wxHydrate(root);
   };
 }
 try { if (localStorage.getItem('eosin.wx')) localStorage.removeItem('eosin.wx'); } catch (e) { } // the first version's cache
@@ -10084,7 +10351,8 @@ const PK = {
   ],
   PROPS: [
     { id: 'shop', x: 300, y: 800, r: 95 }, { id: 'board', x: 720, y: 660, r: 75 }, { id: 'fire', x: 1010, y: 830, r: 85 },
-    { id: 'tank', x: 1400, y: 735, r: 75 }, { id: 'duel', x: 560, y: 655, r: 65 }, { id: 'light', x: 1260, y: 142, r: 70 }
+    { id: 'tank', x: 1400, y: 735, r: 75 }, { id: 'duel', x: 560, y: 655, r: 65 }, { id: 'light', x: 1260, y: 142, r: 70 },
+    { id: 'luck', x: 1235, y: 905, r: 62 }, { id: 'react', x: 440, y: 905, r: 58 }
   ],
   LAMPS: [[180, 680], [520, 905], [1105, 650], [1500, 905], [1260, 590]],
   EMO: ['👋', '😆', '👍', '🎣', '🐟', '❤️'],
@@ -10261,6 +10529,26 @@ function pkDrawProps(g, t, night) {
     g.strokeStyle = '#5E3E22'; g.lineWidth = 4; g.beginPath(); g.moveTo(x, y - 6); g.lineTo(x, y - 70); g.stroke();
     g.fillStyle = '#FF5A1F'; g.beginPath(); g.moveTo(x, y - 70); g.lineTo(x + 34, y - 60); g.lineTo(x, y - 50); g.closePath(); g.fill();
     pkSay(g, t_('pk_duel'), x, y + 22, { small: true });
+  } });
+  // the fortune stall (운세 뽑기): a striped awning, a counter and a round machine with fish inside
+  out.push({ y: 905, d() {
+    const x = 1235, y = 905;
+    g.fillStyle = 'rgba(0,0,0,.15)'; g.beginPath(); g.ellipse(x, y + 3, 62, 10, 0, 0, 7); g.fill();
+    g.fillStyle = '#7A5230'; g.fillRect(x - 54, y - 92, 6, 92); g.fillRect(x + 48, y - 92, 6, 92);
+    g.fillStyle = '#F2E6CF'; g.fillRect(x - 56, y - 38, 112, 38); g.strokeStyle = '#5E3E22'; g.lineWidth = 2; g.strokeRect(x - 56, y - 38, 112, 38);
+    for (let i = 0; i < 6; i++) { g.fillStyle = i % 2 ? '#FFFFFF' : '#7B4BC4'; g.beginPath(); g.moveTo(x - 62 + i * 20.7, y - 112); g.lineTo(x - 62 + (i + 1) * 20.7, y - 112); g.lineTo(x - 62 + (i + 1) * 20.7, y - 92); g.arc(x - 62 + i * 20.7 + 10.35, y - 92, 10.35, 0, Math.PI); g.closePath(); g.fill(); }
+    g.fillStyle = '#C9302C'; g.fillRect(x - 12, y - 64, 24, 26); g.fillStyle = 'rgba(190,230,245,.85)'; g.beginPath(); g.arc(x, y - 78, 20, 0, 7); g.fill(); g.strokeStyle = '#FFFFFF'; g.lineWidth = 2; g.stroke();
+    const fc = ['#FF8A1F', '#5BB6C9', '#F2C94C', '#E93D82']; for (let i = 0; i < 4; i++) { const a = t * (.6 + i * .15) + i * 1.6; g.fillStyle = fc[i]; g.beginPath(); g.ellipse(x + Math.cos(a) * 9, y - 78 + Math.sin(a) * 8, 5, 3, a, 0, 7); g.fill(); }
+    pkSay(g, t_('pk_luck'), x, y - 124);
+  } });
+  // the strike practice frame (챔질 연습장): a float hanging over a tub of water
+  out.push({ y: 905, d() {
+    const x = 440, y = 905;
+    g.fillStyle = '#3F87B5'; g.beginPath(); g.ellipse(x, y - 6, 40, 12, 0, 0, 7); g.fill(); g.fillStyle = '#7CC6E3'; g.beginPath(); g.ellipse(x, y - 9, 34, 8, 0, 0, 7); g.fill();
+    g.strokeStyle = '#7A5230'; g.lineWidth = 5; g.beginPath(); g.moveTo(x - 46, y - 2); g.lineTo(x - 46, y - 96); g.lineTo(x + 18, y - 96); g.stroke();
+    const bob = Math.sin(t * 3) * 2; g.strokeStyle = 'rgba(40,40,40,.6)'; g.lineWidth = 1; g.beginPath(); g.moveTo(x + 14, y - 96); g.lineTo(x + 14, y - 26 + bob); g.stroke();
+    g.fillStyle = '#FF3B2F'; g.beginPath(); g.ellipse(x + 14, y - 20 + bob, 5, 8, 0, Math.PI, 0); g.fill(); g.fillStyle = '#FFF'; g.beginPath(); g.ellipse(x + 14, y - 20 + bob, 5, 6, 0, 0, Math.PI); g.fill();
+    pkSay(g, t_('pk_react'), x - 6, y - 108);
   } });
   // lamp posts
   for (const [lx, ly] of PK.LAMPS) out.push({ y: ly, d() { g.fillStyle = '#2E3A46'; g.fillRect(lx - 3, ly - 76, 6, 76); g.fillRect(lx - 9, ly - 4, 18, 6); g.fillStyle = night ? '#FFE9A6' : '#E8EEF2'; g.beginPath(); g.arc(lx, ly - 82, 9, 0, 7); g.fill(); } });
@@ -10577,6 +10865,8 @@ function pkProp(id) {
   if (id === 'light') { pkLight(); return; }
   if (id === 'tank') { pkTank(); return; }
   if (id === 'duel') { toast(t('pk_duel_how'), 'info', 5200); }
+  if (id === 'luck') openFortune();
+  if (id === 'react') openReaction();
 }
 function pkSit(on) { PKS.me.act = on ? 'sit' : ''; PKS.me.spot = ''; pkTrackSoon(); }
 function pkShop() {
@@ -10922,10 +11212,221 @@ document.addEventListener('visibilitychange', () => {
   else if (PKS.paused) { PKS.paused = false; pkJoin(PKS.roomNo); }
 });
 
+/* ===== 미니게임: 오늘의 물고기 운세 and 챔질 반응속도.
+   운세: one fish a day, the same all day for the same person (seeded by who and the Korean date) — a fortune to
+   smile at, with a lucky bait, time and lure colour. 반응속도: the float bobs, nibbles to fool you, then dives; tap
+   the moment it does. Five tries, averaged; tapping before the dive is a false strike. Records go in the profile
+   (S.me.games) and are only for fun — they never touch catches or rankings. Both work on the website and in Claude. ===== */
+function kstDay(ms = nowMs()) { return new Date(ms + 9 * 3600e3).toISOString().slice(0, 10); }
+function gmHash(str) { let h = 2166136261; for (const ch of String(str)) h = Math.imul(h ^ ch.charCodeAt(0), 16777619); return h >>> 0; }
+function gmGet() { const g = S.me && S.me.nick ? S.me.games : lsGet('games', null); return g && typeof g === 'object' && !Array.isArray(g) ? g : {}; }
+async function gmSave(patch) {
+  const g = Object.assign({}, gmGet(), patch);
+  if (S.me && S.me.nick) { S.me.games = g; await store.saveMe(); } else lsSet('games', g);
+  return g;
+}
+
+/* ---------- 오늘의 물고기 운세 ---------- */
+const FO_COLORS = ['#E5484D', '#F76B15', '#E2D51C', '#30A46C', '#0090FF', '#8E4EC6', '#E93D82', '#F4F7EE', '#B8C0C8', '#D4A72C'];
+const FO_MSGS = 24;
+function fortuneOf(uid, day) {
+  const R = FD.seeded(gmHash(uid + '|' + day));
+  const m = +day.slice(5, 7) - 1;
+  const pool = GEO.regionPrior(homeRegion(), m).filter(x => SPI[x.id]).slice(0, 24);
+  let tot = 0; for (const x of pool) tot += Math.sqrt(x.p);
+  let r = R() * tot, sp = pool.length ? pool[0].id : 'madai';
+  for (const x of pool) { r -= Math.sqrt(x.p); if (r <= 0) { sp = x.id; break; } }
+  const stars = [2, 3, 3, 4, 4, 4, 4, 5, 5, 3][Math.floor(R() * 10)];
+  const s0 = SPI[sp] || {}; const baits = [...(s0.b || []).map(b => dict(BAIT[b])), ...(s0.lu || []).map(l => dict(LURE[l]))].filter(Boolean);
+  return { sp, stars, bait: baits.length ? baits[Math.floor(R() * baits.length)] : '', time: Math.floor(R() * 8), color: Math.floor(R() * FO_COLORS.length), msg: Math.floor(R() * FO_MSGS), day };
+}
+const foStars = n => '★'.repeat(n) + '☆'.repeat(5 - n);
+function foCardHTML(f, fresh) {
+  const sp = SPI[f.sp]; const [, mo, da] = f.day.split('-').map(Number);
+  return `<div class="fo-card${fresh ? ' fo-in' : ''}">
+    <p class="eyebrow">${t('fo_title')} · ${t('fo_date', { m: mo, d: da })}</p>
+    <div class="fo-pic"><img src="${FD.thumb(sp, 300, 200)}" alt=""></div>
+    <h2 class="fo-name">${esc(nameOf(f.sp))}</h2>
+    <p class="fo-stars" aria-label="${esc(t('fo_stars', { n: f.stars }))}">${foStars(f.stars)}</p>
+    <p class="fo-msg">“${esc(t('fo_m' + f.msg))}”</p>
+    <dl class="fo-lucky">
+      ${f.bait ? `<div><dt>${t('fo_lucky_bait')}</dt><dd>${esc(f.bait)}</dd></div>` : ''}
+      <div><dt>${t('fo_lucky_time')}</dt><dd>${t('fo_t' + f.time)}</dd></div>
+      <div><dt>${t('fo_lucky_color')}</dt><dd><i class="fo-sw" style="background:${FO_COLORS[f.color]}"></i>${t('fo_c' + f.color)}</dd></div>
+    </dl>
+    <div class="actions"><button class="btn btn-primary" id="fo-share">${icon('share')}${t('fo_share')}</button><button class="btn btn-line" data-fosp="${esc(f.sp)}">${icon('fish')}${t('fo_see_fish')}</button></div>
+    <p class="hint">${t('fo_note')}</p>
+  </div>`;
+}
+function openFortune() {
+  const day = kstDay(), f = fortuneOf(myId(), day), drawn = gmGet().fo === day;
+  const w = openModal(`<div class="fo" id="fo-box">${drawn ? foCardHTML(f) : `<div class="fo-back">
+      <div class="fo-deck" id="fo-deck" aria-hidden="true"><span>?</span></div>
+      <h2>${t('fo_title')}</h2><p class="lede">${t('fo_sub')}</p>
+      <button class="btn btn-primary btn-lg" id="fo-draw">${icon('sparkle')}${t('fo_draw')}</button></div>`}</div>`, { label: t('fo_title') });
+  const bind = () => {
+    const sh = $('#fo-share', w); if (sh) sh.onclick = async () => {
+      const text = t('fo_share_text', { fish: nameOf(f.sp), stars: foStars(f.stars), msg: t('fo_m' + f.msg) });
+      if (navigator.share) { try { await navigator.share({ text: text + '\n' + SITE_URL }); return; } catch (e) { if (e && e.name === 'AbortError') return; } }
+      if (await copyText(text + '\n' + SITE_URL)) toast(t('fo_copied'), 'ok');
+    };
+  };
+  w.addEventListener('click', e => { const b = e.target.closest('[data-fosp]'); if (b) { closeModal(w); openSpecies(b.dataset.fosp); } });
+  bind();
+  const go = $('#fo-draw', w);
+  if (go) go.onclick = () => {
+    go.disabled = true; const deck = $('#fo-deck', w); if (deck) deck.classList.add('shake');
+    setTimeout(() => {
+      const box = $('#fo-box', w); if (!box || !box.isConnected) return;
+      box.innerHTML = foCardHTML(f, true); bind();
+      gmSave({ fo: day }).then(() => { if (S.route === 'home' || S.route === 'games') rerenderSoon(); });
+    }, 750);
+  };
+}
+/* the home page: a line to draw it, or today's fish once drawn */
+function foStripHTML() {
+  if (!S.ready) return '';
+  const day = kstDay();
+  if (gmGet().fo !== day) return `<button class="card fo-strip" data-act="fortune"><span class="fo-strip-ic" aria-hidden="true">🎣</span><span class="fo-strip-t"><b>${t('fo_title')}</b><span class="muted small">${t('fo_sub')}</span></span><span class="btn btn-primary btn-sm">${t('fo_draw')}</span></button>`;
+  const f = fortuneOf(myId(), day);
+  return `<button class="card fo-strip done" data-act="fortune"><img src="${FD.thumb(SPI[f.sp], 120, 66)}" alt=""><span class="fo-strip-t"><b>${t('fo_today')} · ${esc(nameOf(f.sp))} <span class="fo-st">${foStars(f.stars)}</span></b><span class="muted small">“${esc(t('fo_m' + f.msg))}”</span></span>${icon('chev')}</button>`;
+}
+
+/* ---------- 챔질 반응속도 ---------- */
+const RX = { ROUNDS: 5, MIN: 100, MISS: 1500 };
+function rxGrade(avg) { return avg < 230 ? 1 : avg < 280 ? 2 : avg < 340 ? 3 : avg < 450 ? 4 : 5; }
+function rxBoard() { // everyone's best average (plausible ones only), best first
+  const rows = [];
+  const add = (uid, a) => { const g = a && a.games; if (!g || !(g.rtAvg >= 120 && g.rtAvg < RX.MISS)) return; rows.push({ uid, a, avg: Math.round(g.rtAvg), best: Math.round(g.rt || g.rtAvg) }); };
+  for (const [uid, a] of S.anglers) if (uid !== myId()) add(uid, a);
+  if (S.me && S.me.nick) add(myId(), S.me);
+  return rows.sort((x, y) => x.avg - y.avg || x.best - y.best);
+}
+function openReaction() {
+  const w = openModal(`<div class="rx">
+    <div class="rx-top"><h2>${icon('clock')}${t('rx_title')}</h2><span class="rx-round num" id="rx-round"></span></div>
+    <div class="rx-stage" id="rx-stage" role="button" tabindex="0" aria-label="${esc(t('rx_tap'))}"><canvas id="rx-cv" aria-hidden="true"></canvas><p class="rx-big num" id="rx-big" aria-live="assertive"></p></div>
+    <p class="rx-msg" id="rx-msg">${t('rx_sub')}</p>
+    <ol class="rx-times" id="rx-times"></ol>
+    <div class="rx-end" id="rx-end" hidden></div>
+    <div class="actions"><button class="btn btn-primary btn-lg" id="rx-go">${t('rx_start')}</button></div>
+  </div>`, { label: t('rx_title') });
+  const cv = $('#rx-cv', w), stage = $('#rx-stage', w), big = $('#rx-big', w), msg = $('#rx-msg', w), list = $('#rx-times', w), go = $('#rx-go', w), end = $('#rx-end', w), rnd = $('#rx-round', w);
+  const G = { st: 'idle', times: [], fouls: 0, timers: [], nibs: [], at: 0, sinkAt: 0, raf: 0 };
+  RX.cur = G; // the running game (the tests look at it)
+  const later = (fn, ms) => G.timers.push(setTimeout(fn, ms));
+  const clear = () => { G.timers.forEach(clearTimeout); G.timers = []; };
+  const paintList = () => { list.innerHTML = G.times.map(v => `<li class="${v >= RX.MISS ? 'miss' : ''}">${v >= RX.MISS ? t('rx_miss') : t('rx_ms', { n: v })}</li>`).join(''); rnd.textContent = G.st === 'idle' || G.st === 'done' ? '' : t('rx_round', { n: Math.min(G.times.length + 1, RX.ROUNDS), of: RX.ROUNDS }); };
+  function round() {
+    clear(); G.st = 'wait'; G.at = performance.now(); big.textContent = ''; big.className = 'rx-big num'; msg.textContent = t('rx_wait');
+    const delay = 1500 + Math.random() * 3200;
+    G.nibs = []; for (let i = Math.floor(Math.random() * 3); i > 0; i--) G.nibs.push(400 + Math.random() * (delay - 700));
+    later(() => { if (G.st === 'wait') { G.st = 'sinkNext'; } }, delay); // the dive shows on the next frame, and the clock starts there
+    paintList();
+  }
+  function record(v) {
+    G.times.push(v); paintList();
+    if (G.times.length >= RX.ROUNDS) later(finish, 900); else later(round, 1000);
+  }
+  function foul(key) { clear(); G.st = 'foul'; G.fouls++; big.textContent = '✋'; big.className = 'rx-big num bad'; msg.textContent = t(key); if (navigator.vibrate) try { navigator.vibrate([30, 40, 30]); } catch (e) { } later(round, 1200); }
+  function hit(ts) {
+    if (G.st === 'wait') return foul('rx_foul');
+    if (G.st === 'sinkNext') return foul('rx_toofast');
+    if (G.st !== 'sink') return;
+    const v = Math.round(ts - G.sinkAt);
+    if (v < RX.MIN) return foul('rx_toofast');
+    clear(); G.st = 'got'; big.textContent = t('rx_ms', { n: v }); big.className = 'rx-big num ok'; msg.textContent = v < 230 ? '⚡' : '';
+    record(v);
+  }
+  async function finish() {
+    clear(); G.st = 'done'; cancelAnimationFrame(G.raf); paintList();
+    const ok = G.times.filter(v => v < RX.MISS);
+    const avg = Math.round(G.times.reduce((a, b) => a + b, 0) / G.times.length), best = ok.length ? Math.min(...ok) : null;
+    const old = gmGet(); const rec = !(old.rtAvg <= avg);
+    const patch = { rtN: (old.rtN || 0) + 1 };
+    if (rec) { patch.rtAvg = avg; patch.rtAt = nowMs(); }
+    if (best != null && !(old.rt <= best)) patch.rt = best;
+    await gmSave(patch);
+    const board = rxBoard(); const me = board.findIndex(x => x.uid === myId());
+    big.textContent = ''; msg.textContent = '';
+    end.hidden = false; end.innerHTML = `<p class="rx-grade">${t('rx_g' + rxGrade(avg))}${rec ? ` <span class="chip chip-new">${t('rx_newrec')}</span>` : ''}</p>
+      <div class="rx-sum"><div><span>${t('rx_avg')}</span><b class="num">${t('rx_ms', { n: avg })}</b></div><div><span>${t('rx_best')}</span><b class="num">${best == null ? '—' : t('rx_ms', { n: best })}</b></div>${G.fouls ? `<div><span>${t('rx_fouls_k')}</span><b class="num">${G.fouls}</b></div>` : ''}</div>
+      ${me >= 0 && S.me && S.me.nick ? `<p class="muted small">${t('rx_myrank', { n: me + 1, of: board.length })}</p>` : ''}`;
+    go.textContent = t('rx_again'); go.hidden = false;
+    if (S.route === 'games') rerenderSoon();
+  }
+  // drawing: sea, a float that bobs, twitches for nibbles and dives for the bite
+  function draw(now) {
+    G.raf = requestAnimationFrame(draw);
+    if (!cv.isConnected) { cancelAnimationFrame(G.raf); clear(); return; }
+    const r = cv.getBoundingClientRect(); const wd = r.width, ht = r.height; if (!wd || !ht) return;
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    if (cv.width !== Math.round(wd * dpr)) { cv.width = Math.round(wd * dpr); cv.height = Math.round(ht * dpr); }
+    const g = cv.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const sea = ht * .42, tt = now / 1000;
+    const sky = g.createLinearGradient(0, 0, 0, ht); sky.addColorStop(0, '#9ED4EA'); sky.addColorStop(.415, '#CFEAF4'); sky.addColorStop(.42, '#2E8CC0'); sky.addColorStop(1, '#0E4E78');
+    g.fillStyle = sky; g.fillRect(0, 0, wd, ht);
+    g.strokeStyle = 'rgba(255,255,255,.5)'; g.lineWidth = 2; g.beginPath(); for (let x = 0; x <= wd; x += 8) { const y = sea + Math.sin(x / 20 + tt * 2) * 2; if (x) g.lineTo(x, y); else g.moveTo(x, y); } g.stroke();
+    if (G.st === 'sinkNext') { G.st = 'sink'; G.sinkAt = now; if (navigator.vibrate) try { navigator.vibrate(50); } catch (e) { } later(() => { if (G.st === 'sink') { clear(); G.st = 'got'; big.textContent = t('rx_miss'); big.className = 'rx-big num bad'; record(RX.MISS); } }, RX.MISS); }
+    const el = (now - G.at);
+    let dy = Math.sin(tt * 2.6) * 2.5;
+    if (G.st === 'wait' && G.nibs.some(n => el >= n && el < n + 260)) dy = 5 + Math.sin(tt * 45) * 2; // a nibble: a little twitch
+    if (G.st === 'sink') dy = Math.min(26, (now - G.sinkAt) * .25) + 4;
+    const fx = wd / 2, fy = sea + dy;
+    g.strokeStyle = 'rgba(255,255,255,.75)'; g.lineWidth = 1.2; g.beginPath(); g.moveTo(fx, 0); g.lineTo(fx, fy - 26); g.stroke();
+    g.save(); g.beginPath(); g.rect(0, 0, wd, sea + 1); g.clip(); // the part above the water
+    g.fillStyle = '#FF3B2F'; g.beginPath(); g.ellipse(fx, fy - 12, 9, 15, 0, Math.PI, 0); g.fill(); g.fillStyle = '#FFF'; g.fillRect(fx - 9, fy - 12, 18, 6); g.fillStyle = '#FF3B2F'; g.beginPath(); g.ellipse(fx, fy - 6, 9, 9, 0, 0, Math.PI); g.fill();
+    g.strokeStyle = '#2B2433'; g.lineWidth = 2; g.beginPath(); g.moveTo(fx, fy - 27); g.lineTo(fx, fy - 40); g.stroke();
+    g.restore();
+    g.fillStyle = 'rgba(255,59,47,.35)'; g.beginPath(); g.ellipse(fx, fy - 4, 8, 12, 0, 0, Math.PI * 2); if (fy - 4 > sea) g.fill(); // under water, faint
+    if (G.st === 'sink') { const k = (now - G.sinkAt) / 400; for (let i = 0; i < 3; i++) { const rr = ((k + i / 3) % 1) * 46; g.strokeStyle = `rgba(255,255,255,${1 - rr / 46})`; g.beginPath(); g.ellipse(fx, sea + 2, rr, rr * .3, 0, 0, Math.PI * 2); g.stroke(); }
+      g.font = `800 ${Math.round(Math.min(wd, ht) * .17)}px ${getComputedStyle(document.body).fontFamily}`; g.textAlign = 'center'; g.fillStyle = '#FF5A1F'; g.fillText(t('pk_zzirit'), wd / 2, sea * .55); }
+  }
+  G.raf = requestAnimationFrame(draw);
+  const press = e => { if (G.st === 'idle' || G.st === 'done' || G.st === 'foul' || G.st === 'got') return; e.preventDefault(); hit(e.timeStamp || performance.now()); };
+  stage.addEventListener('pointerdown', press);
+  stage.addEventListener('keydown', e => { if ((e.key === ' ' || e.key === 'Enter') && !e.repeat) press(e); });
+  go.onclick = () => { G.times = []; G.fouls = 0; end.hidden = true; end.innerHTML = ''; go.hidden = true; stage.focus({ preventScroll: true }); round(); };
+  paintList();
+}
+
+/* ---------- the page ---------- */
+VIEWS.games = {
+  render(el) {
+    const g = gmGet(); const day = kstDay(); const drawn = g.fo === day; const f = drawn ? fortuneOf(myId(), day) : null;
+    const board = rxBoard(); const meAt = board.findIndex(x => x.uid === myId());
+    el.innerHTML = `<div class="page games-page">
+      <header class="page-head"><h1>${t('gm_title')}</h1><p class="lede">${t('gm_sub')}</p></header>
+      <div class="gm-grid">
+        <section class="card gm-card gm-fo">
+          <div class="gm-art fo-art" aria-hidden="true">${f ? `<img src="${FD.thumb(SPI[f.sp], 240, 160)}" alt="">` : '<span>?</span>'}</div>
+          <h2 class="h3">${t('fo_title')}</h2>
+          <p class="muted">${f ? `${t('fo_today')}: <b>${esc(nameOf(f.sp))}</b> <span class="fo-st">${foStars(f.stars)}</span>` : t('fo_sub')}</p>
+          <button class="btn ${f ? 'btn-line' : 'btn-primary'}" data-act="fortune">${f ? t('fo_open') : t('fo_draw')}</button>
+        </section>
+        <section class="card gm-card gm-rx">
+          <div class="gm-art rx-art" aria-hidden="true"><i class="rx-float"></i></div>
+          <h2 class="h3">${t('rx_title')}</h2>
+          <p class="muted">${t('rx_sub')}</p>
+          <p class="gm-mine">${t('rx_mine')}: <b class="num">${g.rtAvg ? t('rx_ms', { n: Math.round(g.rtAvg) }) : t('rx_none_yet')}</b>${g.rt ? ` <span class="muted small">(${t('rx_best')} ${t('rx_ms', { n: Math.round(g.rt) })})</span>` : ''}</p>
+          <button class="btn btn-primary" data-act="reaction">${t('gm_play')}</button>
+        </section>
+        ${window.APP_RT === 'web' ? `<a class="card gm-card gm-park" href="#park"><div class="gm-art pk-art" aria-hidden="true">${typeof PK_THUMB === 'string' && PK_THUMB ? `<img src="${PK_THUMB}" alt="">` : ''}</div><h2 class="h3">${t('gm_park')}</h2><p class="muted">${t('gm_park_sub')}</p><span class="btn btn-line">${t('home_live_go')}</span></a>` : ''}
+      </div>
+      <section class="card rx-rank">
+        <div class="sec-head tight"><h2 class="h3">${icon('trophy')}${t('rx_rank')}</h2><span class="muted small">${t('gm_fun')}</span></div>
+        ${board.length ? `<ol class="rk-list">${board.slice(0, 10).map((x, i) => `<li class="${x.uid === myId() ? 'me' : ''}"><span class="wk-rank r${i + 1}">${i + 1}</span><button class="rk-who" data-seauid="${esc(x.uid)}">${avatar(x.a, 30)}<b>${esc(x.a.nick || '?')}</b>${lvMini(x.a, x.uid)}</button><span class="rk-v num">${t('rx_ms', { n: x.avg })}</span></li>`).join('')}</ol>
+          ${meAt >= 10 ? `<p class="muted small">${t('rx_myrank', { n: meAt + 1, of: board.length })}</p>` : ''}` : `<p class="muted">${t('rx_rank_none')}</p>`}
+      </section>
+    </div>`;
+    if (window.APP_RT === 'web' && typeof pkThumb === 'function' && !PK_THUMB) { pkThumb(); setTimeout(() => { const a = $('.gm-park .gm-art', el); if (a && PK_THUMB && !a.firstChild) a.innerHTML = `<img src="${PK_THUMB}" alt="">`; }, 1500); }
+  }
+};
+
 /* ===== Router, global events, boot ===== */
 const QR_PATH = 'M0 0h7v1h-7zM8 0h2v1h-2zM11 0h3v1h-3zM17 0h1v1h-1zM21 0h2v1h-2zM26 0h7v1h-7zM0 1h1v1h-1zM6 1h1v1h-1zM8 1h7v1h-7zM16 1h1v1h-1zM18 1h2v1h-2zM21 1h2v1h-2zM26 1h1v1h-1zM32 1h1v1h-1zM0 2h1v1h-1zM2 2h3v1h-3zM6 2h1v1h-1zM8 2h3v1h-3zM13 2h2v1h-2zM16 2h1v1h-1zM20 2h2v1h-2zM24 2h1v1h-1zM26 2h1v1h-1zM28 2h3v1h-3zM32 2h1v1h-1zM0 3h1v1h-1zM2 3h3v1h-3zM6 3h1v1h-1zM9 3h1v1h-1zM11 3h1v1h-1zM14 3h1v1h-1zM16 3h4v1h-4zM21 3h2v1h-2zM24 3h1v1h-1zM26 3h1v1h-1zM28 3h3v1h-3zM32 3h1v1h-1zM0 4h1v1h-1zM2 4h3v1h-3zM6 4h1v1h-1zM8 4h3v1h-3zM13 4h1v1h-1zM15 4h4v1h-4zM22 4h1v1h-1zM26 4h1v1h-1zM28 4h3v1h-3zM32 4h1v1h-1zM0 5h1v1h-1zM6 5h1v1h-1zM12 5h1v1h-1zM15 5h3v1h-3zM20 5h5v1h-5zM26 5h1v1h-1zM32 5h1v1h-1zM0 6h7v1h-7zM8 6h1v1h-1zM10 6h1v1h-1zM12 6h1v1h-1zM14 6h1v1h-1zM16 6h1v1h-1zM18 6h1v1h-1zM20 6h1v1h-1zM22 6h1v1h-1zM24 6h1v1h-1zM26 6h7v1h-7zM9 7h1v1h-1zM12 7h2v1h-2zM15 7h2v1h-2zM18 7h3v1h-3zM22 7h2v1h-2zM0 8h1v1h-1zM3 8h6v1h-6zM11 8h4v1h-4zM17 8h1v1h-1zM19 8h1v1h-1zM23 8h3v1h-3zM28 8h1v1h-1zM30 8h3v1h-3zM0 9h1v1h-1zM2 9h2v1h-2zM7 9h1v1h-1zM9 9h1v1h-1zM13 9h2v1h-2zM17 9h4v1h-4zM22 9h2v1h-2zM28 9h3v1h-3zM0 10h4v1h-4zM5 10h4v1h-4zM10 10h1v1h-1zM12 10h2v1h-2zM15 10h3v1h-3zM21 10h1v1h-1zM23 10h1v1h-1zM28 10h5v1h-5zM1 11h1v1h-1zM5 11h1v1h-1zM7 11h1v1h-1zM9 11h1v1h-1zM12 11h2v1h-2zM16 11h2v1h-2zM20 11h1v1h-1zM22 11h1v1h-1zM24 11h2v1h-2zM27 11h1v1h-1zM30 11h3v1h-3zM1 12h1v1h-1zM3 12h2v1h-2zM6 12h1v1h-1zM9 12h3v1h-3zM13 12h1v1h-1zM15 12h1v1h-1zM17 12h2v1h-2zM20 12h2v1h-2zM24 12h1v1h-1zM26 12h2v1h-2zM31 12h2v1h-2zM1 13h2v1h-2zM7 13h3v1h-3zM13 13h2v1h-2zM18 13h1v1h-1zM22 13h6v1h-6zM0 14h3v1h-3zM4 14h3v1h-3zM10 14h1v1h-1zM12 14h1v1h-1zM15 14h1v1h-1zM18 14h5v1h-5zM24 14h1v1h-1zM26 14h1v1h-1zM28 14h2v1h-2zM1 15h1v1h-1zM3 15h1v1h-1zM7 15h1v1h-1zM11 15h2v1h-2zM16 15h1v1h-1zM19 15h1v1h-1zM23 15h3v1h-3zM27 15h4v1h-4zM32 15h1v1h-1zM0 16h1v1h-1zM6 16h3v1h-3zM13 16h1v1h-1zM15 16h2v1h-2zM20 16h1v1h-1zM22 16h7v1h-7zM30 16h1v1h-1zM1 17h2v1h-2zM4 17h1v1h-1zM9 17h1v1h-1zM12 17h1v1h-1zM14 17h9v1h-9zM25 17h2v1h-2zM28 17h1v1h-1zM30 17h1v1h-1zM32 17h1v1h-1zM0 18h1v1h-1zM3 18h1v1h-1zM5 18h2v1h-2zM8 18h1v1h-1zM10 18h1v1h-1zM15 18h5v1h-5zM21 18h4v1h-4zM27 18h1v1h-1zM29 18h2v1h-2zM32 18h1v1h-1zM0 19h1v1h-1zM3 19h3v1h-3zM8 19h1v1h-1zM12 19h1v1h-1zM18 19h1v1h-1zM22 19h2v1h-2zM26 19h1v1h-1zM28 19h5v1h-5zM3 20h1v1h-1zM6 20h2v1h-2zM10 20h1v1h-1zM12 20h1v1h-1zM14 20h3v1h-3zM18 20h1v1h-1zM20 20h2v1h-2zM23 20h1v1h-1zM28 20h2v1h-2zM0 21h2v1h-2zM4 21h2v1h-2zM8 21h3v1h-3zM17 21h2v1h-2zM21 21h3v1h-3zM25 21h1v1h-1zM27 21h2v1h-2zM30 21h1v1h-1zM0 22h1v1h-1zM3 22h5v1h-5zM11 22h2v1h-2zM14 22h1v1h-1zM17 22h1v1h-1zM22 22h2v1h-2zM26 22h1v1h-1zM28 22h5v1h-5zM0 23h1v1h-1zM2 23h3v1h-3zM7 23h1v1h-1zM12 23h1v1h-1zM14 23h2v1h-2zM17 23h4v1h-4zM23 23h3v1h-3zM28 23h1v1h-1zM30 23h1v1h-1zM32 23h1v1h-1zM0 24h2v1h-2zM4 24h4v1h-4zM10 24h2v1h-2zM13 24h1v1h-1zM20 24h1v1h-1zM22 24h1v1h-1zM24 24h6v1h-6zM32 24h1v1h-1zM8 25h1v1h-1zM10 25h9v1h-9zM21 25h1v1h-1zM24 25h1v1h-1zM28 25h1v1h-1zM30 25h1v1h-1zM32 25h1v1h-1zM0 26h7v1h-7zM8 26h1v1h-1zM11 26h1v1h-1zM15 26h1v1h-1zM17 26h1v1h-1zM19 26h3v1h-3zM23 26h2v1h-2zM26 26h1v1h-1zM28 26h1v1h-1zM30 26h1v1h-1zM0 27h1v1h-1zM6 27h1v1h-1zM8 27h1v1h-1zM14 27h2v1h-2zM17 27h4v1h-4zM24 27h1v1h-1zM28 27h3v1h-3zM0 28h1v1h-1zM2 28h3v1h-3zM6 28h1v1h-1zM8 28h1v1h-1zM12 28h3v1h-3zM16 28h2v1h-2zM20 28h9v1h-9zM32 28h1v1h-1zM0 29h1v1h-1zM2 29h3v1h-3zM6 29h1v1h-1zM8 29h2v1h-2zM16 29h1v1h-1zM18 29h1v1h-1zM20 29h4v1h-4zM25 29h1v1h-1zM27 29h1v1h-1zM30 29h3v1h-3zM0 30h1v1h-1zM2 30h3v1h-3zM6 30h1v1h-1zM11 30h1v1h-1zM13 30h1v1h-1zM15 30h1v1h-1zM18 30h3v1h-3zM23 30h2v1h-2zM27 30h3v1h-3zM31 30h2v1h-2zM0 31h1v1h-1zM6 31h1v1h-1zM10 31h1v1h-1zM12 31h3v1h-3zM25 31h1v1h-1zM27 31h6v1h-6zM0 32h7v1h-7zM8 32h1v1h-1zM10 32h1v1h-1zM15 32h4v1h-4zM23 32h2v1h-2zM27 32h2v1h-2z';
-const ROUTES = ['home', 'scan', 'past', 'map', 'park', 'chat', 'rank', 'friends', 'board', 'teams', 'points', 'sea', 'char', 'dex', 'tackle', 'log', 'help', 'about', 'prefs', 'admin'];
-const LIVE_VIEWS = new Set(['home', 'park', 'chat', 'rank', 'friends', 'board', 'teams', 'points', 'sea', 'dex', 'log', 'admin']);
+const ROUTES = ['home', 'scan', 'past', 'map', 'park', 'games', 'chat', 'rank', 'friends', 'board', 'teams', 'points', 'sea', 'char', 'dex', 'tackle', 'log', 'help', 'about', 'prefs', 'admin'];
+const LIVE_VIEWS = new Set(['home', 'park', 'games', 'chat', 'rank', 'friends', 'board', 'teams', 'points', 'sea', 'dex', 'log', 'admin']);
 const viewOf = r => (r === 'past' ? 'scan' : r);
 
 function updateStatic() {
@@ -10962,7 +11463,8 @@ function updateShell() {
 const NAV_GROUPS = [
   ['fish', 'fish', ['scan', 'map', 'points', 'dex', 'tackle']],
   ['mine', 'chart', ['log', 'sea', 'char']],
-  ['social', 'users', ['park', 'chat', 'rank', 'friends', 'board', 'teams']],
+  ['play', 'sparkle', ['park', 'games']],
+  ['social', 'users', ['chat', 'rank', 'friends', 'board', 'teams']],
   ['help', 'info', ['help', 'about', 'prefs', 'admin']]
 ];
 function navGroupOf(route) { const r = viewOf(route || ''); const g = NAV_GROUPS.find(x => x[2].includes(r)); return g ? g[0] : null; }
@@ -11098,6 +11600,8 @@ document.addEventListener('click', e => {
     else if (a === 'auth') openAuth('join');
     else if (a === 'noti') openNoti();
     else if (a === 'logout') openLogout();
+    else if (a === 'fortune') openFortune();
+    else if (a === 'reaction') openReaction();
     else if (a === 'withdraw') openWithdraw();
     else if (a === 'install') openInstall();
     else if (a === 'weekly') openWeekly();

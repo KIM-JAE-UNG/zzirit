@@ -165,14 +165,16 @@ const AI_NOFISH = { fish_visible: false, candidates: [], other_en: '', other_sci
   ok(await A.evaluate(() => notiUnread()) === 0 && await A.$eval('.rail-ctl .noti-btn [data-notibadge]', n => n.hidden), 'opened notifications count as read');
   await go(A, 'home', 1200); await shot(A, 'b05_home', true);
   ok((await A.$$('.home-board .hb-item')).length === 1, 'home shows hot post');
-  ok(await A.$eval('#wx-card .wx-go', n => /잔잔/.test(n.textContent)).catch(() => false), 'home shows the sea weather with a rough read');
-  ok(await A.$eval('#wx-line', n => /4\.2/.test(n.textContent) && /북서풍/.test(n.textContent) && /0\.6/.test(n.textContent) && /18\.6/.test(n.textContent) && /40%/.test(n.textContent)), 'wind, direction, waves, water temperature and rain shown');
+  ok(await A.$eval('#wx-card .fs-why', n => /잔잔/.test(n.textContent)).catch(() => false), 'home shows the sea weather with a plain verdict');
+  ok(await A.$eval('#fs-body .fs-tiles', n => /4\.2/.test(n.textContent) && /북서풍/.test(n.textContent) && /0\.6/.test(n.textContent) && /18\.6/.test(n.textContent) && /40%/.test(n.textContent)), 'wind, direction, waves, water temperature and rain shown');
+  ok(await A.$$eval('#fs-body .fs-tile', ns => ns.length === 4 && ns.every(n => n.querySelector('.ft-w').textContent.trim().length > 0)), 'four tiles in plain words (wind, waves, sky, tide)');
+  ok(await A.$eval('#fs-body .fs-tile.st-good .ft-w', n => /잔잔|약해요|낮아요/.test(n.textContent)).catch(() => false), 'calm wind reads as calm');
   ok(await A.$eval('#wx-card a[href="https://open-meteo.com/"]', n => !!n).catch(() => false), 'the weather credits Open-Meteo');
-  const fsN = await A.$eval('#fs-top .fs-n', n => +n.textContent).catch(() => NaN);
-  ok(fsN >= 0 && fsN <= 100 && await A.$$eval('#fs-top .fs-parts li', ns => ns.length) === 3 && await A.$eval('#fs-top .fs-lvl', n => n.textContent.length > 1).catch(() => false), 'today\'s fishing score with weather, tide and season parts: ' + fsN);
-  ok(await A.$eval('#fs-top', n => /35\s*\/\s*40/.test(n.textContent.replace(/\s+/g, ' '))).catch(() => false), 'calm weather with a 40% chance of rain scores 35 of 40');
-  ok(await A.$eval('#fs-extra', n => /06:10~07:40/.test(n.textContent) && /16:35~18:05/.test(n.textContent)).catch(() => false), 'best times from sunrise and sunset (dawn and dusk windows)');
-  ok(await A.$$eval('#fs-extra .fs-fish [data-sp]', ns => ns.length) === 3, 'three fish biting now, tappable');
+  const fsN = await A.$eval('#fs-body .fs-n', n => +n.textContent).catch(() => NaN);
+  ok(fsN >= 0 && fsN <= 100 && await A.$$eval('#fs-body .fs-parts li', ns => ns.length) === 3 && await A.$eval('#fs-body .fs-verdict', n => n.textContent.length > 1).catch(() => false), 'today\'s fishing score with weather, tide and season parts: ' + fsN);
+  ok(await A.$eval('#fs-body .fs-how', n => /35\s*\/\s*40/.test(n.textContent.replace(/\s+/g, ' '))).catch(() => false), 'calm weather with a 40% chance of rain scores 35 of 40');
+  ok(await A.$eval('#fs-body .fs-rows', n => /06:10~07:40/.test(n.textContent) && /16:35~18:05/.test(n.textContent)).catch(() => false), 'best times from sunrise and sunset (dawn and dusk windows)');
+  ok(await A.$$eval('#fs-body .fs-rows [data-sp]', ns => ns.length) === 3, 'three fish biting now, tappable');
   const fsu = await A.evaluate(() => {
     const st = { wind: 3, gust: 4, wave: .4, code: 95, rain: 10 };
     const bad = fishScore(st, { rg: 'KS', fresh: false });
@@ -184,7 +186,7 @@ const AI_NOFISH = { fish_visible: false, candidates: [], other_en: '', other_sci
   ok(fsu.lake.fresh === true && fsu.lake.rg === 'KF' && fsu.freshTide === null && fsu.freshTotal > 0 && fsu.freshTotal <= 100, 'a lake point uses fresh-water fish and leaves the tide out');
   await shot(A, 'b05b_fishing_score');
   const wxn1 = WXN; await go(A, 'board', 600); await go(A, 'home', 900);
-  ok(WXN === wxn1 && await A.$eval('#wx-line', n => /4\.2/.test(n.textContent)), `the weather is kept for a while instead of asked again (${wxn1} → ${WXN})`);
+  ok(WXN === wxn1 && await A.$eval('#fs-body .fs-tiles', n => /4\.2/.test(n.textContent)), `the weather is kept for a while instead of asked again (${wxn1} → ${WXN})`);
 
   /* ---------- teams ---------- */
   await go(A, 'teams', 900); await shot(A, 't01_teams_none');
@@ -319,7 +321,7 @@ const AI_NOFISH = { fish_visible: false, candidates: [], other_en: '', other_sci
   /* ---------- 2026-10-28b: level tags, notice, share card, what's new, sanity checks, photo cache ---------- */
   await go(B, 'board', 1200);
   ok((await B.$$('.bd-card .lv-mini')).length > 0, 'board shows level tags next to names');
-  await go(A, 'rank', 1200);
+  await go(A, 'rank', 1200); await A.selectOption('#rk-period', 'all'); await A.waitForTimeout(500); // the test catches may date from an earlier month
   ok((await A.$$('.lb-who .lv-mini')).length > 0, 'ranking shows level tags');
   // operator notice
   await go(A, 'admin', 1200);
@@ -408,7 +410,7 @@ const AI_NOFISH = { fish_visible: false, candidates: [], other_en: '', other_sci
   await W.waitForTimeout(600); await W.reload(); await W.waitForTimeout(5500);
   ok(!!(await W.$('.wn')), 'an earlier member sees what changed');
   ok(!!(await W.$('#wn-id')), 'update notes offer to create a login ID');
-  ok(await W.$eval('.wn', n => /갯바위 공원/.test(n.textContent) && /실시간 채팅/.test(n.textContent) && /글·댓글/.test(n.textContent) && /탈퇴/.test(n.textContent) && n.querySelectorAll('.wn-list li').length <= 6), 'update notes list the newest features (at most 6 lines)');
+  ok(await W.$eval('.wn', n => /미니게임/.test(n.textContent) && /오늘의 출조/.test(n.textContent) && /갯바위 공원/.test(n.textContent) && /실시간 채팅/.test(n.textContent) && n.querySelectorAll('.wn-list li').length <= 6), 'update notes list the newest features (at most 6 lines)');
   ok(await W.$eval('.wn', n => !/초기화/.test(n.textContent)), 'update notes do not claim a reset that the server has not done');
   await shot(W, 'q04_whatsnew');
   await W.click('#wn-ok'); await W.waitForTimeout(400); await W.reload(); await W.waitForTimeout(5000);
@@ -529,7 +531,7 @@ const AI_NOFISH = { fish_visible: false, candidates: [], other_en: '', other_sci
   ok(!(await B.evaluate(() => [...S.points.values()].some(p => p.name === '다대포 방파제 끝'))), 'a private point never reaches others');
   await B.click('.pt-card'); await B.waitForTimeout(900);
   ok(!!(await B.$('.pt-detail')) && !(await B.$('#pt-edit')) && !(await B.$('#pt-del')), 'others can read it but not edit or delete it');
-  ok(await B.$eval('#pt-wx .wx-go', n => !!n).catch(() => false), 'a fishing point shows the weather there');
+  ok(await B.$eval('#pt-wx .fs-mini', n => !!n).catch(() => false) && (await B.$$('#pt-wx .fb-it')).length >= 2, 'a fishing point shows the weather there');
   await shot(B, 'r05_point_detail');
   await closeModals(B);
   await go(B, 'map', 2600);
@@ -701,7 +703,7 @@ const AI_NOFISH = { fish_visible: false, candidates: [], other_en: '', other_sci
   /* ---------- 2026-10-29d: the menu in four groups ---------- */
   const navOpen = p => p.$$eval('.nav-grp.open', ns => ns.map(n => n.dataset.grp).join(','));
   await A.evaluate(() => { localStorage.removeItem('eosin.navOpen'); }); await go(A, 'board', 900);
-  ok(await A.$$eval('.nav > .nav-grp', ns => ns.length) === 4 && await A.$$eval('.nav > a', ns => ns.map(n => n.dataset.route).join()) === 'home', 'side menu: home + four groups');
+  ok(await A.$$eval('.nav > .nav-grp', ns => ns.length) === 5 && await A.$$eval('.nav > a', ns => ns.map(n => n.dataset.route).join()) === 'home', 'side menu: home + five groups');
   ok(await navOpen(A) === 'social' && await A.$eval('.nav-grp[data-grp="social"] .nav-gh', n => n.getAttribute('aria-expanded')) === 'true', 'the group of the page on screen is open, the rest closed');
   ok(!(await A.$('.nav-grp[data-grp="fish"] a[data-route="dex"]').then(n => n.isVisible())), 'links in a closed group are hidden');
   await A.click('[data-navgrp="fish"]'); await A.waitForTimeout(350);
@@ -715,7 +717,7 @@ const AI_NOFISH = { fish_visible: false, candidates: [], other_en: '', other_sci
   await shot(A, 'n01_menu_groups');
   // the phone's sheet: groups, one open at a time, the page's group first
   await go(D, 'teams', 900); await D.click('[data-act="more"]'); await D.waitForTimeout(500);
-  ok(await D.$$eval('.more .more-grp', ns => ns.length) === 4 && await D.$$eval('.more .more-grp.open', ns => ns.map(n => n.dataset.mgrp).join()) === 'social', 'phone menu: four groups, the page\'s group open');
+  ok(await D.$$eval('.more .more-grp', ns => ns.length) === 5 && await D.$$eval('.more .more-grp.open', ns => ns.map(n => n.dataset.mgrp).join()) === 'social', 'phone menu: five groups, the page\'s group open');
   ok(!!(await D.$('.more-grp.open .more-item.on[href="#teams"]')), 'phone menu: the page on screen is marked');
   await D.click('.more-grp[data-mgrp="help"] .more-gh'); await D.waitForTimeout(350);
   ok(await D.$$eval('.more .more-grp.open', ns => ns.map(n => n.dataset.mgrp).join()) === 'help', 'phone menu: opening a group closes the other');

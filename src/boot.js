@@ -1,7 +1,7 @@
 /* ===== Router, global events, boot ===== */
 const QR_PATH = '__QR_PATH__';
-const ROUTES = ['home', 'scan', 'past', 'map', 'park', 'chat', 'rank', 'friends', 'board', 'teams', 'points', 'sea', 'char', 'dex', 'tackle', 'log', 'help', 'about', 'prefs', 'admin'];
-const LIVE_VIEWS = new Set(['home', 'park', 'chat', 'rank', 'friends', 'board', 'teams', 'points', 'sea', 'dex', 'log', 'admin']);
+const ROUTES = ['home', 'scan', 'past', 'map', 'park', 'games', 'chat', 'rank', 'friends', 'board', 'teams', 'points', 'sea', 'char', 'dex', 'tackle', 'log', 'help', 'about', 'prefs', 'admin'];
+const LIVE_VIEWS = new Set(['home', 'park', 'games', 'chat', 'rank', 'friends', 'board', 'teams', 'points', 'sea', 'dex', 'log', 'admin']);
 const viewOf = r => (r === 'past' ? 'scan' : r);
 
 function updateStatic() {
@@ -38,7 +38,8 @@ function updateShell() {
 const NAV_GROUPS = [
   ['fish', 'fish', ['scan', 'map', 'points', 'dex', 'tackle']],
   ['mine', 'chart', ['log', 'sea', 'char']],
-  ['social', 'users', ['park', 'chat', 'rank', 'friends', 'board', 'teams']],
+  ['play', 'sparkle', ['park', 'games']],
+  ['social', 'users', ['chat', 'rank', 'friends', 'board', 'teams']],
   ['help', 'info', ['help', 'about', 'prefs', 'admin']]
 ];
 function navGroupOf(route) { const r = viewOf(route || ''); const g = NAV_GROUPS.find(x => x[2].includes(r)); return g ? g[0] : null; }
@@ -174,6 +175,8 @@ document.addEventListener('click', e => {
     else if (a === 'auth') openAuth('join');
     else if (a === 'noti') openNoti();
     else if (a === 'logout') openLogout();
+    else if (a === 'fortune') openFortune();
+    else if (a === 'reaction') openReaction();
     else if (a === 'withdraw') openWithdraw();
     else if (a === 'install') openInstall();
     else if (a === 'weekly') openWeekly();

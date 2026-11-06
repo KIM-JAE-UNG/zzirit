@@ -71,7 +71,7 @@ function openPoint(id) {
   if (px) wxFetch(p.lat, p.lon).then(d => {
     if (!px.isConnected) return;
     const fs = fishScore(d, Object.assign({ id: p.id, lat: p.lat, lon: p.lon, kind: p.kind }, placeRegion(p)));
-    px.innerHTML = d ? `<span class="fs-mini">${t('fs_title')} <b>${fs.total}</b>/100 ${fsChip(fs)}</span>${wxLine(d)}` : `<span class="muted small">${t('wx_fail')}</span>`;
+    px.innerHTML = d ? fsBriefHTML(d, fs) : `<span class="muted small">${t('wx_fail')}</span>`;
   });
   const mp = $('#pt-map', w); if (mp) mp.onclick = () => { closeModal(w); S.mapFocus = [p.lon, p.lat, 12]; location.hash = 'map'; };
   const ed = $('#pt-edit', w); if (ed) ed.onclick = () => { closeModal(w); openPointEdit(id); };

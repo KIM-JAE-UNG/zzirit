@@ -83,6 +83,7 @@ VIEWS.home = {
       </section>
 
       ${wxCardHTML()}
+      ${foStripHTML()}
       ${idTipHTML() || instTipHTML()}
       ${newsCardHTML()}
 
@@ -1293,7 +1294,7 @@ async function openRelink(uid) {
 }
 
 /* ---------- More (mobile) ---------- */
-const NAV_ICON = { home: 'home', park: 'wave', chat: 'chat', scan: 'scan', map: 'map', points: 'pin', dex: 'book', tackle: 'lure', log: 'log', sea: 'sea', char: 'user', rank: 'trophy', friends: 'users', board: 'board', teams: 'flag', help: 'chat', about: 'sparkle', prefs: 'gear', admin: 'shield' };
+const NAV_ICON = { home: 'home', park: 'wave', games: 'star', chat: 'chat', scan: 'scan', map: 'map', points: 'pin', dex: 'book', tackle: 'lure', log: 'log', sea: 'sea', char: 'user', rank: 'trophy', friends: 'users', board: 'board', teams: 'flag', help: 'chat', about: 'sparkle', prefs: 'gear', admin: 'shield' };
 function openMore() {
   const nIn = S.me && S.me.nick ? frLists().inc.length : 0;
   // the account first: who is signed in, with a way to sign out (only when there is a way back in: a login ID or a linked device)

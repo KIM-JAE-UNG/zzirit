@@ -8,7 +8,9 @@ const LEAF = fs.readFileSync(LIB('leaflet/dist/leaflet.js'), 'utf8');
 const QRLIB = fs.readFileSync(LIB('qrcode-generator/qrcode.js'), 'utf8');
 const OUT = __dirname + '/../out/live/'; fs.mkdirSync(OUT, { recursive: true });
 const BASE = 'http://127.0.0.1:8768/index.html';
-const logs = [], fails = []; const ok = (c, m) => { logs.push((c ? '✓ ' : '✗ ') + m); if (!c) fails.push(m); };
+// the update notes this build would show: marked as seen, so no dialog gets in the way (whatever the current id is)
+const WN = (fs.readFileSync(__dirname + '/../../index.html', 'utf8').match(/WHATS_NEW = '([^']+)'/) || [])[1] || '';
+const logs = [], fails = [], PAGES = []; const ok = (c, m) => { logs.push((c ? '✓ ' : '✗ ') + m); if (!c) fails.push(m); };
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const dump = async () => (await fetch('http://127.0.0.1:8768/__sb/dump')).json();
 const feature = q => fetch('http://127.0.0.1:8768/__sb/feature?' + q);
@@ -20,7 +22,7 @@ async function until(fn, ms = 6000, step = 150) { const t0 = Date.now(); let v; 
   try {
     const mk = async (name, opts = {}) => {
       const ctx = await b.newContext(Object.assign({ viewport: { width: 1360, height: 860 }, locale: 'ko-KR' }, opts.ctx || {}));
-      await ctx.addInitScript(() => { try { localStorage.setItem('eosin.welcomed', '1'); localStorage.setItem('eosin.wn', '"2026-10-29d"'); } catch (e) { } });
+      await ctx.addInitScript(wn => { try { localStorage.setItem('eosin.welcomed', '1'); localStorage.setItem('eosin.wn', JSON.stringify(wn)); } catch (e) { } }, WN);
       await ctx.route('https://cdn.jsdelivr.net/npm/@supabase/**', r => r.fulfill({ contentType: 'text/javascript', body: FAKE }));
       await ctx.route('https://cdn.jsdelivr.net/npm/qrcode-generator**', r => r.fulfill({ contentType: 'text/javascript', body: QRLIB }));
       await ctx.route('https://cdnjs.cloudflare.com/**', r => r.fulfill({ contentType: 'text/javascript', body: LEAF }));
@@ -36,7 +38,7 @@ async function until(fn, ms = 6000, step = 150) { const t0 = Date.now(); let v; 
       p.on('pageerror', e => { logs.push(name + ' PAGEERROR: ' + e.message + ' ' + (e.stack || '').split('\n').slice(1, 3).join(' ')); fails.push(name + ' pageerror ' + e.message); });
       p.on('console', m => { if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) logs.push(name + ' console.error: ' + m.text().slice(0, 220)); });
       await p.goto(BASE + '#home'); await p.waitForTimeout(1500);
-      p._ctx = ctx; p._name = name;
+      p._ctx = ctx; p._name = name; PAGES.push(p);
       return p;
     };
     const go = async (p, h, w = 900) => { await p.evaluate(x => { location.hash = x; }, h); await p.waitForTimeout(w); };
@@ -332,7 +334,7 @@ async function until(fn, ms = 6000, step = 150) { const t0 = Date.now(); let v; 
     await P.click('[data-act="more"]'); await P.waitForTimeout(500);
     ok(await P.$$eval('.more a[href="#park"], .more a[href="#chat"]', ns => ns.length === 2), 'phone: park and chat in the menu sheet');
     await shot(P, 'l16_phone_more');
-  } catch (e) { logs.push('CRASH ' + (e.stack || e)); fails.push('crash'); }
+  } catch (e) { logs.push('CRASH ' + (e.stack || e)); fails.push('crash'); for (const p of PAGES) { try { await p.screenshot({ path: OUT + 'crash_' + p._name + '.png' }); } catch (x) { } } }
   console.log(logs.join('\n'));
   console.log(`\n${fails.length ? 'FAILED: ' + fails.length : 'ALL PASSED'}`);
   await b.close();
