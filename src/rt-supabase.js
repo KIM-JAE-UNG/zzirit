@@ -195,7 +195,26 @@
   };
   // the operator deletes a board post / comment for good (it lives in its author's document)
   const board = { adminRemove: (owner, kind, id) => rpcOrThrow('board_admin_remove', { p_owner: owner, p_kind: kind, p_id: id }) };
-  window.APP_AUTH = { sb, session, acct, link, news, review, admin, ids, push, chat, dm, rt, account, board, error: () => authErr };
+  // 찌릿 포인트: the server keeps the wallet, the weekly mini-game board, the prizes and the lure shop; these codes come back
+  const ZP_CODES = ['not_enough', 'owned', 'no_item', 'no_profile', 'not_signed_in', 'not_admin', 'bad_amount', 'no_account', 'slow_down'];
+  async function zpRpc(name, args) {
+    const s = await session(); if (!s) throw mkErr('not_signed_in');
+    const { data, error } = await sb.rpc(name, args || {});
+    if (error) {
+      const m = String(error.message || error.details || ''), k = ZP_CODES.find(x => m.includes(x));
+      throw mkErr(k === 'slow_down' ? 'slow' : k || rpcCode(error), m);
+    }
+    return data;
+  }
+  const zp = {
+    state: () => zpRpc('zp_state'),
+    rxBegin: () => zpRpc('rx_begin'),
+    rxSubmit: (token, times) => zpRpc('rx_submit', { p_token: token, p_times: times }),
+    buy: item => zpRpc('zp_buy', { p_item: item }),
+    grant: (uid, delta, note) => zpRpc('zp_grant', { p_acct: uid, p_delta: delta, p_note: note || '' }),
+    void: (game, wk, uid, on) => zpRpc('zp_void', { p_game: game, p_wk: wk, p_acct: uid, p_void: on !== false })
+  };
+  window.APP_AUTH = { sb, session, acct, link, news, review, admin, ids, push, chat, dm, rt, account, board, zp, error: () => authErr };
 
   /* ---- document paths → tables ---- */
   function route(path) {

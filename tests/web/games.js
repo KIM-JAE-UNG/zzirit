@@ -78,17 +78,23 @@ async function until(fn, ms = 6000, step = 60) { const t0 = Date.now(); let v; w
     ok(!!res && res.times.length === 5 && res.times.every(v => v >= 100 && v < 1500), 'reaction: five rounds measured — ' + JSON.stringify(res && res.times));
     ok(!!res && res.g.rtAvg > 0 && res.g.rt > 0 && res.g.rt <= res.g.rtAvg, 'reaction: average and best saved');
     ok(!!(await A.$('.rx-grade')) && /ms/.test(await A.$eval('.rx-sum', n => n.textContent)), 'reaction: a grade and the times shown');
+    const wk = await until(() => A.$eval('.rx-wk.ok', n => n.textContent).catch(() => ''), 5000);
+    ok(/이번 주 1위/.test(wk || ''), 'reaction: the run went on this week\'s board (started and checked on the server) — ' + wk);
     await shot(A, 'g06_result');
     await closeModals(A); await A.waitForTimeout(500);
     d = await dump();
     ok(d.T.anglers[aId].data.games.rtAvg === res.g.rtAvg, 'reaction: the record is on the profile (server)');
-    const B = await mk('B'); await onboard(B, '번개손'); 
-    await B.evaluate(() => gmSave({ rtAvg: 205, rt: 180 })); await B.waitForTimeout(800);
-    await go(A, 'games', 1200);
-    const rk = await A.$$eval('.rx-rank .rk-list li', ns => ns.map(n => n.textContent));
-    ok(rk.length === 2 && /번개손/.test(rk[0]) && /운세왕/.test(rk[1]), 'ranking: the faster average first — ' + JSON.stringify(rk));
-    await B.evaluate(() => gmSave({ rtAvg: 40 })); await B.waitForTimeout(800); await go(A, 'home', 300); await go(A, 'games', 900);
-    ok((await A.$$('.rx-rank .rk-list li')).length === 1, 'ranking: an impossible time is left out');
+    ok(d.ZPS && Object.values(d.ZPS.scores).some(x => x.acct === aId && x.score === Math.round(res.times.reduce((a, b) => a + b, 0) / 5)), 'reaction: the server keeps the run with the same average');
+    const B = await mk('B'); await onboard(B, '번개손');
+    await B.evaluate(() => gmSave({ rtAvg: 205, rt: 180 })); await B.waitForTimeout(800); // a record typed into the profile, no real run
+    await go(A, 'home', 300); await go(A, 'games', 1200);
+    let rk = await A.$$eval('.rx-week .rk-list li', ns => ns.map(n => n.textContent));
+    ok(rk.length === 1 && /운세왕/.test(rk[0]) && /\+300P/.test(rk[0]), 'weekly board: only real runs count (a record written into a profile does not) — ' + JSON.stringify(rk));
+    ok(!!(await A.$('.zp-prizes .p1')) && /300P/.test(await A.$eval('.zp-prizes', n => n.textContent)), 'weekly board: the prizes are listed');
+    ok(/이번 주 1위/.test(await A.$eval('.gm-week', n => n.textContent)), 'games page: my place this week on the reaction card');
+    // a forged run straight to the server: refused
+    const forged = await B.evaluate(async () => { const tok = await APP_AUTH.zp.rxBegin(); return APP_AUTH.zp.rxSubmit(tok, [150, 150, 150, 150, 150]); });
+    ok(forged && forged.err === 'too_fast', 'weekly board: a run sent without playing is refused — ' + JSON.stringify(forged));
     /* the park stalls */
     await go(A, 'park', 1800);
     await A.evaluate(() => pkWalk(1235, 935));

@@ -2,7 +2,8 @@
    운세: one fish a day, the same all day for the same person (seeded by who and the Korean date) — a fortune to
    smile at, with a lucky bait, time and lure colour. 반응속도: the float bobs, nibbles to fool you, then dives; tap
    the moment it does. Five tries, averaged; tapping before the dive is a false strike. Records go in the profile
-   (S.me.games) and are only for fun — they never touch catches or rankings. Both work on the website and in Claude. ===== */
+   (S.me.games) and never touch catches or the angler rankings. On the website a 반응속도 run is also started and checked on
+   the server, which keeps this week's board and pays its prizes in 찌릿 포인트 (shop.js). Both games work in Claude too. ===== */
 function kstDay(ms = nowMs()) { return new Date(ms + 9 * 3600e3).toISOString().slice(0, 10); }
 function gmHash(str) { let h = 2166136261; for (const ch of String(str)) h = Math.imul(h ^ ch.charCodeAt(0), 16777619); return h >>> 0; }
 function gmGet() { const g = S.me && S.me.nick ? S.me.games : lsGet('games', null); return g && typeof g === 'object' && !Array.isArray(g) ? g : {}; }
@@ -137,8 +138,21 @@ function openReaction() {
     big.textContent = ''; msg.textContent = '';
     end.hidden = false; end.innerHTML = `<p class="rx-grade">${t('rx_g' + rxGrade(avg))}${rec ? ` <span class="chip chip-new">${t('rx_newrec')}</span>` : ''}</p>
       <div class="rx-sum"><div><span>${t('rx_avg')}</span><b class="num">${t('rx_ms', { n: avg })}</b></div><div><span>${t('rx_best')}</span><b class="num">${best == null ? '—' : t('rx_ms', { n: best })}</b></div>${G.fouls ? `<div><span>${t('rx_fouls_k')}</span><b class="num">${G.fouls}</b></div>` : ''}</div>
-      ${me >= 0 && S.me && S.me.nick ? `<p class="muted small">${t('rx_myrank', { n: me + 1, of: board.length })}</p>` : ''}`;
+      ${me >= 0 && S.me && S.me.nick && !zpOn() ? `<p class="muted small">${t('rx_myrank', { n: me + 1, of: board.length })}</p>` : ''}`;
     go.textContent = t('rx_again'); go.hidden = false;
+    if (G.tok) {
+      const wk = document.createElement('p'); wk.className = 'rx-wk'; wk.textContent = t('rx_wk_sending'); end.appendChild(wk);
+      const tok = await G.tok; G.tok = null;
+      let r = null;
+      if (tok) { try { r = await APP_AUTH.zp.rxSubmit(tok, G.times.slice(0, RX.ROUNDS)); } catch (e) { r = { err: (e && e.code) || 'unavailable' }; } }
+      else r = { err: G.tokErr || 'unavailable' };
+      RX.last = r;
+      if (wk.isConnected) {
+        if (r && !r.err) { wk.innerHTML = `${icon('trophy')}<span>${t('rx_wk_place', { n: r.r, of: r.n })}${r.rec ? ` <span class="chip chip-new">${t('rx_wk_rec')}</span>` : ''}</span>`; wk.classList.add('ok'); }
+        else wk.textContent = t(r && r.err === 'too_fast' ? 'rx_wk_fast' : r && r.err === 'slow' ? 'rx_wk_slow' : r && r.err === 'need_update' ? 'zp_err_server' : 'rx_wk_err');
+      }
+      zpLoad(true).then(() => { if (S.route === 'games') rerenderSoon(); });
+    } else if (zpOn() && !zpMine()) { const wk = document.createElement('p'); wk.className = 'rx-wk'; wk.textContent = t('rx_wk_profile'); end.appendChild(wk); }
     if (S.route === 'games') rerenderSoon();
   }
   // drawing: sea, a float that bobs, twitches for nibbles and dives for the bite
@@ -172,7 +186,12 @@ function openReaction() {
   const press = e => { if (G.st === 'idle' || G.st === 'done' || G.st === 'foul' || G.st === 'got') return; e.preventDefault(); hit(e.timeStamp || performance.now()); };
   stage.addEventListener('pointerdown', press);
   stage.addEventListener('keydown', e => { if ((e.key === ' ' || e.key === 'Enter') && !e.repeat) press(e); });
-  go.onclick = () => { G.times = []; G.fouls = 0; end.hidden = true; end.innerHTML = ''; go.hidden = true; stage.focus({ preventScroll: true }); round(); };
+  go.onclick = () => {
+    G.times = []; G.fouls = 0; end.hidden = true; end.innerHTML = ''; go.hidden = true; stage.focus({ preventScroll: true });
+    // on the website the run starts on the server too, so this week's board (and its prizes) only takes real games
+    G.tok = zpMine() ? APP_AUTH.zp.rxBegin().catch(e => { G.tokErr = (e && e.code) || 'unavailable'; return null; }) : null; G.tokErr = null;
+    round();
+  };
   paintList();
 }
 
@@ -181,8 +200,11 @@ VIEWS.games = {
   render(el) {
     const g = gmGet(); const day = kstDay(); const drawn = g.fo === day; const f = drawn ? fortuneOf(myId(), day) : null;
     const board = rxBoard(); const meAt = board.findIndex(x => x.uid === myId());
+    const srv = zpOn(); if (srv) zpEnsure();
+    const wme = srv && ZP.st && ZP.st.rx && ZP.st.rx.me;
     el.innerHTML = `<div class="page games-page">
       <header class="page-head"><h1>${t('gm_title')}</h1><p class="lede">${t('gm_sub')}</p></header>
+      ${srv ? zpWalletHTML('games') : ''}
       <div class="gm-grid">
         <section class="card gm-card gm-fo">
           <div class="gm-art fo-art" aria-hidden="true">${f ? `<img src="${FD.thumb(SPI[f.sp], 240, 160)}" alt="">` : '<span>?</span>'}</div>
@@ -195,15 +217,17 @@ VIEWS.games = {
           <h2 class="h3">${t('rx_title')}</h2>
           <p class="muted">${t('rx_sub')}</p>
           <p class="gm-mine">${t('rx_mine')}: <b class="num">${g.rtAvg ? t('rx_ms', { n: Math.round(g.rtAvg) }) : t('rx_none_yet')}</b>${g.rt ? ` <span class="muted small">(${t('rx_best')} ${t('rx_ms', { n: Math.round(g.rt) })})</span>` : ''}</p>
+          ${srv ? `<p class="gm-week">${wme ? t('rx_wk_mine', { n: wme.r, ms: wme.s }) : t('rx_wk_prize')}</p>` : ''}
           <button class="btn btn-primary" data-act="reaction">${t('gm_play')}</button>
         </section>
         ${window.APP_RT === 'web' ? `<a class="card gm-card gm-park" href="#park"><div class="gm-art pk-art" aria-hidden="true">${typeof PK_THUMB === 'string' && PK_THUMB ? `<img src="${PK_THUMB}" alt="">` : ''}</div><h2 class="h3">${t('gm_park')}</h2><p class="muted">${t('gm_park_sub')}</p><span class="btn btn-line">${t('home_live_go')}</span></a>` : ''}
       </div>
-      <section class="card rx-rank">
+      ${srv ? rxWeekHTML() : `<section class="card rx-rank">
         <div class="sec-head tight"><h2 class="h3">${icon('trophy')}${t('rx_rank')}</h2><span class="muted small">${t('gm_fun')}</span></div>
         ${board.length ? `<ol class="rk-list">${board.slice(0, 10).map((x, i) => `<li class="${x.uid === myId() ? 'me' : ''}"><span class="wk-rank r${i + 1}">${i + 1}</span><button class="rk-who" data-seauid="${esc(x.uid)}">${avatar(x.a, 30)}<b>${esc(x.a.nick || '?')}</b>${lvMini(x.a, x.uid)}</button><span class="rk-v num">${t('rx_ms', { n: x.avg })}</span></li>`).join('')}</ol>
           ${meAt >= 10 ? `<p class="muted small">${t('rx_myrank', { n: meAt + 1, of: board.length })}</p>` : ''}` : `<p class="muted">${t('rx_rank_none')}</p>`}
-      </section>
+      </section>`}
+      ${srv ? `<a class="card gm-shop" href="#lures"><span class="gm-shop-art" aria-hidden="true">${['minnow', 'egi', 'tai'].map(id => `<img src="${ZL.url(id)}" alt="">`).join('')}</span><span class="gm-shop-t"><b>${t('zl_title')}</b><span class="muted small">${t('gm_shop_sub')}</span></span>${icon('chev')}</a>` : ''}
     </div>`;
     if (window.APP_RT === 'web' && typeof pkThumb === 'function' && !PK_THUMB) { pkThumb(); setTimeout(() => { const a = $('.gm-park .gm-art', el); if (a && PK_THUMB && !a.firstChild) a.innerHTML = `<img src="${PK_THUMB}" alt="">`; }, 1500); }
   }

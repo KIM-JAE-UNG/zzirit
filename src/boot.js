@@ -1,7 +1,7 @@
 /* ===== Router, global events, boot ===== */
 const QR_PATH = '__QR_PATH__';
-const ROUTES = ['home', 'scan', 'past', 'map', 'park', 'games', 'chat', 'rank', 'friends', 'board', 'teams', 'points', 'sea', 'char', 'dex', 'tackle', 'log', 'help', 'about', 'prefs', 'admin'];
-const LIVE_VIEWS = new Set(['home', 'park', 'games', 'chat', 'rank', 'friends', 'board', 'teams', 'points', 'sea', 'dex', 'log', 'admin']);
+const ROUTES = ['home', 'scan', 'past', 'map', 'park', 'games', 'lures', 'chat', 'rank', 'friends', 'board', 'teams', 'points', 'sea', 'char', 'dex', 'tackle', 'log', 'help', 'about', 'prefs', 'admin'];
+const LIVE_VIEWS = new Set(['home', 'park', 'games', 'lures', 'chat', 'rank', 'friends', 'board', 'teams', 'points', 'sea', 'dex', 'log', 'admin']);
 const viewOf = r => (r === 'past' ? 'scan' : r);
 
 function updateStatic() {
@@ -38,7 +38,7 @@ function updateShell() {
 const NAV_GROUPS = [
   ['fish', 'fish', ['scan', 'map', 'points', 'dex', 'tackle']],
   ['mine', 'chart', ['log', 'sea', 'char']],
-  ['play', 'sparkle', ['park', 'games']],
+  ['play', 'sparkle', ['park', 'games', 'lures']],
   ['social', 'users', ['chat', 'rank', 'friends', 'board', 'teams']],
   ['help', 'info', ['help', 'about', 'prefs', 'admin']]
 ];
@@ -166,6 +166,8 @@ document.addEventListener('click', e => {
   if (inModal && !tgt.closest('[data-act="donate"]')) { const c = tgt.closest('[data-catch]'); if (c && tgt.closest('.admin')) { } return; }
   const sp = tgt.closest('[data-sp]'); if (sp) { openSpecies(sp.dataset.sp); return; }
   const ct = tgt.closest('[data-catch]'); if (ct && !tgt.closest('[data-verdict]')) { const [uid, cid] = ct.dataset.catch.split('|'); openCatch(uid, cid); return; }
+  const zl = tgt.closest('[data-zl]'); if (zl) { openLure(zl.dataset.zl); return; }
+  const zv = tgt.closest('[data-zpvoid]'); if (zv) { if (!armed(zv, t('zp_void_sure'))) return; const [va, vw] = zv.dataset.zpvoid.split('|'); zpVoid(va, vw); return; }
   const act = tgt.closest('[data-act]');
   if (act) {
     const a = act.dataset.act;
@@ -262,7 +264,7 @@ matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', () => { 
   S.unit = lsGet('unit', 'cm');
   S.me = lsGet('me', null);
   onHash();
-  store.init().then(() => { updateStatic(); updateShell(); try { dmStart(); } catch (e) { console.warn(e); } if (S.route === 'admin' && !S.isOwner) location.hash = 'home'; setTimeout(maybeWhatsNew, 2500); setTimeout(maybeWelcome, 1800); setTimeout(pushSync, 4000); });
+  store.init().then(() => { updateStatic(); updateShell(); try { dmStart(); } catch (e) { console.warn(e); } if (zpMine()) setTimeout(() => zpLoad(), 3000); if (S.route === 'admin' && !S.isOwner) location.hash = 'home'; setTimeout(maybeWhatsNew, 2500); setTimeout(maybeWelcome, 1800); setTimeout(pushSync, 4000); });
   if (window.APP_RT === 'web' && 'serviceWorker' in navigator) navigator.serviceWorker.addEventListener('message', e => { const h = e.data && e.data.go; if (typeof h === 'string' && /^#[a-z]+$/.test(h)) location.hash = h.slice(1); });
   const idle = window.requestIdleCallback || (f => setTimeout(f, 1200));
   idle(() => { GEO.loadEnv(); });

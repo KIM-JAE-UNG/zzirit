@@ -449,14 +449,19 @@ function maybeWelcome(tries = 0) {
 }
 function myPoints() { return myCatches().filter(c => eligible(c, myId())).reduce((a, c) => a + (c.sc || 0), 0); }
 
-/* ===== Payments: KakaoPay transfer-code link (no bank account shown anywhere) ===== */
+/* ===== Payments: a KakaoPay transfer-code link and a Toss ID by default (no bank account shown). The operator can also
+   turn on a bank transfer (admin page): then the account appears in this window only, with a copy button (KakaoPay and
+   bank apps send to an account from there) and, on a phone, a Toss link that fills in the account and the amount. ===== */
+function bankFull(name) { const n = String(name || '').trim(); return !n || /(은행|뱅크|금고|우체국|증권|협)$/.test(n) ? n : n + '은행'; }
 function payLinks(amt) {
   const cfg = S.admin.config || {};
   const kurl = cfg.kakaoUrl || DEV.kakaoPayUrl || '';
   let kakao = null;
   if (/^https:\/\/qr\.kakaopay\.com\//.test(kurl)) kakao = cfg.kakaoAmt ? kurl.replace(/\/$/, '') + (amt * 524288).toString(16) : kurl;
   const toss = cfg.tossId ? `https://toss.me/${encodeURIComponent(cfg.tossId)}/${amt}` : null;
-  return { kakao, toss };
+  const no = String(cfg.bankNo || '').replace(/\D/g, '');
+  const bank = cfg.bankOn && /^\d{8,16}$/.test(no) && cfg.bankName ? { name: bankFull(cfg.bankName), no, holder: String(cfg.bankHolder || '').slice(0, 20), toss: `supertoss://send?amount=${amt}&bank=${encodeURIComponent(bankFull(cfg.bankName))}&accountNo=${no}&origin=qr` } : null;
+  return { kakao, toss, bank };
 }
 let _qrLib = null;
 function loadQrLib() {
@@ -481,7 +486,7 @@ async function drawQr(box, text) {
 function openPay({ kind, ref, amt, title, desc, onDone }) {
   const code = 'ZZ-' + rid(4).toUpperCase();
   const L = payLinks(amt);
-  const ready = !!(L.kakao || L.toss);
+  const ready = !!(L.kakao || L.toss || L.bank);
   const desktop = matchMedia('(hover: hover) and (pointer: fine)').matches;
   const w = openModal(`
     <div class="pay">
@@ -491,12 +496,17 @@ function openPay({ kind, ref, amt, title, desc, onDone }) {
       <div class="pay-amt"><span class="num">${fmtN(amt)}</span><span>${t('won')}</span></div>
       ${ready ? `
       <ol class="pay-steps">
-        <li><p class="ps-h"><span class="ps-n">1</span>${t(desktop ? 'pay_step1_pc' : L.toss && L.kakao ? 'pay_step1_both' : L.toss ? 'pay_toss' : 'pay_step1')}</p>
-          <div class="pay-methods">
+        <li><p class="ps-h"><span class="ps-n">1</span>${t(!L.toss && !L.kakao ? 'pay_bank' : desktop ? 'pay_step1_pc' : L.toss && L.kakao ? 'pay_step1_both' : L.toss ? 'pay_toss' : 'pay_step1')}</p>
+          ${L.toss || L.kakao ? `<div class="pay-methods">
             ${L.toss ? `<a class="btn btn-toss btn-lg" href="${esc(L.toss)}" target="_blank" rel="noopener" data-pm="toss">${t('pay_toss')}</a>` : ''}
             ${L.kakao ? `<a class="btn btn-kpay btn-lg" href="${esc(L.kakao)}" target="_blank" rel="noopener" data-pm="kakao">${t('pay_kakao')}</a>` : ''}
-          </div>
-          ${desktop ? `<div class="pay-qr"><div class="pay-qr-img" id="pay-qr"></div><p class="hint">${t(L.toss ? 'pay_qr_hint_toss' : 'pay_qr_hint')}</p></div>` : ''}
+          </div>` : ''}
+          ${desktop && (L.toss || L.kakao) ? `<div class="pay-qr"><div class="pay-qr-img" id="pay-qr"></div><p class="hint">${t(L.toss ? 'pay_qr_hint_toss' : 'pay_qr_hint')}</p></div>` : ''}
+          ${L.bank ? `<div class="pay-bank" data-copybox>
+            ${L.toss || L.kakao ? `<p class="lbl">${t('pay_bank')}</p>` : ''}
+            <div class="pay-bank-no"><span class="muted small">${esc(L.bank.name)}${L.bank.holder ? ' · ' + esc(L.bank.holder) : ''}</span><span class="copy-src mono big">${esc(L.bank.no)}</span></div>
+            <div class="pay-bank-act"><button class="btn btn-line btn-sm" data-copy="${esc(L.bank.no)}" data-pm="bank">${icon('copy')} ${t('copy')}</button>${desktop ? '' : `<a class="btn btn-toss btn-sm" href="${esc(L.bank.toss)}" data-pm="bank">${t('pay_bank_toss')}</a>`}</div>
+            <p class="hint">${t('pay_bank_hint')}</p></div>` : ''}
           <div class="pay-code" data-copybox>
             <div><span class="lbl">${t('pay_memo')}</span><span class="copy-src mono big">${code}</span></div>
             <button class="btn btn-line btn-sm" data-copy="${code}">${icon('copy')} ${t('copy')}</button>
@@ -506,14 +516,14 @@ function openPay({ kind, ref, amt, title, desc, onDone }) {
           <button class="btn btn-primary btn-lg btn-block" id="pay-done" disabled>${t('pay_done')}</button>
           <p class="hint" id="pay-wait">${t('pay_wait')}</p></li>
       </ol>
-      <p class="fine">${t('pay_fine2')}</p>` : `
+      <p class="fine">${t(L.bank ? 'pay_fine3' : 'pay_fine2')}</p>` : `
       <p class="note">${icon('info')} ${t('pay_none')}</p>
       <div class="actions"><a class="btn btn-kakao btn-lg btn-block" href="${DEV.kakaoUrl}" target="_blank" rel="noopener">${icon('chat')}${t('kakao_ask')}</a></div>`}
     </div>`, { label: title });
   // Toss first: money sent to a Toss ID arrives without the operator having to accept it (KakaoPay needs "받기")
   const qbox = $('#pay-qr', w); if (qbox) drawQr(qbox, L.toss || L.kakao);
   if (!ready) return;
-  let method = L.toss ? 'toss' : 'kakao';
+  let method = L.toss ? 'toss' : L.kakao ? 'kakao' : 'bank';
   const done = $('#pay-done', w);
   // "I sent it" only wakes up after the payment page was opened (phone) or the QR has been on screen a while (computer)
   const arm = () => { if (!done.isConnected) return; done.disabled = false; const pw = $('#pay-wait', w); if (pw) pw.hidden = true; };
@@ -1171,7 +1181,7 @@ function openShareCard(blob, name, text) {
 }
 
 /* ===== What's new: shown once after a big update (website only; needs the matching server update) ===== */
-const WHATS_NEW = '2026-11-06a', WN_TS = Date.parse('2026-11-06T03:00:00Z'); // people who joined after this have nothing to catch up on
+const WHATS_NEW = '2026-11-07a', WN_TS = Date.parse('2026-11-07T03:00:00Z'); // people who joined after this have nothing to catch up on
 const BOOT_AT = Date.now();
 /* what each update brought, newest last; people see what came after the last one they saw (at most 6 lines) */
 const WN_ITEMS = [
@@ -1180,7 +1190,8 @@ const WN_ITEMS = [
   ['2026-10-29b', 'wave', 'wn_fs'], ['2026-10-29b', 'trophy', 'wn_wk'], ['2026-10-29b', 'chart', 'wn_st'], ['2026-10-29b', 'phone', 'wn_push'],
   ['2026-10-29c', 'camera', 'wn_fix'], ['2026-10-29c', 'menu', 'wn_menu'],
   ['2026-10-29d', 'wave', 'wn_park'], ['2026-10-29d', 'chat', 'wn_chat'], ['2026-10-29d', 'board', 'wn_bdmod'], ['2026-10-29d', 'user', 'wn_wd'],
-  ['2026-11-06a', 'star', 'wn_games'], ['2026-11-06a', 'wave', 'wn_fs2']
+  ['2026-11-06a', 'star', 'wn_games'], ['2026-11-06a', 'wave', 'wn_fs2'],
+  ['2026-11-07a', 'coin', 'wn_zp']
 ];
 function maybeWhatsNew(tries = 0) {
   if (window.APP_RT !== 'web' || lsGet('wn', '') === WHATS_NEW || tries > 6) return;

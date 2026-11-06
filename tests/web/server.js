@@ -4,7 +4,7 @@ const LIB = p => require.resolve(p, { paths: [require('path').join(__dirname, '.
 const ROOT = path.resolve(__dirname, '..', '..'), LEAFLET = LIB('leaflet/dist/leaflet.js');
 let ver = 1; const events = []; const STATS = { photoSelects: 0 };
 const T = { anglers: {}, photos: {}, labels: {}, orders: {}, suggest: {}, admin_docs: {}, spots: {}, board: {}, teams: {}, news: {}, points: {}, reviews: {}, chat: {}, dm: {} };
-const FEATURES = { del: true, wd: true };
+const FEATURES = { del: true, wd: true, zp: true };
 // live chat: the open chat and 1:1 between friends (the same rules as private.chat_guard / dm_guard), mutes, rate limits
 let seq = 100; const MUTES = {}; const RATE = {};
 function tryOk(k, max, ms) { const now = Date.now(); const a = (RATE[k] || []).filter(x => now - x < ms); if (a.length >= max) { RATE[k] = a; return false; } a.push(now); RATE[k] = a; return true; }
@@ -20,6 +20,32 @@ const RT = {}, RTQ = {}, RTSEEN = {}; const RTSTATS = { sent: 0, delivered: 0 };
 function rtState(topic) { const st = {}; for (const [cid, m] of RT[topic] || []) if (m.payload) (st[m.key] = st[m.key] || []).push(Object.assign({ presence_ref: cid }, m.payload)); return st; }
 function rtSync(topic) { const st = rtState(topic); for (const cid of (RT[topic] || new Map()).keys()) (RTQ[cid] = RTQ[cid] || []).push({ topic, type: 'presence', state: st }); }
 setInterval(() => { const now = Date.now(); for (const [topic, m] of Object.entries(RT)) { let ch = false; for (const cid of [...m.keys()]) if (now - (RTSEEN[cid] || 0) > 3000) { m.delete(cid); ch = true; } if (ch) rtSync(topic); } }, 1000);
+// 찌릿 포인트 (the same rules as migration 0016): wallets, the book, owned lures, the weekly 챔질 반응속도 board, runs that
+// start here and are checked when they end, prizes paid once per finished week (300 / 200 / 100, 20 for playing, gold lure)
+const ZPS = { wal: {}, led: [], owned: {}, scores: {}, runs: {}, settled: {}, seq: 0, items: [['spoon', 100], ['vib', 150], ['jig', 200], ['egi', 200], ['tai', 300], ['minnow', 500], ['gold', null]] };
+function zpWeek(ms = Date.now()) { const d = new Date(ms + 9 * 3600e3); const off = (d.getUTCDay() + 6) % 7; return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() - off)).toISOString().slice(0, 10); }
+const zpAddDays = (wk, n) => new Date(Date.parse(wk + 'T00:00:00Z') + n * 864e5).toISOString().slice(0, 10);
+function zpAdd(acct, d, r, ref, n) {
+  if (ZPS.led.some(x => x.acct === acct && x.r === r && x.ref === ref)) return false;
+  const w = ZPS.wal[acct] || (ZPS.wal[acct] = { bal: 0, earned: 0 });
+  if (w.bal + d < 0) throw new Error('not_enough');
+  w.bal += d; if (d > 0) w.earned += d;
+  ZPS.led.push({ id: ++ZPS.seq, acct, d, r, ref, n: n || '', at: new Date().toISOString() }); return true;
+}
+function zpBoard(game, wk) {
+  const rows = Object.values(ZPS.scores).filter(x => x.game === game && x.wk === wk && !x.void).sort((a, b) => a.score - b.score || (a.best == null ? 1e9 : a.best) - (b.best == null ? 1e9 : b.best) || a.at - b.at);
+  return rows.map((x, i) => ({ a: x.acct, s: x.score, b: x.best == null ? null : x.best, r: i + 1, n: rows.length }));
+}
+function zpAward(game, wk) {
+  if (Date.now() < Date.parse(wk + 'T00:00:00+09:00') + 7 * 864e5 + 60e3 || ZPS.settled[game + wk]) return 0;
+  ZPS.settled[game + wk] = true; const ref = game + ':' + wk;
+  for (const x of zpBoard(game, wk)) {
+    if (x.r <= 3) { zpAdd(x.a, [300, 200, 100][x.r - 1], 'prize', ref, String(x.r)); if (x.r === 1) (ZPS.owned[x.a] = ZPS.owned[x.a] || []).includes('gold') || ZPS.owned[x.a].push('gold'); }
+    else zpAdd(x.a, 20, 'join', ref, '');
+  }
+  return 1;
+}
+const zpNick = me => { const a = T.anglers[me]; return !!(a && a.data && String(a.data.nick || '').trim()); };
 const PUSH = {}, PUSHLOG = []; // phone notices: subscriptions saved through the RPCs, and what the app asked the push function // admin_delete_user present on the "server" (the live one gets it with the SQL update)
 const isAdmin = uid => !!uid && (admins.has(uid) || admins.has(acct(uid)));
 const admins = new Set(); const links = {}; const codes = {};
@@ -240,7 +266,60 @@ http.createServer(async (req, res) => {
       for (const [n, x] of Object.entries(logins)) if (x.owner === me) delete logins[n];
       for (const [ep, x] of Object.entries(PUSH)) if (acct(x.acct) === me) delete PUSH[ep];
       for (const [dev, own] of Object.entries(links)) if (own === me) delete links[dev];
+      delete ZPS.wal[me]; delete ZPS.owned[me]; delete ZPS.runs[me]; ZPS.led = ZPS.led.filter(x => x.acct !== me); for (const [k, x] of Object.entries(ZPS.scores)) if (x.acct === me) delete ZPS.scores[k];
       return send({ data: { ok: true } });
+    }
+    if (/^(zp_|rx_)/.test(q.name)) {
+      const err = m => send({ error: { code: 'P0001', message: m } });
+      if (!FEATURES.zp) return send({ error: { code: 'PGRST202', message: 'Could not find the function public.' + q.name + ' in the schema cache' } });
+      if (!uid) return err('not_signed_in');
+      const me = acct(uid), wk = zpWeek(), A = q.args || {};
+      if (q.name === 'zp_state') {
+        for (const w of new Set(Object.values(ZPS.scores).filter(x => x.game === 'rx' && x.wk < wk && x.wk >= zpAddDays(wk, -35)).map(x => x.wk))) zpAward('rx', w);
+        const w = ZPS.wal[me] || { bal: 0, earned: 0 }, b = zpBoard('rx', wk), l = zpBoard('rx', zpAddDays(wk, -7)), mine = b.find(x => x.a === me);
+        return send({ data: { wk, bal: w.bal, earned: w.earned, owned: ZPS.owned[me] || [], items: ZPS.items.map(([id, price]) => ({ id, price })),
+          rx: { top: b.slice(0, 10).map(({ a, s, b: bb }) => ({ a, s, b: bb })), n: b.length, me: mine ? { s: mine.s, b: mine.b, r: mine.r } : null, last: l.slice(0, 3).map(({ a, s, b: bb, r }) => ({ a, s, b: bb, r })), lastn: l.length },
+          led: ZPS.led.filter(x => x.acct === me).sort((x, y) => y.id - x.id).slice(0, 30).map(({ id, d, r, ref, n, at }) => ({ id, d, r, ref, n, at })) } });
+      }
+      if (q.name === 'rx_begin') {
+        if (!zpNick(me)) return err('no_profile');
+        if (!tryOk('rxb:' + me, 60, 3600e3)) return err('slow_down');
+        const token = require('crypto').randomUUID(); ZPS.runs[me] = { token, at: Date.now(), used: false }; return send({ data: token });
+      }
+      if (q.name === 'rx_submit') {
+        const r = ZPS.runs[me];
+        if (!r || r.token !== A.p_token || r.used || Date.now() - r.at > 15 * 60e3) return send({ data: { err: 'bad_run' } });
+        r.used = true; const ts = A.p_times;
+        if (!Array.isArray(ts) || ts.length !== 5 || ts.some(x => !Number.isInteger(x) || x < 100 || x > 1500)) return send({ data: { err: 'bad_run' } });
+        const sum = ts.reduce((a, b) => a + b, 0), avg = Math.round(sum / 5), ok = ts.filter(x => x < 1500), best = ok.length ? Math.min(...ok) : null;
+        if (avg < 140 || Date.now() - r.at < 5 * 1500 + 4 * 1000 + sum - 1500) return send({ data: { err: 'too_fast' } });
+        const k = 'rx|' + wk + '|' + me, old = ZPS.scores[k]; let rec = false;
+        if (!old) { ZPS.scores[k] = { game: 'rx', wk, acct: me, score: avg, best, void: false, at: Date.now() }; rec = true; }
+        else if (avg < old.score) { Object.assign(old, { score: avg, best, at: Date.now() }); rec = true; }
+        const mine = zpBoard('rx', wk).find(x => x.a === me);
+        return send({ data: { avg, best, rec, r: mine ? mine.r : null, n: mine ? mine.n : null, wk } });
+      }
+      if (q.name === 'zp_buy') {
+        if (!zpNick(me)) return err('no_profile');
+        const it = ZPS.items.find(x => x[0] === A.p_item); if (!it || it[1] == null) return err('no_item');
+        const own = ZPS.owned[me] || (ZPS.owned[me] = []); if (own.includes(A.p_item)) return err('owned');
+        const w = ZPS.wal[me] || (ZPS.wal[me] = { bal: 0, earned: 0 }); if (w.bal < it[1]) return err('not_enough');
+        if (it[1] > 0) zpAdd(me, -it[1], 'buy', A.p_item, ''); own.push(A.p_item);
+        return send({ data: { item: A.p_item, bal: w.bal } });
+      }
+      if (q.name === 'zp_grant') {
+        if (!isAdmin(uid)) return err('not_admin');
+        const to = acct(A.p_acct); if (!to || !T.anglers[to]) return err('no_account');
+        let d = Math.round(+A.p_delta || 0); if (!d || Math.abs(d) > 100000) return err('bad_amount');
+        const w = ZPS.wal[to] || (ZPS.wal[to] = { bal: 0, earned: 0 }); if (d < 0) d = Math.max(d, -w.bal);
+        if (d) zpAdd(to, d, 'grant', require('crypto').randomUUID(), String(A.p_note || '').slice(0, 80));
+        return send({ data: w.bal });
+      }
+      if (q.name === 'zp_void') {
+        if (!isAdmin(uid)) return err('not_admin');
+        const x = ZPS.scores[A.p_game + '|' + A.p_wk + '|' + acct(A.p_acct)]; if (!x) return send({ data: false });
+        x.void = A.p_void !== false; return send({ data: true });
+      }
     }
     if (q.name === 'push_subscribe') {
       if (!uid) return send({ error: { message: 'not_signed_in' } });
@@ -284,8 +363,9 @@ http.createServer(async (req, res) => {
     const since = +u.searchParams.get('since') || 0, who = u.searchParams.get('uid') || null;
     return send({ ver, events: events.filter(e => e.ver > since && (e.eventType === 'DELETE' || !['points', 'reviews', 'dm', 'chat'].includes(e.table) || visible(e.table, e.new, who))) });
   }
+  if (u.pathname === '/__sb/zp_seed') { const q = await body(req); const wk = q.wk || zpAddDays(zpWeek(), q.weeksAgo ? -7 * q.weeksAgo : 0); for (const r of q.rows || []) ZPS.scores['rx|' + wk + '|' + r.acct] = { game: 'rx', wk, acct: r.acct, score: r.score, best: r.best == null ? null : r.best, void: !!r.void, at: Date.now() - 864e5 * 9 + (r.order || 0) }; return send({ ok: true, wk }); }
   if (u.pathname === '/__sb/feature') { for (const [k, v] of u.searchParams) FEATURES[k] = v === '1'; return send(FEATURES); }
-  if (u.pathname === '/__sb/dump') return send({ T, admins: [...admins], links, STATS, PUSH, PUSHLOG, logins: Object.keys(logins), MUTES, RTSTATS, RT: Object.fromEntries(Object.entries(RT).map(([k, m]) => [k, [...m.values()].map(x => x.key)])) });
+  if (u.pathname === '/__sb/dump') return send({ T, admins: [...admins], links, STATS, PUSH, PUSHLOG, logins: Object.keys(logins), MUTES, RTSTATS, ZPS, RT: Object.fromEntries(Object.entries(RT).map(([k, m]) => [k, [...m.values()].map(x => x.key)])) });
   if (u.pathname === '/__sb/config') { const q = await body(req); const g = T.admin_docs.config || (T.admin_docs.config = { id: 'config', data: {} }); g.data = Object.assign({}, g.data, q); push('admin_docs', 'UPDATE', g, { id: 'config' }); return send({ ok: true }); }
   if (u.pathname === '/__sb/grant') { const q = await body(req); const g = T.admin_docs.grants || (T.admin_docs.grants = { id: 'grants', data: {} }); g.data[q.uid] = Object.assign({}, g.data[q.uid], { [q.oid]: q.v }); push('admin_docs', 'UPDATE', g, { id: 'grants' }); return send({ ok: true }); }
   const f = u.pathname === '/_leaflet_test.js' ? LEAFLET : path.join(ROOT, decodeURIComponent(u.pathname === '/' ? '/index.html' : u.pathname));

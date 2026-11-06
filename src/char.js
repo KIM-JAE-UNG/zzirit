@@ -27,6 +27,7 @@ const CH = (() => {
     o.hc = clamp(parseInt(o.hc, 10) || 0, 0, HAIRC.length - 1);
     for (const k of ['hs', 'ey', 'mo', 'ht', 'ou', 'ac', 'rd']) if (!(o[k] in P[k])) o[k] = DEF[k];
     o.htc = hex(o.htc) || DEF.htc; o.ouc = hex(o.ouc) || DEF.ouc; o.bg = hex(o.bg) || DEF.bg;
+    if (!(typeof ZL !== 'undefined' && ZL.BY[o.lu])) delete o.lu; // the 찌릿 루어 on the line (shop.js decides whose)
     return o;
   }
   // deterministic look for anglers who never made one (so every sea has its angler)
@@ -157,6 +158,12 @@ const CH = (() => {
     const hands = `<circle cx="28.7" cy="93" r="3.9" fill="${skin}" ${s}/><circle cx="${rod ? 77.6 : 72}" cy="${rod ? 90.6 : 93}" r="3.9" fill="${skin}" ${s}/>`;
     return L + R + hands;
   }
+  // the lure hangs nose up from the end of the line (110, 64), turned around its line tie
+  function lureSVG(c) {
+    const L = c.lu && ZL.BY[c.lu]; if (!L) return '';
+    const s = .12, [tx, ty] = L.tie;
+    return `<g transform="translate(${(110 - s * ty).toFixed(2)} ${(64 + s * tx).toFixed(2)}) scale(${s}) rotate(-90)">${ZL.inner(c.lu, 'ch')}</g>`;
+  }
   function rodSVG(c) {
     const [a, b] = ROD[c.rd] || ROD.carbon;
     return `<path d="M73 98 L113 6" stroke="${OL}" stroke-width="3.4" stroke-linecap="round"/><path d="M73 98 L113 6" stroke="${a}" stroke-width="1.9" stroke-linecap="round"/>
@@ -178,7 +185,7 @@ const CH = (() => {
     const rod = mode === 'full';
     const neck = `<rect x="45" y="58" width="10" height="9" rx="3" fill="${sh(skin, -.08)}" stroke="${OL}" stroke-width="1.4"/>`;
     const body = `${legs(c)}${outfit(c, skin)}${neck}${c.ac === 'towel' ? acc(c, true) : ''}${arms(c, skin, mode !== 'head')}`;
-    const inner = `${mode === 'head' ? '' : '<ellipse cx="50" cy="126" rx="21" ry="3.2" fill="#000" opacity=".16"/>'}${hairBack(c, HAIRC[c.hc][0])}${rod ? rodSVG(c) : ''}${body}${head(Object.assign({}, c, { ac: c.ac === 'towel' ? 'none' : c.ac }))}`;
+    const inner = `${mode === 'head' ? '' : '<ellipse cx="50" cy="126" rx="21" ry="3.2" fill="#000" opacity=".16"/>'}${hairBack(c, HAIRC[c.hc][0])}${rod ? rodSVG(c) + lureSVG(c) : ''}${body}${head(Object.assign({}, c, { ac: c.ac === 'towel' ? 'none' : c.ac }))}`;
     const vb = mode === 'head' ? '13 4 74 74' : mode === 'body' ? '14 2 72 128' : '8 0 112 130';
     const w = mode === 'head' ? 74 : mode === 'body' ? 72 : 112, h = mode === 'head' ? 74 : mode === 'body' ? 128 : 130;
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${vb}" width="${w * 2}" height="${h * 2}">${inner}</svg>`;
@@ -220,7 +227,12 @@ const CH = (() => {
   return { SKIN, HAIRC, CLOTH, BG, P, ROD, DEF, norm, fromSeed, svg, url, image, locked, needOf, hairLocked, fit };
 })();
 
-function charOf(a, uid) { return a && a.char ? CH.fit(CH.norm(a.char), a, uid || avatarUid(a)) : CH.fromSeed(uid || (a && a.nick) || 'x'); }
+function charOf(a, uid) {
+  const c = a && a.char ? CH.fit(CH.norm(a.char), a, uid || avatarUid(a)) : CH.fromSeed(uid || (a && a.nick) || 'x');
+  const lu = typeof lureOf === 'function' ? lureOf(a, uid || avatarUid(a)) : '';
+  if (lu) c.lu = lu; else delete c.lu;
+  return c;
+}
 function safeColor(c) { return /^#[0-9a-fA-F]{6}$/.test(String(c)) ? c : '#CDEBF5'; }
 
 /* ---- avatars: character face, uploaded photo, or the first letter ---- */

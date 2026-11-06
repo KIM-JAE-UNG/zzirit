@@ -14,6 +14,7 @@ echo "== live database before the reset"; node db/before-reset.test.mjs | tail -
 echo "== phone notices: database"; node db/push.test.mjs | tail -1; [ "${PIPESTATUS[0]}" = 0 ] || fail=1
 echo "== phone notices: encryption (RFC 8291)"; node push/webpush.test.mjs | tail -1; [ "${PIPESTATUS[0]}" = 0 ] || fail=1
 echo "== live chat, 1:1, leaving: database"; node db/chat.test.mjs | tail -1; [ "${PIPESTATUS[0]}" = 0 ] || fail=1
+echo "== points, weekly board, lure shop: database"; node db/points.test.mjs | tail -1; [ "${PIPESTATUS[0]}" = 0 ] || fail=1
 node web/server.js > out-web-server.log 2>&1 & WS=$!
 node claude/server.js > out-claude-server.log 2>&1 & CS=$!
 trap 'kill $WS $CS 2>/dev/null; rm -f out-web-server.log out-claude-server.log' EXIT
@@ -31,6 +32,9 @@ echo "== live: chat, park, duels, board, leaving"; node web/live.js > out-live.t
 kill $WS 2>/dev/null; sleep 0.3; node web/server.js > out-web-server.log 2>&1 & WS=$!
 for i in $(seq 1 30); do curl -s -o /dev/null http://127.0.0.1:8768/index.html && break; sleep 0.3; done
 echo "== mini games: fortune, reaction"; node web/games.js > out-games.txt 2>&1; grep -E '✗|CRASH|PAGEERROR|ALL PASSED|FAILED' out-games.txt; grep -q 'ALL PASSED' out-games.txt || fail=1
-mkdir -p out && mv -f out-web.txt out-claude.txt out-phone.txt out-live.txt out-games.txt out/ 2>/dev/null
+kill $WS 2>/dev/null; sleep 0.3; node web/server.js > out-web-server.log 2>&1 & WS=$!
+for i in $(seq 1 30); do curl -s -o /dev/null http://127.0.0.1:8768/index.html && break; sleep 0.3; done
+echo "== points: prizes, the lure shop, the bank option"; node web/shop.js > out-shop.txt 2>&1; grep -E '✗|CRASH|PAGEERROR|ALL PASSED|FAILED' out-shop.txt; grep -q 'ALL PASSED' out-shop.txt || fail=1
+mkdir -p out && mv -f out-web.txt out-claude.txt out-phone.txt out-live.txt out-games.txt out-shop.txt out/ 2>/dev/null
 [ $fail = 0 ] && echo "ALL CHECKS PASSED" || echo "SOME CHECKS FAILED (details in tests/out/)"
 exit $fail

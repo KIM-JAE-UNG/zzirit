@@ -539,7 +539,7 @@ function pkShop() {
   const m = pkKst().m; const top = pkPool(m).slice(0, 4);
   openModal(`<div class="pk-shop"><h2>${icon('lure')} ${t('pk_shop')}</h2><p class="lede">${t('pk_shop_sub')}</p>
     <ul class="pk-shop-list">${top.map(x => { const sp = SPI[x.id]; const baits = [...(sp.b || []).map(b => dict(BAIT[b])), ...(sp.lu || []).map(l => dict(LURE[l]))].slice(0, 3); return `<li><img src="${FD.thumb(sp, 120, 66)}" alt=""><span><b>${esc(spName(sp))}</b><span class="muted small">${esc(baits.join(' · '))}</span></span></li>`; }).join('')}</ul>
-    <a class="btn btn-line" href="#tackle">${t('pk_shop_more')}</a></div>`, { label: t('pk_shop') });
+    <div class="actions">${zpOn() ? `<a class="btn btn-primary" href="#lures">${icon('lure')}${t('zl_title')}</a>` : ''}<a class="btn btn-line" href="#tackle">${t('pk_shop_more')}</a></div></div>`, { label: t('pk_shop') });
 }
 function pkLight() {
   const w = openModal(`<div class="pk-light"><h2>${t('pk_light')}</h2><p class="lede">${t('pk_light_sub')}</p>${typeof wxCardHTML === 'function' && wxOn() ? wxCardHTML() : `<p class="muted">${t('pk_light_none')}</p>`}</div>`, { wide: true, label: t('pk_light') });
@@ -562,28 +562,36 @@ function pkPool(m) {
   return PK_POOL.list;
 }
 // the same seed gives the same fish in the same order: in a duel both players get exactly the same sea
-function pkFish(seed, idx, m) {
+function pkFish(seed, idx, m, perk) {
   const R = FD.seeded((seed ^ Math.imul(idx + 1, 2654435761)) >>> 0);
-  const pool = pkPool(m); let r = R(), sp = pool.length ? pool[0].id : 'madai';
+  let pool = pkPool(m);
+  if (perk && perk.sp) { // a lure made for some species: those come more often
+    const w = pool.map(x => x.p * (perk.sp.includes(x.id) ? perk.x : 1)), tot = w.reduce((a, b) => a + b, 0) || 1;
+    pool = pool.map((x, i) => ({ id: x.id, p: w[i] / tot }));
+  }
+  let r = R(), sp = pool.length ? pool[0].id : 'madai';
   for (const x of pool) { r -= x.p; if (r <= 0) { sp = x.id; break; } }
-  const s0 = SPI[sp]; const trophy = R() < .07;
+  const s0 = SPI[sp]; const trophy = R() < .07 * ((perk && perk.trophy) || 1);
   let len = trophy ? s0.L * (1.15 + .35 * R()) : s0.L * (.55 + .5 * R() + .25 * R() * R());
   len = Math.round(Math.max(8, Math.min(s0.X * .97, len)) * 10) / 10;
-  const q = len / s0.L, wait = 1.6 + R() * 4.2;
+  const q = len / s0.L, wait = (1.6 + R() * 4.2) * ((perk && perk.wait) || 1);
   const nibs = []; for (let i = Math.floor(R() * 3); i > 0; i--) nibs.push(.5 + R() * Math.max(.2, wait - 1));
-  const win = clamp(1.05 - .25 * (q - 1), .55, 1.1);
+  const win = clamp(1.05 - .25 * (q - 1), .55, 1.1) + ((perk && perk.win) || 0);
   const pulls = []; let at = .8 + R() * 1.2; while (at < 40) { const d = .5 + R() * .5; pulls.push([at, at + d]); at += d + .9 + R() * 1.6 / Math.max(.6, q); }
   return { sp, len, q, wait, nibs, win, pulls, trophy };
 }
 function pkGameOpen(mode, opts = {}) {
   const box = $('#pk-game'); if (!box) return;
   const spot = PK.SPOTS.find(s => s.id === opts.spot) || pkNear(PK.SPOTS, PKS.me.x, PKS.me.y, 80) || null; // a duel can start anywhere
-  PKS.game = { mode, seed: (opts.seed >>> 0) || ((Math.random() * 2 ** 32) >>> 0), m: opts.m != null ? opts.m : pkKst().m, idx: 0, phase: mode === 'duel' ? 'wait' : 'ready', pt: 0, f: null, T: 35, D: 100, slack: 0, hold: false, bag: [], score: 0, msg: '', spot };
+  // the lure on my line helps a little when fishing alone; a duel is the same sea and the same rules for both
+  const lure = mode === 'solo' && S.me && S.me.lure ? myLure() : '';
+  PKS.game = { mode, seed: (opts.seed >>> 0) || ((Math.random() * 2 ** 32) >>> 0), m: opts.m != null ? opts.m : pkKst().m, idx: 0, phase: mode === 'duel' ? 'wait' : 'ready', pt: 0, f: null, T: 35, D: 100, slack: 0, hold: false, bag: [], score: 0, msg: '', spot, lure, perk: (lure && ZL.BY[lure].perk) || null };
   if (mode === 'duel') PKS.game.f = pkFish(PKS.game.seed, 0, PKS.game.m);
   if (PKS.me.moving || (PKS.me.path && PKS.me.path.length)) pkWalk(PKS.me.x, PKS.me.y); // stop where I am (and tell the others)
   PKS.me.act = mode === 'duel' ? 'duel' : 'fish'; PKS.me.spot = spot ? spot.id : ''; if (spot && spot.dx) PKS.me.dir = spot.dx < 0 ? -1 : 1; pkTrackSoon();
   box.hidden = false; box.className = 'pk-game mode-' + mode;
-  box.innerHTML = `<div class="pkg-top"><b id="pkg-title">${mode === 'duel' ? '⚔️ ' + t('pk_duel_vs', { nick: esc((S.anglers.get(PKS.duel.peer) || {}).nick || '?') }) : '🎣 ' + t('pk_fishing')}</b><span class="pkg-time num" id="pkg-time"></span>${mode === 'duel' ? '' : `<button class="pkg-x" data-pkg="quit" aria-label="${esc(t('close'))}">${icon('close')}</button>`}</div>
+  const lu = PKS.game.lure;
+  box.innerHTML = `<div class="pkg-top"><b id="pkg-title">${mode === 'duel' ? '⚔️ ' + t('pk_duel_vs', { nick: esc((S.anglers.get(PKS.duel.peer) || {}).nick || '?') }) : '🎣 ' + t('pk_fishing')}</b>${lu ? `<span class="pkg-lure" title="${esc(t('zl_p_' + lu))}"><img src="${ZL.url(lu)}" alt="">${esc(zlName(lu))}</span>` : ''}<span class="pkg-time num" id="pkg-time"></span>${mode === 'duel' ? '' : `<button class="pkg-x" data-pkg="quit" aria-label="${esc(t('close'))}">${icon('close')}</button>`}</div>
     ${mode === 'duel' ? `<div class="pkg-score"><span>${t('pk_me')} <b class="num" id="pkg-my">0</b></span><span>${t('pk_them')} <b class="num" id="pkg-op">0</b></span></div>` : ''}
     <canvas id="pkg-cv" aria-hidden="true"></canvas>
     <div class="pkg-meters"><div class="pkg-meter" title="${esc(t('pk_tension'))}"><span class="pkg-zone"></span><i id="pkg-t"></i></div><div class="pkg-meter dist" title="${esc(t('pk_distance'))}"><i id="pkg-d"></i></div></div>
@@ -607,11 +615,11 @@ function pkGameClose(silent) {
 function pkGameInput(down) {
   const G = PKS.game; if (!G) return;
   if (!down) { G.hold = false; return; }
-  if (G.phase === 'ready') { G.f = pkFish(G.seed, G.idx, G.m); G.phase = 'wait'; G.pt = 0; G.msg = ''; }
+  if (G.phase === 'ready') { G.f = pkFish(G.seed, G.idx, G.m, G.perk); G.phase = 'wait'; G.pt = 0; G.msg = ''; }
   else if (G.phase === 'wait') { G.phase = 'lost'; G.pt = 0; G.msg = t('pk_early'); G.again = true; } // too soon: the fish swam off (the same fish comes back)
   else if (G.phase === 'bite') { G.phase = 'fight'; G.pt = 0; G.T = 35; G.D = 100; G.slack = 0; G.hold = true; G.msg = ''; }
   else if (G.phase === 'fight') G.hold = true;
-  else if ((G.phase === 'got' || G.phase === 'lost') && G.mode === 'solo' && G.pt > .4) { if (G.phase === 'lost' && !G.again) G.idx++; G.again = false; G.f = pkFish(G.seed, G.idx, G.m); G.phase = 'wait'; G.pt = 0; G.msg = ''; }
+  else if ((G.phase === 'got' || G.phase === 'lost') && G.mode === 'solo' && G.pt > .4) { if (G.phase === 'lost' && !G.again) G.idx++; G.again = false; G.f = pkFish(G.seed, G.idx, G.m, G.perk); G.phase = 'wait'; G.pt = 0; G.msg = ''; }
   pkGameView();
 }
 function pkGameStep(dt, t) {
@@ -626,7 +634,8 @@ function pkGameStep(dt, t) {
   else if (G.phase === 'bite' && G.pt > f.win) { G.phase = 'lost'; G.pt = 0; G.msg = t_('pk_missed'); G.again = false; }
   else if (G.phase === 'fight') {
     const pull = f.pulls.some(([a, b]) => G.pt >= a && G.pt < b);
-    if (G.hold) { G.D -= (24 / (.7 + .5 * f.q)) * (G.T >= 40 && G.T <= 85 ? 1.25 : .8) * dt; G.T += (16 + 10 * f.q + (pull ? 42 : 0)) * dt; }
+    const pk = G.perk || {};
+    if (G.hold) { G.D -= (24 / (.7 + .5 * f.q)) * (G.T >= 40 && G.T <= 85 ? 1.25 : .8) * (pk.reel || 1) * dt; G.T += (16 + 10 * f.q + (pull ? 42 : 0)) * (pk.tension || 1) * dt; }
     else { G.T -= 34 * dt; G.D += (pull ? 10 : 3) * dt; }
     G.T = clamp(G.T, 0, 100); G.D = clamp(G.D, 0, 100);
     G.slack = G.T < 6 ? G.slack + dt : 0;
@@ -691,6 +700,12 @@ function pkGameDraw(t) {
   } else if (G.phase === 'got' && f && SPI[f.sp]) {
     FD.draw(g, SPI[f.sp], w / 2, sea + (h - sea) * .45, Math.min(w * .42, 120), { t });
   } else if (G.phase !== 'ready' && G.phase !== 'over') {
+    const li = G.lure && ZL.img(G.lure);
+    if (li && li.complete && li.naturalWidth) { // under the float: the lure on its leader, a little hazy in the water
+      const ly = Math.min(h - 30, fy + 44);
+      g.strokeStyle = 'rgba(255,255,255,.35)'; g.lineWidth = 1; g.beginPath(); g.moveTo(fx, fy); g.lineTo(fx, ly - 22); g.stroke();
+      g.save(); g.globalAlpha = .8; g.translate(fx, ly + Math.sin(t * 2) * 1.5); g.rotate(-Math.PI / 2 + Math.sin(t * 1.3) * .08); g.drawImage(li, -34, -14, 60, 30); g.restore();
+    }
     g.strokeStyle = 'rgba(255,255,255,.7)'; g.lineWidth = 1; g.beginPath(); g.moveTo(w / 2, 0); g.lineTo(fx, fy - 8); g.stroke();
     g.fillStyle = '#FF3B2F'; g.beginPath(); g.ellipse(fx, fy - 6, 5, 7, 0, Math.PI, 0); g.fill(); g.fillStyle = '#FFF'; g.beginPath(); g.ellipse(fx, fy - 6, 5, 7, 0, 0, Math.PI); g.fill();
     g.strokeStyle = '#2B2433'; g.lineWidth = 1; g.beginPath(); g.moveTo(fx, fy - 13); g.lineTo(fx, fy - 18); g.stroke();

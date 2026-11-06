@@ -1207,8 +1207,25 @@ VIEWS.admin = {
         </div>
         <label class="switch"><input type="checkbox" id="ad-kamt" ${cfg.kakaoAmt ? 'checked' : ''}><span class="sw"></span><span>${t('ad_kakao_amt')}</span></label>
         <p class="hint">${t('ad_pay_hint')}</p>
+        <div class="ad-bank">
+          <p class="lbl">${icon('lock')} ${t('ad_bank')}</p>
+          <div class="row3">
+            <div class="field"><label for="ad-bank-name">${t('ad_bank_name')}</label><input id="ad-bank-name" value="${esc(cfg.bankName || '')}" placeholder="신한" maxlength="20" list="ad-banks"><datalist id="ad-banks">${['신한', '국민', '우리', '하나', '농협', '기업', '카카오뱅크', '토스뱅크', '케이뱅크', '부산', '경남', '새마을금고', '우체국'].map(b => `<option value="${b}">`).join('')}</datalist></div>
+            <div class="field"><label for="ad-bank-no">${t('ad_bank_no')}</label><input id="ad-bank-no" value="${esc(cfg.bankNo || '')}" inputmode="numeric" maxlength="24" autocomplete="off"></div>
+            <div class="field"><label for="ad-bank-holder">${t('ad_bank_holder')}</label><input id="ad-bank-holder" value="${esc(cfg.bankHolder || '')}" maxlength="20" autocomplete="off"></div>
+          </div>
+          <label class="switch"><input type="checkbox" id="ad-bank-on" ${cfg.bankOn ? 'checked' : ''}><span class="sw"></span><span>${t('ad_bank_on')}</span></label>
+          <p class="hint warn">${icon('warn')} ${t('ad_bank_warn')}</p>
+        </div>
         <div class="actions"><button class="btn btn-primary" id="ad-save">${t('save')}</button></div>
       </section>
+      ${window.APP_RT === 'web' ? `<section class="card ad-zp"><h2 class="h3">${icon('coin')}${t('ad_zp')}</h2><p class="hint">${t('ad_zp_hint')}</p>
+        <form id="ad-zp" class="row3">
+          <div class="field"><label for="ad-zp-who">${t('ad_zp_who')}</label><select id="ad-zp-who">${[...S.anglers].filter(([, a]) => a && a.nick).sort((x, y) => String(x[1].nick).localeCompare(String(y[1].nick))).map(([uid, a]) => `<option value="${esc(uid)}">${esc(a.nick)}</option>`).join('')}</select></div>
+          <div class="field"><label for="ad-zp-amt">${t('ad_zp_amt')}</label><input id="ad-zp-amt" type="number" step="10" value="100" inputmode="numeric"></div>
+          <div class="field"><label for="ad-zp-note">${t('ad_zp_note')}</label><input id="ad-zp-note" maxlength="40" autocomplete="off"></div>
+          <div class="actions"><button class="btn btn-primary" type="submit">${icon('coin')}${t('ad_zp_go')}</button></div>
+        </form></section>` : ''}
       <section class="card"><h2 class="h3">${icon('clock')}${t('ad_orders')}</h2><p class="hint">${t('ad_orders_hint')}</p>
         ${orders.length ? `<div class="tbl"><table><thead><tr><th>${t('angler')}</th><th>${t('ad_item')}</th><th class="r">${t('ad_amt')}</th><th>${t('pay_memo')}</th><th>${t('ad_when')}</th><th></th></tr></thead><tbody>${orders.map(({ uid, o, st }) => `<tr><td>${esc(o.nick || S.anglers.get(uid)?.nick || '?')}</td><td>${esc(o.kind === 'item' ? dict(SHOPI[o.ref]?.n) || o.ref : o.kind === 'past' ? t('ord_past_old') : t('donate_title'))}</td><td class="r num">${fmtN(o.amt)}</td><td class="mono">${esc(o.code)}</td><td class="small">${fmtDT(o.ts)}</td><td class="nowrap">${st === 'wait' ? `<button class="btn btn-primary btn-xs" data-grant="${uid}|${o.id}|ok">${t('ad_confirm')}</button> <button class="btn btn-ghost btn-xs" data-grant="${uid}|${o.id}|no">${t('ad_cancel_order')}</button>` : `<span class="chip ${st === 'ok' ? 'chip-ok' : 'chip-closed'}">${t('ord_' + st)}</span> <button class="btn btn-ghost btn-xs" data-grant="${uid}|${o.id}|wait">${t('ad_undo')}</button>`}</td></tr>`).join('')}</tbody></table></div>` : `<p class="muted">${t('ad_none')}</p>`}
       </section>
@@ -1235,8 +1252,20 @@ VIEWS.admin = {
       const toss = $('#ad-toss', el).value.trim().replace(/^(https?:\/\/)?(www\.)?toss\.me\//i, '').replace(/[/?#\s].*$/, '');
       const kakao = $('#ad-kakao', el).value.trim();
       if (kakao && !/^https:\/\/qr\.kakaopay\.com\//.test(kakao)) { toast(t('ad_kakao_bad'), 'warn'); return; }
-      await store.saveAdmin('config', Object.assign({}, S.admin.config || {}, { tossId: toss, kakaoUrl: kakao, kakaoAmt: $('#ad-kamt', el).checked }));
+      const bankNo = $('#ad-bank-no', el).value.replace(/\D/g, ''), bankName = $('#ad-bank-name', el).value.trim().slice(0, 20), bankOn = $('#ad-bank-on', el).checked;
+      if (bankOn && (!/^\d{8,16}$/.test(bankNo) || !bankName)) { toast(t('ad_bank_no') + '?', 'warn'); return; }
+      await store.saveAdmin('config', Object.assign({}, S.admin.config || {}, { tossId: toss, kakaoUrl: kakao, kakaoAmt: $('#ad-kamt', el).checked, bankName, bankNo, bankHolder: $('#ad-bank-holder', el).value.trim().slice(0, 20), bankOn }));
       toast(t('saved'));
+    };
+    const zpf = $('#ad-zp', el);
+    if (zpf) zpf.onsubmit = async e => {
+      e.preventDefault();
+      const uid = $('#ad-zp-who', el).value, amt = Math.round(+$('#ad-zp-amt', el).value || 0), note = $('#ad-zp-note', el).value.trim().slice(0, 40);
+      if (!uid || !amt) return;
+      const b = zpf.querySelector('button[type="submit"]'); b.disabled = true;
+      try { const n = await APP_AUTH.zp.grant(uid, amt, note); toast(t('ad_zp_done', { nick: (S.anglers.get(uid) || {}).nick || '?', n: fmtN(n) }), 'ok'); $('#ad-zp-note', el).value = ''; }
+      catch (err) { toast(t(err && err.code === 'need_update' ? 'zp_err_server' : 'zp_err'), 'warn'); }
+      finally { b.disabled = false; }
     };
     $('#ad-notice-go', el).onclick = async () => {
       const v = $('#ad-notice', el).value.trim().slice(0, 400);
@@ -1294,7 +1323,7 @@ async function openRelink(uid) {
 }
 
 /* ---------- More (mobile) ---------- */
-const NAV_ICON = { home: 'home', park: 'wave', games: 'star', chat: 'chat', scan: 'scan', map: 'map', points: 'pin', dex: 'book', tackle: 'lure', log: 'log', sea: 'sea', char: 'user', rank: 'trophy', friends: 'users', board: 'board', teams: 'flag', help: 'chat', about: 'sparkle', prefs: 'gear', admin: 'shield' };
+const NAV_ICON = { home: 'home', park: 'wave', games: 'star', lures: 'lure', chat: 'chat', scan: 'scan', map: 'map', points: 'pin', dex: 'book', tackle: 'lure', log: 'log', sea: 'sea', char: 'user', rank: 'trophy', friends: 'users', board: 'board', teams: 'flag', help: 'chat', about: 'sparkle', prefs: 'gear', admin: 'shield' };
 function openMore() {
   const nIn = S.me && S.me.nick ? frLists().inc.length : 0;
   // the account first: who is signed in, with a way to sign out (only when there is a way back in: a login ID or a linked device)
@@ -1307,7 +1336,7 @@ function openMore() {
   // the four groups; the one with the page on screen starts open, one open at a time so the sheet stays short
   const cur = navGroupOf(S.route) || 'fish';
   const grp = NAV_GROUPS.map(([id, gic, routes]) => {
-    const list = routes.filter(r => ((r !== 'points' && r !== 'park' && r !== 'chat') || window.APP_RT === 'web') && (r !== 'admin' || S.isOwner));
+    const list = routes.filter(r => ((r !== 'points' && r !== 'park' && r !== 'chat' && r !== 'lures') || window.APP_RT === 'web') && (r !== 'admin' || S.isOwner));
     const nDm = window.APP_RT === 'web' && typeof dmUnread === 'function' ? dmUnread() : 0;
     const on = id === cur, dot = (list.includes('friends') && nIn) || (list.includes('chat') && nDm);
     return `<section class="more-grp${on ? ' open' : ''}" data-mgrp="${id}">
