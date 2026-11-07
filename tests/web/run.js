@@ -410,11 +410,15 @@ const AI_NOFISH = { fish_visible: false, candidates: [], other_en: '', other_sci
   await W.waitForTimeout(600); await W.reload(); await W.waitForTimeout(5500);
   ok(!!(await W.$('.wn')), 'an earlier member sees what changed');
   ok(!!(await W.$('#wn-id')), 'update notes offer to create a login ID');
-  ok(await W.$eval('.wn', n => /루어 상점/.test(n.textContent) && /미니게임/.test(n.textContent) && /오늘의 출조/.test(n.textContent) && /갯바위 공원/.test(n.textContent) && /실시간 채팅/.test(n.textContent) && n.querySelectorAll('.wn-list li').length <= 6), 'update notes list the newest features (at most 6 lines)');
+  ok(await W.$eval('.wn', n => /찌릿 낚시점/.test(n.textContent) && !/낚싯대·릴·찌 칸이/.test(n.textContent) && /미니게임/.test(n.textContent) && /오늘의 출조/.test(n.textContent) && /갯바위 공원/.test(n.textContent) && /실시간 채팅/.test(n.textContent) && n.querySelectorAll('.wn-list li').length <= 6), 'update notes list the newest features (at most 6 lines)');
   ok(await W.$eval('.wn', n => !/초기화/.test(n.textContent)), 'update notes do not claim a reset that the server has not done');
   await shot(W, 'q04_whatsnew');
   await W.click('#wn-ok'); await W.waitForTimeout(400); await W.reload(); await W.waitForTimeout(5000);
   ok(!(await W.$('.wn')), 'update notes show only once');
+  // someone who already saw the points update gets just the tackle line
+  await W.evaluate(() => openWhatsNew('someid', '2026-11-07a')); await W.waitForTimeout(500);
+  ok(await W.$eval('.wn', n => n.querySelectorAll('.wn-list li').length === 1 && /낚싯대·릴·찌 칸이/.test(n.textContent)).catch(() => false), 'after the points update, the notes show only the tackle line');
+  await W.click('#wn-ok'); await W.waitForTimeout(400);
   // photo cache: a second visit doesn't download the same photos again
   const P = await mk('P');
   await go(P, 'home', 1500); await P.evaluate(() => { const f = document.querySelector('.feed'); if (f) f.scrollIntoView(); }); await P.waitForTimeout(2000);

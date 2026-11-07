@@ -583,9 +583,10 @@ function pkFish(seed, idx, m, perk) {
 function pkGameOpen(mode, opts = {}) {
   const box = $('#pk-game'); if (!box) return;
   const spot = PK.SPOTS.find(s => s.id === opts.spot) || pkNear(PK.SPOTS, PKS.me.x, PKS.me.y, 80) || null; // a duel can start anywhere
-  // the lure on my line helps a little when fishing alone; a duel is the same sea and the same rules for both
-  const lure = mode === 'solo' && S.me && S.me.lure ? myLure() : '';
-  PKS.game = { mode, seed: (opts.seed >>> 0) || ((Math.random() * 2 ** 32) >>> 0), m: opts.m != null ? opts.m : pkKst().m, idx: 0, phase: mode === 'duel' ? 'wait' : 'ready', pt: 0, f: null, T: 35, D: 100, slack: 0, hold: false, bag: [], score: 0, msg: '', spot, lure, perk: (lure && ZL.BY[lure].perk) || null };
+  // the gear from the 찌릿 낚시점 helps a little when fishing alone; a duel is the same sea and the same rules for both
+  // (the float still shows: it is only how it looks)
+  const solo = mode === 'solo', lure = solo ? myGear('lure') : '', fl = myGear('float');
+  PKS.game = { mode, seed: (opts.seed >>> 0) || ((Math.random() * 2 ** 32) >>> 0), m: opts.m != null ? opts.m : pkKst().m, idx: 0, phase: mode === 'duel' ? 'wait' : 'ready', pt: 0, f: null, T: 35, D: 100, slack: 0, hold: false, bag: [], score: 0, msg: '', spot, lure, float: fl, perk: solo ? ZL.perk(ZL.KINDS.map(myGear)) : null };
   if (mode === 'duel') PKS.game.f = pkFish(PKS.game.seed, 0, PKS.game.m);
   if (PKS.me.moving || (PKS.me.path && PKS.me.path.length)) pkWalk(PKS.me.x, PKS.me.y); // stop where I am (and tell the others)
   PKS.me.act = mode === 'duel' ? 'duel' : 'fish'; PKS.me.spot = spot ? spot.id : ''; if (spot && spot.dx) PKS.me.dir = spot.dx < 0 ? -1 : 1; pkTrackSoon();
@@ -706,9 +707,16 @@ function pkGameDraw(t) {
       g.strokeStyle = 'rgba(255,255,255,.35)'; g.lineWidth = 1; g.beginPath(); g.moveTo(fx, fy); g.lineTo(fx, ly - 22); g.stroke();
       g.save(); g.globalAlpha = .8; g.translate(fx, ly + Math.sin(t * 2) * 1.5); g.rotate(-Math.PI / 2 + Math.sin(t * 1.3) * .08); g.drawImage(li, -34, -14, 60, 30); g.restore();
     }
-    g.strokeStyle = 'rgba(255,255,255,.7)'; g.lineWidth = 1; g.beginPath(); g.moveTo(w / 2, 0); g.lineTo(fx, fy - 8); g.stroke();
-    g.fillStyle = '#FF3B2F'; g.beginPath(); g.ellipse(fx, fy - 6, 5, 7, 0, Math.PI, 0); g.fill(); g.fillStyle = '#FFF'; g.beginPath(); g.ellipse(fx, fy - 6, 5, 7, 0, 0, Math.PI); g.fill();
-    g.strokeStyle = '#2B2433'; g.lineWidth = 1; g.beginPath(); g.moveTo(fx, fy - 13); g.lineTo(fx, fy - 18); g.stroke();
+    const fi = G.float && ZL.img(G.float, 'game');
+    if (fi && fi.complete && fi.naturalWidth) { // the float from the shop stands on the water: 80 is the waterline in its drawing
+      const k = 52 / 120;
+      g.strokeStyle = 'rgba(255,255,255,.7)'; g.lineWidth = 1; g.beginPath(); g.moveTo(w / 2, 0); g.lineTo(fx, fy - 78 * k); g.stroke();
+      g.drawImage(fi, fx - 120 * k, fy - 80 * k, 240 * k, 120 * k);
+    } else {
+      g.strokeStyle = 'rgba(255,255,255,.7)'; g.lineWidth = 1; g.beginPath(); g.moveTo(w / 2, 0); g.lineTo(fx, fy - 8); g.stroke();
+      g.fillStyle = '#FF3B2F'; g.beginPath(); g.ellipse(fx, fy - 6, 5, 7, 0, Math.PI, 0); g.fill(); g.fillStyle = '#FFF'; g.beginPath(); g.ellipse(fx, fy - 6, 5, 7, 0, 0, Math.PI); g.fill();
+      g.strokeStyle = '#2B2433'; g.lineWidth = 1; g.beginPath(); g.moveTo(fx, fy - 13); g.lineTo(fx, fy - 18); g.stroke();
+    }
   }
 }
 

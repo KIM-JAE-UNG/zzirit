@@ -1,8 +1,10 @@
-/* ===== 찌릿 포인트 and the 찌릿 루어 shop (website). The points live only in the app: never bought with money, never paid
+/* ===== 찌릿 포인트 and the 찌릿 낚시점 (website). The points live only in the app: never bought with money, never paid
    out, never traded. The server keeps every number — the wallet, the weekly 챔질 반응속도 board and its prizes (300 / 200 /
    100 for the first three, 20 for everyone else who played, the 황금 번개 lure for the winner), the book of every change
-   and what each angler owns. The lure an angler picks (S.me.lure) hangs from their line on the character and in the park,
-   and helps a little in the park's solo fishing — never in duels or any ranking. ===== */
+   and what each angler owns. The shop has four sections (lures, rods, reels, floats); in each, two signature pieces carry
+   the ZZIRIT mark and take a few weeks of winning. One piece per section is equipped (S.me.lure / rod / reel / float): the
+   lure hangs from the character's line, the rod and reel are in its hands, the float is the one in the fishing game; together
+   they help a little in the park's solo fishing — never in duels or any ranking. ===== */
 const ZP = { st: null, at: 0, p: null, err: null };
 const ZP_PRIZE = [300, 200, 100], ZP_JOIN = 20;
 function zpOn() { return window.APP_RT === 'web' && !!(window.APP_AUTH && window.APP_AUTH.zp); }
@@ -26,13 +28,15 @@ function zpEnsure() {
 const zpBal = () => (ZP.st && ZP.st.bal) || 0;
 function zpOwns(id) { const L = ZL.BY[id]; if (!L) return false; return !!L.free || !!(ZP.st && (ZP.st.owned || []).includes(id)); }
 function zpPrice(id) { const it = ZP.st && (ZP.st.items || []).find(x => x.id === id); return it ? it.price : ZL.BY[id] ? ZL.BY[id].price : null; }
-// the lure on someone's line: mine only if I own it (once the server has said what I own); others' as they show it
-function lureOf(a, uid) {
-  const id = a && typeof a.lure === 'string' ? a.lure : ''; if (!ZL.BY[id]) return '';
+// what someone has equipped in a section: mine only if I own it (once the server has said what I own); others' as shown
+function gearOf(a, uid, kind) {
+  const id = a && typeof a[kind] === 'string' ? a[kind] : ''; const L = ZL.BY[id]; if (!L || L.kind !== kind) return '';
   const mine = a === S.me || (uid && uid === myId());
   return mine && ZP.st && !zpOwns(id) ? '' : id;
 }
-const myLure = () => lureOf(S.me, myId()) || 'jighead';
+const lureOf = (a, uid) => gearOf(a, uid, 'lure');
+const myGear = kind => gearOf(S.me, myId(), kind);
+const myLure = () => myGear('lure') || 'jighead';
 const zlName = id => ZL.BY[id] ? t('zl_n_' + id) : String(id || '');
 const zlSpec = L => Array.isArray(L.spec) ? dict(L.spec) : L.spec;
 
@@ -103,27 +107,32 @@ function zpBookHTML() {
 }
 
 /* ---------- the shop ---------- */
-function zlCardHTML(L, eq) {
-  const own = zpOwns(L.id), on = eq === L.id, price = zpPrice(L.id);
+function zlCardHTML(L) {
+  const own = zpOwns(L.id), on = myGear(L.kind) === L.id, price = zpPrice(L.id);
   const tag = on ? `<span class="zl-tag on">${icon('check')}${t('zl_equipped')}</span>`
     : own ? `<span class="zl-tag own">${t('zl_owned')}</span>`
     : L.prize ? `<span class="zl-tag prize">${icon('trophy')}${t('zl_prize')}</span>`
     : `<span class="zl-tag price num">${icon('coin')}${fmtN(price)}P</span>`;
-  return `<button class="zl-card${own ? ' own' : ''}${on ? ' on' : ''}${L.prize ? ' champ' : ''}" data-zl="${L.id}" style="--zl-a:${L.bg[0]};--zl-b:${L.bg[1]}">
+  return `<button class="zl-card${own ? ' own' : ''}${on ? ' on' : ''}${L.prize ? ' champ' : ''}${L.sig ? ' sig' : ''}" data-zl="${L.id}" style="--zl-a:${L.bg[0]};--zl-b:${L.bg[1]}">
+    ${L.sig ? `<span class="zl-sigb">${ZL.mark('silver', 'b' + L.id.replace(/_/g, ''))}SIGNATURE</span>` : ''}
     <span class="zl-art"><img src="${ZL.url(L.id)}" alt="" decoding="async"></span>
     <span class="zl-meta"><b>${esc(zlName(L.id))}</b><span class="small">${esc(t('zl_t_' + L.id))} · ${esc(zlSpec(L))}</span></span>${tag}</button>`;
 }
+const ZL_TAB_ART = { lure: 'minnow', rod: 'rod_bolt', reel: 'reel_bolt', float: 'float_spark' };
 VIEWS.lures = {
   render(el) {
     zpEnsure();
-    const eq = S.me && S.me.lure ? myLure() : '';
+    const tab = ZL.KINDS.includes(S.shopTab) ? S.shopTab : (S.shopTab = lsGet('shopTab', 'lure'), ZL.KINDS.includes(S.shopTab) ? S.shopTab : (S.shopTab = 'lure'));
+    const items = ZL.LIST.filter(L => L.kind === tab);
     el.innerHTML = `<div class="page lures-page">
       <header class="zl-hero">
-        <div class="zl-hero-t"><p class="eyebrow">ZZIRIT LURES</p><h1>${t('zl_title')}</h1><p class="lede">${t('zl_sub')}</p></div>
-        <div class="zl-hero-art" aria-hidden="true"><img src="${ZL.url('minnow')}" alt=""></div>
+        <div class="zl-hero-t"><p class="eyebrow"><span class="zl-hero-mark">${ZL.mark('silver', 'hero')}</span>ZZIRIT TACKLE</p><h1>${t('zl_title')}</h1><p class="lede">${t('zl_sub')}</p></div>
+        <div class="zl-hero-art${tab === 'float' ? ' float' : ''}" aria-hidden="true"><img src="${ZL.url(ZL_TAB_ART[tab], 'game')}" alt=""></div>
         ${zpWalletHTML('shop')}
       </header>
-      <div class="zl-grid">${ZL.LIST.map(L => zlCardHTML(L, eq)).join('')}</div>
+      <div class="chips zl-tabs" role="tablist">${ZL.KINDS.map(k => `<button class="chip${k === tab ? ' on' : ''}" role="tab" aria-selected="${k === tab}" data-zltab="${k}">${t('shop_t_' + k)}${myGear(k) && k !== 'lure' ? '<i class="zl-dot"></i>' : ''}</button>`).join('')}</div>
+      <div class="zl-grid">${items.map(L => zlCardHTML(L)).join('')}</div>
+      <p class="muted small zl-signote">${ZL.mark('silver', 'note')}${t('zl_sig_note')}</p>
       ${zpMine() && ZP.st ? zpBookHTML() : ''}
       <p class="fine">${t('zp_fine')}</p>
     </div>`;
@@ -133,7 +142,7 @@ function openLure(id) {
   const L = ZL.BY[id]; if (!L) return;
   let armed = 0, fresh = false;
   const body = () => {
-    const own = zpOwns(id), price = zpPrice(id), bal = zpBal(), on = !!(S.me && S.me.lure === id) && own;
+    const own = zpOwns(id), price = zpPrice(id), bal = zpBal(), on = !!(S.me && S.me[L.kind] === id) && own;
     let act;
     if (!zpOn()) act = `<p class="muted small">${t('zp_web_only')}</p>`;
     else if (!zpMine()) act = `<p class="muted small">${t('zp_need_profile')}</p><button class="btn btn-primary btn-lg btn-block" data-act="onboard">${t('onb_go')}</button>`;
@@ -145,11 +154,12 @@ function openLure(id) {
     else act = `<button class="btn btn-primary btn-lg btn-block" disabled>${icon('coin')}${t('zl_buy', { p: fmtN(price) })}</button><p class="hint">${t('zl_short', { n: fmtN(price - bal) })}</p><a class="btn btn-line btn-block" href="#games">${t('zp_earn_more')}</a>`;
     const u = ZL.url(id);
     return `<div class="zl-detail" style="--zl-a:${L.bg[0]};--zl-b:${L.bg[1]}">
-      <div class="zl-stage${fresh ? ' fresh' : ''}"><div class="zl-float"><img src="${u}" alt="${esc(zlName(id))}"><i class="zl-shine" style="-webkit-mask-image:url(&quot;${u}&quot;);mask-image:url(&quot;${u}&quot;)"></i></div>${L.prize ? '<span class="zl-badge">CHAMPION</span>' : ''}${fresh ? `<span class="zl-new">${t('zl_new')}</span>` : ''}</div>
+      <div class="zl-stage${fresh ? ' fresh' : ''}${L.sig ? ' sig' : ''}"><div class="zl-float"><img src="${u}" alt="${esc(zlName(id))}"><i class="zl-shine" style="-webkit-mask-image:url(&quot;${u}&quot;);mask-image:url(&quot;${u}&quot;)"></i></div>${L.prize ? '<span class="zl-badge">CHAMPION</span>' : L.sig ? `<span class="zl-badge sig">${ZL.mark('silver', 'db')}SIGNATURE</span>` : ''}${fresh ? `<span class="zl-new">${t('zl_new')}</span>` : ''}</div>
       <div class="zl-body">
         <p class="eyebrow no-up">${esc(t('zl_t_' + id))} · ${esc(zlSpec(L))}</p>
         <h2>${esc(zlName(id))}</h2>
         <p class="lede">${t('zl_d_' + id)}</p>
+        <p class="muted small zl-where">${icon(L.kind === 'float' ? 'wave' : 'user')} ${t('zl_where_' + L.kind)}</p>
         ${L.perk ? `<p class="zl-perk">${icon('sparkle')}<span><b>${t('zl_perk_h')}</b> ${t('zl_p_' + id)}</span></p>` : ''}
         <div class="zl-act">${act}</div>
         ${zpMine() && ZP.st ? `<p class="muted small zl-bal">${icon('coin')} ${t('zp_have', { n: fmtN(bal) })}</p>` : ''}
@@ -180,7 +190,7 @@ function openLure(id) {
     }
     if (k === 'equip' || k === 'off') {
       if (!S.me || !S.me.nick) return;
-      if (k === 'equip') S.me.lure = id; else delete S.me.lure;
+      if (k === 'equip') S.me[L.kind] = id; else delete S.me[L.kind];
       b.disabled = true; fresh = false;
       await store.saveMe(); S.dataVer++;
       paint(); toast(t(k === 'equip' ? 'zl_equip_done' : 'zl_unequip_done', { name: zlName(id) }), 'ok');

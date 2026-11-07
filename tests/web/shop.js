@@ -49,7 +49,16 @@ async function until(fn, ms = 6000, step = 80) { const t0 = Date.now(); let v; w
     ok(!!(await A.$('.gm-shop')), 'games page: a way to the lure shop');
     await go(A, 'lures', 1400);
     const cards = await A.$$eval('.zl-card', ns => ns.map(n => n.dataset.zl + ':' + n.querySelector('.zl-tag').textContent.trim()));
-    ok(cards.length === 8 && cards[0] === 'jighead:보유' && cards.includes('minnow:500P') && cards.includes('gold:1등 상품'), 'shop: eight lures, the starter one owned, prices, the prize lure — ' + JSON.stringify(cards));
+    ok(cards.length === 8 && cards[0] === 'jighead:보유' && cards.includes('minnow:1,000P') && cards.includes('jig:800P') && cards.includes('gold:1등 상품'), 'shop: eight lures, the starter one owned, prices, the prize lure — ' + JSON.stringify(cards));
+    ok(JSON.stringify(await A.$$eval('.zl-card.sig', ns => ns.map(n => n.dataset.zl))) === '["jig","minnow","gold"]', 'shop: the mark only on the signature lures (and the gold prize)');
+    for (const [k, ids] of [['rod', ['rod_basic', 'rod_iso', 'rod_wine', 'rod_spark', 'rod_bolt']], ['reel', ['reel_basic', 'reel_red', 'reel_lbr', 'reel_spark', 'reel_bolt']], ['float', ['float_basic', 'float_ball', 'float_led', 'float_spark', 'float_bolt']]]) {
+      await A.click(`[data-zltab="${k}"]`); await A.waitForTimeout(500);
+      const got = await A.$$eval('.zl-card', ns => ns.map(n => n.dataset.zl + (n.classList.contains('sig') ? '*' : '')));
+      ok(JSON.stringify(got) === JSON.stringify(ids.map((x, i) => x + (i >= 3 ? '*' : ''))), `shop: the ${k} section, two signature pieces — ` + JSON.stringify(got));
+      ok(await A.$$eval('.zl-card img', ns => ns.every(n => n.complete && n.naturalWidth > 0)), `shop: every ${k} picture draws`);
+      await shot(A, 's01_shop_' + k, true);
+    }
+    await A.click('[data-zltab="lure"]'); await A.waitForTimeout(400);
     ok(await A.$$eval('.zl-card img', ns => ns.every(n => n.complete && n.naturalWidth > 0)), 'shop: every lure picture draws');
     await shot(A, 's01_shop', true);
     ok(await A.evaluate(() => !!document.querySelector('.nav a[data-route="lures"]')), 'the shop is in the menu (play group)');
@@ -93,7 +102,7 @@ async function until(fn, ms = 6000, step = 80) { const t0 = Date.now(); let v; w
     await closeModals(A); await A.waitForTimeout(500);
     ok(await A.$eval('[data-zl="tai"]', n => n.classList.contains('on')), 'shop: the card says equipped');
     await A.click('[data-zl="minnow"]'); await A.waitForTimeout(500);
-    ok(await A.$eval('.zl-act .btn', n => n.disabled) && /500P 더/.test(await A.$eval('.zl-act', n => n.textContent)), 'not enough points: the button waits, and says how many more');
+    ok(await A.$eval('.zl-act .btn', n => n.disabled) && /1,000P 더/.test(await A.$eval('.zl-act', n => n.textContent)), 'not enough points: the button waits, and says how many more');
     await closeModals(A);
     const book = await A.$$eval('.zp-led li', ns => ns.map(n => n.textContent));
     ok(book.length === 2 && /구매/.test(book[0]) && /-300P/.test(book[0]) && /1등/.test(book[1]) && /\+300P/.test(book[1]), 'the book: the prize and the purchase — ' + JSON.stringify(book));
@@ -121,20 +130,35 @@ async function until(fn, ms = 6000, step = 80) { const t0 = Date.now(); let v; w
     ok(await OP.evaluate(() => S.isOwner), 'operator signed in');
     await go(OP, 'admin', 1400);
     ok(!!(await OP.$('#ad-zp')), 'admin: a form to give points');
-    await OP.selectOption('#ad-zp-who', aId); await OP.fill('#ad-zp-amt', '700'); await OP.fill('#ad-zp-note', '사진 이벤트 1등');
+    await OP.selectOption('#ad-zp-who', aId); await OP.fill('#ad-zp-amt', '1500'); await OP.fill('#ad-zp-note', '사진 이벤트 1등');
     await OP.click('#ad-zp button[type="submit"]'); await OP.waitForTimeout(800);
-    ok(/700P/.test(await toasts(OP)), 'admin: told the new balance');
-    d = await dump(); ok(d.ZPS.wal[aId].bal === 700, 'admin: 700P on the server');
+    ok(/1,500P/.test(await toasts(OP)), 'admin: told the new balance');
+    d = await dump(); ok(d.ZPS.wal[aId].bal === 1500, 'admin: 1,500P on the server');
     const nope = await A.evaluate(async u => { try { await APP_AUTH.zp.grant(u, 99999, 'me'); return 'given'; } catch (e) { return e.code; } }, aId);
     ok(nope === 'not_admin', 'only the operator gives points');
     await go(A, 'games', 300); await A.evaluate(() => zpLoad(true)); await go(A, 'lures', 1400);
     const gift = await until(() => A.$eval('.zp-win', n => n.textContent).catch(() => ''), 5000);
-    ok(/받았어요/.test(gift || '') && /사진 이벤트 1등/.test(gift || '') && /\+700P/.test(gift || ''), 'a gift from the operator: told once, with the note');
+    ok(/받았어요/.test(gift || '') && /사진 이벤트 1등/.test(gift || '') && /\+1,500P/.test(gift || ''), 'a gift from the operator: told once, with the note');
     await closeModals(A);
     await A.click('[data-zl="minnow"]'); await A.waitForTimeout(500);
     await A.click('[data-zla="buy"]'); await A.waitForTimeout(250); await A.click('[data-zla="buy"]');
-    ok(!!(await until(() => A.$('[data-zla="equip"]'), 4000)), 'with the gift, the minnow can be bought');
+    ok(!!(await until(() => A.$('[data-zla="equip"]'), 4000)), 'with the gift, the signature minnow can be bought');
     await closeModals(A); await A.waitForTimeout(400);
+    // a reel and a float from the other sections, equipped: the reel on the character, the float in the fishing game
+    for (const [k, id] of [['reel', 'reel_lbr'], ['float', 'float_ball']]) {
+      await A.click(`[data-zltab="${k}"]`); await A.waitForTimeout(400);
+      await A.click(`[data-zl="${id}"]`); await A.waitForTimeout(400);
+      await A.click('[data-zla="buy"]'); await A.waitForTimeout(250); await A.click('[data-zla="buy"]');
+      await until(() => A.$('[data-zla="equip"]'), 4000); await A.click('[data-zla="equip"]'); await A.waitForTimeout(700);
+      await closeModals(A); await A.waitForTimeout(300);
+    }
+    d = await dump();
+    ok(d.ZPS.wal[aId].bal === 150 && d.T.anglers[aId].data.reel === 'reel_lbr' && d.T.anglers[aId].data.float === 'float_ball', 'reel and float bought (1,500 − 1,000 − 250 − 100) and equipped');
+    ok(await A.evaluate(() => { const c = charOf(S.me, S.uid); return c.re === 'reel_lbr' && CH.svg(c, 'full').includes('#C9A13A'); }), 'character: the gold LB reel on the rod');
+    await go(A, 'park', 1800); await A.evaluate(() => pkGameOpen('solo', { spot: 'r1' })); await A.waitForTimeout(500);
+    ok(await A.evaluate(() => PKS.game.float === 'float_ball' && PKS.game.perk.win >= .1 && PKS.game.perk.reel > 1.1), 'park: the ball float in the game, the reel and float help together');
+    await A.click('#pkg-btn'); await A.waitForTimeout(1200); await shot(A, 's07b_park_float');
+    await A.evaluate(() => pkGameClose()); await go(A, 'lures', 900); await A.click('[data-zltab="lure"]'); await A.waitForTimeout(300);
     ok(/사진 이벤트 1등/.test(await A.$eval('.zp-book', n => n.textContent)), 'the book shows the operator\'s note');
 
     /* ---------- a bank transfer in the payment window (only when the operator turns it on) ---------- */

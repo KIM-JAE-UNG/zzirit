@@ -27,7 +27,9 @@ const CH = (() => {
     o.hc = clamp(parseInt(o.hc, 10) || 0, 0, HAIRC.length - 1);
     for (const k of ['hs', 'ey', 'mo', 'ht', 'ou', 'ac', 'rd']) if (!(o[k] in P[k])) o[k] = DEF[k];
     o.htc = hex(o.htc) || DEF.htc; o.ouc = hex(o.ouc) || DEF.ouc; o.bg = hex(o.bg) || DEF.bg;
-    if (!(typeof ZL !== 'undefined' && ZL.BY[o.lu])) delete o.lu; // the 찌릿 루어 on the line (shop.js decides whose)
+    // the gear from the 찌릿 낚시점 (shop.js decides whose): the lure on the line, the rod and the reel in the hands
+    const ok = (id, kind) => typeof ZL !== 'undefined' && ZL.BY[id] && ZL.BY[id].kind === kind;
+    if (!ok(o.lu, 'lure')) delete o.lu; if (!ok(o.gr, 'rod')) delete o.gr; if (!ok(o.re, 'reel')) delete o.re;
     return o;
   }
   // deterministic look for anglers who never made one (so every sea has its angler)
@@ -164,10 +166,21 @@ const CH = (() => {
     const s = .12, [tx, ty] = L.tie;
     return `<g transform="translate(${(110 - s * ty).toFixed(2)} ${(64 + s * tx).toFixed(2)}) scale(${s}) rotate(-90)">${ZL.inner(c.lu, 'ch')}</g>`;
   }
+  // the shop's reel: its body and spool colours, the handle knob; a signature reel glints
+  function reelSVG(c) {
+    const R = ZL.BY[c.re], [body, spool] = R.reelC;
+    return `<path d="M72.5 94 L67.4 97.4" stroke="${OL}" stroke-width="1.3" stroke-linecap="round"/><circle cx="67" cy="97.8" r="1.6" fill="${spool}" stroke="${OL}" stroke-width=".8"/>
+      <ellipse cx="77.4" cy="96.2" rx="2.9" ry="2" transform="rotate(-66 77.4 96.2)" fill="${spool}" stroke="${OL}" stroke-width="1"/>
+      <circle cx="72.5" cy="94" r="4.4" fill="${body}" stroke="${OL}" stroke-width="1.2"/><circle cx="72.5" cy="94" r="1.4" fill="${spool}"/><circle cx="71.4" cy="92.8" r="1" fill="#fff" opacity=".45"/>
+      ${R.sig ? '<path d="M80 99.6 l.5 1.4 1.4.5-1.4.5-.5 1.4-.5-1.4-1.4-.5 1.4-.5z" fill="#BFE3FF"/>' : ''}`;
+  }
   function rodSVG(c) {
-    const [a, b] = ROD[c.rd] || ROD.carbon;
+    const G = c.gr && ZL.BY[c.gr];
+    const [a, b] = G ? G.rodC : ROD[c.rd] || ROD.carbon;
     return `<path d="M73 98 L113 6" stroke="${OL}" stroke-width="3.4" stroke-linecap="round"/><path d="M73 98 L113 6" stroke="${a}" stroke-width="1.9" stroke-linecap="round"/>
-      <path d="M74.5 94.6 L77.4 88" stroke="${b}" stroke-width="2.6" stroke-linecap="round"/><circle cx="72.5" cy="94" r="3.6" fill="#9AA3AD" stroke="${OL}" stroke-width="1.2"/><circle cx="72.5" cy="94" r="1.2" fill="${OL}"/>
+      <path d="M74.5 94.6 L77.4 88" stroke="${b}" stroke-width="2.6" stroke-linecap="round"/>${G ? `<path d="M88 64 L89.6 60.4 M98 41 L99.6 37.4" stroke="${b}" stroke-width="2.4" stroke-linecap="butt"/>` : ''}
+      ${c.re ? reelSVG(c) : `<circle cx="72.5" cy="94" r="3.6" fill="#9AA3AD" stroke="${OL}" stroke-width="1.2"/><circle cx="72.5" cy="94" r="1.2" fill="${OL}"/>`}
+      ${G && G.sig ? '<circle cx="113" cy="6" r="3.2" fill="#5AB0FF" opacity=".35"/><path d="M113 2.4 l.7 2.9 2.9.7-2.9.7-.7 2.9-.7-2.9-2.9-.7 2.9-.7z" fill="#fff"/>' : ''}
       <path d="M113 6 Q118 34 110 64" stroke="#fff" stroke-width=".9" fill="none" opacity=".85"/>${c.rd === 'gold' ? '<path d="M100 30 l1.2 2.6 2.8.4-2 2 .5 2.8-2.5-1.3-2.5 1.3.5-2.8-2-2 2.8-.4z" fill="#FFF3B0"/>' : ''}`;
   }
   function head(c) {
@@ -229,8 +242,8 @@ const CH = (() => {
 
 function charOf(a, uid) {
   const c = a && a.char ? CH.fit(CH.norm(a.char), a, uid || avatarUid(a)) : CH.fromSeed(uid || (a && a.nick) || 'x');
-  const lu = typeof lureOf === 'function' ? lureOf(a, uid || avatarUid(a)) : '';
-  if (lu) c.lu = lu; else delete c.lu;
+  const who = uid || avatarUid(a);
+  for (const [k, kind] of [['lu', 'lure'], ['gr', 'rod'], ['re', 'reel']]) { const id = typeof gearOf === 'function' ? gearOf(a, who, kind) : ''; if (id) c[k] = id; else delete c[k]; }
   return c;
 }
 function safeColor(c) { return /^#[0-9a-fA-F]{6}$/.test(String(c)) ? c : '#CDEBF5'; }

@@ -59,7 +59,10 @@ check(await week('2026-11-01T15:30:00Z') === '2026-11-02', 'Monday 00:30 in Kore
 /* ---------- the starting state ---------- */
 let s = await state(A);
 check(s.bal === 0 && s.earned === 0 && J(s.owned) === '[]', 'a new angler: no points, nothing owned');
-check(J(s.items.map(i => [i.id, i.price])) === J([['spoon', 100], ['vib', 150], ['jig', 200], ['egi', 200], ['tai', 300], ['minnow', 500], ['gold', null]]), 'the shop lists the lures with their prices (the gold one not for sale): ' + J(s.items));
+const price = Object.fromEntries(s.items.map(i => [i.id, i.price]));
+check(price.spoon === 100 && price.vib === 150 && price.egi === 200 && price.tai === 300 && price.gold === null, 'the shop lists the lures with their prices (the gold one not for sale): ' + J(s.items));
+check(price.jig === 800 && price.minnow === 1000 && price.rod_bolt === 1200 && price.reel_bolt === 1200 && price.rod_spark === 900 && price.reel_spark === 900 && price.float_spark === 800 && price.float_bolt === 1000, 'the signature pieces cost a few weeks of winning (800–1,200)');
+check(price.rod_iso === 150 && price.rod_wine === 250 && price.reel_red === 180 && price.reel_lbr === 250 && price.float_ball === 100 && price.float_led === 200 && s.items.length === 19, 'rods, reels and floats are on the shelf too');
 check(J(s.rx.top) === '[]' && s.rx.n === 0 && s.rx.me === null && J(s.rx.last) === '[]', 'empty boards');
 check(/not_signed_in/.test(await fails(() => asRole('authenticated', '', () => q(`select public.zp_state()`)))), 'signed out: no state');
 check((await fails(() => asRole('anon', '', () => q(`select public.zp_state()`)))) !== null, 'anon cannot call it');
@@ -143,7 +146,7 @@ check((await as(ADM, () => q(`select * from public.game_scores where acct = $1`,
 
 /* ---------- the shop ---------- */
 const buy = (u, it) => rpc(u, `select public.zp_buy($1) r`, [it]).then(r => r.r);
-check(/not_enough/.test(await fails(() => buy(A, 'jig'))), 'not enough points (100 for a 200 lure)');
+check(/not_enough/.test(await fails(() => buy(A, 'egi'))), 'not enough points (100 for a 200 lure)');
 r = await buy(A, 'spoon');
 check(r.bal === 0 && await owns(A, 'spoon') && await bal(A) === 0, 'buying: the price comes off, the lure is mine');
 check(/owned/.test(await fails(() => buy(A, 'spoon'))), 'the same lure twice: no');
@@ -152,7 +155,7 @@ check(/no_profile/.test(await fails(() => buy(D, 'spoon'))), 'no profile, no sho
 await q(`update public.zp_items set active = false where id = 'egi'`);
 check(/no_item/.test(await fails(() => buy(B, 'egi'))), 'an item taken off the shelf');
 await q(`update public.zp_items set active = true where id = 'egi'`);
-check(/not_enough/.test(await fails(() => buy(E, 'egi'))), 'a linked phone shops with its account\'s wallet (empty now)');
+check(/not_enough/.test(await fails(() => buy(E, 'float_ball'))), 'a linked phone shops with its account\'s wallet (empty now)');
 s = await state(A);
 check(s.owned.includes('spoon'), 'my lures in the state: ' + J(s.owned));
 check(s.led[0].r === 'buy' && s.led[0].d === -100 && s.led[0].ref === 'spoon', 'the purchase is in my book');
@@ -163,6 +166,9 @@ const grant = (u, to, d, note) => rpc(u, `select public.zp_grant($1, $2, $3) b`,
 check(/not_admin/.test(await fails(() => grant(A, A, 500))), 'only the operator gives points');
 check(await grant(ADM, A, 500, '이벤트 1등') === 500 && await bal(A) === 500, 'the operator gives 500 for an event');
 check(await grant(ADM, E, 50) === 550, 'to a linked phone means to its account');
+r = await buy(A, 'reel_lbr');
+check(r.bal === 300 && await owns(A, 'reel_lbr'), 'a reel from the new sections: 250 off');
+check(/not_enough/.test(await fails(() => buy(A, 'rod_bolt'))), 'a signature rod needs 1,200');
 check(await grant(ADM, A, -9999) === 0 && await bal(A) === 0, 'taking points stops at zero');
 check(/bad_amount/.test(await fails(() => grant(ADM, A, 0))) && /no_account/.test(await fails(() => grant(ADM, '12345678-1234-1234-1234-123456789012', 10))), 'zero, or nobody: refused');
 s = await state(A);

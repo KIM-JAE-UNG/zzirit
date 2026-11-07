@@ -167,6 +167,7 @@ document.addEventListener('click', e => {
   const sp = tgt.closest('[data-sp]'); if (sp) { openSpecies(sp.dataset.sp); return; }
   const ct = tgt.closest('[data-catch]'); if (ct && !tgt.closest('[data-verdict]')) { const [uid, cid] = ct.dataset.catch.split('|'); openCatch(uid, cid); return; }
   const zl = tgt.closest('[data-zl]'); if (zl) { openLure(zl.dataset.zl); return; }
+  const zt = tgt.closest('[data-zltab]'); if (zt) { S.shopTab = zt.dataset.zltab; lsSet('shopTab', S.shopTab); rerender(); return; }
   const zv = tgt.closest('[data-zpvoid]'); if (zv) { if (!armed(zv, t('zp_void_sure'))) return; const [va, vw] = zv.dataset.zpvoid.split('|'); zpVoid(va, vw); return; }
   const act = tgt.closest('[data-act]');
   if (act) {

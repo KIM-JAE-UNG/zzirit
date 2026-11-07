@@ -1729,7 +1729,7 @@ a.zp-wallet:hover { border-color: var(--accent); }
 .zl-meta { display: flex; flex-direction: column; gap: 2px; padding: 4px 14px 13px; min-width: 0; }
 .zl-meta b { font-size: 15.5px; }
 .zl-meta .small { color: rgba(255,255,255,.66); font-size: 12px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.zl-tag { position: absolute; top: 10px; right: 10px; display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 99px; border: 1px solid rgba(255,255,255,.2); background: rgba(0,0,0,.32); backdrop-filter: blur(6px); font-size: 12.5px; font-weight: 700; color: #fff; }
+.zl-tag { position: absolute; z-index: 1; top: 10px; right: 10px; display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 99px; border: 1px solid rgba(255,255,255,.2); background: rgba(0,0,0,.32); backdrop-filter: blur(6px); font-size: 12.5px; font-weight: 700; color: #fff; }
 .zl-tag .ic { width: 14px; height: 14px; }
 .zl-tag.price { padding-left: 4px; border-color: transparent; background: linear-gradient(180deg, #FFE68A, #F2B200); color: #4A2E00; }
 .zl-tag.on { border-color: transparent; background: var(--accent); }
@@ -1787,6 +1787,30 @@ a.zp-wallet:hover { border-color: var(--accent); }
 
 .zp-win .actions { justify-content: center; }
 .gm-shop > .ic { transform: rotate(-90deg); }
+
+/* ===== 찌릿 낚시점: sections and the signature line ===== */
+.zl-tabs { margin: 0 0 14px; gap: 8px; }
+.zl-tabs .chip { padding: 8px 18px; font-size: 15px; cursor: pointer; position: relative; }
+.zl-tabs .chip.on { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.zl-dot { position: absolute; top: 5px; right: 6px; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
+.zl-hero-mark { display: inline-block; width: 26px; height: 24px; margin: 0 6px -6px 0; filter: drop-shadow(0 0 6px rgba(90,176,255,.45)); }
+.zl-hero-mark svg, .zl-sigb svg, .zl-badge.sig svg, .zl-signote svg { width: 100%; height: 100%; display: block; }
+.zl-card.sig { border-color: rgba(120,180,255,.5); box-shadow: 0 0 0 1px rgba(90,176,255,.25), 0 12px 30px rgba(20,70,180,.35); }
+.zl-card.sig::before { content: ""; position: absolute; inset: -40%; z-index: -1; background: conic-gradient(from 200deg, transparent 0 70%, rgba(90,176,255,.22) 80%, transparent 90%); animation: zl-orbit 7s linear infinite; }
+.zl-card.sig.on { box-shadow: 0 0 0 2px var(--accent), 0 12px 30px rgba(20,70,180,.35); }
+.zl-sigb { position: absolute; z-index: 1; left: 10px; top: 10px; display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px 2px 4px; border-radius: 6px; background: linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,.08)); border: 1px solid rgba(160,205,255,.45); font-family: var(--f-disp); font-size: 10.5px; font-weight: 800; letter-spacing: .16em; color: #DCEBFF; backdrop-filter: blur(6px); }
+.zl-sigb svg { width: 18px; height: 16px; flex: none; }
+.zl-badge.sig { display: inline-flex; align-items: center; gap: 5px; background: linear-gradient(180deg, #E6F0FF, #9CC3FF); color: #0B1E46; padding-left: 5px; }
+.zl-badge.sig svg { width: 20px; height: 18px; }
+.zl-stage.sig::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(60% 50% at 70% 20%, rgba(90,176,255,.22), transparent 70%); }
+.zl-signote { display: flex; align-items: center; gap: 8px; margin: -4px 0 18px; }
+.zl-signote svg { width: 24px; height: 22px; flex: none; }
+.zl-where { display: flex; align-items: center; gap: 6px; margin: 8px 0 0; }
+.zl-where .ic { width: 15px; height: 15px; }
+@keyframes zl-orbit { to { transform: rotate(360deg); } }
+@media (max-width: 560px) { .zl-tabs { gap: 6px; } .zl-tabs .chip { padding: 7px 14px; font-size: 14px; } .zl-sigb { left: 7px; top: 7px; font-size: 9.5px; letter-spacing: .1em; } }
+@media (prefers-reduced-motion: reduce) { .zl-card.sig::before { animation: none; } }
+.zl-hero-art.float img { transform: none; }
 
 </style>
 <div class="app">
@@ -3208,9 +3232,9 @@ Object.assign(T, {
   wn_fs2_p: ['점수 옆에 한 줄 결론, 바람·파도·날씨·물때를 쉬운 말과 색으로 보여 드려요.', 'A one-line verdict next to the score, and wind, waves, sky and tide in plain words and colours.', '点数の横に一言の結論、風・波・天気・潮をやさしい言葉と色で。', '分数旁一句话结论，风、浪、天气、潮汐用简单的话和颜色展示。'],
 
   /* 찌릿 포인트 · 찌릿 루어 */
-  nav_lures: ['찌릿 루어', 'ZZIRIT Lures', 'ZZIRITルアー', 'ZZIRIT拟饵'],
-  zl_title: ['찌릿 루어 상점', 'ZZIRIT Lure Shop', 'ZZIRITルアーショップ', 'ZZIRIT拟饵商店'],
-  zl_sub: ['미니게임 상금(찌릿 포인트)으로 사는 찌릿 오리지널 루어예요. 장착하면 캐릭터 낚싯줄에 달리고, 갯바위 낚시에서 조금 도와줘요.', 'Original ZZIRIT lures, bought with mini-game prize points. Equip one and it hangs from your character’s line and helps a little when fishing at the rocks.', 'ミニゲームの賞金(ZZポイント)で買えるZZIRITオリジナルルアー。装着するとキャラの釣り糸に付き、磯釣りで少し助けてくれます。', '用小游戏奖金（ZZ积分）购买的ZZIRIT原创拟饵。装备后会挂在角色的钓线上，并在礁石钓鱼时稍有帮助。'],
+  nav_lures: ['찌릿 낚시점', 'ZZIRIT Tackle', 'ZZIRIT釣具店', 'ZZIRIT渔具店'],
+  zl_title: ['찌릿 낚시점', 'ZZIRIT Tackle Shop', 'ZZIRIT釣具店', 'ZZIRIT渔具店'],
+  zl_sub: ['미니게임 상금(찌릿 포인트)으로 사는 찌릿 장비예요. 장착하면 캐릭터와 갯바위 낚시에 나타나고, 혼자 낚시할 때 조금 도와줘요.', 'ZZIRIT gear, bought with mini-game prize points. Equipped gear shows on your character and at the rocks, and helps a little when you fish alone.', 'ミニゲームの賞金(ZZポイント)で買えるZZIRITの釣具。装着するとキャラと磯釣りに現れ、一人で釣るときに少し助けてくれます。', '用小游戏奖金（ZZ积分）购买的ZZIRIT渔具。装备后会出现在角色和礁石钓鱼中，独自钓鱼时稍有帮助。'],
   zp_name: ['찌릿 포인트', 'ZZ Points', 'ZZポイント', 'ZZ积分'],
   zp_mine: ['내 찌릿 포인트', 'My ZZ Points', '自分のZZポイント', '我的ZZ积分'],
   zp_go_shop: ['루어 상점', 'Lure shop', 'ルアーショップ', '拟饵商店'],
@@ -3260,17 +3284,17 @@ Object.assign(T, {
   zl_n_vib: ['진동 바이브', 'Pulse Vibe', 'パルスバイブ', '脉冲VIB'], zl_t_vib: ['바이브레이션', 'Lipless vibration', 'バイブレーション', '振动饵'],
   zl_d_vib: ['작아도 온몸으로 떨며 고기를 불러요. 등에서 줄을 묶는 파이어 타이거.', 'Small, but it shakes its whole body to call fish. Fire-tiger paint, tied on its back.', '小さくても全身で震えて魚を呼びます。背中で結ぶファイアタイガー。', '体型虽小却全身震动招鱼，背部系线的火虎配色。'],
   zl_p_vib: ['줄이 15% 덜 팽팽해져요.', 'Line tension rises 15% slower.', 'ラインの張りが15%ゆるやかに。', '鱼线张力上升慢15%。'],
-  zl_n_jig: ['섬광 메탈지그', 'Flash Metal Jig', '閃光メタルジグ', '闪光铁板'], zl_t_jig: ['메탈지그', 'Metal jig', 'メタルジグ', '铁板'],
-  zl_d_jig: ['깊은 곳까지 빠르게 내려가요. 핑크 홀로그램과 야광 줄무늬, 앞쪽에 어시스트 훅 두 개.', 'Gets deep fast: pink hologram, glow stripes and twin assist hooks at the head.', '深場まで素早く沈みます。ピンクのホログラムと夜光ストライプ、前にアシストフック2本。', '快速下沉到深处：粉色镭射、夜光条纹，前端两枚辅助钩。'],
-  zl_p_jig: ['입질이 25% 빨리 와요.', 'Bites come 25% sooner.', 'アタリが25%早く来ます。', '咬钩快25%。'],
+  zl_n_jig: ['섬광 메탈지그', 'Flash Metal Jig', '閃光メタルジグ', '闪光铁板'], zl_t_jig: ['시그니처 메탈지그', 'Signature metal jig', 'シグネチャー メタルジグ', '签名铁板'],
+  zl_d_jig: ['깊은 곳까지 빠르게. 핑크 홀로그램과 야광 줄무늬에 찌릿 로고를 새긴 시그니처 지그예요.', 'Gets deep fast: pink hologram and glow stripes, with the ZZIRIT mark — a signature jig.', '深場まで素早く。ピンクのホログラムと夜光ストライプにZZIRITロゴを入れたシグネチャージグ。', '快速下沉：粉色镭射与夜光条纹，印有ZZIRIT标志的签名铁板。'],
+  zl_p_jig: ['입질이 30% 빨리 오고, 대물이 1.3배 잘 와요.', 'Bites come 30% sooner, trophy fish 1.3× as often.', 'アタリが30%早く、大物が1.3倍出やすく。', '咬钩快30%，大鱼出现率×1.3。'],
   zl_n_egi: ['오징어킬러 에기', 'Squid Killer Egi', 'イカキラー餌木', '鱿鱼杀手木虾'], zl_t_egi: ['에기', 'Egi (squid jig)', 'エギ', '木虾'],
   zl_d_egi: ['금테이프 위에 오렌지 천을 씌우고 마블 무늬를 넣었어요. 야광 눈과 우산 바늘.', 'Orange cloth over gold tape with a marble back, a glow eye and the umbrella of pins.', '金テープの上にオレンジの布、背中はマーブル。夜光の目と傘針。', '金箔上覆橙色布料，背部大理石纹，夜光眼和伞形针。'],
   zl_p_egi: ['챔질할 시간이 0.3초 늘어요.', '0.3 s more time to strike.', 'アワセの猶予が0.3秒延びます。', '扬竿时间多0.3秒。'],
   zl_n_tai: ['홍염 타이라바', 'Red Flame Tai Rubber', '紅炎タイラバ', '红焰鲷鱼铅头'], zl_t_tai: ['타이라바', 'Tai rubber', 'タイラバ', '鲷鱼铅头'],
   zl_d_tai: ['반짝이가 박힌 붉은 머리와 하늘거리는 스커트. 참돔이 못 참는 색이에요.', 'A glittering red head and a fluttering skirt — the colour sea bream can’t resist.', 'ラメ入りの赤いヘッドとゆらめくスカート。マダイが我慢できない色です。', '闪粉红头配飘逸裙摆，真鲷无法抗拒的颜色。'],
   zl_p_tai: ['참돔·감성돔이 3배 잘 와요.', 'Red and black sea bream come 3× as often.', 'マダイ・クロダイが3倍来やすく。', '真鲷·黑鲷上钩率×3。'],
-  zl_n_minnow: ['번개 미노우', 'Lightning Minnow', '稲妻ミノー', '闪电米诺'], zl_t_minnow: ['플로팅 미노우', 'Floating minnow', 'フローティングミノー', '浮水米诺'],
-  zl_d_minnow: ['찌릿의 대표 루어. 블루 크롬 옆구리를 따라 번개가 흐르고, 투명 립이 물을 갈라요.', 'ZZIRIT’s signature: lightning runs along a blue-chrome flank and a clear lip cuts the water.', 'ZZIRITの代表ルアー。ブルークロームの側面に稲妻が走り、透明リップが水を切ります。', 'ZZIRIT的招牌拟饵：闪电沿蓝色镀铬侧身流动，透明舌板破水而行。'],
+  zl_n_minnow: ['번개 미노우', 'Lightning Minnow', '稲妻ミノー', '闪电米诺'], zl_t_minnow: ['시그니처 플로팅 미노우', 'Signature floating minnow', 'シグネチャー フローティングミノー', '签名浮水米诺'],
+  zl_d_minnow: ['찌릿의 대표 루어. 블루 크롬 옆구리에 번개가 흘러 찌릿 로고로 이어지고, 투명 립이 물을 갈라요.', 'ZZIRIT’s signature: lightning runs along a blue-chrome flank into the ZZIRIT mark, and a clear lip cuts the water.', 'ZZIRITの代表ルアー。ブルークロームの側面を稲妻が走ってロゴへつながり、透明リップが水を切ります。', 'ZZIRIT的招牌拟饵：闪电沿蓝色镀铬侧身流向ZZIRIT标志，透明舌板破水而行。'],
   zl_p_minnow: ['대물이 2배 잘 와요.', 'Trophy fish twice as often.', '大物が2倍出やすく。', '大鱼出现率×2。'],
   zl_n_gold: ['황금 번개', 'Golden Lightning', '黄金の稲妻', '黄金闪电'], zl_t_gold: ['챔피언 미노우', 'Champion minnow', 'チャンピオンミノー', '冠军米诺'],
   zl_d_gold: ['챔질 반응속도 주간 1등만 받는 금빛 미노우. 팔지 않아요.', 'The gold minnow only a weekly strike-reaction winner gets. Never for sale.', 'アワセ反応速度の週間1位だけがもらえる金色のミノー。非売品です。', '只有扬竿反应速度周冠军才能获得的金色米诺，非卖品。'],
@@ -3284,9 +3308,9 @@ Object.assign(T, {
   rx_wk_profile: ['프로필을 만들면 주간 순위에 올라 상금을 받을 수 있어요.', 'Make a profile to join the weekly board and win prizes.', 'プロフィールを作ると週間順位に載って賞金がもらえます。', '创建个人资料即可进入每周排名并赢取奖金。'],
   rx_wk_mine: ['이번 주 {n}위 · {ms}ms', 'This week: #{n} · {ms} ms', '今週{n}位・{ms}ms', '本周第{n}名·{ms}毫秒'],
   rx_wk_prize: ['이번 주 1등은 300P + 황금 번개 루어', 'This week’s #1 wins 300P + the Golden Lightning', '今週の1位は300P+黄金の稲妻', '本周第一名得300P+黄金闪电'],
-  gm_shop_sub: ['상금으로 찌릿 오리지널 루어를 사서 장착해 보세요', 'Spend your prizes on original ZZIRIT lures and equip one', '賞金でZZIRITオリジナルルアーを買って装着しよう', '用奖金购买并装备ZZIRIT原创拟饵'],
-  wn_zp_h: ['미니게임 상금 · 찌릿 루어 상점', 'Mini-game prizes & the ZZIRIT lure shop', 'ミニゲーム賞金・ZZIRITルアーショップ', '小游戏奖金·ZZIRIT拟饵商店'],
-  wn_zp_p: ['챔질 반응속도 주간 1·2·3등은 300·200·100P, 참가만 해도 20P! 모은 포인트로 찌릿 루어를 사서 장착해 보세요.', 'Weekly strike reaction #1/#2/#3 win 300/200/100P, and 20P just for playing! Spend them on ZZIRIT lures and equip one.', 'アワセ反応速度の週間1・2・3位は300・200・100P、参加だけでも20P!貯めたポイントでZZIRITルアーを買って装着しよう。', '扬竿反应速度每周第1·2·3名得300·200·100P，参与即得20P！用积分购买并装备ZZIRIT拟饵吧。'],
+  gm_shop_sub: ['상금으로 찌릿 장비(루어·낚싯대·릴·찌)를 사서 장착해 보세요', 'Spend your prizes on ZZIRIT gear — lures, rods, reels, floats', '賞金でZZIRITの釣具(ルアー・竿・リール・ウキ)を買って装着しよう', '用奖金购买并装备ZZIRIT渔具（拟饵·鱼竿·渔轮·浮漂）'],
+  wn_zp_h: ['미니게임 상금 · 찌릿 낚시점', 'Mini-game prizes & the ZZIRIT Tackle Shop', 'ミニゲーム賞金・ZZIRIT釣具店', '小游戏奖金·ZZIRIT渔具店'],
+  wn_zp_p: ['챔질 반응속도 주간 1·2·3등은 300·200·100P, 참가만 해도 20P! 모은 포인트로 루어·낚싯대·릴·찌를 사서 장착해 보세요. 찌릿 로고가 들어간 시그니처 장비는 칸마다 두 개뿐이에요.', 'Weekly strike reaction #1/#2/#3 win 300/200/100P, and 20P just for playing! Spend them on lures, rods, reels and floats. Gear with the ZZIRIT mark is the signature line — only two in each section.', 'アワセ反応速度の週間1・2・3位は300・200・100P、参加だけでも20P!貯めたポイントでルアー・竿・リール・ウキを買って装着しよう。ZZIRITロゴ入りのシグネチャーは各カテゴリーに2つだけ。', '扬竿反应速度每周第1·2·3名得300·200·100P，参与即得20P！用积分购买并装备拟饵·鱼竿·渔轮·浮漂吧。带ZZIRIT标志的签名款每类只有两件。'],
   ad_zp: ['찌릿 포인트 지급', 'Give ZZ Points', 'ZZポイント付与', '发放ZZ积分'], ad_zp_who: ['받을 사람', 'Who', '対象', '对象'],
   ad_zp_amt: ['포인트 (빼려면 -)', 'Points (minus to take)', 'ポイント(マイナスで減算)', '积分（负数为扣除）'], ad_zp_note: ['메모 (상대 내역에 보여요)', 'Note (shown in their history)', 'メモ(相手の履歴に表示)', '备注（显示在对方记录中）'],
   ad_zp_go: ['지급', 'Give', '付与', '发放'], ad_zp_done: ['{nick}님 잔액 {n}P', '{nick} now has {n}P', '{nick}さんの残高 {n}P', '{nick}余额{n}P'],
@@ -3298,6 +3322,58 @@ Object.assign(T, {
   pay_bank_hint: ['계좌번호를 복사해 카카오페이(송금 → 계좌)나 은행 앱에서 보내세요. 받는 분 통장 표시에 위 코드를 적어 주세요.', 'Copy the account number and send from KakaoPay (Send → To account) or your bank app. Put the code above in the transfer memo.', '口座番号をコピーして、カカオペイ(送金→口座)や銀行アプリから送ってください。振込メモに上のコードを入れてください。', '复制账号后，用KakaoPay（转账→到账户）或银行应用转账，并在转账备注中填写上方代码。'],
   pay_bank_toss: ['토스로 보내기 (계좌 자동 입력)', 'Send with Toss (account filled in)', 'Tossで送る(口座自動入力)', '用Toss转账（自动填写账户）'],
   pay_fine3: ['입금이 확인되면 적용돼요(보통 하루 안). 메모 칸에 위 코드를 꼭 적어 주세요. 입금하지 않고 "보냈어요"만 누르면 적용되지 않아요.', 'It applies once the payment is confirmed (usually within a day). Please put the code above in the memo. Tapping "I sent it" without sending does nothing.', '入金が確認されると適用されます(通常1日以内)。メモ欄に上のコードを必ず入れてください。送金せずに「送りました」を押しても適用されません。', '确认到账后生效（通常一天内）。请务必在备注里填上方的代码。未转账只点"已转账"不会生效。'],
+
+  /* 찌릿 낚시점: sections, signature gear */
+  shop_t_lure: ['루어', 'Lures', 'ルアー', '拟饵'], shop_t_rod: ['낚싯대', 'Rods', '竿', '鱼竿'], shop_t_reel: ['릴', 'Reels', 'リール', '渔轮'], shop_t_float: ['찌', 'Floats', 'ウキ', '浮漂'],
+  zl_sig_note: ['로고가 들어간 장비는 찌릿 시그니처예요. 칸마다 두 개뿐이고, 열심히 모아야 살 수 있어요.', 'Gear with the ZZIRIT mark is the signature line: only two in each section, and it takes some winning to buy.', 'ロゴ入りの釣具はZZIRITシグネチャー。各カテゴリーに2つだけで、頑張って貯めないと買えません。', '带标志的渔具是ZZIRIT签名款，每类只有两件，需要努力攒积分才能买到。'],
+  zl_where_lure: ['캐릭터 낚싯줄 끝과 갯바위 공원에 보여요.', 'Hangs from your character’s line, also in the park.', 'キャラの釣り糸の先と磯の公園に見えます。', '挂在角色钓线末端，公园里也看得到。'],
+  zl_where_rod: ['캐릭터와 갯바위 공원의 낚싯대가 바뀌어요.', 'Your character’s rod becomes this one, also in the park.', 'キャラと公園の竿がこれに変わります。', '角色和公园里的鱼竿会换成这根。'],
+  zl_where_reel: ['캐릭터 낚싯대에 이 릴이 달려요.', 'This reel goes on your character’s rod.', 'キャラの竿にこのリールが付きます。', '角色的鱼竿会装上这个渔轮。'],
+  zl_where_float: ['갯바위 낚시 화면의 찌가 이걸로 바뀌어요.', 'The float in the rock-fishing game becomes this one.', '磯釣りゲームのウキがこれに変わります。', '礁石钓鱼游戏里的浮漂会换成这个。'],
+  zl_n_rod_basic: ['기본 카본대', 'Basic Carbon Rod', 'ベーシック カーボンロッド', '基础碳素竿'], zl_t_rod_basic: ['갯바위 낚싯대', 'Rock rod', '磯竿', '矶钓竿'],
+  zl_d_rod_basic: ['누구나 처음 가진 검은 카본대. 가볍고 무난해요.', 'The black carbon rod everyone starts with: light and easy.', 'みんなが最初に持つ黒いカーボン竿。軽くて扱いやすい。', '人人都有的黑色碳素竿，轻巧好用。'],
+  zl_n_rod_iso: ['갯바위 1호대', 'Iso Rod #1', '磯竿1号', '矶竿1号'], zl_t_rod_iso: ['갯바위 낚싯대', 'Rock rod', '磯竿', '矶钓竿'],
+  zl_d_rod_iso: ['흰 블랭크에 빨간 감기, 코르크 손잡이. 바다 위에서 눈에 잘 띄어요.', 'White blank, red wraps and a cork grip — easy to spot by the sea.', '白いブランクに赤いスレッド、コルクグリップ。海でよく目立ちます。', '白色竿身、红色绑线、软木握把，在海边很显眼。'],
+  zl_p_rod_iso: ['줄이 8% 덜 팽팽해져요.', 'Line tension rises 8% slower.', 'ラインの張りが8%ゆるやかに。', '鱼线张力上升慢8%。'],
+  zl_n_rod_wine: ['감성돔 전용대', 'Black Bream Special', 'チヌ専用竿', '黑鲷专用竿'], zl_t_rod_wine: ['갯바위 낚싯대', 'Rock rod', '磯竿', '矶钓竿'],
+  zl_d_rod_wine: ['와인빛 블랭크에 금색 감기와 릴시트. 감성돔 낚시꾼의 로망이에요.', 'A wine-red blank with gold wraps and seat — every black-bream angler’s dream.', 'ワインレッドのブランクに金のスレッドとリールシート。チヌ釣り師の憧れ。', '酒红竿身配金色绑线和轮座，黑鲷钓手的梦想。'],
+  zl_p_rod_wine: ['줄 긴장이 12% 줄고, 챔질 여유가 0.1초 늘어요.', 'Tension 12% lower, 0.1 s more to strike.', '張りが12%ゆるく、アワセの猶予が0.1秒延びます。', '张力降低12%，扬竿时间多0.1秒。'],
+  zl_n_rod_spark: ['찌릿 스파크', 'ZZIRIT Spark', 'ZZIRIT スパーク', 'ZZIRIT 火花'], zl_t_rod_spark: ['시그니처 갯바위대', 'Signature rock rod', 'シグネチャー磯竿', '签名矶竿'],
+  zl_d_rod_spark: ['딥 네이비 블랭크에 블루 펄, 카본 릴시트에 찌릿 로고를 새겼어요.', 'A deep-navy blank with blue pearl, and the ZZIRIT mark on a carbon reel seat.', 'ディープネイビーのブランクにブルーパール、カーボンリールシートにZZIRITロゴ。', '深海军蓝竿身带蓝色珠光，碳纤维轮座刻有ZZIRIT标志。'],
+  zl_p_rod_spark: ['줄 긴장이 16% 줄고, 대물이 1.2배 잘 와요.', 'Tension 16% lower, trophy fish 1.2× as often.', '張りが16%ゆるく、大物が1.2倍出やすく。', '张力降低16%，大鱼出现率×1.2。'],
+  zl_n_rod_bolt: ['찌릿 블루 볼트', 'ZZIRIT Blue Bolt', 'ZZIRIT ブルーボルト', 'ZZIRIT 蓝色闪电'], zl_t_rod_bolt: ['시그니처 갯바위대', 'Signature rock rod', 'シグネチャー磯竿', '签名矶竿'],
+  zl_d_rod_bolt: ['크롬 블루 블랭크에 오렌지 번개 감기. 찌릿 최고급 낚싯대예요.', 'A chrome-blue blank with an orange lightning wrap — ZZIRIT’s finest rod.', 'クロームブルーのブランクにオレンジの稲妻スレッド。ZZIRIT最高級の竿。', '镀铬蓝竿身配橙色闪电绑线，ZZIRIT顶级鱼竿。'],
+  zl_p_rod_bolt: ['줄 긴장이 22% 줄고, 챔질 여유 +0.15초, 대물 1.3배.', 'Tension 22% lower, 0.15 s more to strike, trophy fish 1.3×.', '張りが22%ゆるく、アワセ+0.15秒、大物1.3倍。', '张力降低22%，扬竿多0.15秒，大鱼×1.3。'],
+  zl_n_reel_basic: ['기본 스피닝 릴', 'Basic Spinning Reel', 'ベーシック スピニングリール', '基础纺车轮'], zl_t_reel_basic: ['스피닝 릴', 'Spinning reel', 'スピニングリール', '纺车轮'],
+  zl_d_reel_basic: ['검은 몸체에 초록 줄. 처음엔 이걸로 충분해요.', 'A black body and green line — plenty to start with.', '黒いボディに緑のライン。最初はこれで十分。', '黑色机身配绿色鱼线，入门足够了。'],
+  zl_n_reel_red: ['레드 2500', 'Red 2500', 'レッド2500', '红色2500'], zl_t_reel_red: ['스피닝 릴', 'Spinning reel', 'スピニングリール', '纺车轮'],
+  zl_d_reel_red: ['빨간 사이드 커버와 스풀이 포인트인 가벼운 릴이에요.', 'A light reel with a red side plate and spool.', '赤いサイドカバーとスプールが目を引く軽いリール。', '红色侧盖和线杯为亮点的轻量渔轮。'],
+  zl_p_reel_red: ['감기가 8% 빨라요.', 'Reel in 8% faster.', '巻きが8%速くなります。', '收线快8%。'],
+  zl_n_reel_lbr: ['레버브레이크 LB', 'Lever Brake LB', 'レバーブレーキLB', '手刹轮LB'], zl_t_reel_lbr: ['레버브레이크 릴', 'Lever-brake reel', 'レバーブレーキリール', '手刹纺车轮'],
+  zl_d_reel_lbr: ['갯바위꾼의 필수품. 레버로 줄을 풀었다 잡았다 하며 큰 고기를 버텨요.', 'The rock angler’s essential: the lever lets line out and holds it to tire a big fish.', '磯釣り師の必需品。レバーで糸を出したり止めたりして大物に耐えます。', '矶钓必备：用手刹放线收线，与大鱼周旋。'],
+  zl_p_reel_lbr: ['감기가 12% 빨라지고, 챔질 여유가 0.05초 늘어요.', 'Reel in 12% faster, 0.05 s more to strike.', '巻きが12%速く、アワセの猶予が0.05秒延びます。', '收线快12%，扬竿时间多0.05秒。'],
+  zl_n_reel_spark: ['찌릿 스파크 릴', 'ZZIRIT Spark Reel', 'ZZIRIT スパークリール', 'ZZIRIT 火花轮'], zl_t_reel_spark: ['시그니처 스피닝 릴', 'Signature spinning reel', 'シグネチャー スピニングリール', '签名纺车轮'],
+  zl_d_reel_spark: ['네이비 바디에 블루 라인, 로터에 찌릿 로고를 새겼어요.', 'A navy body, blue line and the ZZIRIT mark on the rotor.', 'ネイビーボディにブルーライン、ローターにZZIRITロゴ。', '海军蓝机身配蓝色鱼线，转子上有ZZIRIT标志。'],
+  zl_p_reel_spark: ['감기가 15% 빨라지고, 줄 긴장이 5% 줄어요.', 'Reel in 15% faster, tension 5% lower.', '巻きが15%速く、張りが5%ゆるく。', '收线快15%，张力降低5%。'],
+  zl_n_reel_bolt: ['찌릿 블루 볼트 LB', 'ZZIRIT Blue Bolt LB', 'ZZIRIT ブルーボルトLB', 'ZZIRIT 蓝色闪电LB'], zl_t_reel_bolt: ['시그니처 레버브레이크 릴', 'Signature lever-brake reel', 'シグネチャー レバーブレーキリール', '签名手刹轮'],
+  zl_d_reel_bolt: ['크롬 블루 바디에 오렌지 레버와 스풀. 찌릿 최고급 릴이에요.', 'A chrome-blue body with an orange lever and spool — ZZIRIT’s finest reel.', 'クロームブルーのボディにオレンジのレバーとスプール。ZZIRIT最高級のリール。', '镀铬蓝机身配橙色手刹和线杯，ZZIRIT顶级渔轮。'],
+  zl_p_reel_bolt: ['감기가 20% 빨라지고, 챔질 여유가 0.1초 늘어요.', 'Reel in 20% faster, 0.1 s more to strike.', '巻きが20%速く、アワセの猶予が0.1秒延びます。', '收线快20%，扬竿时间多0.1秒。'],
+  zl_n_float_basic: ['기본 막대찌', 'Basic Stick Float', 'ベーシック棒ウキ', '基础棒浮'], zl_t_float_basic: ['막대찌', 'Stick float', '棒ウキ', '棒浮'],
+  zl_d_float_basic: ['빨간 찌톱이 물 위에 꼿꼿이 서는 기본 찌예요.', 'The basic float: a red tip standing straight on the water.', '赤いトップが水面にまっすぐ立つ基本のウキ。', '红色浮顶直立在水面的基础浮漂。'],
+  zl_n_float_ball: ['구멍찌 B', 'Ball Float B', '円錐ウキB', '孔浮B'], zl_t_float_ball: ['구멍찌', 'Ball float', '円錐ウキ', '孔浮'],
+  zl_d_float_ball: ['갯바위 낚시의 상징, 주황 구멍찌. 입질이 잘 보여요.', 'The orange ball float, the symbol of rock fishing — bites are easy to see.', '磯釣りの象徴、オレンジの円錐ウキ。アタリがよく見えます。', '矶钓的象征——橙色孔浮，咬钩看得清楚。'],
+  zl_p_float_ball: ['챔질 여유가 0.1초 늘어요.', '0.1 s more to strike.', 'アワセの猶予が0.1秒延びます。', '扬竿时间多0.1秒。'],
+  zl_n_float_led: ['전자찌', 'LED Float', '電気ウキ', '电子浮'], zl_t_float_led: ['전자찌', 'LED float', '電気ウキ', '电子浮'],
+  zl_d_float_led: ['밤바다에서도 초록 불빛이 또렷해요.', 'Its green light stays clear even on the night sea.', '夜の海でも緑の光がくっきり。', '夜晚的海上绿光依然清晰。'],
+  zl_p_float_led: ['챔질 여유 +0.15초, 입질이 8% 빨리 와요.', '0.15 s more to strike, bites 8% sooner.', 'アワセ+0.15秒、アタリが8%早く。', '扬竿多0.15秒，咬钩快8%。'],
+  zl_n_float_spark: ['찌릿 스파크 찌', 'ZZIRIT Spark Float', 'ZZIRIT スパークウキ', 'ZZIRIT 火花浮'], zl_t_float_spark: ['시그니처 전자찌', 'Signature LED float', 'シグネチャー電気ウキ', '签名电子浮'],
+  zl_d_float_spark: ['파랗게 빛나는 찌톱, 몸통에 찌릿 로고. 입질이 오면 찌릿! 하고 들어가요.', 'A blue-glowing tip and the ZZIRIT mark on the body — it dives with a zzirit! on a bite.', '青く光るトップ、ボディにZZIRITロゴ。アタリでピリッと沈みます。', '蓝光浮顶，浮身印有ZZIRIT标志，一咬钩就“嗞”地沉下。'],
+  zl_p_float_spark: ['챔질 여유 +0.2초, 입질이 12% 빨리 와요.', '0.2 s more to strike, bites 12% sooner.', 'アワセ+0.2秒、アタリが12%早く。', '扬竿多0.2秒，咬钩快12%。'],
+  zl_n_float_bolt: ['찌릿 블루 볼트 구멍찌', 'ZZIRIT Blue Bolt Ball Float', 'ZZIRIT ブルーボルト円錐ウキ', 'ZZIRIT 蓝色闪电孔浮'], zl_t_float_bolt: ['시그니처 구멍찌', 'Signature ball float', 'シグネチャー円錐ウキ', '签名孔浮'],
+  zl_d_float_bolt: ['크롬 블루 몸통에 오렌지 머리, 찌릿 로고. 찌릿 최고급 찌예요.', 'A chrome-blue body, orange top and the ZZIRIT mark — ZZIRIT’s finest float.', 'クロームブルーのボディにオレンジのトップ、ZZIRITロゴ。ZZIRIT最高級のウキ。', '镀铬蓝浮身、橙色浮顶、ZZIRIT标志，ZZIRIT顶级浮漂。'],
+  zl_p_float_bolt: ['챔질 여유 +0.25초, 입질이 15% 빨리 와요.', '0.25 s more to strike, bites 15% sooner.', 'アワセ+0.25秒、アタリが15%早く。', '扬竿多0.25秒，咬钩快15%。'],
+  wn_tackle_h: ['찌릿 낚시점: 낚싯대·릴·찌', 'ZZIRIT Tackle: rods, reels, floats', 'ZZIRIT釣具店: 竿・リール・ウキ', 'ZZIRIT渔具店：鱼竿·渔轮·浮漂'],
+  wn_tackle_p: ['루어 옆에 낚싯대·릴·찌 칸이 생겼어요. 찌릿 로고가 들어간 시그니처 장비는 칸마다 두 개뿐이에요.', 'Rods, reels and floats now sit next to the lures. Gear with the ZZIRIT mark is the signature line — only two in each section.', 'ルアーの隣に竿・リール・ウキが加わりました。ZZIRITロゴ入りのシグネチャーは各カテゴリーに2つだけ。', '拟饵旁新增鱼竿·渔轮·浮漂。带ZZIRIT标志的签名款每类只有两件。'],
 });
 
 /* ===== Tackle dictionaries: [ko, en, ja, zh] ===== */
@@ -7326,7 +7402,7 @@ function openShareCard(blob, name, text) {
 }
 
 /* ===== What's new: shown once after a big update (website only; needs the matching server update) ===== */
-const WHATS_NEW = '2026-11-07a', WN_TS = Date.parse('2026-11-07T03:00:00Z'); // people who joined after this have nothing to catch up on
+const WHATS_NEW = '2026-11-07b', WN_TS = Date.parse('2026-11-07T03:00:00Z'); // people who joined after this have nothing to catch up on
 const BOOT_AT = Date.now();
 /* what each update brought, newest last; people see what came after the last one they saw (at most 6 lines) */
 const WN_ITEMS = [
@@ -7336,8 +7412,9 @@ const WN_ITEMS = [
   ['2026-10-29c', 'camera', 'wn_fix'], ['2026-10-29c', 'menu', 'wn_menu'],
   ['2026-10-29d', 'wave', 'wn_park'], ['2026-10-29d', 'chat', 'wn_chat'], ['2026-10-29d', 'board', 'wn_bdmod'], ['2026-10-29d', 'user', 'wn_wd'],
   ['2026-11-06a', 'star', 'wn_games'], ['2026-11-06a', 'wave', 'wn_fs2'],
-  ['2026-11-07a', 'coin', 'wn_zp']
+  ['2026-11-07a', 'coin', 'wn_zp'], ['2026-11-07b', 'lure', 'wn_tackle']
 ];
+const WN_PART = { wn_tackle: 'wn_zp' };
 function maybeWhatsNew(tries = 0) {
   if (window.APP_RT !== 'web' || lsGet('wn', '') === WHATS_NEW || tries > 6) return;
   if (!S.ready || $('.modal-wrap.in')) { setTimeout(() => maybeWhatsNew(tries + 1), 4000); return; }
@@ -7351,7 +7428,9 @@ function maybeWhatsNew(tries = 0) {
 }
 function openWhatsNew(id, seen = '') {
   // the newest update first (in the listed order); the login-ID line leads for people who still have no ID
-  const pick = WN_ITEMS.filter(x => x[0] > seen && x[2] !== 'wn_id');
+  // a line that only adds to an earlier one is left out when that earlier one (now saying it all) is in the list too
+  const pick0 = WN_ITEMS.filter(x => x[0] > seen && x[2] !== 'wn_id'), keys = new Set(pick0.map(x => x[2]));
+  const pick = pick0.filter(x => !(WN_PART[x[2]] && keys.has(WN_PART[x[2]])));
   const vers = [...new Set(pick.map(x => x[0]))].sort().reverse();
   const all = vers.flatMap(v => pick.filter(x => x[0] === v));
   if (!id && idSupported()) all.unshift(WN_ITEMS.find(x => x[2] === 'wn_id'));
@@ -8776,7 +8855,7 @@ function openMore() {
 
 /* ===== 찌릿 루어: the shop's lures, drawn here as SVG — nose to the right, light from the top left. Each one is built from
    its own body shape and paint (gradients, foil, scales or cloth), a 3D eye and real hardware: split rings, treble hooks
-   with barbs, assist hooks on braided cord. ZL.url(id): a picture for <img> (cached) · ZL.inner(id, prefix): the same
+   with barbs, assist hooks on braided cord — and the ZZIRIT mark (traced from the logo) with a spark on its line tie. ZL.url(id): a picture for <img> (cached) · ZL.inner(id, prefix): the same
    drawing to place inside another SVG (the character's line) · ZL.img(id): an Image for canvas. ===== */
 const ZL = (() => {
   const st = s => s.map(([o, c, a]) => `<stop offset="${o}" stop-color="${c}"${a != null && a !== 1 ? ` stop-opacity="${a}"` : ''}/>`).join('');
@@ -8799,20 +8878,65 @@ const ZL = (() => {
   function eye(p, x, y, r, c = ['#FFF4BF', '#F2B200', '#8F5A00']) {
     return `${rg(p + 'ey', x - r * .3, y - r * .35, r * 1.05, [[0, c[0]], [.5, c[1]], [1, c[2]]])}<circle cx="${n(x)}" cy="${n(y)}" r="${n(r)}" fill="#0C0F14"/><circle cx="${n(x)}" cy="${n(y)}" r="${n(r * .82)}" fill="url(#${p}ey)"/><circle cx="${n(x + r * .12)}" cy="${n(y + r * .08)}" r="${n(r * .44)}" fill="#05070A"/><ellipse cx="${n(x - r * .3)}" cy="${n(y - r * .36)}" rx="${n(r * .27)}" ry="${n(r * .2)}" fill="#fff" opacity=".95"/><circle cx="${n(x + r * .34)}" cy="${n(y + r * .32)}" r="${n(r * .1)}" fill="#fff" opacity=".7"/>`;
   }
-  // the brand mark: a lightning bolt
-  const bolt = (x, y, s, fill, extra = '') => `<path d="M${n(x)} ${n(y)} h${n(7.4 * s)} l${n(-3.3 * s)} ${n(5.2 * s)} h${n(5.4 * s)} l${n(-11.6 * s)} ${n(11 * s)} l${n(3.3 * s)} ${n(-7.4 * s)} h${n(-5.2 * s)} z" fill="${fill}" ${extra}/>`;
   // fine diagonal lines for holographic foil, and fish scales
   const hatch = (id, c, a, gap = 2.2, ang = 62) => `<pattern id="${id}" patternUnits="userSpaceOnUse" width="${gap}" height="${gap}" patternTransform="rotate(${ang})"><path d="M0 0 V${gap}" stroke="${c}" stroke-width=".55" stroke-opacity="${a}"/></pattern>`;
   const scales = (id, c, a) => `<pattern id="${id}" patternUnits="userSpaceOnUse" width="7" height="7"><path d="M0 3.5 A3.5 3.5 0 0 1 7 3.5 M-3.5 7 A3.5 3.5 0 0 1 3.5 7 M3.5 7 A3.5 3.5 0 0 1 10.5 7" fill="none" stroke="${c}" stroke-opacity="${a}" stroke-width=".55"/></pattern>`;
   const gloss = (d, w = 2.4, a = .6) => `<path d="${d}" fill="none" stroke="#fff" stroke-width="${w}" stroke-linecap="round" opacity="${a}"/>`;
 
+  /* ---------- the ZZIRIT mark, traced from the logo: one silver ribbon that is the fish — its forehead thin at the top
+     right, sweeping down to the left and back out as the tail — a blue wave under the tail, the face line and the eye, and
+     the line rising to a spark and coming down as the hook in the fish's mouth. Drawn in a 120 × 104 box. Only the
+     signature gear carries it (two in each section, and the champion's gold lure), with a spark on its line tie. ---------- */
+  const ZZ_FISH = 'M79.2 42.3 C74 40 66 40.2 60.9 40.8 C52 42.4 44 45.4 38.7 48.2 C32 51.8 27 55 22.4 59.3 C16 65.4 11 71 7.7 76.5 C14 80 26 80 39.4 76.7 C45 84 49 91.6 55.4 93.4 C64 95.6 75 93.2 85.8 81.3 C80 85.2 70.2 88.6 64.5 87.9 C52 86.4 40 77 32.1 68.6 C36 60.6 42 53.6 49.3 49.3 C54.6 46.2 60 44.2 65.6 43.2 C70.6 42.4 75.6 42 79.2 42.3 Z';
+  const ZZ_FACE = 'M80.2 44.6 C80.4 50.4 78.6 56.4 74.4 61.2 C76.6 62 77.6 60.4 78.6 58.2 C80.2 54 80.8 49.2 80.2 44.6 Z';
+  const ZZ_WAVE = 'M7.3 79.2 C17 78.6 25.6 82.2 34.2 87.8 C38 90.6 42 94.6 46 97.4 C51 100.8 57 102.6 62 101.2 C64.6 100.6 67 99.8 69.1 98.7 C66 99.4 61 98.6 58.2 96.9 C52 92 47.4 86 41.7 80.6 C38.8 78 35 75.8 31.6 76.2 C27 77.6 20 78 15 75.8 C12 77 9.6 78.4 7.3 79.2 Z';
+  const ZZ_LINE = 'M65.7 28.3 C79 19.6 94 12.2 108.4 9';
+  const ZZ_HOOK = 'M110.6 11.4 C109.6 18 101.6 32 93.2 44.6 C91.4 47.6 92.6 51.4 90.2 54.4 C87.6 57.6 83 60.8 78.2 62.8';
+  const ZZ_STYLE = {
+    silver: { f: [['#FFFFFF'], ['#D9E1EB'], ['#9AA7B8']], w: [['#2563EB'], ['#3B8BFF'], ['#9BD0FF']], eye: '#FFFFFF', ln: '#EEF3F9', sp: '#5AB0FF', edge: '#0B1530' },
+    navy: { f: [['#1B3A73'], ['#0E2350'], ['#06143A']], w: [['#1D4ED8'], ['#2F7BFF'], ['#7CC4FF']], eye: '#0E2350', ln: '#0E2350', sp: '#4DA3FF' },
+    dark: { f: [['#2B2414'], ['#16110A'], ['#0B0804']], w: [['#1D4ED8'], ['#3B82F6'], ['#93C5FD']], eye: '#16110A', ln: '#16110A', sp: '#5AB0FF' },
+    etch: { f: [['#5A3A00', .55]], w: [['#7A4E00', .5]], eye: '#5A3A00', ln: '#5A3A00', sp: '', lift: '#FFF7D6' }
+  };
+  // a four-point glint with a soft blue glow
+  const spark = (id, x, y, r = 6, c = '#5AB0FF') => `${rg(id, x, y, r, [[0, '#FFFFFF', .95], [.22, c, .75], [1, c, 0]])}<circle cx="${n(x)}" cy="${n(y)}" r="${n(r)}" fill="url(#${id})"/><path d="M${n(x - r)} ${n(y)} L${n(x)} ${n(y - r * .1)} L${n(x + r)} ${n(y)} L${n(x)} ${n(y + r * .1)} Z M${n(x)} ${n(y - r * .78)} L${n(x + r * .09)} ${n(y)} L${n(x)} ${n(y + r * .78)} L${n(x - r * .09)} ${n(y)} Z" fill="#fff"/>`;
+  function zzMark(p, x, y, w, style = 'silver', rot = 0) {
+    const S = ZZ_STYLE[style] || ZZ_STYLE.silver, k = w / 120;
+    const stops = a => a.length === 1 ? [[0, a[0][0], a[0][1] == null ? 1 : a[0][1]], [1, a[0][0], a[0][1] == null ? 1 : a[0][1]]] : a.map(([c, o], i) => [i / (a.length - 1), c, o == null ? 1 : o]);
+    const ink = d => `<path d="${d}" fill="url(#${p}zf)"${S.edge ? ` stroke="${S.edge}" stroke-opacity=".45" stroke-width="3" paint-order="stroke" stroke-linejoin="round"` : ''}/>`;
+    const body = `${lg(p + 'zf', 30, 38, 70, 92, stops(S.f))}${lg(p + 'zw', 8, 80, 66, 102, stops(S.w))}
+      ${S.lift ? `<g transform="translate(1.2 1.4)" fill="${S.lift}" opacity=".75"><path d="${ZZ_FISH}"/><path d="${ZZ_FACE}"/><path d="${ZZ_WAVE}"/></g>` : ''}
+      ${ink(ZZ_FISH)}${ink(ZZ_FACE)}<path d="${ZZ_WAVE}" fill="url(#${p}zw)"${S.edge ? ` stroke="${S.edge}" stroke-opacity=".45" stroke-width="3" paint-order="stroke" stroke-linejoin="round"` : ''}/>
+      <circle cx="71.5" cy="47.4" r="1.9" fill="${S.eye}"/>
+      ${S.edge ? `<path d="${ZZ_LINE}" fill="none" stroke="${S.edge}" stroke-opacity=".4" stroke-width="3.6" stroke-linecap="round"/><path d="${ZZ_HOOK}" fill="none" stroke="${S.edge}" stroke-opacity=".4" stroke-width="4.8" stroke-linecap="round" stroke-linejoin="round"/>` : ''}
+      <path d="${ZZ_LINE}" fill="none" stroke="${S.ln}" stroke-width="1.5" stroke-linecap="round" opacity=".9"/>
+      <path d="${ZZ_HOOK}" fill="none" stroke="${S.ln}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+      ${S.sp ? spark(p + 'zs', 108.6, 9.2, 12, S.sp) : ''}`;
+    return `<g transform="translate(${n(x)} ${n(y)})${rot ? ` rotate(${rot})` : ''} scale(${n(k * 1000) / 1000})">${body}</g>`;
+  }
+  // "ZZIRIT" in thin strokes (drawn, so it looks the same on every phone), h units tall
+  function zzWord(x, y, h, color, op = .8, word = 'ZZIRIT') {
+    const G = { Z: ['M0 0H4L0 5H4', 5.6], I: ['M.5 0V5', 2.6], R: ['M0 5V0H2.7C4.1 0 4.1 2.6 2.7 2.6H0M2.2 2.6L4 5', 5.6], T: ['M0 0H4M2 0V5', 5.6], C: ['M4 .6C3.4 0 2.8 0 2.2 0C.8 0 0 1.1 0 2.5S.8 5 2.2 5C2.8 5 3.4 5 4 4.4', 5.6], H: ['M0 0V5M4 0V5M0 2.5H4', 5.6], A: ['M0 5L2 0L4 5M.8 3.2H3.2', 5.6], M: ['M0 5V0L2 3L4 0V5', 5.6], P: ['M0 5V0H2.7C4.1 0 4.1 2.8 2.7 2.8H0', 5.6], O: ['M2 0C.8 0 0 1.1 0 2.5S.8 5 2 5S4 3.9 4 2.5S3.2 0 2 0Z', 5.6], N: ['M0 5V0L4 5V0', 5.6],
+      B: ['M0 5V0H2.6C3.7 0 3.9 2.4 2.6 2.4H0M2.6 2.4C4.1 2.4 4.2 5 2.6 5H0', 5.4], L: ['M0 0V5H3.8', 5], S: ['M3.8.6C3.3.2 2.7 0 2 0C1 0 .2.6.2 1.3C.2 3 4 2 4 3.7C4 4.5 3.1 5 2 5C1.2 5 .5 4.8 0 4.3', 5.4],
+      E: ['M3.8 0H0V5H3.8M0 2.5H3.2', 5], K: ['M0 0V5M3.8 0L0 3.2M1.3 2.2L4 5', 5.4], F: ['M3.8 0H0V5M0 2.5H3.2', 5],
+      0: ['M2 0C.8 0 0 1.1 0 2.5S.8 5 2 5S4 3.9 4 2.5S3.2 0 2 0Z', 5.4], 1: ['M1 .9L2.2 0V5', 3.6], 2: ['M.2 1.1C.5.4 1.2 0 2 0C3.2 0 3.9.7 3.9 1.5C3.9 2.6 2.8 3.2 0 5H4', 5.4],
+      3: ['M.2.5C.7.2 1.3 0 2 0C3.2 0 3.8.6 3.8 1.3C3.8 2 3 2.5 2 2.5C3.2 2.5 4 3.1 4 3.8C4 4.6 3.2 5 2 5C1.2 5 .6 4.8 0 4.5', 5.4], 4: ['M3 5V0L0 3.4H4', 5.4],
+      5: ['M3.8 0H.6L.3 2.3C.8 2 1.4 1.9 2 1.9C3.2 1.9 4 2.6 4 3.5S3.2 5 2 5C1.2 5 .6 4.8 0 4.4', 5.4], 6: ['M3.6.3C3.2.1 2.7 0 2.2 0C.9 0 0 1.2 0 2.9C0 4.2.8 5 2 5S4 4.3 4 3.3S3.2 1.8 2 1.8S0 2.4 0 3.2', 5.4],
+      7: ['M0 0H4L1.6 5', 5.2], 8: ['M2 2.4C3.1 2.4 3.7 1.9 3.7 1.2S3.1 0 2 0S.3.5.3 1.2S.9 2.4 2 2.4C3.2 2.4 4 3 4 3.7S3.2 5 2 5S0 4.4 0 3.7S.8 2.4 2 2.4Z', 5.4],
+      9: ['M.4 4.7C.8 4.9 1.3 5 1.8 5C3.1 5 4 3.8 4 2.1C4 .8 3.2 0 2 0S0 .7 0 1.7S.8 3.2 2 3.2S4 2.6 4 1.8', 5.4], '-': ['M.4 2.6H3', 3.8], '.': ['M.6 4.4V5', 1.8] };
+    let d = '', cx = 0;
+    for (const ch of word) { const g = G[ch]; if (!g) { cx += 3; continue; } d += `<path d="${g[0]}" transform="translate(${n(cx)} 0)"/>`; cx += g[1]; }
+    const k = h / 5;
+    return `<g transform="translate(${n(x)} ${n(y)}) scale(${n(k * 1000) / 1000})" fill="none" stroke="${color}" stroke-width="${n(.7 / Math.max(k, .3))}" stroke-linecap="square" opacity="${op}">${d}</g>`;
+  }
+
   /* ---------- 번개 미노우 (and the 황금 번개 prize, the same body in gold) ---------- */
-  const ARC = 'M166 52.6 L150 51.2 L143.5 56.4 L124 53.6 L116 58.6 L96 55.2 L88.5 59.8 L68 56.4 L62 59.4 L42 56.4';
+  const ARC = 'M129 58.8 L117 55.6 L109 60.2 L92 56.2 L85 60.4 L68 56.6 L62 59.6 L42 56.6';
   const MIN = 'M34 50 C58 41 100 34 140 34 C170 34 192 40 204 50 C209 55 207 61 200 64.5 C186 71 160 75 130 75 C95 74 60 66 34 60 C29.6 58.6 29.6 51.4 34 50 Z';
   function minnow(p, gold) {
     const C = gold
-      ? { b0: '#4A2C00', b1: '#A86F00', s0: '#FFF6C9', s1: '#FFD23F', s2: '#E2A100', bel: '#FFF4CC', line: '#B91C1C', sc: '#6B4200', iris: ['#FFFFFF', '#FF5A5A', '#7A0000'], bolt: '#1B1300', glow: '#FFF9DB' }
-      : { b0: '#061B4D', b1: '#1E63E9', s0: '#F2F6FC', s1: '#B9C7DA', s2: '#EEF3FA', bel: '#FFFFFF', line: '#FF5A1F', sc: '#0B2F7A', iris: ['#FFF4BF', '#F2B200', '#8F5A00'], bolt: '#FF5A1F', glow: '#FFFFFF' };
+      ? { b0: '#4A2C00', b1: '#A86F00', s0: '#FFF6C9', s1: '#FFD23F', s2: '#E2A100', bel: '#FFF4CC', line: '#B91C1C', sc: '#6B4200', iris: ['#FFFFFF', '#FF5A5A', '#7A0000'], glow: '#FFF9DB' }
+      : { b0: '#061B4D', b1: '#1E63E9', s0: '#F2F6FC', s1: '#B9C7DA', s2: '#EEF3FA', bel: '#FFFFFF', line: '#FF5A1F', sc: '#0B2F7A', iris: ['#FFF4BF', '#F2B200', '#8F5A00'], glow: '#FFFFFF' };
     return `<defs>
       <clipPath id="${p}c"><path d="${MIN}"/></clipPath>
       ${lg(p + 'b', 0, 34, 0, 75, [[0, C.b0], [.27, C.b1], [.43, C.s0], [.55, C.s1], [.7, C.s2], [1, C.bel]])}
@@ -8826,7 +8950,7 @@ const ZL = (() => {
     <path d="M196 63 L227 84 Q231 88.5 225.5 90.4 L215 91 Q206 86 193 70 Z" fill="url(#${p}l)" stroke="#fff" stroke-width=".8" stroke-opacity=".85"/>
     <path d="M200 67 L223 85" stroke="#fff" stroke-width=".9" opacity=".7"/>
     <path d="M196 63 L227 84 Q231 88.5 225.5 90.4 L215 91 Q206 86 193 70 Z" fill="none" stroke="#294A70" stroke-width=".5" stroke-opacity=".45"/>
-    ${ring(221.5, 84.6, 2.4, 2.6)}
+    ${ring(221.5, 84.6, 2.4, 2.6)}${spark(p + 'sp', 221.5, 84.6, 6)}
     ${wire('M128 72 L128 76.6', 1.4)}${treble(128, 79.2, 1.02)}
     ${wire('M33 55 L29.4 55', 1.4)}${treble(26.4, 55.6, .95)}
     <path d="${MIN}" fill="url(#${p}b)"/>
@@ -8841,12 +8965,13 @@ const ZL = (() => {
       <ellipse cx="170" cy="61" rx="10" ry="7" fill="url(#${p}r)"/>
       <path d="M171.5 37.5 C163.5 46 163.5 61 170.5 71" fill="none" stroke="#0B1A33" stroke-width="1.1" opacity=".38"/>
       <path d="M173 38 C166 46 166 60 172 70" fill="none" stroke="#fff" stroke-width=".6" opacity=".55"/>
-      ${bolt(56, 45.4, .5, C.bolt, 'opacity=".9"')}
+      ${zzWord(gold ? 92 : 100, 66.4, 2.5, gold ? '#5C3A00' : '#0B2F7A', .55, gold ? 'CHAMPION' : 'ZZIRIT')}
       <path d="M52 40 C90 31 150 30 196 44 L196 52 C150 41 92 42 52 52 Z" fill="url(#${p}h)"/>
     </g>
     ${gloss('M66 42.5 C100 36.6 150 35.6 186 41', 2.2, .7)}
     ${gloss('M150 70.5 C170 69 186 66.5 196 63', 1.2, .35)}
     <path d="${MIN}" fill="none" stroke="#0B1530" stroke-width=".7" stroke-opacity=".45"/>
+    ${zzMark(p + 'm', 128, 42.4, 26, gold ? 'dark' : 'navy')}
     ${eye(p, 185, 48.6, 6.8, C.iris)}
     ${gold ? `<path d="M118 47 l1.2 3 3 1.2-3 1.2-1.2 3-1.2-3-3-1.2 3-1.2z M66 49 l.9 2.2 2.2.9-2.2.9-.9 2.2-.9-2.2-2.2-.9 2.2-.9z" fill="#fff" opacity=".95"/>` : ''}`;
   }
@@ -8874,11 +8999,11 @@ const ZL = (() => {
       ${[0, 1, 2, 3, 4, 5, 6, 7].map(i => `<path d="M${48 + i * 19} 72 L${58 + i * 19} 59.5 L${64 + i * 19} 59.5 L${54 + i * 19} 72 Z" fill="#F4FFE8" opacity=".85"/>`).join('')}
       <rect x="22" y="42" width="195" height="29" fill="url(#${p}f)"/>
       <path d="M34 56.4 C80 55.8 150 55.6 207 56.4" fill="none" stroke="#fff" stroke-width="1" opacity=".9"/>
-      ${bolt(146, 45.6, .7, '#FFFFFF', 'opacity=".95"')}
     </g>
     ${gloss('M58 50.4 C100 45.4 160 45 196 49.6', 1.7, .8)}
     <path d="${JIG}" fill="none" stroke="#3A0A26" stroke-width=".7" stroke-opacity=".55"/>
-    ${eye(p, 199.5, 54.2, 4.2, ['#FFFFFF', '#FF3D7F', '#6B0030'])}`;
+    ${zzMark(p + 'm', 143.6, 44.6, 22, 'navy')}
+    ${eye(p, 199.5, 54.2, 4.2, ['#FFFFFF', '#FF3D7F', '#6B0030'])}${spark(p + 'sp', 220.4, 64.2, 6)}`;
   }
 
   /* ---------- 오징어킬러 에기: orange cloth over gold tape, marble back, a glow eye in its socket, lead plate under the chin,
@@ -8951,7 +9076,6 @@ const ZL = (() => {
       <rect x="44" y="28" width="165" height="60" fill="url(#${p}u)"/>
       <path d="M58 44 C90 31 150 28 196 44 L196 52 C150 38 92 40 58 54 Z" fill="url(#${p}h)"/>
       <path d="M172 39 C166 50 166 62 173 73" fill="none" stroke="#B3001B" stroke-width="1.6" opacity=".7"/>
-      ${bolt(120, 63.5, .7, '#FFFFFF', 'opacity=".85"')}
     </g>
     ${gloss('M70 41 C102 32.4 152 31.2 190 41.6', 2, .7)}
     <path d="${VIB}" fill="none" stroke="#2A2400" stroke-width=".7" stroke-opacity=".45"/>
@@ -8984,7 +9108,6 @@ const ZL = (() => {
       <rect x="30" y="38" width="180" height="40" fill="url(#${p}x)"/>
       <path d="M38 62 C64 72.6 110 74.8 150 72 C176 70 196 65 204 60 L206 78 L34 78 Z" fill="url(#${p}k)"/>
       ${[[66, 52], [92, 63.6], [156, 51], [176, 62.6]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="2.9" fill="#8A0B16"/><circle cx="${x}" cy="${y}" r="2.3" fill="#E11D2E"/><circle cx="${x - .8}" cy="${y - .9}" r=".8" fill="#fff" opacity=".75"/>`).join('')}
-      ${bolt(116, 50.5, .72, '#6B2A00', 'opacity=".5"')}
     </g>
     <path d="M48 47.6 C76 42.4 140 41.4 190 50.4" fill="none" stroke="#FFFCEB" stroke-width="2.2" stroke-linecap="round" opacity=".85"/>
     <path d="${SPN}" fill="none" stroke="#4A2E00" stroke-width=".9" stroke-opacity=".65"/>
@@ -9014,7 +9137,6 @@ const ZL = (() => {
     ${glitter.join('')}
     <circle cx="182" cy="48" r="22" fill="none" stroke="#5A0000" stroke-width=".8" stroke-opacity=".6"/>
     <ellipse cx="174.5" cy="37.5" rx="7" ry="4.2" transform="rotate(-28 174.5 37.5)" fill="#fff" opacity=".55"/>
-    ${bolt(170, 52, .62, '#FFE27A', 'opacity=".9"')}
     ${eye(p, 190.5, 45, 6.2, ['#FFFFFF', '#FFD84D', '#9A6A00'])}`;
   }
 
@@ -9041,24 +9163,199 @@ const ZL = (() => {
     ${eye(p, 193.5, 54.6, 4.4, ['#FFFFFF', '#FF5A1F', '#8A2400'])}`;
   }
 
-  // the line: id, drawing, price (the server's price wins), perk in the park's solo game, how it is shown
+  /* ---------- 낚싯대: the butt half of a rod at an angle — butt cap, grip, reel seat (the signature rods carry the mark on
+     it), fore grip, winding check, then the blank with thread wraps and guides running off to the top right ---------- */
+  const cy4 = c => [[0, c[0]], [.26, c[1]], [.55, c[2]], [1, c[3] || c[0]]];
+  const cyl = (id, x0, x1, r, c, rx = 1) => `${lg(id, 0, -r, 0, r, cy4(c))}<rect x="${n(x0)}" y="${n(-r)}" width="${n(x1 - x0)}" height="${n(2 * r)}" rx="${rx}" fill="url(#${id})"/>`;
+  function rod(p, C) {
+    const rAt = x => 4.6 - (x - 138) * (3.1 / 134);
+    const tex = C.tex === 'cork'
+      ? `<pattern id="${p}t" patternUnits="userSpaceOnUse" width="7" height="5"><ellipse cx="2" cy="1.4" rx="1.3" ry=".7" fill="#6B4A1E" opacity=".45"/><ellipse cx="5.4" cy="3.6" rx=".9" ry=".5" fill="#6B4A1E" opacity=".4"/><circle cx="4.6" cy="1" r=".4" fill="#FFF1D6" opacity=".5"/></pattern>`
+      : `<pattern id="${p}t" patternUnits="userSpaceOnUse" width="3" height="3"><circle cx=".8" cy=".8" r=".45" fill="#fff" opacity=".1"/><circle cx="2.2" cy="2.1" r=".35" fill="#000" opacity=".25"/></pattern>`;
+    const carbon = `<pattern id="${p}cb" patternUnits="userSpaceOnUse" width="2.4" height="2.4"><rect width="1.2" height="1.2" fill="#fff" opacity=".1"/><rect x="1.2" y="1.2" width="1.2" height="1.2" fill="#fff" opacity=".1"/></pattern>`;
+    const guide = (x, h, rr) => { const r0 = rAt(x); return `${cyl(p + 'gw' + x, x - 5, x + 5, r0 + .55, C.wrap, .6)}<path d="M${n(x - 5)} ${n(-r0 - .6)} V${n(r0 + .6)} M${n(x + 5)} ${n(-r0 - .6)} V${n(r0 + .6)}" stroke="${C.trim}" stroke-width=".7"/>
+      <path d="M${n(x - 3.4)} ${n(r0)} L${n(x)} ${n(h - rr)} L${n(x + 3.4)} ${n(r0)}" fill="none" stroke="${C.guide}" stroke-width="1.1" stroke-linejoin="round"/>
+      <ellipse cx="${x}" cy="${n(h)}" rx="${n(rr * .34)}" ry="${n(rr)}" fill="none" stroke="${C.guide}" stroke-width="1.4"/><ellipse cx="${x}" cy="${n(h)}" rx="${n(rr * .2)}" ry="${n(rr * .74)}" fill="none" stroke="#C9D2DD" stroke-width=".6"/>`; };
+    return `<defs>${tex}${carbon}</defs>
+    <ellipse cx="128" cy="113" rx="104" ry="4" fill="#000" opacity=".18"/>
+    <g transform="translate(9 107) rotate(-24)">
+      ${lg(p + 'bl', 0, -4.6, 0, 4.6, cy4(C.blank))}<path d="M138 -4.6 L274 -1.5 L274 1.5 L138 4.6 Z" fill="url(#${p}bl)"/>
+      <path d="M140 -3.4 L272 -.9" stroke="#fff" stroke-width=".8" opacity=".45"/>
+      ${guide(176, 19, 7)}${guide(220, 13, 4.6)}${guide(256, 9, 3.2)}
+      ${cyl(p + 'dw', 140, 154, 4.9, C.wrap, .6)}<path d="M140 -5 V5 M143 -5 V5 M151 -5 V5 M154 -5 V5" stroke="${C.trim}" stroke-width=".7"/>
+      ${C.zig ? `<path d="M156 -4.4 L160 4.2 L164 -4.2 L168 4.1 L172 -4.1" fill="none" stroke="${C.zig}" stroke-width="1.6" stroke-linejoin="round"/>` : ''}
+      ${zzWord(180, -1.3, 2.6, C.text, .85, C.label)}
+      <path d="M0 -7.6 H9 V7.6 H0 C-1.4 7.6 -2.2 4.6 -2.2 0 C-2.2 -4.6 -1.4 -7.6 0 -7.6 Z" fill="url(#${p}cp)"/>${lg(p + 'cp', 0, -7.6, 0, 7.6, cy4(C.cap))}
+      ${cyl(p + 'g1', 9, 64, 7, C.grip, 2)}<rect x="9" y="-7" width="55" height="14" rx="2" fill="url(#${p}t)"/>
+      ${cyl(p + 'h1', 64, 69, 7.6, C.hood)}
+      ${cyl(p + 'st', 69, 98, 6.2, C.seat)}${C.sig ? `<rect x="69" y="-6.2" width="29" height="12.4" fill="url(#${p}cb)"/>` : ''}
+      ${cyl(p + 'nt', 98, 108, 6.8, C.hood)}<path d="M100 -6.8 V6.8 M102 -6.8 V6.8 M104 -6.8 V6.8 M106 -6.8 V6.8" stroke="#000" stroke-width=".5" opacity=".3"/>
+      ${cyl(p + 'g2', 108, 134, 6.4, C.grip, 2)}<rect x="108" y="-6.4" width="26" height="12.8" rx="2" fill="url(#${p}t)"/>
+      ${cyl(p + 'wc', 134, 138, 5.6, C.hood)}
+      <path d="M144 5 C144 9 147 10 149 8.4" fill="none" stroke="${C.guide}" stroke-width=".9"/>
+      ${C.sig ? `${zzMark(p + 'm', 76.6, -6.2, 14.4, 'silver')}${spark(p + 'sp', 176, 19 - 7, 7)}` : ''}
+    </g>`;
+  }
+
+  /* ---------- 릴: a spinning reel from the side, hanging under a piece of rod — foot and stem, the gear body with its
+     side plate, the handle arm and knob, the rotor and bail, the spool full of line, the drag knob. A lever-brake (LB)
+     reel has its brake lever in front of the stem. The signature reels carry the mark on the side plate. ---------- */
+  function reel(p, C) {
+    const knob = C.knobT === 'paddle'
+      ? `<path d="M56 98 C52 93 54 87 60 86 C66 85 70 90 68 96 C66 102 60 103 56 98 Z" fill="url(#${p}kn)"/>`
+      : `<ellipse cx="62" cy="96" rx="8" ry="7.4" fill="url(#${p}kn)"/><ellipse cx="59.6" cy="93" rx="3" ry="2" fill="#fff" opacity=".35"/>`;
+    return `<defs>
+      ${lg(p + 'rd', 0, 9, 0, 17, cy4(['#15181D', '#4A505A', '#22262D']))}
+      ${lg(p + 'rf', 0, 0, 240, 0, [[0, '#fff', 0], [.24, '#fff'], [.8, '#fff'], [1, '#fff', 0]])}
+      <mask id="${p}rm" maskUnits="userSpaceOnUse" x="0" y="0" width="240" height="120"><rect x="0" y="0" width="240" height="30" fill="url(#${p}rf)"/></mask>
+      ${lg(p + 'bd', 76, 50, 126, 100, [[0, C.body[1]], [.45, C.body[0]], [1, C.body[2]]])}
+      ${rg(p + 'cv', 94, 68, 24, [[0, C.cover[0]], [.6, C.cover[1]], [1, C.cover[2]]])}
+      ${lg(p + 'rt', 0, 52, 0, 100, cy4(C.rotor))}
+      ${lg(p + 'sp', 0, 57, 0, 95, cy4(C.spool))}
+      ${lg(p + 'ln', 0, 60, 0, 92, cy4(C.line))}
+      ${lg(p + 'kn', 0, 88, 0, 104, cy4(C.knob))}
+      ${lg(p + 'dg', 0, 66, 0, 86, cy4(C.drag || C.spool))}
+      <pattern id="${p}lt" patternUnits="userSpaceOnUse" width="2" height="1.6"><path d="M0 .8 H2" stroke="#fff" stroke-width=".35" opacity=".35"/></pattern>
+    </defs>
+    <ellipse cx="124" cy="112" rx="70" ry="4" fill="#000" opacity=".18"/>
+    <rect x="0" y="9" width="240" height="8" rx="2" fill="url(#${p}rd)" mask="url(#${p}rm)"/>
+    <path d="M84 17 H126 C127 17 127 20 126 20 H84 C83 20 83 17 84 17 Z" fill="${C.body[2]}"/>
+    <path d="M96 20 C94 32 91 42 93 53 L109 53 C107 42 108 31 111 20 Z" fill="url(#${p}bd)"/>
+    ${C.lb ? `<path d="M110 26 C124 25 142 30 156 42 L153.4 45.6 C141 35.6 125 31 110 31.4 Z" fill="${C.lb}"/><circle cx="111" cy="28.6" r="2.4" fill="${C.body[2]}"/>` : ''}
+    <path d="M76 66 C76 55 87 50 101 50 C118 50 127 58 127 71 L127 85 C127 96 117 101 102 101 C87 101 76 95 76 84 Z" fill="url(#${p}bd)"/>
+    <ellipse cx="100" cy="75.6" rx="20.5" ry="21" fill="url(#${p}cv)"/>
+    <ellipse cx="100" cy="75.6" rx="20.5" ry="21" fill="none" stroke="#000" stroke-opacity=".25" stroke-width=".8"/>
+    ${C.accent ? `<path d="M80 62 C88 55 104 53 116 58" fill="none" stroke="${C.accent}" stroke-width="1.6"/>` : ''}
+    <circle cx="100" cy="75.6" r="9" fill="none" stroke="#fff" stroke-opacity=".18" stroke-width="1"/>
+    <path d="M126 55 L145 51.4 C148 51 149 53 149 56 L149 96 C149 99 148 101 145 100.6 L126 97 Z" fill="url(#${p}rt)"/>
+    <path d="M140 51.8 L170 49.2 L171 52.6 L141 55.4 Z M140 96.6 L170 99.2 L171 95.8 L141 93 Z" fill="url(#${p}rt)"/>
+    <path d="M168 49.4 C190 50 194 98 168 99.2" fill="none" stroke="${C.bail}" stroke-width="2.2"/><path d="M168 49.4 C189 50.4 193 97 168 99.2" fill="none" stroke="#fff" stroke-width=".6" opacity=".6"/>
+    <rect x="163" y="46.4" width="7" height="6" rx="1.4" fill="${C.bail}"/>
+    ${C.sig ? zzMark(p + 'm', 127.6, 64.6, 19, C.markStyle || 'silver') : ''}
+    <rect x="149" y="56.6" width="4" height="39" rx="1" fill="url(#${p}sp)"/>
+    <rect x="153" y="60.4" width="22" height="31.4" fill="url(#${p}ln)"/><rect x="153" y="60.4" width="22" height="31.4" fill="url(#${p}lt)"/>
+    <rect x="175" y="57.4" width="4.6" height="37.6" rx="1.2" fill="url(#${p}sp)"/>
+    <rect x="179.6" y="65.6" width="11" height="21" rx="2.4" fill="url(#${p}dg)"/><path d="M182 65.6 V86.6 M184.6 65.6 V86.6 M187.2 65.6 V86.6" stroke="#000" stroke-width=".6" opacity=".25"/>
+    <path d="M100 75.6 L62 96" stroke="url(#${p}bd)" stroke-width="6.4" stroke-linecap="round"/><path d="M100 75.6 L62 96" stroke="#fff" stroke-width="1" opacity=".3" transform="translate(-.6 -1.6)"/>
+    <circle cx="100" cy="75.6" r="5" fill="${C.body[2]}"/><circle cx="98.6" cy="74.2" r="1.6" fill="#fff" opacity=".4"/>
+    ${knob}
+    ${C.sig ? spark(p + 'sk', 185, 76, 7) : ''}`;
+  }
+
+  /* ---------- 찌: floats standing in calm water (the water is left out for the fishing game, which draws its own) —
+     a stick float, a ball float (구멍찌) with its hole and stopper, an LED float that glows. The signature floats carry
+     the mark on the body and glow blue at the top. ---------- */
+  const WL = 80;
+  function water(p, x, w, behind) {
+    return behind
+      ? `${lg(p + 'wa', 0, WL, 0, 120, [[0, '#7CC4FF', .28], [1, '#0B3D91', .55]])}<rect x="0" y="${WL}" width="240" height="${120 - WL}" fill="url(#${p}wa)"/>`
+      : `<path d="M0 ${WL} H240" stroke="#BFE3FF" stroke-width=".8" opacity=".55"/>${[1, 2, 3].map(i => `<ellipse cx="${x}" cy="${WL + .4}" rx="${n(w * .6 + i * 17)}" ry="${n(1.6 + i * 1.3)}" fill="none" stroke="#E6F4FF" stroke-width="${n(1.1 - i * .25)}" opacity="${n(.75 - i * .2)}"/>`).join('')}`;
+  }
+  function stickFloat(p, C, o) {
+    const x = 120, k = o.sig ? 1.42 : 1.18;
+    const body = `M${x} 38 C${n(x + 9 * k)} 44 ${n(x + 9.5 * k)} 66 ${n(x + 6.4 * k)} 84 C${n(x + 4.6 * k)} 93 ${n(x + 2 * k)} 99 ${x} 101 C${n(x - 2 * k)} 99 ${n(x - 4.6 * k)} 93 ${n(x - 6.4 * k)} 84 C${n(x - 9.5 * k)} 66 ${n(x - 9 * k)} 44 ${x} 38 Z`;
+    return `${lg(p + 'fb', x - 9 * k, 0, x + 9 * k, 0, [[0, C.body[2]], [.32, C.body[0]], [.58, C.body[1]], [1, C.body[2]]])}
+      ${lg(p + 'ft', x - 2.2, 0, x + 2.2, 0, [[0, C.top[1]], [.4, C.top[0]], [1, C.top[1]]])}
+      <clipPath id="${p}fc"><path d="${body}"/></clipPath>
+      ${C.glow ? `${rg(p + 'gl', x, 12, 16, [[0, C.glow, .85], [.35, C.glow, .35], [1, C.glow, 0]])}<circle cx="${x}" cy="12" r="16" fill="url(#${p}gl)"/>` : ''}
+      <path d="M${x} 2 V8" stroke="#2B2F36" stroke-width=".9"/>
+      <rect x="${x - 2.2}" y="7" width="4.4" height="32" rx="2" fill="url(#${p}ft)"/>
+      <rect x="${x - 2.2}" y="${7 + 12}" width="4.4" height="3" fill="${C.band || '#fff'}" opacity=".95"/><rect x="${x - 2.2}" y="${7 + 22}" width="4.4" height="2.6" fill="${C.band || '#fff'}" opacity=".95"/>
+      <path d="${body}" fill="url(#${p}fb)"/>
+      <g clip-path="url(#${p}fc)">
+        <rect x="${x - 14}" y="47" width="28" height="5" fill="${C.ring}"/>
+        <rect x="${x - 14}" y="${o.sig ? 91 : 70}" width="28" height="${o.sig ? 3 : 4}" fill="${C.ring}" opacity=".9"/>
+        ${o.sig ? zzMark(p + 'm', x - 10.6, 55.4, 21, C.markStyle || 'silver', 0) : ''}
+        <path d="M${x - 4.4} 44 C${x - 6.4} 58 ${x - 6} 76 ${x - 3.6} 90" fill="none" stroke="#fff" stroke-width="1.4" opacity=".5"/>
+      </g>
+      <path d="${body}" fill="none" stroke="#000" stroke-opacity=".3" stroke-width=".6"/>
+      <path d="M${x} 101 V114" stroke="#2B2F36" stroke-width="1.3"/><circle cx="${x}" cy="115.6" r="1.8" fill="none" stroke="#2B2F36" stroke-width="1"/>
+      ${o.sig ? spark(p + 'sk', x, 6, 9, C.glow || '#5AB0FF') : ''}`;
+  }
+  function ballFloat(p, C, o) {
+    const x = 120, cy = 66, r = 23;
+    return `${rg(p + 'bf', x - 8, cy - 9, r * 1.3, [[0, C.body[0]], [.55, C.body[1]], [1, C.body[2]]])}
+      ${rg(p + 'bt', x - 7, cy - 14, r, [[0, C.top[0]], [.6, C.top[1]], [1, C.top[2]]])}
+      <clipPath id="${p}bc"><circle cx="${x}" cy="${cy}" r="${r}"/></clipPath>
+      <path d="M${x} 2 V${cy - r}" stroke="#D7DEE6" stroke-width=".8" opacity=".9"/>
+      <ellipse cx="${x}" cy="22" rx="3" ry="4" fill="#E11D2E"/><ellipse cx="${x - 1}" cy="20.6" rx="1" ry="1.3" fill="#fff" opacity=".6"/>
+      <circle cx="${x}" cy="${cy}" r="${r}" fill="url(#${p}bf)"/>
+      <g clip-path="url(#${p}bc)">
+        <path d="M${x - r} ${cy - 2} C${x - 10} ${cy + 3} ${x + 10} ${cy + 3} ${x + r} ${cy - 2} V${cy - r} H${x - r} Z" fill="url(#${p}bt)"/>
+        ${C.stripe ? `<path d="M${x - r} ${cy + 1} C${x - 10} ${cy + 6} ${x + 10} ${cy + 6} ${x + r} ${cy + 1}" fill="none" stroke="${C.stripe}" stroke-width="2.2"/>` : ''}
+        ${o.sig ? zzMark(p + 'm', x - 4.6, cy - 19.4, 21, 'silver') : ''}
+        <ellipse cx="${x - 8}" cy="${cy - 12}" rx="8" ry="5" transform="rotate(-25 ${x - 8} ${cy - 12})" fill="#fff" opacity=".45"/>
+      </g>
+      <circle cx="${x}" cy="${cy}" r="${r}" fill="none" stroke="#000" stroke-opacity=".28" stroke-width=".7"/>
+      <ellipse cx="${x}" cy="${cy - r + 1.4}" rx="2.4" ry="1.2" fill="#1A1D22"/>
+      <path d="M${x} ${cy + r} V114" stroke="#D7DEE6" stroke-width=".8" opacity=".85"/>
+      <ellipse cx="${x}" cy="${cy + r + 1}" rx="1.8" ry="1" fill="#1A1D22"/>
+      ${o.sig ? spark(p + 'sk', x, cy - r - 2, 9, '#5AB0FF') : ''}`;
+  }
+  function floatArt(p, C, o) {
+    o = o || {};
+    const art = C.ball ? ballFloat(p, C, o) : stickFloat(p, C, o);
+    if (!o.water) return art;
+    // in the water: the part below the line a little blue and blurred, ripples around
+    return `<defs><clipPath id="${p}up"><rect x="0" y="0" width="240" height="${WL}"/></clipPath><clipPath id="${p}dn"><rect x="0" y="${WL}" width="240" height="${120 - WL}"/></clipPath></defs>
+      ${water(p, 120, C.ball ? 46 : 18, true)}
+      <g clip-path="url(#${p}dn)" opacity=".55">${art.replace(/id="([^"]+)"/g, 'id="$1u"').replace(/url\(#([^)]+)\)/g, 'url(#$1u)')}</g>
+      <g clip-path="url(#${p}up)">${art}</g>
+      ${water(p, 120, C.ball ? 46 : 18, false)}`;
+  }
+
+  // the line: id, kind, drawing, price (the server's price wins), help in the park's solo game, how it is shown. Each kind
+  // has a free basic piece; the signature (sig) pieces carry the ZZIRIT mark and cost a few weeks of winning.
+  const R = (c, o) => p => rod(p, Object.assign({ cap: ['#111', '#4A4F57', '#25292F'], hood: ['#6E7682', '#E9EDF2', '#A9B1BC', '#5A616B'], guide: '#3A404A', trim: '#C9D2DD', text: '#fff', label: '1-530' }, c, o || {}));
+  const RL = c => p => reel(p, Object.assign({ bail: '#C9D1DB', knob: ['#15181D', '#4A505A', '#22262D'] }, c));
+  const FL = c => (p, o) => floatArt(p, c, Object.assign({ sig: !!c.sig }, o));
   const LIST = [
-    { id: 'jighead', draw: jighead, tie: [190, 34.4], spec: '3.5g · 2"', price: 0, free: true, perk: null, bg: ['#20344F', '#0B1626'] },
-    { id: 'spoon', draw: spoon, tie: [213.4, 58], spec: '7g', price: 100, perk: { reel: 1.15 }, bg: ['#4A3510', '#1A1206'] },
-    { id: 'vib', draw: vib, tie: [171, 24.6], spec: '70mm · 14g', price: 150, perk: { tension: .85 }, bg: ['#2C3D0A', '#0F1504'] },
-    { id: 'jig', draw: jig, tie: [220.4, 64.2], spec: '120mm · 40g', price: 200, perk: { wait: .75 }, bg: ['#45173A', '#160712'] },
-    { id: 'egi', draw: egi, tie: [215.6, 53.6], spec: ['3.5호', 'size 3.5', '3.5号', '3.5号'], price: 200, perk: { win: .3 }, bg: ['#4A2408', '#1A0C03'] },
-    { id: 'tai', draw: tai, tie: [182, 4], spec: '60g', price: 300, perk: { sp: ['madai', 'kurodai'], x: 3 }, bg: ['#4A0E0E', '#180404'] },
-    { id: 'minnow', draw: p => minnow(p, false), tie: [221.5, 84.6], spec: '110mm · 16g', price: 500, perk: { trophy: 2 }, bg: ['#0E2C66', '#050E24'] },
-    { id: 'gold', draw: p => minnow(p, true), tie: [221.5, 84.6], spec: '110mm · 16g', price: null, prize: true, perk: { trophy: 2, reel: 1.1 }, bg: ['#4D3800', '#140E00'] }
+    { id: 'jighead', kind: 'lure', draw: jighead, tie: [190, 34.4], spec: '3.5g · 2"', price: 0, free: true, perk: null, bg: ['#20344F', '#0B1626'] },
+    { id: 'spoon', kind: 'lure', draw: spoon, tie: [213.4, 58], spec: '7g', price: 100, perk: { reel: 1.15 }, bg: ['#4A3510', '#1A1206'] },
+    { id: 'vib', kind: 'lure', draw: vib, tie: [171, 24.6], spec: '70mm · 14g', price: 150, perk: { tension: .85 }, bg: ['#2C3D0A', '#0F1504'] },
+    { id: 'egi', kind: 'lure', draw: egi, tie: [215.6, 53.6], spec: ['3.5호', 'size 3.5', '3.5号', '3.5号'], price: 200, perk: { win: .3 }, bg: ['#4A2408', '#1A0C03'] },
+    { id: 'tai', kind: 'lure', draw: tai, tie: [182, 4], spec: '60g', price: 300, perk: { sp: ['madai', 'kurodai'], x: 3 }, bg: ['#4A0E0E', '#180404'] },
+    { id: 'jig', kind: 'lure', sig: true, draw: jig, tie: [220.4, 64.2], spec: '120mm · 40g', price: 800, perk: { wait: .7, trophy: 1.3 }, bg: ['#45173A', '#160712'] },
+    { id: 'minnow', kind: 'lure', sig: true, draw: p => minnow(p, false), tie: [221.5, 84.6], spec: '110mm · 16g', price: 1000, perk: { trophy: 2 }, bg: ['#0E2C66', '#050E24'] },
+    { id: 'gold', kind: 'lure', sig: true, draw: p => minnow(p, true), tie: [221.5, 84.6], spec: '110mm · 16g', price: null, prize: true, perk: { trophy: 2, reel: 1.1 }, bg: ['#4D3800', '#140E00'] },
+    { id: 'rod_basic', kind: 'rod', draw: R({ grip: ['#14161A', '#3A3E45', '#202328'], seat: ['#7C8590', '#F0F3F6', '#B5BDC7', '#5E6670'], blank: ['#0E1013', '#4B5059', '#1E2126'], wrap: ['#2A2E35', '#6B727C', '#3A3F47'], label: '1-530' }), spec: ['1호 5.3m', '#1 · 5.3 m', '1号 5.3m', '1号 5.3米'], price: 0, free: true, perk: null, bg: ['#26303D', '#0D1117'], rodC: ['#1E2126', '#4B5059'] },
+    { id: 'rod_iso', kind: 'rod', draw: R({ grip: ['#B98D55', '#E8C995', '#C9A06A'], tex: 'cork', seat: ['#4A4F57', '#9AA2AD', '#6B727C', '#30343A'], blank: ['#C9CCD0', '#FFFFFF', '#E8EAED'], wrap: ['#8E0B16', '#E3263A', '#B5121F'], trim: '#E8C46A', text: '#B5121F', label: '1-530' }), spec: ['1호 5.3m', '#1 · 5.3 m', '1号 5.3m', '1号 5.3米'], price: 150, perk: { tension: .92 }, bg: ['#3A2A22', '#120C09'], rodC: ['#E8EAED', '#B5121F'] },
+    { id: 'rod_wine', kind: 'rod', draw: R({ grip: ['#14161A', '#3A3E45', '#202328'], seat: ['#8A6A1E', '#F5DE8A', '#C9A13A', '#6B4E10'], hood: ['#8A6A1E', '#F5DE8A', '#C9A13A', '#6B4E10'], blank: ['#3D0612', '#B11E3A', '#6E0E22'], wrap: ['#8A6A1E', '#F5DE8A', '#C9A13A'], trim: '#1A0A0E', text: '#F5DE8A', label: '1.5-530', guide: '#2A2E35' }), spec: ['1.5호 5.3m', '#1.5 · 5.3 m', '1.5号 5.3m', '1.5号 5.3米'], price: 250, perk: { tension: .88, win: .1 }, bg: ['#4A0E1C', '#16040A'], rodC: ['#6E0E22', '#F5DE8A'] },
+    { id: 'rod_spark', kind: 'rod', sig: true, draw: R({ grip: ['#0B1530', '#2A3A5E', '#141F3A'], seat: ['#0A0C10', '#3A404A', '#15181D'], hood: ['#5E6670', '#E9EDF2', '#A9B1BC', '#454B54'], blank: ['#06143A', '#2F6BFF', '#0E2A6E'], wrap: ['#C9D2DD', '#FFFFFF', '#9AA4B2'], trim: '#2F6BFF', text: '#fff', label: 'ZZIRIT 1.5-530', sig: true }), spec: ['1.5호 5.3m', '#1.5 · 5.3 m', '1.5号 5.3m', '1.5号 5.3米'], price: 900, perk: { tension: .84, trophy: 1.2 }, bg: ['#10285E', '#040B1E'], rodC: ['#0E2A6E', '#2F6BFF'] },
+    { id: 'rod_bolt', kind: 'rod', sig: true, draw: R({ grip: ['#0B1530', '#2A3A5E', '#141F3A'], seat: ['#0A0C10', '#3A404A', '#15181D'], hood: ['#1D4ED8', '#9BD0FF', '#3B82F6', '#0B2C7A'], blank: ['#7A8FB0', '#F4F8FF', '#9DB4DA', '#3D5E99'], wrap: ['#C2410C', '#FF8A4C', '#FF5A1F'], trim: '#0B1530', zig: '#FF5A1F', text: '#0B1530', label: 'ZZIRIT BOLT', sig: true, guide: '#2A2E35' }), spec: ['2호 5.3m', '#2 · 5.3 m', '2号 5.3m', '2号 5.3米'], price: 1200, perk: { tension: .78, win: .15, trophy: 1.3 }, bg: ['#173E86', '#050E24'], rodC: ['#9DB4DA', '#FF5A1F'] },
+    { id: 'reel_basic', kind: 'reel', draw: RL({ body: ['#3A3F47', '#5E6670', '#1E2126'], cover: ['#4A505A', '#2A2E35', '#15181D'], rotor: ['#15181D', '#5E6670', '#2A2E35'], spool: ['#7C8590', '#F0F3F6', '#B5BDC7', '#5E6670'], line: ['#2C7A3A', '#7FD68C', '#3E9A4E'] }), spec: '2500', price: 0, free: true, perk: null, bg: ['#26303D', '#0D1117'], reelC: ['#3A3F47', '#B5BDC7'] },
+    { id: 'reel_red', kind: 'reel', draw: RL({ body: ['#3A3F47', '#5E6670', '#1E2126'], cover: ['#E3263A', '#8E0B16', '#4A060C'], rotor: ['#15181D', '#5E6670', '#2A2E35'], spool: ['#8E0B16', '#FF6B76', '#C2121F', '#5A060C'], line: ['#C9D2DD', '#FFFFFF', '#E3E8EE'], knob: ['#8E0B16', '#FF6B76', '#C2121F'], accent: '#E3263A' }), spec: '2500', price: 180, perk: { reel: 1.08 }, bg: ['#3D1016', '#140507'], reelC: ['#3A3F47', '#E3263A'] },
+    { id: 'reel_lbr', kind: 'reel', draw: RL({ body: ['#C9A13A', '#F5DE8A', '#8A6A1E'], cover: ['#F5DE8A', '#C9A13A', '#6B4E10'], rotor: ['#15181D', '#5E6670', '#2A2E35'], spool: ['#8A6A1E', '#F5DE8A', '#C9A13A', '#6B4E10'], line: ['#E8C46A', '#FFF3B0', '#D9A93A'], lb: '#C9A13A', knobT: 'paddle' }), spec: 'LB 2500', price: 250, perk: { reel: 1.12, win: .05 }, bg: ['#3D2E0A', '#140F03'], reelC: ['#C9A13A', '#F5DE8A'] },
+    { id: 'reel_spark', kind: 'reel', sig: true, draw: RL({ body: ['#0E2A6E', '#2F6BFF', '#06143A'], cover: ['#1B3A73', '#0E2350', '#06143A'], rotor: ['#06143A', '#3B82F6', '#0E2350'], spool: ['#9AA4B2', '#FFFFFF', '#C9D2DD', '#6B727C'], line: ['#1D4ED8', '#7CC4FF', '#2F7BFF'], knob: ['#06143A', '#3B82F6', '#0E2350'], sig: true }), spec: '2500', price: 900, perk: { reel: 1.15, tension: .95 }, bg: ['#10285E', '#040B1E'], reelC: ['#0E2A6E', '#2F6BFF'] },
+    { id: 'reel_bolt', kind: 'reel', sig: true, draw: RL({ body: ['#9DB4DA', '#F4F8FF', '#3D5E99'], cover: ['#1B3A73', '#0E2350', '#06143A'], rotor: ['#3D5E99', '#F4F8FF', '#7A8FB0'], spool: ['#C2410C', '#FF8A4C', '#FF5A1F', '#7A2A00'], line: ['#C9D2DD', '#FFFFFF', '#E3E8EE'], knob: ['#C2410C', '#FF8A4C', '#FF5A1F'], lb: '#FF5A1F', accent: '#FF5A1F', knobT: 'paddle', sig: true, markStyle: 'navy', drag: ['#0B1530', '#3A4A6E', '#141F3A'] }), spec: 'LB 2500', price: 1200, perk: { reel: 1.2, win: .1 }, bg: ['#173E86', '#050E24'], reelC: ['#9DB4DA', '#FF5A1F'] },
+    { id: 'float_basic', kind: 'float', draw: FL({ body: ['#FFFFFF', '#E9ECEF', '#9AA4B2'], top: ['#FF5A1F', '#C2410C'], ring: '#15181D' }), spec: '1호', price: 0, free: true, perk: null, bg: ['#1E3A5F', '#0A1626'] },
+    { id: 'float_ball', kind: 'float', draw: FL({ ball: true, body: ['#FFFFFF', '#E3E8EE', '#8E99A8'], top: ['#FFB27A', '#FF5A1F', '#C2410C'] }), spec: 'B', price: 100, perk: { win: .1 }, bg: ['#1E3A5F', '#0A1626'] },
+    { id: 'float_led', kind: 'float', draw: FL({ body: ['#3A3F47', '#7C8590', '#15181D'], top: ['#B9FFB0', '#3BD45A'], ring: '#9AA4B2', band: '#E9FFE6', glow: '#4ADE80' }), spec: '1호 LED', price: 200, perk: { win: .15, wait: .92 }, bg: ['#0E2A2A', '#041010'] },
+    { id: 'float_spark', kind: 'float', sig: true, draw: FL({ body: ['#1B3A73', '#3B6FD0', '#06143A'], top: ['#BFE3FF', '#3B8BFF'], ring: '#C9D2DD', band: '#E6F4FF', glow: '#5AB0FF', sig: true }), spec: '1호 LED', price: 800, perk: { win: .2, wait: .88 }, bg: ['#10285E', '#040B1E'] },
+    { id: 'float_bolt', kind: 'float', sig: true, draw: FL({ ball: true, body: ['#F4F8FF', '#9DB4DA', '#3D5E99'], top: ['#FFD0B0', '#FF5A1F', '#C2410C'], stripe: '#0B1530', sig: true }), spec: 'B', price: 1000, perk: { win: .25, wait: .85 }, bg: ['#173E86', '#050E24'] }
   ];
+  const KINDS = ['lure', 'rod', 'reel', 'float'];
   const BY = Object.fromEntries(LIST.map(x => [x.id, x]));
-  const inner = (id, pfx) => { const L = BY[id]; return L ? L.draw((pfx || 'zl') + id) : ''; };
-  const svg = (id, pfx) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 120" width="480" height="240">${inner(id, pfx)}</svg>`;
+  // a picture of one piece; floats come in the water unless v === 'game' (the fishing game draws its own water)
+  const inner = (id, pfx, v) => { const L = BY[id]; return L ? L.draw((pfx || 'zl') + id.replace(/_/g, ''), { water: L.kind === 'float' && v !== 'game' }) : ''; };
+  const svg = (id, pfx, v) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 120" width="480" height="240">${inner(id, pfx, v)}</svg>`;
   const _url = new Map(), _img = new Map();
-  function url(id) { let u = _url.get(id); if (!u && BY[id]) { u = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg(id)); _url.set(id, u); } return u || ''; }
-  function img(id) { let im = _img.get(id); if (!im && BY[id]) { im = new Image(); im.decoding = 'async'; im.src = url(id); _img.set(id, im); } return im || null; }
-  return { LIST, BY, inner, svg, url, img };
+  function url(id, v) { const k = id + '|' + (v || ''); let u = _url.get(k); if (!u && BY[id]) { u = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg(id, '', v)); _url.set(k, u); } return u || ''; }
+  function img(id, v) { const k = id + '|' + (v || ''); let im = _img.get(k); if (!im && BY[id]) { im = new Image(); im.decoding = 'async'; im.src = url(id, v); _img.set(k, im); } return im || null; }
+  // the help of everything on the line together, kept within bounds so the game stays a game
+  function perk(ids) {
+    const o = { reel: 1, tension: 1, wait: 1, win: 0, trophy: 1, sp: null, x: 1 };
+    for (const id of ids) {
+      const P = id && BY[id] && BY[id].perk; if (!P) continue;
+      if (P.reel) o.reel *= P.reel; if (P.tension) o.tension *= P.tension; if (P.wait) o.wait *= P.wait;
+      if (P.win) o.win += P.win; if (P.trophy) o.trophy *= P.trophy; if (P.sp) { o.sp = P.sp; o.x = P.x; }
+    }
+    o.reel = Math.min(o.reel, 1.4); o.tension = Math.max(o.tension, .65); o.wait = Math.max(o.wait, .6); o.win = Math.min(o.win, .6); o.trophy = Math.min(o.trophy, 2.6);
+    return o;
+  }
+  // the mark on its own (for pages): <svg> of the ZZIRIT fish, wave, line and spark
+  const mark = (style = 'silver', pfx = 'zm') => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="2 -4 122 110" aria-hidden="true">${zzMark(pfx, 0, 0, 120, style)}</svg>`;
+  return { LIST, KINDS, BY, inner, svg, url, img, perk, mark };
 })();
 
 /* ===== My character (original chibi angler) · profile picture ===== */
@@ -9090,7 +9387,9 @@ const CH = (() => {
     o.hc = clamp(parseInt(o.hc, 10) || 0, 0, HAIRC.length - 1);
     for (const k of ['hs', 'ey', 'mo', 'ht', 'ou', 'ac', 'rd']) if (!(o[k] in P[k])) o[k] = DEF[k];
     o.htc = hex(o.htc) || DEF.htc; o.ouc = hex(o.ouc) || DEF.ouc; o.bg = hex(o.bg) || DEF.bg;
-    if (!(typeof ZL !== 'undefined' && ZL.BY[o.lu])) delete o.lu; // the 찌릿 루어 on the line (shop.js decides whose)
+    // the gear from the 찌릿 낚시점 (shop.js decides whose): the lure on the line, the rod and the reel in the hands
+    const ok = (id, kind) => typeof ZL !== 'undefined' && ZL.BY[id] && ZL.BY[id].kind === kind;
+    if (!ok(o.lu, 'lure')) delete o.lu; if (!ok(o.gr, 'rod')) delete o.gr; if (!ok(o.re, 'reel')) delete o.re;
     return o;
   }
   // deterministic look for anglers who never made one (so every sea has its angler)
@@ -9227,10 +9526,21 @@ const CH = (() => {
     const s = .12, [tx, ty] = L.tie;
     return `<g transform="translate(${(110 - s * ty).toFixed(2)} ${(64 + s * tx).toFixed(2)}) scale(${s}) rotate(-90)">${ZL.inner(c.lu, 'ch')}</g>`;
   }
+  // the shop's reel: its body and spool colours, the handle knob; a signature reel glints
+  function reelSVG(c) {
+    const R = ZL.BY[c.re], [body, spool] = R.reelC;
+    return `<path d="M72.5 94 L67.4 97.4" stroke="${OL}" stroke-width="1.3" stroke-linecap="round"/><circle cx="67" cy="97.8" r="1.6" fill="${spool}" stroke="${OL}" stroke-width=".8"/>
+      <ellipse cx="77.4" cy="96.2" rx="2.9" ry="2" transform="rotate(-66 77.4 96.2)" fill="${spool}" stroke="${OL}" stroke-width="1"/>
+      <circle cx="72.5" cy="94" r="4.4" fill="${body}" stroke="${OL}" stroke-width="1.2"/><circle cx="72.5" cy="94" r="1.4" fill="${spool}"/><circle cx="71.4" cy="92.8" r="1" fill="#fff" opacity=".45"/>
+      ${R.sig ? '<path d="M80 99.6 l.5 1.4 1.4.5-1.4.5-.5 1.4-.5-1.4-1.4-.5 1.4-.5z" fill="#BFE3FF"/>' : ''}`;
+  }
   function rodSVG(c) {
-    const [a, b] = ROD[c.rd] || ROD.carbon;
+    const G = c.gr && ZL.BY[c.gr];
+    const [a, b] = G ? G.rodC : ROD[c.rd] || ROD.carbon;
     return `<path d="M73 98 L113 6" stroke="${OL}" stroke-width="3.4" stroke-linecap="round"/><path d="M73 98 L113 6" stroke="${a}" stroke-width="1.9" stroke-linecap="round"/>
-      <path d="M74.5 94.6 L77.4 88" stroke="${b}" stroke-width="2.6" stroke-linecap="round"/><circle cx="72.5" cy="94" r="3.6" fill="#9AA3AD" stroke="${OL}" stroke-width="1.2"/><circle cx="72.5" cy="94" r="1.2" fill="${OL}"/>
+      <path d="M74.5 94.6 L77.4 88" stroke="${b}" stroke-width="2.6" stroke-linecap="round"/>${G ? `<path d="M88 64 L89.6 60.4 M98 41 L99.6 37.4" stroke="${b}" stroke-width="2.4" stroke-linecap="butt"/>` : ''}
+      ${c.re ? reelSVG(c) : `<circle cx="72.5" cy="94" r="3.6" fill="#9AA3AD" stroke="${OL}" stroke-width="1.2"/><circle cx="72.5" cy="94" r="1.2" fill="${OL}"/>`}
+      ${G && G.sig ? '<circle cx="113" cy="6" r="3.2" fill="#5AB0FF" opacity=".35"/><path d="M113 2.4 l.7 2.9 2.9.7-2.9.7-.7 2.9-.7-2.9-2.9-.7 2.9-.7z" fill="#fff"/>' : ''}
       <path d="M113 6 Q118 34 110 64" stroke="#fff" stroke-width=".9" fill="none" opacity=".85"/>${c.rd === 'gold' ? '<path d="M100 30 l1.2 2.6 2.8.4-2 2 .5 2.8-2.5-1.3-2.5 1.3.5-2.8-2-2 2.8-.4z" fill="#FFF3B0"/>' : ''}`;
   }
   function head(c) {
@@ -9292,8 +9602,8 @@ const CH = (() => {
 
 function charOf(a, uid) {
   const c = a && a.char ? CH.fit(CH.norm(a.char), a, uid || avatarUid(a)) : CH.fromSeed(uid || (a && a.nick) || 'x');
-  const lu = typeof lureOf === 'function' ? lureOf(a, uid || avatarUid(a)) : '';
-  if (lu) c.lu = lu; else delete c.lu;
+  const who = uid || avatarUid(a);
+  for (const [k, kind] of [['lu', 'lure'], ['gr', 'rod'], ['re', 'reel']]) { const id = typeof gearOf === 'function' ? gearOf(a, who, kind) : ''; if (id) c[k] = id; else delete c[k]; }
   return c;
 }
 function safeColor(c) { return /^#[0-9a-fA-F]{6}$/.test(String(c)) ? c : '#CDEBF5'; }
@@ -11483,9 +11793,10 @@ function pkFish(seed, idx, m, perk) {
 function pkGameOpen(mode, opts = {}) {
   const box = $('#pk-game'); if (!box) return;
   const spot = PK.SPOTS.find(s => s.id === opts.spot) || pkNear(PK.SPOTS, PKS.me.x, PKS.me.y, 80) || null; // a duel can start anywhere
-  // the lure on my line helps a little when fishing alone; a duel is the same sea and the same rules for both
-  const lure = mode === 'solo' && S.me && S.me.lure ? myLure() : '';
-  PKS.game = { mode, seed: (opts.seed >>> 0) || ((Math.random() * 2 ** 32) >>> 0), m: opts.m != null ? opts.m : pkKst().m, idx: 0, phase: mode === 'duel' ? 'wait' : 'ready', pt: 0, f: null, T: 35, D: 100, slack: 0, hold: false, bag: [], score: 0, msg: '', spot, lure, perk: (lure && ZL.BY[lure].perk) || null };
+  // the gear from the 찌릿 낚시점 helps a little when fishing alone; a duel is the same sea and the same rules for both
+  // (the float still shows: it is only how it looks)
+  const solo = mode === 'solo', lure = solo ? myGear('lure') : '', fl = myGear('float');
+  PKS.game = { mode, seed: (opts.seed >>> 0) || ((Math.random() * 2 ** 32) >>> 0), m: opts.m != null ? opts.m : pkKst().m, idx: 0, phase: mode === 'duel' ? 'wait' : 'ready', pt: 0, f: null, T: 35, D: 100, slack: 0, hold: false, bag: [], score: 0, msg: '', spot, lure, float: fl, perk: solo ? ZL.perk(ZL.KINDS.map(myGear)) : null };
   if (mode === 'duel') PKS.game.f = pkFish(PKS.game.seed, 0, PKS.game.m);
   if (PKS.me.moving || (PKS.me.path && PKS.me.path.length)) pkWalk(PKS.me.x, PKS.me.y); // stop where I am (and tell the others)
   PKS.me.act = mode === 'duel' ? 'duel' : 'fish'; PKS.me.spot = spot ? spot.id : ''; if (spot && spot.dx) PKS.me.dir = spot.dx < 0 ? -1 : 1; pkTrackSoon();
@@ -11606,9 +11917,16 @@ function pkGameDraw(t) {
       g.strokeStyle = 'rgba(255,255,255,.35)'; g.lineWidth = 1; g.beginPath(); g.moveTo(fx, fy); g.lineTo(fx, ly - 22); g.stroke();
       g.save(); g.globalAlpha = .8; g.translate(fx, ly + Math.sin(t * 2) * 1.5); g.rotate(-Math.PI / 2 + Math.sin(t * 1.3) * .08); g.drawImage(li, -34, -14, 60, 30); g.restore();
     }
-    g.strokeStyle = 'rgba(255,255,255,.7)'; g.lineWidth = 1; g.beginPath(); g.moveTo(w / 2, 0); g.lineTo(fx, fy - 8); g.stroke();
-    g.fillStyle = '#FF3B2F'; g.beginPath(); g.ellipse(fx, fy - 6, 5, 7, 0, Math.PI, 0); g.fill(); g.fillStyle = '#FFF'; g.beginPath(); g.ellipse(fx, fy - 6, 5, 7, 0, 0, Math.PI); g.fill();
-    g.strokeStyle = '#2B2433'; g.lineWidth = 1; g.beginPath(); g.moveTo(fx, fy - 13); g.lineTo(fx, fy - 18); g.stroke();
+    const fi = G.float && ZL.img(G.float, 'game');
+    if (fi && fi.complete && fi.naturalWidth) { // the float from the shop stands on the water: 80 is the waterline in its drawing
+      const k = 52 / 120;
+      g.strokeStyle = 'rgba(255,255,255,.7)'; g.lineWidth = 1; g.beginPath(); g.moveTo(w / 2, 0); g.lineTo(fx, fy - 78 * k); g.stroke();
+      g.drawImage(fi, fx - 120 * k, fy - 80 * k, 240 * k, 120 * k);
+    } else {
+      g.strokeStyle = 'rgba(255,255,255,.7)'; g.lineWidth = 1; g.beginPath(); g.moveTo(w / 2, 0); g.lineTo(fx, fy - 8); g.stroke();
+      g.fillStyle = '#FF3B2F'; g.beginPath(); g.ellipse(fx, fy - 6, 5, 7, 0, Math.PI, 0); g.fill(); g.fillStyle = '#FFF'; g.beginPath(); g.ellipse(fx, fy - 6, 5, 7, 0, 0, Math.PI); g.fill();
+      g.strokeStyle = '#2B2433'; g.lineWidth = 1; g.beginPath(); g.moveTo(fx, fy - 13); g.lineTo(fx, fy - 18); g.stroke();
+    }
   }
 }
 
@@ -12022,17 +12340,19 @@ VIEWS.games = {
         ${board.length ? `<ol class="rk-list">${board.slice(0, 10).map((x, i) => `<li class="${x.uid === myId() ? 'me' : ''}"><span class="wk-rank r${i + 1}">${i + 1}</span><button class="rk-who" data-seauid="${esc(x.uid)}">${avatar(x.a, 30)}<b>${esc(x.a.nick || '?')}</b>${lvMini(x.a, x.uid)}</button><span class="rk-v num">${t('rx_ms', { n: x.avg })}</span></li>`).join('')}</ol>
           ${meAt >= 10 ? `<p class="muted small">${t('rx_myrank', { n: meAt + 1, of: board.length })}</p>` : ''}` : `<p class="muted">${t('rx_rank_none')}</p>`}
       </section>`}
-      ${srv ? `<a class="card gm-shop" href="#lures"><span class="gm-shop-art" aria-hidden="true">${['minnow', 'egi', 'tai'].map(id => `<img src="${ZL.url(id)}" alt="">`).join('')}</span><span class="gm-shop-t"><b>${t('zl_title')}</b><span class="muted small">${t('gm_shop_sub')}</span></span>${icon('chev')}</a>` : ''}
+      ${srv ? `<a class="card gm-shop" href="#lures"><span class="gm-shop-art" aria-hidden="true">${['minnow', 'reel_spark', 'float_spark'].map(id => `<img src="${ZL.url(id, 'game')}" alt="">`).join('')}</span><span class="gm-shop-t"><b>${t('zl_title')}</b><span class="muted small">${t('gm_shop_sub')}</span></span>${icon('chev')}</a>` : ''}
     </div>`;
     if (window.APP_RT === 'web' && typeof pkThumb === 'function' && !PK_THUMB) { pkThumb(); setTimeout(() => { const a = $('.gm-park .gm-art', el); if (a && PK_THUMB && !a.firstChild) a.innerHTML = `<img src="${PK_THUMB}" alt="">`; }, 1500); }
   }
 };
 
-/* ===== 찌릿 포인트 and the 찌릿 루어 shop (website). The points live only in the app: never bought with money, never paid
+/* ===== 찌릿 포인트 and the 찌릿 낚시점 (website). The points live only in the app: never bought with money, never paid
    out, never traded. The server keeps every number — the wallet, the weekly 챔질 반응속도 board and its prizes (300 / 200 /
    100 for the first three, 20 for everyone else who played, the 황금 번개 lure for the winner), the book of every change
-   and what each angler owns. The lure an angler picks (S.me.lure) hangs from their line on the character and in the park,
-   and helps a little in the park's solo fishing — never in duels or any ranking. ===== */
+   and what each angler owns. The shop has four sections (lures, rods, reels, floats); in each, two signature pieces carry
+   the ZZIRIT mark and take a few weeks of winning. One piece per section is equipped (S.me.lure / rod / reel / float): the
+   lure hangs from the character's line, the rod and reel are in its hands, the float is the one in the fishing game; together
+   they help a little in the park's solo fishing — never in duels or any ranking. ===== */
 const ZP = { st: null, at: 0, p: null, err: null };
 const ZP_PRIZE = [300, 200, 100], ZP_JOIN = 20;
 function zpOn() { return window.APP_RT === 'web' && !!(window.APP_AUTH && window.APP_AUTH.zp); }
@@ -12056,13 +12376,15 @@ function zpEnsure() {
 const zpBal = () => (ZP.st && ZP.st.bal) || 0;
 function zpOwns(id) { const L = ZL.BY[id]; if (!L) return false; return !!L.free || !!(ZP.st && (ZP.st.owned || []).includes(id)); }
 function zpPrice(id) { const it = ZP.st && (ZP.st.items || []).find(x => x.id === id); return it ? it.price : ZL.BY[id] ? ZL.BY[id].price : null; }
-// the lure on someone's line: mine only if I own it (once the server has said what I own); others' as they show it
-function lureOf(a, uid) {
-  const id = a && typeof a.lure === 'string' ? a.lure : ''; if (!ZL.BY[id]) return '';
+// what someone has equipped in a section: mine only if I own it (once the server has said what I own); others' as shown
+function gearOf(a, uid, kind) {
+  const id = a && typeof a[kind] === 'string' ? a[kind] : ''; const L = ZL.BY[id]; if (!L || L.kind !== kind) return '';
   const mine = a === S.me || (uid && uid === myId());
   return mine && ZP.st && !zpOwns(id) ? '' : id;
 }
-const myLure = () => lureOf(S.me, myId()) || 'jighead';
+const lureOf = (a, uid) => gearOf(a, uid, 'lure');
+const myGear = kind => gearOf(S.me, myId(), kind);
+const myLure = () => myGear('lure') || 'jighead';
 const zlName = id => ZL.BY[id] ? t('zl_n_' + id) : String(id || '');
 const zlSpec = L => Array.isArray(L.spec) ? dict(L.spec) : L.spec;
 
@@ -12133,27 +12455,32 @@ function zpBookHTML() {
 }
 
 /* ---------- the shop ---------- */
-function zlCardHTML(L, eq) {
-  const own = zpOwns(L.id), on = eq === L.id, price = zpPrice(L.id);
+function zlCardHTML(L) {
+  const own = zpOwns(L.id), on = myGear(L.kind) === L.id, price = zpPrice(L.id);
   const tag = on ? `<span class="zl-tag on">${icon('check')}${t('zl_equipped')}</span>`
     : own ? `<span class="zl-tag own">${t('zl_owned')}</span>`
     : L.prize ? `<span class="zl-tag prize">${icon('trophy')}${t('zl_prize')}</span>`
     : `<span class="zl-tag price num">${icon('coin')}${fmtN(price)}P</span>`;
-  return `<button class="zl-card${own ? ' own' : ''}${on ? ' on' : ''}${L.prize ? ' champ' : ''}" data-zl="${L.id}" style="--zl-a:${L.bg[0]};--zl-b:${L.bg[1]}">
+  return `<button class="zl-card${own ? ' own' : ''}${on ? ' on' : ''}${L.prize ? ' champ' : ''}${L.sig ? ' sig' : ''}" data-zl="${L.id}" style="--zl-a:${L.bg[0]};--zl-b:${L.bg[1]}">
+    ${L.sig ? `<span class="zl-sigb">${ZL.mark('silver', 'b' + L.id.replace(/_/g, ''))}SIGNATURE</span>` : ''}
     <span class="zl-art"><img src="${ZL.url(L.id)}" alt="" decoding="async"></span>
     <span class="zl-meta"><b>${esc(zlName(L.id))}</b><span class="small">${esc(t('zl_t_' + L.id))} · ${esc(zlSpec(L))}</span></span>${tag}</button>`;
 }
+const ZL_TAB_ART = { lure: 'minnow', rod: 'rod_bolt', reel: 'reel_bolt', float: 'float_spark' };
 VIEWS.lures = {
   render(el) {
     zpEnsure();
-    const eq = S.me && S.me.lure ? myLure() : '';
+    const tab = ZL.KINDS.includes(S.shopTab) ? S.shopTab : (S.shopTab = lsGet('shopTab', 'lure'), ZL.KINDS.includes(S.shopTab) ? S.shopTab : (S.shopTab = 'lure'));
+    const items = ZL.LIST.filter(L => L.kind === tab);
     el.innerHTML = `<div class="page lures-page">
       <header class="zl-hero">
-        <div class="zl-hero-t"><p class="eyebrow">ZZIRIT LURES</p><h1>${t('zl_title')}</h1><p class="lede">${t('zl_sub')}</p></div>
-        <div class="zl-hero-art" aria-hidden="true"><img src="${ZL.url('minnow')}" alt=""></div>
+        <div class="zl-hero-t"><p class="eyebrow"><span class="zl-hero-mark">${ZL.mark('silver', 'hero')}</span>ZZIRIT TACKLE</p><h1>${t('zl_title')}</h1><p class="lede">${t('zl_sub')}</p></div>
+        <div class="zl-hero-art${tab === 'float' ? ' float' : ''}" aria-hidden="true"><img src="${ZL.url(ZL_TAB_ART[tab], 'game')}" alt=""></div>
         ${zpWalletHTML('shop')}
       </header>
-      <div class="zl-grid">${ZL.LIST.map(L => zlCardHTML(L, eq)).join('')}</div>
+      <div class="chips zl-tabs" role="tablist">${ZL.KINDS.map(k => `<button class="chip${k === tab ? ' on' : ''}" role="tab" aria-selected="${k === tab}" data-zltab="${k}">${t('shop_t_' + k)}${myGear(k) && k !== 'lure' ? '<i class="zl-dot"></i>' : ''}</button>`).join('')}</div>
+      <div class="zl-grid">${items.map(L => zlCardHTML(L)).join('')}</div>
+      <p class="muted small zl-signote">${ZL.mark('silver', 'note')}${t('zl_sig_note')}</p>
       ${zpMine() && ZP.st ? zpBookHTML() : ''}
       <p class="fine">${t('zp_fine')}</p>
     </div>`;
@@ -12163,7 +12490,7 @@ function openLure(id) {
   const L = ZL.BY[id]; if (!L) return;
   let armed = 0, fresh = false;
   const body = () => {
-    const own = zpOwns(id), price = zpPrice(id), bal = zpBal(), on = !!(S.me && S.me.lure === id) && own;
+    const own = zpOwns(id), price = zpPrice(id), bal = zpBal(), on = !!(S.me && S.me[L.kind] === id) && own;
     let act;
     if (!zpOn()) act = `<p class="muted small">${t('zp_web_only')}</p>`;
     else if (!zpMine()) act = `<p class="muted small">${t('zp_need_profile')}</p><button class="btn btn-primary btn-lg btn-block" data-act="onboard">${t('onb_go')}</button>`;
@@ -12175,11 +12502,12 @@ function openLure(id) {
     else act = `<button class="btn btn-primary btn-lg btn-block" disabled>${icon('coin')}${t('zl_buy', { p: fmtN(price) })}</button><p class="hint">${t('zl_short', { n: fmtN(price - bal) })}</p><a class="btn btn-line btn-block" href="#games">${t('zp_earn_more')}</a>`;
     const u = ZL.url(id);
     return `<div class="zl-detail" style="--zl-a:${L.bg[0]};--zl-b:${L.bg[1]}">
-      <div class="zl-stage${fresh ? ' fresh' : ''}"><div class="zl-float"><img src="${u}" alt="${esc(zlName(id))}"><i class="zl-shine" style="-webkit-mask-image:url(&quot;${u}&quot;);mask-image:url(&quot;${u}&quot;)"></i></div>${L.prize ? '<span class="zl-badge">CHAMPION</span>' : ''}${fresh ? `<span class="zl-new">${t('zl_new')}</span>` : ''}</div>
+      <div class="zl-stage${fresh ? ' fresh' : ''}${L.sig ? ' sig' : ''}"><div class="zl-float"><img src="${u}" alt="${esc(zlName(id))}"><i class="zl-shine" style="-webkit-mask-image:url(&quot;${u}&quot;);mask-image:url(&quot;${u}&quot;)"></i></div>${L.prize ? '<span class="zl-badge">CHAMPION</span>' : L.sig ? `<span class="zl-badge sig">${ZL.mark('silver', 'db')}SIGNATURE</span>` : ''}${fresh ? `<span class="zl-new">${t('zl_new')}</span>` : ''}</div>
       <div class="zl-body">
         <p class="eyebrow no-up">${esc(t('zl_t_' + id))} · ${esc(zlSpec(L))}</p>
         <h2>${esc(zlName(id))}</h2>
         <p class="lede">${t('zl_d_' + id)}</p>
+        <p class="muted small zl-where">${icon(L.kind === 'float' ? 'wave' : 'user')} ${t('zl_where_' + L.kind)}</p>
         ${L.perk ? `<p class="zl-perk">${icon('sparkle')}<span><b>${t('zl_perk_h')}</b> ${t('zl_p_' + id)}</span></p>` : ''}
         <div class="zl-act">${act}</div>
         ${zpMine() && ZP.st ? `<p class="muted small zl-bal">${icon('coin')} ${t('zp_have', { n: fmtN(bal) })}</p>` : ''}
@@ -12210,7 +12538,7 @@ function openLure(id) {
     }
     if (k === 'equip' || k === 'off') {
       if (!S.me || !S.me.nick) return;
-      if (k === 'equip') S.me.lure = id; else delete S.me.lure;
+      if (k === 'equip') S.me[L.kind] = id; else delete S.me[L.kind];
       b.disabled = true; fresh = false;
       await store.saveMe(); S.dataVer++;
       paint(); toast(t(k === 'equip' ? 'zl_equip_done' : 'zl_unequip_done', { name: zlName(id) }), 'ok');
@@ -12393,6 +12721,7 @@ document.addEventListener('click', e => {
   const sp = tgt.closest('[data-sp]'); if (sp) { openSpecies(sp.dataset.sp); return; }
   const ct = tgt.closest('[data-catch]'); if (ct && !tgt.closest('[data-verdict]')) { const [uid, cid] = ct.dataset.catch.split('|'); openCatch(uid, cid); return; }
   const zl = tgt.closest('[data-zl]'); if (zl) { openLure(zl.dataset.zl); return; }
+  const zt = tgt.closest('[data-zltab]'); if (zt) { S.shopTab = zt.dataset.zltab; lsSet('shopTab', S.shopTab); rerender(); return; }
   const zv = tgt.closest('[data-zpvoid]'); if (zv) { if (!armed(zv, t('zp_void_sure'))) return; const [va, vw] = zv.dataset.zpvoid.split('|'); zpVoid(va, vw); return; }
   const act = tgt.closest('[data-act]');
   if (act) {

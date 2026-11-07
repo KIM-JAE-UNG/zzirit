@@ -22,7 +22,7 @@ function rtSync(topic) { const st = rtState(topic); for (const cid of (RT[topic]
 setInterval(() => { const now = Date.now(); for (const [topic, m] of Object.entries(RT)) { let ch = false; for (const cid of [...m.keys()]) if (now - (RTSEEN[cid] || 0) > 3000) { m.delete(cid); ch = true; } if (ch) rtSync(topic); } }, 1000);
 // 찌릿 포인트 (the same rules as migration 0016): wallets, the book, owned lures, the weekly 챔질 반응속도 board, runs that
 // start here and are checked when they end, prizes paid once per finished week (300 / 200 / 100, 20 for playing, gold lure)
-const ZPS = { wal: {}, led: [], owned: {}, scores: {}, runs: {}, settled: {}, seq: 0, items: [['spoon', 100], ['vib', 150], ['jig', 200], ['egi', 200], ['tai', 300], ['minnow', 500], ['gold', null]] };
+const ZPS = { wal: {}, led: [], owned: {}, scores: {}, runs: {}, settled: {}, seq: 0, items: [['spoon', 100], ['vib', 150], ['egi', 200], ['tai', 300], ['jig', 800], ['minnow', 1000], ['gold', null], ['rod_iso', 150], ['rod_wine', 250], ['rod_spark', 900], ['rod_bolt', 1200], ['reel_red', 180], ['reel_lbr', 250], ['reel_spark', 900], ['reel_bolt', 1200], ['float_ball', 100], ['float_led', 200], ['float_spark', 800], ['float_bolt', 1000]] };
 function zpWeek(ms = Date.now()) { const d = new Date(ms + 9 * 3600e3); const off = (d.getUTCDay() + 6) % 7; return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() - off)).toISOString().slice(0, 10); }
 const zpAddDays = (wk, n) => new Date(Date.parse(wk + 'T00:00:00Z') + n * 864e5).toISOString().slice(0, 10);
 function zpAdd(acct, d, r, ref, n) {

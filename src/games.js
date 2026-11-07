@@ -227,7 +227,7 @@ VIEWS.games = {
         ${board.length ? `<ol class="rk-list">${board.slice(0, 10).map((x, i) => `<li class="${x.uid === myId() ? 'me' : ''}"><span class="wk-rank r${i + 1}">${i + 1}</span><button class="rk-who" data-seauid="${esc(x.uid)}">${avatar(x.a, 30)}<b>${esc(x.a.nick || '?')}</b>${lvMini(x.a, x.uid)}</button><span class="rk-v num">${t('rx_ms', { n: x.avg })}</span></li>`).join('')}</ol>
           ${meAt >= 10 ? `<p class="muted small">${t('rx_myrank', { n: meAt + 1, of: board.length })}</p>` : ''}` : `<p class="muted">${t('rx_rank_none')}</p>`}
       </section>`}
-      ${srv ? `<a class="card gm-shop" href="#lures"><span class="gm-shop-art" aria-hidden="true">${['minnow', 'egi', 'tai'].map(id => `<img src="${ZL.url(id)}" alt="">`).join('')}</span><span class="gm-shop-t"><b>${t('zl_title')}</b><span class="muted small">${t('gm_shop_sub')}</span></span>${icon('chev')}</a>` : ''}
+      ${srv ? `<a class="card gm-shop" href="#lures"><span class="gm-shop-art" aria-hidden="true">${['minnow', 'reel_spark', 'float_spark'].map(id => `<img src="${ZL.url(id, 'game')}" alt="">`).join('')}</span><span class="gm-shop-t"><b>${t('zl_title')}</b><span class="muted small">${t('gm_shop_sub')}</span></span>${icon('chev')}</a>` : ''}
     </div>`;
     if (window.APP_RT === 'web' && typeof pkThumb === 'function' && !PK_THUMB) { pkThumb(); setTimeout(() => { const a = $('.gm-park .gm-art', el); if (a && PK_THUMB && !a.firstChild) a.innerHTML = `<img src="${PK_THUMB}" alt="">`; }, 1500); }
   }
