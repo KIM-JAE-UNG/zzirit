@@ -811,7 +811,7 @@ async function openWithdraw() {
         err.textContent = msg === k ? t('wd_err_unavailable') : msg; err.hidden = false; go.disabled = false; return;
       }
     }
-    try { pkStop(); } catch (x) { }
+    try { liveStop(); } catch (x) { }
     await wipeDevice();
     closeModal(w); toast(t('wd_done'), 'ok', 6000);
     setTimeout(() => { location.hash = 'home'; location.reload(); }, 1600);

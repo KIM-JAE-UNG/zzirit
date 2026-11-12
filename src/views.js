@@ -82,8 +82,8 @@ VIEWS.home = {
         </div>
       </section>
 
+      ${liveTeaserHTML()}
       ${wxCardHTML()}
-      ${foStripHTML()}
       ${idTipHTML() || instTipHTML()}
       ${newsCardHTML()}
 
@@ -128,7 +128,6 @@ VIEWS.home = {
         </section>
       </div>
 
-      ${homeLiveHTML()}
 
       <section class="card home-board">
         <div class="sec-head tight"><h2 class="h3">${icon('board')}${t('home_board_title')}</h2><div class="hb-links"><a class="link" href="#teams">${icon('flag')}${myTm && myTm.ok ? esc(myTm.t.name) : t('nav_teams')}</a><a class="link" href="#board">${t('home_board_more')}</a></div></div>

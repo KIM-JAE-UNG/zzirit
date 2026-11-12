@@ -196,7 +196,7 @@
   // the operator deletes a board post / comment for good (it lives in its author's document)
   const board = { adminRemove: (owner, kind, id) => rpcOrThrow('board_admin_remove', { p_owner: owner, p_kind: kind, p_id: id }) };
   // 찌릿 포인트: the server keeps the wallet, the weekly mini-game board, the prizes and the lure shop; these codes come back
-  const ZP_CODES = ['not_enough', 'owned', 'no_item', 'no_profile', 'not_signed_in', 'not_admin', 'bad_amount', 'no_account', 'slow_down'];
+  const ZP_CODES = ['not_enough', 'owned', 'no_item', 'no_profile', 'not_signed_in', 'not_admin', 'not_allowed', 'bad_amount', 'bad_input', 'no_account', 'slow_down'];
   async function zpRpc(name, args) {
     const s = await session(); if (!s) throw mkErr('not_signed_in');
     const { data, error } = await sb.rpc(name, args || {});
@@ -214,7 +214,16 @@
     grant: (uid, delta, note) => zpRpc('zp_grant', { p_acct: uid, p_delta: delta, p_note: note || '' }),
     void: (game, wk, uid, on) => zpRpc('zp_void', { p_game: game, p_wk: wk, p_acct: uid, p_void: on !== false })
   };
-  window.APP_AUTH = { sb, session, acct, link, news, review, admin, ids, push, chat, dm, rt, account, board, zp, error: () => authErr };
+  // 찌릿 라이브: the server decides the bite, the fish and the points; the app only says which patch of water the float is in
+  const liveGame = {
+    state: () => zpRpc('live_state'),
+    schools: (x0, y0, x1, y1) => zpRpc('live_schools', { p_x0: x0, p_y0: y0, p_x1: x1, p_y1: y1 }),
+    cast: (cx, cy, water, onsite, anon) => zpRpc('live_cast', { p_cx: cx, p_cy: cy, p_water: water, p_onsite: !!onsite, p_anon: !!anon }),
+    strike: token => zpRpc('live_strike', { p_token: token }),
+    land: (token, sp, ok) => zpRpc('live_land', { p_token: token, p_sp: sp, p_ok: !!ok }),
+    void: (wk, uid, on) => zpRpc('live_void', { p_wk: wk, p_acct: uid, p_void: on !== false })
+  };
+  window.APP_AUTH = { sb, session, acct, link, news, review, admin, ids, push, chat, dm, rt, account, board, zp, live: liveGame, error: () => authErr };
 
   /* ---- document paths → tables ---- */
   function route(path) {

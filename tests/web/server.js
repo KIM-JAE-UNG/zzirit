@@ -4,7 +4,7 @@ const LIB = p => require.resolve(p, { paths: [require('path').join(__dirname, '.
 const ROOT = path.resolve(__dirname, '..', '..'), LEAFLET = LIB('leaflet/dist/leaflet.js');
 let ver = 1; const events = []; const STATS = { photoSelects: 0 };
 const T = { anglers: {}, photos: {}, labels: {}, orders: {}, suggest: {}, admin_docs: {}, spots: {}, board: {}, teams: {}, news: {}, points: {}, reviews: {}, chat: {}, dm: {} };
-const FEATURES = { del: true, wd: true, zp: true };
+const FEATURES = { del: true, wd: true, zp: true, live: true };
 // live chat: the open chat and 1:1 between friends (the same rules as private.chat_guard / dm_guard), mutes, rate limits
 let seq = 100; const MUTES = {}; const RATE = {};
 function tryOk(k, max, ms) { const now = Date.now(); const a = (RATE[k] || []).filter(x => now - x < ms); if (a.length >= max) { RATE[k] = a; return false; } a.push(now); RATE[k] = a; return true; }
@@ -46,6 +46,29 @@ function zpAward(game, wk) {
   return 1;
 }
 const zpNick = me => { const a = T.anglers[me]; return !!(a && a.data && String(a.data.nick || '').trim()); };
+// 찌릿 라이브 (0019), the same rules as the database: schools, casts, strikes, landings, the fish book, the weekly bag.
+// The waits are short here so the browser tests do not sit by the water; /__sb/live_cfg changes them and fixes the rolls.
+const LVS = { cfg: { remote: 5, cap: 80, waitMin: 1300, waitMax: 1700, fightMin: 700, tier: null, big: null, u: null, school: null }, casts: {}, days: {}, catches: [], dex: {}, settled: {}, void: {}, seq: 0 };
+const LV_SP = (() => { try { const { SP } = new Function(fs.readFileSync(path.join(ROOT, 'src', 'fishdb.js'), 'utf8') + '; return { SP };')(); return Object.fromEntries(SP.map(x => [x.id, { tier: x.r, L: x.L, X: x.X, w: x.w, z: x.z }])); } catch (e) { return {}; } })();
+const LV_PERK = { egi: { win: .3 }, jig: { wait: .7, trophy: 1.3 }, minnow: { trophy: 2 }, gold: { trophy: 2 }, rod_spark: { trophy: 1.2 }, rod_bolt: { trophy: 1.3 }, reel_lbr: { win: .05 }, reel_bolt: { win: .1 }, float_ball: { win: .1 }, float_led: { win: .15, wait: .92 }, float_spark: { win: .2, wait: .88 }, float_bolt: { win: .25, wait: .85 } };
+const lvDay = () => new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10);
+const lvHash = (...a) => { let h = 2166136261; for (const ch of a.join(':')) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); } return (h >>> 0) / 4294967296; };
+const lvSchool = (cx, cy) => { if (LVS.cfg.school != null) return LVS.cfg.school; const thr = .05 + .13 * lvHash('z', Math.floor(cx / 6), Math.floor(cy / 6), Math.floor(Date.now() / 3600e3)), h = lvHash(cx, cy, Math.floor(Date.now() / 600e3)); return h < thr * .18 ? 3 : h < thr * .5 ? 2 : h < thr ? 1 : 0; };
+const lvCm = (sp, u, v, big) => Math.round(Math.min(sp.X, big && sp.X > sp.L * 1.05 ? sp.L * 1.05 + (sp.X - sp.L * 1.05) * Math.pow(v, 1.7) : sp.L * (.55 + .5 * u)) * 10) / 10;
+function lvBoard(wk) {
+  const by = {};
+  for (const c of LVS.catches) if (c.wk === wk && !LVS.void[wk + c.acct]) (by[c.acct] = by[c.acct] || []).push(c);
+  const rows = Object.entries(by).map(([a, l]) => { l.sort((x, y) => y.score - x.score); return { a, s: l.slice(0, 5).reduce((n, c) => n + c.score, 0), n: l.length, sp: l[0].sp, cm: l[0].cm, at: Math.max(...l.map(c => c.id)) }; }).sort((x, y) => y.s - x.s || x.at - y.at);
+  return rows.map((x, i) => Object.assign(x, { r: i + 1 }));
+}
+function lvAward(wk) {
+  if (wk >= zpWeek() || LVS.settled[wk]) return; LVS.settled[wk] = true;
+  for (const x of lvBoard(wk)) if (x.r <= 3) { zpAdd(x.a, [300, 200, 100][x.r - 1], 'prize', 'live:' + wk, String(x.r)); if (x.r === 1) (ZPS.owned[x.a] = ZPS.owned[x.a] || []).includes('gold') || ZPS.owned[x.a].push('gold'); }
+}
+function lvEarn(acct, d, ref) {
+  if (d <= 0) return; const w = ZPS.wal[acct] || (ZPS.wal[acct] = { bal: 0, earned: 0 }); w.bal += d; w.earned += d;
+  const l = ZPS.led.find(x => x.acct === acct && x.r === 'join' && x.ref === ref); if (l) l.d += d; else ZPS.led.push({ id: ++ZPS.seq, acct, d, r: 'join', ref, n: 'live', at: new Date().toISOString() });
+}
 const PUSH = {}, PUSHLOG = []; // phone notices: subscriptions saved through the RPCs, and what the app asked the push function // admin_delete_user present on the "server" (the live one gets it with the SQL update)
 const isAdmin = uid => !!uid && (admins.has(uid) || admins.has(acct(uid)));
 const admins = new Set(); const links = {}; const codes = {};
@@ -269,6 +292,68 @@ http.createServer(async (req, res) => {
       delete ZPS.wal[me]; delete ZPS.owned[me]; delete ZPS.runs[me]; ZPS.led = ZPS.led.filter(x => x.acct !== me); for (const [k, x] of Object.entries(ZPS.scores)) if (x.acct === me) delete ZPS.scores[k];
       return send({ data: { ok: true } });
     }
+    if (/^live_/.test(q.name)) {
+      const err = m => send({ error: { code: 'P0001', message: m } });
+      if (!FEATURES.live) return send({ error: { code: 'PGRST202', message: 'Could not find the function public.' + q.name + ' in the schema cache' } });
+      if (!uid) return err('not_signed_in');
+      const me = acct(uid), wk = zpWeek(), day = lvDay(), A = q.args || {}, C = LVS.cfg;
+      const d = LVS.days[me + day] || (LVS.days[me + day] = { casts: 0, remote: 0, pts: 0, fish: 0 });
+      if (q.name === 'live_state') {
+        for (const w of new Set(LVS.catches.filter(c => c.wk < wk).map(c => c.wk))) lvAward(w);
+        const b = lvBoard(wk), mine = b.find(x => x.a === me), l = lvBoard(zpAddDays(wk, -7));
+        return send({ data: { on: true, wk, now: Date.now(), tide: .6, day: { pts: d.pts, cap: C.cap, fish: d.fish, remote: d.remote, remoteMax: C.remote }, bal: (ZPS.wal[me] || { bal: 0 }).bal,
+          dex: Object.entries(LVS.dex[me] || {}).map(([sp, x]) => ({ sp, n: x.n, best: x.best })),
+          top: b.slice(0, 10).map(({ a, s, n, sp, cm }) => ({ a, s, n, sp, cm })), n: b.length, me: mine ? { s: mine.s, n: mine.n, r: mine.r, sp: mine.sp, cm: mine.cm } : null,
+          last: l.slice(0, 3).map(({ a, s, r, sp, cm }) => ({ a, s, r, sp, cm })),
+          feed: LVS.catches.slice(-20).reverse().map(c => ({ id: c.id, a: c.anon ? null : c.acct, sp: c.sp, cm: c.cm, tier: c.tier, big: c.big, on: c.onsite, gx: c.gx, gy: c.gy, at: c.at })) } });
+      }
+      if (q.name === 'live_schools') {
+        if (A.p_x1 < A.p_x0 || A.p_y1 < A.p_y0 || (A.p_x1 - A.p_x0 + 1) * (A.p_y1 - A.p_y0 + 1) > 3000) return err('bad_input');
+        const cells = []; for (let x = A.p_x0; x <= A.p_x1; x++) for (let y = A.p_y0; y <= A.p_y1; y++) { const sc = LVS.cfg.school != null ? ((x + y) % 4 === 0 ? LVS.cfg.school : 0) : lvSchool(x, y); if (sc > 0) cells.push([x, y, sc]); }
+        return send({ data: { until: (Math.floor(Date.now() / 600e3) + 1) * 600e3, feedAt: false, cells } });
+      }
+      if (q.name === 'live_cast') {
+        if (!zpNick(me)) return err('no_profile');
+        if (!['sea', 'fresh'].includes(A.p_water) || !Number.isInteger(A.p_cx) || !Number.isInteger(A.p_cy)) return err('bad_input');
+        const on = !!A.p_onsite; if (!on && d.remote >= C.remote) return send({ data: { err: 'remote_out', left: 0 } });
+        let waitx = 1, trophy = 1, winx = 0; const a = T.anglers[me], own = ZPS.owned[me] || [];
+        for (const k of ['lure', 'rod', 'reel', 'float']) { const id = a && a.data && a.data[k], P = own.includes(id) && LV_PERK[id]; if (P) { waitx *= P.wait || 1; trophy *= P.trophy || 1; winx += P.win || 0; } }
+        const school = lvSchool(A.p_cx, A.p_cy), wait = Math.round((C.waitMin + Math.random() * (C.waitMax - C.waitMin)) * Math.max(waitx, .6)), win = Math.round(850 + Math.min(winx, .6) * 1000);
+        const token = require('crypto').randomUUID();
+        LVS.casts[me] = { token, cx: A.p_cx, cy: A.p_cy, water: A.p_water, onsite: on, anon: !!A.p_anon, at: Date.now(), wait, win, school, trophy: Math.min(trophy, 2.6), state: 'wait' };
+        d.casts++; if (!on) d.remote++;
+        return send({ data: { token, wait, win, school, feed: false, tide: .6, left: C.remote - d.remote } });
+      }
+      const k = LVS.casts[me];
+      if (q.name === 'live_strike') {
+        if (!k || k.token !== A.p_token || k.state !== 'wait') return send({ data: { err: 'no_cast' } });
+        const ms = Date.now() - k.at;
+        if (ms < k.wait - 150) { k.state = 'done'; return send({ data: { err: 'early' } }); }
+        if (ms > k.wait + k.win + 2500) { k.state = 'done'; return send({ data: { err: 'late' } }); }
+        const m = (1 + .5 * k.school) * (k.onsite ? 1.25 : 1), w = [55, 27, 12 * m, 5 * m * (k.onsite ? 1 : .5), k.onsite ? m : 0]; let r = Math.random() * w.reduce((x, y) => x + y, 0), tier = 1;
+        for (let i = 0; i < 5; i++) { tier = i + 1; r -= w[i]; if (r < 0) break; }
+        if (C.tier) tier = k.onsite ? C.tier : Math.min(C.tier, 4);
+        Object.assign(k, { state: 'hooked', hookAt: Date.now(), tier, u: C.u != null ? C.u : Math.random(), v: Math.random(), big: C.big != null ? C.big : Math.random() < Math.min(.3, .04 * k.trophy * (1 + .25 * k.school)), seed: Math.floor(Math.random() * 2147483647) });
+        return send({ data: { tier: k.tier, u: k.u, v: k.v, big: k.big, seed: k.seed } });
+      }
+      if (q.name === 'live_land') {
+        if (!k || k.token !== A.p_token || k.state !== 'hooked') return send({ data: { err: 'no_cast' } });
+        k.state = 'done'; if (!A.p_ok) return send({ data: { lost: true } });
+        if (Date.now() - k.hookAt < C.fightMin) return send({ data: { err: 'too_fast' } });
+        const sp = LV_SP[A.p_sp];
+        if (!sp || sp.tier > k.tier || (k.water === 'sea' && !(['S', 'B'].includes(sp.w) && ['shore', 'coast', 'brack', 'shelf'].includes(sp.z))) || (k.water === 'fresh' && !['F', 'B'].includes(sp.w))) return send({ data: { err: 'bad_species' } });
+        const cm = lvCm(sp, k.u, k.v, k.big), score = Math.round(100 * cm / sp.X * [1, 1.3, 1.7, 2.3, 3][sp.tier - 1]);
+        let pts = [1, 3, 6, 12, 30][sp.tier - 1]; if (k.big) pts = Math.ceil(pts * 1.5); if (!k.onsite) pts = Math.max(1, Math.ceil(pts * .5));
+        const capped = Math.max(0, Math.min(pts, C.cap - d.pts)), dx = LVS.dex[me] || (LVS.dex[me] = {}), old = dx[A.p_sp], first = !old, best = !!old && cm > old.best, bonus = first ? 10 : 0;
+        dx[A.p_sp] = { n: (old ? old.n : 0) + 1, best: Math.max(old ? old.best : 0, cm) };
+        const row = { id: ++LVS.seq, acct: me, sp: A.p_sp, cm, tier: sp.tier, big: k.big, score, pts: capped + bonus, onsite: k.onsite, anon: k.anon, gx: Math.floor(k.cx / 8), gy: Math.floor(k.cy / 10), wk, at: Date.now() };
+        LVS.catches.push(row); d.pts += capped; d.fish++; lvEarn(me, capped + bonus, 'day:' + day);
+        const mine = lvBoard(wk).find(x => x.a === me);
+        return send({ data: { id: row.id, sp: A.p_sp, cm, tier: sp.tier, big: k.big, score, pts: capped + bonus, first, best, capped: capped < pts, onsite: k.onsite, day: { pts: d.pts, cap: C.cap, fish: d.fish }, wk: { s: mine ? mine.s : 0, r: mine ? mine.r : null }, bal: ZPS.wal[me].bal } });
+      }
+      if (q.name === 'live_void') { if (!isAdmin(uid)) return err('not_allowed'); LVS.void[A.p_wk + acct(A.p_acct)] = A.p_void !== false; return send({ data: true }); }
+      return err('no_function');
+    }
     if (/^(zp_|rx_)/.test(q.name)) {
       const err = m => send({ error: { code: 'P0001', message: m } });
       if (!FEATURES.zp) return send({ error: { code: 'PGRST202', message: 'Could not find the function public.' + q.name + ' in the schema cache' } });
@@ -364,6 +449,7 @@ http.createServer(async (req, res) => {
     return send({ ver, events: events.filter(e => e.ver > since && (e.eventType === 'DELETE' || !['points', 'reviews', 'dm', 'chat'].includes(e.table) || visible(e.table, e.new, who))) });
   }
   if (u.pathname === '/__sb/zp_seed') { const q = await body(req); const wk = q.wk || zpAddDays(zpWeek(), q.weeksAgo ? -7 * q.weeksAgo : 0); for (const r of q.rows || []) ZPS.scores['rx|' + wk + '|' + r.acct] = { game: 'rx', wk, acct: r.acct, score: r.score, best: r.best == null ? null : r.best, void: !!r.void, at: Date.now() - 864e5 * 9 + (r.order || 0) }; return send({ ok: true, wk }); }
+  if (u.pathname === '/__sb/live_cfg') { const q = await body(req); Object.assign(LVS.cfg, q.cfg || {}); if (q.weeksBack) for (const c of LVS.catches) c.wk = zpAddDays(c.wk, -7 * q.weeksBack); if (q.reset) { LVS.casts = {}; LVS.days = {}; LVS.catches = []; LVS.dex = {}; LVS.settled = {}; } return send({ cfg: LVS.cfg, n: LVS.catches.length }); }
   if (u.pathname === '/__sb/feature') { for (const [k, v] of u.searchParams) FEATURES[k] = v === '1'; return send(FEATURES); }
   if (u.pathname === '/__sb/dump') return send({ T, admins: [...admins], links, STATS, PUSH, PUSHLOG, logins: Object.keys(logins), MUTES, RTSTATS, ZPS, RT: Object.fromEntries(Object.entries(RT).map(([k, m]) => [k, [...m.values()].map(x => x.key)])) });
   if (u.pathname === '/__sb/config') { const q = await body(req); const g = T.admin_docs.config || (T.admin_docs.config = { id: 'config', data: {} }); g.data = Object.assign({}, g.data, q); push('admin_docs', 'UPDATE', g, { id: 'config' }); return send({ ok: true }); }
@@ -372,7 +458,7 @@ http.createServer(async (req, res) => {
   fs.readFile(f, (e, buf) => {
     if (e) { res.statusCode = 404; res.end(); return; }
     const ext = path.extname(f).slice(1);
-    res.setHeader('content-type', { html: 'text/html; charset=utf-8', js: 'text/javascript', json: 'application/json', png: 'image/png', jpg: 'image/jpeg', svg: 'image/svg+xml', webmanifest: 'application/manifest+json' }[ext] || 'application/octet-stream');
+    res.setHeader('content-type', { html: 'text/html; charset=utf-8', js: 'text/javascript', json: 'application/json', png: 'image/png', jpg: 'image/jpeg', svg: 'image/svg+xml', webmanifest: 'application/manifest+json', css: 'text/css', pbf: 'application/x-protobuf', webp: 'image/webp' }[ext] || 'application/octet-stream');
     res.end(buf);
   });
 }).listen(8768, () => console.log('fake supabase on 8768'));

@@ -1,7 +1,7 @@
 /* ===== Router, global events, boot ===== */
 const QR_PATH = '__QR_PATH__';
-const ROUTES = ['home', 'scan', 'past', 'map', 'park', 'games', 'lures', 'chat', 'rank', 'friends', 'board', 'teams', 'points', 'sea', 'char', 'dex', 'tackle', 'log', 'help', 'about', 'prefs', 'admin'];
-const LIVE_VIEWS = new Set(['home', 'park', 'games', 'lures', 'chat', 'rank', 'friends', 'board', 'teams', 'points', 'sea', 'dex', 'log', 'admin']);
+const ROUTES = ['home', 'scan', 'past', 'map', 'live', 'lures', 'chat', 'rank', 'friends', 'board', 'teams', 'points', 'sea', 'char', 'dex', 'tackle', 'log', 'help', 'about', 'prefs', 'admin'];
+const LIVE_VIEWS = new Set(['home', 'lures', 'chat', 'rank', 'friends', 'board', 'teams', 'points', 'sea', 'dex', 'log', 'admin']);
 const viewOf = r => (r === 'past' ? 'scan' : r);
 
 function updateStatic() {
@@ -21,6 +21,7 @@ function updateShell() {
   for (const n of [chip, mav]) { if (!n) continue; if (S.me && S.me.nick) { n.setAttribute('href', '#sea'); delete n.dataset.act; } else { n.setAttribute('href', '#'); n.dataset.act = 'onboard'; } }
   $$('.nav-admin').forEach(n => n.hidden = !S.isOwner);
   $$('.nav-web').forEach(n => n.hidden = window.APP_RT !== 'web');
+  $$('.nav-art').forEach(n => n.hidden = window.APP_RT === 'web');
   const nIn = S.me && S.me.nick ? frLists().inc.length : 0;
   $$('[data-frbadge]').forEach(n => { n.hidden = !nIn; n.textContent = nIn > 9 ? '9+' : String(nIn); });
   const fb = $('#fr-mini'); if (fb) fb.setAttribute('aria-label', t('nav_friends') + (nIn ? ` (${nIn})` : ''));
@@ -37,8 +38,7 @@ function updateShell() {
    new inside (a friend request) shows a dot. ===== */
 const NAV_GROUPS = [
   ['fish', 'fish', ['scan', 'map', 'points', 'dex', 'tackle']],
-  ['mine', 'chart', ['log', 'sea', 'char']],
-  ['play', 'sparkle', ['park', 'games', 'lures']],
+  ['mine', 'chart', ['log', 'sea', 'char', 'lures']],
   ['social', 'users', ['chat', 'rank', 'friends', 'board', 'teams']],
   ['help', 'info', ['help', 'about', 'prefs', 'admin']]
 ];
@@ -98,6 +98,8 @@ function onHash() {
   if (/^add=/.test(h)) { S.frQ = decodeURIComponent(h.slice(4)).toUpperCase().slice(0, 12); h = 'friends'; try { history.replaceState(null, '', '#friends'); } catch (e) { } }
   if (h === 'shop') { S.seaTab = 'shop'; h = 'sea'; }
   if (h === 'dm') { S.chatTab = 'dm'; S.dmPeer = null; h = 'chat'; try { history.replaceState(null, '', '#chat'); } catch (e) { } } // a 1:1 notice opens the conversations
+  if (h === 'park' || h === 'games') { h = 'live'; try { history.replaceState(null, '', '#live'); } catch (e) { } } // the old park and mini games became the live sea
+  if (h === 'live' && window.APP_RT !== 'web') h = 'map';
   if (!ROUTES.includes(h)) h = 'home';
   if (h === 'admin' && !S.isOwner && S.ready) h = 'home';
   if (h !== 'sea' && S.route === 'sea') { S.preview = null; }
@@ -178,8 +180,6 @@ document.addEventListener('click', e => {
     else if (a === 'auth') openAuth('join');
     else if (a === 'noti') openNoti();
     else if (a === 'logout') openLogout();
-    else if (a === 'fortune') openFortune();
-    else if (a === 'reaction') openReaction();
     else if (a === 'withdraw') openWithdraw();
     else if (a === 'install') openInstall();
     else if (a === 'weekly') openWeekly();
