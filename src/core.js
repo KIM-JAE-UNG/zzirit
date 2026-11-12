@@ -631,7 +631,7 @@ function boardList({ cat = 'all', sort = 'new', q = '', mineOnly = false } = {})
    open teams accept anyone not banned, closed teams need the leader to add the member to `members`. */
 const TEAM_MAX = 30;
 const TEAM_EMOJI = ['🎣', '🐟', '🐠', '🦑', '🐙', '🦀', '🐋', '🌊', '⚓', '🔥', '⭐', '🏆'];
-const TEAM_COLORS = ['#FF5A1F', '#0B6E8E', '#13784A', '#7A3FC4', '#C28F22', '#C4223A'];
+const TEAM_COLORS = ['#1E66E5', '#0B6E8E', '#13784A', '#7A3FC4', '#C28F22', '#C4223A'];
 function teamOf(uid) {
   if (!uid) return null;
   if (S.teams.has(uid)) return { id: uid, t: S.teams.get(uid), leader: true, ok: true };

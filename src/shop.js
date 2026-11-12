@@ -23,7 +23,7 @@ function zpLoad(force) {
 function zpEnsure() {
   if (!zpOn() || ZP.p || nowMs() - ZP.at < 20e3) return;
   const before = JSON.stringify([ZP.st, ZP.err]);
-  zpLoad(true).then(() => { if (JSON.stringify([ZP.st, ZP.err]) !== before && ['games', 'lures'].includes(viewOf(S.route))) rerenderSoon(); });
+  zpLoad(true).then(() => { if (JSON.stringify([ZP.st, ZP.err]) !== before && ['home', 'lures'].includes(viewOf(S.route))) rerenderSoon(); });
 }
 const zpBal = () => (ZP.st && ZP.st.bal) || 0;
 function zpOwns(id) { const L = ZL.BY[id]; if (!L) return false; return !!L.free || !!(ZP.st && (ZP.st.owned || []).includes(id)); }
@@ -44,14 +44,16 @@ const zlSpec = L => Array.isArray(L.spec) ? dict(L.spec) : L.spec;
 function zpNews() {
   const led = (ZP.st && ZP.st.led) || []; if (!led.length || !zpMine()) return;
   const top = Math.max(...led.map(x => +x.id || 0)), seen = lsGet('zpSeen', null);
-  const fresh = led.filter(x => +x.id > (+seen || 0) && x.d > 0 && x.r !== 'buy' && (seen != null || nowMs() - Date.parse(x.at) < 3 * DAY_MS));
+  const fresh = led.filter(x => +x.id > (+seen || 0) && x.d > 0 && x.r !== 'buy' && !/^day:/.test(x.ref || '') && (seen != null || nowMs() - Date.parse(x.at) < 3 * DAY_MS));
   lsSet('zpSeen', top);
   if (fresh.length) setTimeout(() => zpCelebrate(fresh), 700);
 }
 function zpWeekName(day) { const m = /^(\d{4})-(\d\d)-(\d\d)$/.exec(day || ''); return m ? t('zp_week_of', { m: +m[2], w: Math.ceil(+m[3] / 7) }) : ''; }
 function zpWhy(x) {
   const wk = String(x.ref || '').split(':')[1] || '';
-  if (x.r === 'prize') return t('zp_r_prize', { n: x.n, w: zpWeekName(wk) });
+  const live = /^live:/.test(x.ref || '');
+  if (/^day:/.test(x.ref || '')) return t('zp_r_live');
+  if (x.r === 'prize') return t(live ? 'zp_r_prize_live' : 'zp_r_prize', { n: x.n, w: zpWeekName(wk) });
   if (x.r === 'join') return t('zp_r_join', { w: zpWeekName(wk) });
   if (x.r === 'buy') return t('zp_r_buy', { name: zlName(x.ref) });
   return x.n ? t('zp_r_grant_n', { note: x.n }) : t('zp_r_grant');
@@ -75,29 +77,8 @@ function zpWalletHTML(where) {
   if (!zpOn()) return `<div class="zp-wallet off"><span class="zp-coin">${icon('coin')}</span><span class="zp-w-t"><b>${t('zp_name')}</b><span class="muted small">${t('zp_web_only')}</span></span></div>`;
   if (!zpMine()) return `<div class="zp-wallet"><span class="zp-coin">${icon('coin')}</span><span class="zp-w-t"><b>${t('zp_name')}</b><span class="muted small">${t('zp_need_profile')}</span></span><button class="btn btn-primary btn-sm" data-act="onboard">${t('onb_go')}</button></div>`;
   const n = ZP.st ? fmtN(zpBal()) : '…';
-  const to = where === 'shop' ? '#games' : '#lures';
+  const to = where === 'shop' ? '#live' : '#lures';
   return `<a class="zp-wallet" href="${to}"><span class="zp-coin">${icon('coin')}</span><span class="zp-w-t"><span class="muted small">${t('zp_mine')}</span><b class="zp-bal num" data-zpbal>${n}<small>P</small></b></span><span class="zp-w-go">${t(where === 'shop' ? 'zp_earn_more' : 'zp_go_shop')}${icon('chev')}</span></a>`;
-}
-function zpPrizesHTML() {
-  return `<ul class="zp-prizes"><li class="p1"><span>${t('zp_place', { n: 1 })}</span><b class="num">${ZP_PRIZE[0]}P</b><img src="${ZL.url('gold')}" alt="" title="${esc(zlName('gold'))}"></li><li class="p2"><span>${t('zp_place', { n: 2 })}</span><b class="num">${ZP_PRIZE[1]}P</b></li><li class="p3"><span>${t('zp_place', { n: 3 })}</span><b class="num">${ZP_PRIZE[2]}P</b></li><li><span>${t('zp_join')}</span><b class="num">${ZP_JOIN}P</b></li></ul>`;
-}
-// this week's 챔질 반응속도 board from the server, the time left, last week's podium
-function rxWeekHTML() {
-  const b = ZP.st && ZP.st.rx, wk = ZP.st && ZP.st.wk;
-  const left = Math.max(0, weekStart(weekIdx() + 1) - nowMs()), d = Math.floor(left / DAY_MS), h = Math.floor((left % DAY_MS) / 3600e3);
-  const who = uid => uid === myId() ? S.me : S.anglers.get(uid);
-  const row = (x, i) => { const a = who(x.a); return `<li class="${x.a === myId() ? 'me' : ''}"><span class="wk-rank r${i + 1}">${i + 1}</span><button class="rk-who" data-seauid="${esc(x.a)}">${avatar(a, 30)}<b>${esc((a && a.nick) || '?')}</b>${a ? lvMini(a, x.a) : ''}</button><span class="rk-v num">${t('rx_ms', { n: x.s })}</span>${i < 3 ? `<span class="rk-pz num">+${ZP_PRIZE[i]}P</span>` : ''}${S.isOwner && wk ? `<button class="btn btn-ghost btn-xs" data-zpvoid="${esc(x.a)}|${esc(wk)}">${t('zp_void')}</button>` : ''}</li>`; };
-  const me = b && b.me, n = (b && b.n) || 0;
-  return `<section class="card rx-rank rx-week">
-    <div class="sec-head tight"><h2 class="h3">${icon('trophy')}${t('zp_board')}</h2><span class="muted small">${t('zp_left', { d, h })}</span></div>
-    ${zpPrizesHTML()}
-    ${!b ? `<p class="muted">${ZP.err ? t(ZP.err === 'need_update' ? 'zp_err_server' : 'zp_err') : t('loading')}</p>`
-      : b.top.length ? `<ol class="rk-list">${b.top.map(row).join('')}</ol>${me && me.r > 10 ? `<p class="muted small">${t('rx_myrank', { n: me.r, of: n })}</p>` : ''}`
-      : `<p class="muted">${t('zp_board_none')}</p>`}
-    ${b && !me && zpMine() && b.top.length ? `<p class="muted small">${t('zp_not_yet')}</p>` : ''}
-    ${b && b.last && b.last.length ? `<div class="rx-last"><p class="eyebrow">${t('zp_last_week')}</p><ol class="rx-podium">${b.last.map(x => { const a = who(x.a); return `<li class="p${x.r}"><span class="rx-pd-av">${avatar(a, 40)}<i class="num">${x.r}</i></span><b>${esc((a && a.nick) || '?')}</b><span class="muted small num">${t('rx_ms', { n: x.s })} · +${ZP_PRIZE[x.r - 1]}P</span></li>`; }).join('')}</ol></div>` : ''}
-    <p class="hint">${t('zp_rules')}</p>
-  </section>`;
 }
 function zpBookHTML() {
   const led = (ZP.st && ZP.st.led) || [];
@@ -148,10 +129,10 @@ function openLure(id) {
     else if (!zpMine()) act = `<p class="muted small">${t('zp_need_profile')}</p><button class="btn btn-primary btn-lg btn-block" data-act="onboard">${t('onb_go')}</button>`;
     else if (on) act = `<button class="btn btn-line btn-lg btn-block" data-zla="off">${icon('check')}${t('zl_equipped')} · ${t('zl_unequip')}</button>`;
     else if (own) act = `<button class="btn btn-primary btn-lg btn-block${fresh ? ' pop' : ''}" data-zla="equip">${icon('lure')}${t('zl_equip')}</button>`;
-    else if (L.prize) act = `<p class="note">${icon('trophy')} ${t('zl_prize_how')}</p><a class="btn btn-line btn-block" href="#games">${t('zl_go_games')}</a>`;
+    else if (L.prize) act = `<p class="note">${icon('trophy')} ${t('zl_prize_how')}</p><a class="btn btn-line btn-block" href="#live">${t('zl_go_games')}</a>`;
     else if (!ZP.st) act = `<button class="btn btn-primary btn-lg btn-block" disabled>${t(ZP.err ? 'zp_err' : 'loading')}</button>`;
     else if (bal >= price) act = `<button class="btn btn-primary btn-lg btn-block${armed ? ' armed' : ''}" data-zla="buy">${icon('coin')}${t(armed ? 'zl_buy_sure' : 'zl_buy', { p: fmtN(price) })}</button>`;
-    else act = `<button class="btn btn-primary btn-lg btn-block" disabled>${icon('coin')}${t('zl_buy', { p: fmtN(price) })}</button><p class="hint">${t('zl_short', { n: fmtN(price - bal) })}</p><a class="btn btn-line btn-block" href="#games">${t('zp_earn_more')}</a>`;
+    else act = `<button class="btn btn-primary btn-lg btn-block" disabled>${icon('coin')}${t('zl_buy', { p: fmtN(price) })}</button><p class="hint">${t('zl_short', { n: fmtN(price - bal) })}</p><a class="btn btn-line btn-block" href="#live">${t('zp_earn_more')}</a>`;
     const u = ZL.url(id);
     return `<div class="zl-detail" style="--zl-a:${L.bg[0]};--zl-b:${L.bg[1]}">
       <div class="zl-stage${fresh ? ' fresh' : ''}${L.sig ? ' sig' : ''}"><div class="zl-float"><img src="${u}" alt="${esc(zlName(id))}"><i class="zl-shine" style="-webkit-mask-image:url(&quot;${u}&quot;);mask-image:url(&quot;${u}&quot;)"></i></div>${L.prize ? '<span class="zl-badge">CHAMPION</span>' : L.sig ? `<span class="zl-badge sig">${ZL.mark('silver', 'db')}SIGNATURE</span>` : ''}${fresh ? `<span class="zl-new">${t('zl_new')}</span>` : ''}</div>
@@ -200,6 +181,6 @@ function openLure(id) {
 }
 // the operator strikes a run out of this week's board (or puts it back)
 async function zpVoid(acct, wk) {
-  try { await APP_AUTH.zp.void('rx', wk, acct, true); toast(t('zp_void_done'), 'ok'); await zpLoad(true); rerenderSoon(); }
+  try { await APP_AUTH.live.void(wk, acct, true); if (typeof lvLoad === 'function') lvLoad(true); toast(t('zp_void_done'), 'ok'); await zpLoad(true); rerenderSoon(); }
   catch (e) { toast(t('zp_err'), 'warn'); }
 }

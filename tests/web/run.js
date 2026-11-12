@@ -410,14 +410,14 @@ const AI_NOFISH = { fish_visible: false, candidates: [], other_en: '', other_sci
   await W.waitForTimeout(600); await W.reload(); await W.waitForTimeout(5500);
   ok(!!(await W.$('.wn')), 'an earlier member sees what changed');
   ok(!!(await W.$('#wn-id')), 'update notes offer to create a login ID');
-  ok(await W.$eval('.wn', n => /찌릿 낚시점/.test(n.textContent) && !/낚싯대·릴·찌 칸이/.test(n.textContent) && /미니게임/.test(n.textContent) && /오늘의 출조/.test(n.textContent) && /갯바위 공원/.test(n.textContent) && /실시간 채팅/.test(n.textContent) && n.querySelectorAll('.wn-list li').length <= 6), 'update notes list the newest features (at most 6 lines)');
+  ok(await W.$eval('.wn', n => /찌릿 라이브/.test(n.textContent) && /새 디자인/.test(n.textContent) && !/미니게임:|갯바위 공원 개장/.test(n.textContent) && /오늘의 출조/.test(n.textContent) && /실시간 채팅/.test(n.textContent) && n.querySelectorAll('.wn-list li').length <= 6), 'update notes list the newest features (at most 6 lines)');
   ok(await W.$eval('.wn', n => !/초기화/.test(n.textContent)), 'update notes do not claim a reset that the server has not done');
   await shot(W, 'q04_whatsnew');
   await W.click('#wn-ok'); await W.waitForTimeout(400); await W.reload(); await W.waitForTimeout(5000);
   ok(!(await W.$('.wn')), 'update notes show only once');
-  // someone who already saw the points update gets just the tackle line
-  await W.evaluate(() => openWhatsNew('someid', '2026-11-07a')); await W.waitForTimeout(500);
-  ok(await W.$eval('.wn', n => n.querySelectorAll('.wn-list li').length === 1 && /낚싯대·릴·찌 칸이/.test(n.textContent)).catch(() => false), 'after the points update, the notes show only the tackle line');
+  // someone who saw everything up to the tackle shop gets just the live sea and the new look
+  await W.evaluate(() => openWhatsNew('someid', '2026-11-07b')); await W.waitForTimeout(500);
+  ok(await W.$eval('.wn', n => n.querySelectorAll('.wn-list li').length === 2 && /찌릿 라이브/.test(n.textContent) && /새 디자인/.test(n.textContent)).catch(() => false), 'after the last update, the notes show only the live sea and the new look');
   await W.click('#wn-ok'); await W.waitForTimeout(400);
   // photo cache: a second visit doesn't download the same photos again
   const P = await mk('P');
@@ -707,7 +707,7 @@ const AI_NOFISH = { fish_visible: false, candidates: [], other_en: '', other_sci
   /* ---------- 2026-10-29d: the menu in four groups ---------- */
   const navOpen = p => p.$$eval('.nav-grp.open', ns => ns.map(n => n.dataset.grp).join(','));
   await A.evaluate(() => { localStorage.removeItem('eosin.navOpen'); }); await go(A, 'board', 900);
-  ok(await A.$$eval('.nav > .nav-grp', ns => ns.length) === 5 && await A.$$eval('.nav > a', ns => ns.map(n => n.dataset.route).join()) === 'home', 'side menu: home + five groups');
+  ok(await A.$$eval('.nav > .nav-grp', ns => ns.length) === 4 && await A.$$eval('.nav > a', ns => ns.map(n => n.dataset.route).join()) === 'home,live', 'side menu: home, the live sea and four groups');
   ok(await navOpen(A) === 'social' && await A.$eval('.nav-grp[data-grp="social"] .nav-gh', n => n.getAttribute('aria-expanded')) === 'true', 'the group of the page on screen is open, the rest closed');
   ok(!(await A.$('.nav-grp[data-grp="fish"] a[data-route="dex"]').then(n => n.isVisible())), 'links in a closed group are hidden');
   await A.click('[data-navgrp="fish"]'); await A.waitForTimeout(350);
@@ -721,7 +721,7 @@ const AI_NOFISH = { fish_visible: false, candidates: [], other_en: '', other_sci
   await shot(A, 'n01_menu_groups');
   // the phone's sheet: groups, one open at a time, the page's group first
   await go(D, 'teams', 900); await D.click('[data-act="more"]'); await D.waitForTimeout(500);
-  ok(await D.$$eval('.more .more-grp', ns => ns.length) === 5 && await D.$$eval('.more .more-grp.open', ns => ns.map(n => n.dataset.mgrp).join()) === 'social', 'phone menu: five groups, the page\'s group open');
+  ok(await D.$$eval('.more .more-grp', ns => ns.length) === 4 && await D.$$eval('.more .more-grp.open', ns => ns.map(n => n.dataset.mgrp).join()) === 'social', 'phone menu: four groups, the page\'s group open');
   ok(!!(await D.$('.more-grp.open .more-item.on[href="#teams"]')), 'phone menu: the page on screen is marked');
   await D.click('.more-grp[data-mgrp="help"] .more-gh'); await D.waitForTimeout(350);
   ok(await D.$$eval('.more .more-grp.open', ns => ns.map(n => n.dataset.mgrp).join()) === 'help', 'phone menu: opening a group closes the other');

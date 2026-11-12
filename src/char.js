@@ -18,7 +18,7 @@ const CH = (() => {
     rd: { bamboo: 1, carbon: 1, lure: 6, sea: 11, gold: 'pr_gold' }
   };
   const ROD = { bamboo: ['#B88A4A', '#8A6232'], carbon: ['#23272E', '#D2412F'], lure: ['#2F6FD0', '#F2F2F2'], sea: ['#F2F2F2', '#2F6FB5'], gold: ['#F5C542', '#B8860B'] };
-  const DEF = { v: 1, sk: 1, hs: 'short', hc: 0, ey: 'dot', mo: 'smile', ht: 'cap', htc: '#FF5A1F', ou: 'vest', ouc: '#3E8E5A', ac: 'none', rd: 'carbon', bg: '#CDEBF5' };
+  const DEF = { v: 1, sk: 1, hs: 'short', hc: 0, ey: 'dot', mo: 'smile', ht: 'cap', htc: '#2F6FB5', ou: 'vest', ouc: '#3E8E5A', ac: 'none', rd: 'carbon', bg: '#CDEBF5' };
   const OL = '#2B2433';
   const hex = c => (/^#[0-9a-fA-F]{6}$/.test(String(c)) ? c : null);
   function norm(c) {

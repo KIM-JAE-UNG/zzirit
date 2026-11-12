@@ -811,7 +811,7 @@ async function openWithdraw() {
         err.textContent = msg === k ? t('wd_err_unavailable') : msg; err.hidden = false; go.disabled = false; return;
       }
     }
-    try { pkStop(); } catch (x) { }
+    try { liveStop(); } catch (x) { }
     await wipeDevice();
     closeModal(w); toast(t('wd_done'), 'ok', 6000);
     setTimeout(() => { location.hash = 'home'; location.reload(); }, 1600);
@@ -1097,13 +1097,13 @@ function fitText(g, s, max) { if (g.measureText(s).width <= max) return s; let a
 async function catchCardBlob(uid, a, c) {
   const W = 1080, H = 1350, P = 60;
   const SANS = '"IBM Plex Sans KR", "IBM Plex Sans JP", "Noto Sans SC", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif';
-  const DISP = '"Big Shoulders Display", ' + SANS;
-  try { await Promise.race([Promise.all([document.fonts.load(`800 170px ${DISP}`, '0123456789.cm'), document.fonts.load(`700 64px ${SANS}`, nameOf(c.sp) + (a.nick || ''))]), new Promise(r => setTimeout(r, 2500))]); } catch (e) { }
+  const DISP = '"Chakra Petch", ' + SANS;
+  try { await Promise.race([Promise.all([document.fonts.load(`italic 700 170px ${DISP}`, '0123456789.cm'), document.fonts.load(`700 64px ${SANS}`, nameOf(c.sp) + (a.nick || ''))]), new Promise(r => setTimeout(r, 2500))]); } catch (e) { }
   const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
   const g = cv.getContext('2d');
-  const bg = g.createLinearGradient(0, 0, W, H); bg.addColorStop(0, '#0E2440'); bg.addColorStop(1, '#070C16');
+  const bg = g.createLinearGradient(0, 0, W, H); bg.addColorStop(0, '#0B1730'); bg.addColorStop(1, '#050A13');
   g.fillStyle = bg; g.fillRect(0, 0, W, H);
-  const glow = g.createRadialGradient(W * .85, H * .1, 0, W * .85, H * .1, W * .7); glow.addColorStop(0, 'rgba(255,90,31,.18)'); glow.addColorStop(1, 'rgba(255,90,31,0)');
+  const glow = g.createRadialGradient(W * .85, H * .1, 0, W * .85, H * .1, W * .7); glow.addColorStop(0, 'rgba(57,137,210,.34)'); glow.addColorStop(1, 'rgba(57,137,210,0)');
   g.fillStyle = glow; g.fillRect(0, 0, W, H);
   // photo (or the drawn fish when there is none)
   const sp = SPI[c.sp];
@@ -1130,9 +1130,9 @@ async function catchCardBlob(uid, a, c) {
   g.textBaseline = 'alphabetic'; g.fillStyle = '#FFFFFF';
   g.font = `700 64px ${SANS}`; g.fillText(fitText(g, nameOf(c.sp) || '?', W - P * 2), P, py + ph + 100);
   const lenTxt = String(Math.round(c.len * 10) / 10);
-  g.font = `800 176px ${DISP}`; g.fillStyle = '#FF6A2B'; g.fillText(lenTxt, P - 4, py + ph + 270);
+  g.font = `italic 700 176px ${DISP}`; g.fillStyle = '#7CC4FF'; g.fillText(lenTxt, P - 4, py + ph + 270);
   const lw = g.measureText(lenTxt).width;
-  g.font = `800 72px ${DISP}`; g.fillStyle = '#FFFFFF'; g.fillText('cm', P + lw + 14, py + ph + 270);
+  g.font = `italic 700 72px ${DISP}`; g.fillStyle = '#FFFFFF'; g.fillText('cm', P + lw + 14, py + ph + 270);
   // when, where (sea area only), who
   const where = c.sea && c.lon != null ? dict(GEO.seaOf(c.lon, c.lat).n) : regionName(c.rg || '');
   const lv = uid ? lvInfo(a, uid).L : 1;
@@ -1181,7 +1181,7 @@ function openShareCard(blob, name, text) {
 }
 
 /* ===== What's new: shown once after a big update (website only; needs the matching server update) ===== */
-const WHATS_NEW = '2026-11-07b', WN_TS = Date.parse('2026-11-07T03:00:00Z'); // people who joined after this have nothing to catch up on
+const WHATS_NEW = '2026-11-12a', WN_TS = Date.parse('2026-11-07T03:00:00Z'); // people who joined after this have nothing to catch up on
 const BOOT_AT = Date.now();
 /* what each update brought, newest last; people see what came after the last one they saw (at most 6 lines) */
 const WN_ITEMS = [
@@ -1189,11 +1189,11 @@ const WN_ITEMS = [
   ['2026-10-29', 'bell', 'wn_noti'], ['2026-10-29', 'wave', 'wn_wx'], ['2026-10-29', 'medal', 'wn_bdg'], ['2026-10-29', 'download', 'wn_inst'], ['2026-10-29', 'logout', 'wn_out'],
   ['2026-10-29b', 'wave', 'wn_fs'], ['2026-10-29b', 'trophy', 'wn_wk'], ['2026-10-29b', 'chart', 'wn_st'], ['2026-10-29b', 'phone', 'wn_push'],
   ['2026-10-29c', 'camera', 'wn_fix'], ['2026-10-29c', 'menu', 'wn_menu'],
-  ['2026-10-29d', 'wave', 'wn_park'], ['2026-10-29d', 'chat', 'wn_chat'], ['2026-10-29d', 'board', 'wn_bdmod'], ['2026-10-29d', 'user', 'wn_wd'],
-  ['2026-11-06a', 'star', 'wn_games'], ['2026-11-06a', 'wave', 'wn_fs2'],
-  ['2026-11-07a', 'coin', 'wn_zp'], ['2026-11-07b', 'lure', 'wn_tackle']
+  ['2026-10-29d', 'chat', 'wn_chat'], ['2026-10-29d', 'board', 'wn_bdmod'], ['2026-10-29d', 'user', 'wn_wd'],
+  ['2026-11-06a', 'wave', 'wn_fs2'],
+  ['2026-11-12a', 'live', 'wn_live'], ['2026-11-12a', 'sparkle', 'wn_look']
 ];
-const WN_PART = { wn_tackle: 'wn_zp' };
+const WN_PART = {};
 function maybeWhatsNew(tries = 0) {
   if (window.APP_RT !== 'web' || lsGet('wn', '') === WHATS_NEW || tries > 6) return;
   if (!S.ready || $('.modal-wrap.in')) { setTimeout(() => maybeWhatsNew(tries + 1), 4000); return; }

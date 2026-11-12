@@ -82,8 +82,8 @@ VIEWS.home = {
         </div>
       </section>
 
+      ${liveTeaserHTML()}
       ${wxCardHTML()}
-      ${foStripHTML()}
       ${idTipHTML() || instTipHTML()}
       ${newsCardHTML()}
 
@@ -128,7 +128,6 @@ VIEWS.home = {
         </section>
       </div>
 
-      ${homeLiveHTML()}
 
       <section class="card home-board">
         <div class="sec-head tight"><h2 class="h3">${icon('board')}${t('home_board_title')}</h2><div class="hb-links"><a class="link" href="#teams">${icon('flag')}${myTm && myTm.ok ? esc(myTm.t.name) : t('nav_teams')}</a><a class="link" href="#board">${t('home_board_more')}</a></div></div>
@@ -859,7 +858,7 @@ VIEWS.sea = {
     const ch = S.me && S.me.char ? S.me.char : CH.DEF;
     sc.setState({ theme, decor, fx: inc.filter(x => SHOPI[x].k === 'fx'), fish: it.k === 'flair' ? [] : [{ key: 'a', sp: 'madai', len: 45 }], char: Object.assign({}, ch, id === 'pr_gold' ? { rd: 'gold' } : {}), rod: id === 'pr_gold' ? 'gold' : ch.rd, hideChar: it.k === 'flair' });
     sc.t = 2.2; sc.frame(16, true);
-    if (it.k === 'flair') { const x = c.getContext('2d'); x.setTransform(1, 0, 0, 1, 0, 0); x.fillStyle = 'rgba(0,0,0,.35)'; x.fillRect(0, 0, c.width, c.height); x.font = '700 34px "Big Shoulders Display", sans-serif'; x.textAlign = 'center'; x.fillStyle = id === 'fl_gold' ? '#ffd54a' : '#fff'; x.fillText(APP_NAME[1], c.width / 2, c.height / 2 + 12); x.strokeStyle = id === 'fl_gold' ? '#ffd54a' : '#3fb6d8'; x.lineWidth = 6; x.beginPath(); x.arc(c.width / 2, c.height / 2, 54, 0, Math.PI * 2); x.stroke(); }
+    if (it.k === 'flair') { const x = c.getContext('2d'); x.setTransform(1, 0, 0, 1, 0, 0); x.fillStyle = 'rgba(0,0,0,.35)'; x.fillRect(0, 0, c.width, c.height); x.font = '700 34px "Chakra Petch", sans-serif'; x.textAlign = 'center'; x.fillStyle = id === 'fl_gold' ? '#ffd54a' : '#fff'; x.fillText(APP_NAME[1], c.width / 2, c.height / 2 + 12); x.strokeStyle = id === 'fl_gold' ? '#ffd54a' : '#3fb6d8'; x.lineWidth = 6; x.beginPath(); x.arc(c.width / 2, c.height / 2, 54, 0, Math.PI * 2); x.stroke(); }
     sc.stop(); if (sc._ro) sc._ro.disconnect();
     const url = c.toDataURL('image/jpeg', .82); c.remove(); FD._it[key] = url; return url;
   },
@@ -1150,7 +1149,7 @@ VIEWS.prefs = {
         ${window.APP_RT === 'web' && !S.isOwner ? `<p class="hint"><a href="#claim">${icon('shield')} ${t('claim_title')}</a></p>` : ''}
       </section>
       ${wdCardHTML()}
-      <section class="card credits"><h2 class="h3">${t('credits_title')}</h2><p class="small">${t('credits_text')}</p>${wxOn() ? `<p class="small">${t('credits_wx')} · <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo.com</a> (CC BY 4.0)</p>` : ''}</section>
+      <section class="card credits"><h2 class="h3">${t('credits_title')}</h2><p class="small">${t('credits_text')}</p>${wxOn() ? `<p class="small">${t('credits_wx')} · <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo.com</a> (CC BY 4.0)</p>` : ''}${window.APP_RT === 'web' ? `<p class="small">${t('credits_map')} · © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors (ODbL) · <a href="https://openmaptiles.org/" target="_blank" rel="noopener">OpenMapTiles</a> · <a href="https://openfreemap.org/" target="_blank" rel="noopener">OpenFreeMap</a> · <a href="https://maplibre.org/" target="_blank" rel="noopener">MapLibre GL JS</a> (BSD-3-Clause)</p>` : ''}</section>
     </div>`;
     pushBind(el);
     const fo = $('#pf-froff', el);
@@ -1336,7 +1335,7 @@ function openMore() {
   // the four groups; the one with the page on screen starts open, one open at a time so the sheet stays short
   const cur = navGroupOf(S.route) || 'fish';
   const grp = NAV_GROUPS.map(([id, gic, routes]) => {
-    const list = routes.filter(r => ((r !== 'points' && r !== 'park' && r !== 'chat' && r !== 'lures') || window.APP_RT === 'web') && (r !== 'admin' || S.isOwner));
+    const list = routes.filter(r => ((r !== 'points' && r !== 'live' && r !== 'chat' && r !== 'lures') || window.APP_RT === 'web') && (r !== 'admin' || S.isOwner));
     const nDm = window.APP_RT === 'web' && typeof dmUnread === 'function' ? dmUnread() : 0;
     const on = id === cur, dot = (list.includes('friends') && nIn) || (list.includes('chat') && nDm);
     return `<section class="more-grp${on ? ' open' : ''}" data-mgrp="${id}">

@@ -1,5 +1,6 @@
-// Live features with several people at once: the open chat, 1:1 between friends, the park (people, walking, emotes,
-// speech bubbles, the fishing game, a duel), the operator's board tools, comment editing and leaving (회원 탈퇴).
+// Live features with several people at once: the open chat, 1:1 between friends, 찌릿 라이브 (the game on the real map:
+// on the spot, floats seen by others, the bite, the fight, the catch, the book, far-away casts on a phone), the operator's
+// board tools, comment editing and leaving (회원 탈퇴).
 // Run with a fresh fake server up (node web/server.js). Screenshots land in tests/out/live/.
 const { chromium } = require('playwright'); const fs = require('fs');
 const LIB = p => require.resolve(p, { paths: [require('path').join(__dirname, '..')] });
@@ -23,6 +24,8 @@ async function until(fn, ms = 6000, step = 150) { const t0 = Date.now(); let v; 
     const mk = async (name, opts = {}) => {
       const ctx = await b.newContext(Object.assign({ viewport: { width: 1360, height: 860 }, locale: 'ko-KR' }, opts.ctx || {}));
       await ctx.addInitScript(wn => { try { localStorage.setItem('eosin.welcomed', '1'); localStorage.setItem('eosin.wn', JSON.stringify(wn)); } catch (e) { } }, WN);
+      // the live map draws the test tiles (a lakeside town) instead of asking the tile server
+      await ctx.addInitScript(() => { window.LIVE_TILES = { tiles: '/tests/fixtures/tiles/{z}/{x}/{y}.pbf', glyphs: '', minzoom: 10 }; });
       await ctx.route('https://cdn.jsdelivr.net/npm/@supabase/**', r => r.fulfill({ contentType: 'text/javascript', body: FAKE }));
       await ctx.route('https://cdn.jsdelivr.net/npm/qrcode-generator**', r => r.fulfill({ contentType: 'text/javascript', body: QRLIB }));
       await ctx.route('https://cdnjs.cloudflare.com/**', r => r.fulfill({ contentType: 'text/javascript', body: LEAF }));
@@ -49,15 +52,17 @@ async function until(fn, ms = 6000, step = 150) { const t0 = Date.now(); let v; 
     const uidOf = p => p.evaluate(() => S.uid);
 
     /* ---------- people ---------- */
-    const A = await mk('A'); await onboard(A, '갯바위왕');
-    const B = await mk('B'); await onboard(B, '감성돔러버');
+    const LAKE = { latitude: 47.36655, longitude: 8.54135, accuracy: 12 }; // on the quay, a cast away from the lake
+    const A = await mk('A', { ctx: { geolocation: LAKE, permissions: ['geolocation'] } }); await onboard(A, '갯바위왕');
+    const B = await mk('B', { ctx: { geolocation: { latitude: 47.36640, longitude: 8.54180, accuracy: 15 }, permissions: ['geolocation'] } }); await onboard(B, '감성돔러버');
     const OP = await mk('OP'); await onboard(OP, '관리테스트');
     await go(OP, 'claim', 600); await OP.fill('#cl-code', 'testcode1234abcd'); await OP.click('#cl-go'); await OP.waitForTimeout(2400); await closeModals(OP);
     ok(await OP.evaluate(() => S.isOwner), 'operator signed in');
     const aId = await uidOf(A), bId = await uidOf(B), opId = await uidOf(OP);
     ok(!!aId && !!bId && aId !== bId, 'two separate accounts');
-    // the menu has the park and the chat (in the community group)
-    ok(await A.$eval('.nav a[data-route="park"]', n => !n.hidden && n.offsetParent !== null).catch(() => false) || await A.$eval('.nav a[data-route="park"]', n => !n.hidden), 'park in the menu');
+    // the menu has the live sea right under home; the park and the mini games are gone
+    ok(await A.$eval('.nav > a[data-route="live"]', n => !n.hidden && /찌릿 라이브/.test(n.textContent)), 'live in the menu');
+    ok(!(await A.$('.nav a[data-route="park"], .nav a[data-route="games"]')), 'no park, no mini games in the menu');
     ok(await A.$eval('.nav a[data-route="chat"]', n => !n.hidden), 'chat in the menu');
 
     /* ---------- the open chat ---------- */
@@ -141,91 +146,77 @@ async function until(fn, ms = 6000, step = 150) { const t0 = Date.now(); let v; 
     const opRead = await OP.evaluate(() => APP_AUTH.dm.list());
     ok(opRead.length === 0, 'dm: not even the operator reads 1:1');
 
-    /* ---------- the park ---------- */
-    await go(A, 'park', 1800); await go(B, 'park', 1800);
-    ok(!!(await until(() => A.$(`[data-pkwho="${bId}"]`))), 'park: A sees B in the list');
-    ok(!!(await until(() => B.$(`[data-pkwho="${aId}"]`))), 'park: B sees A');
-    ok(/1번 공원 · 2명/.test(await A.$eval('#pk-status', n => n.textContent)), 'park: who is here');
-    await A.waitForTimeout(600); await shot(A, 'l04_park_A');
-    // at night (Korean time): the lamps, the fire and the lighthouse light up
-    await A.evaluate(() => { window._kst = pkKst; pkKst = () => ({ h: 21.5, m: 9 }); }); await A.waitForTimeout(500); await shot(A, 'l04b_park_night');
-    await A.evaluate(() => { pkKst = window._kst; });
-    // walking: one tap, the others see the walk
-    await A.evaluate(() => pkWalk(980, 720));
-    ok(!!(await until(() => B.evaluate(u => { const p = PKS.people.get(u); return p && Math.abs(p.gx - 980) < 3 && Math.abs(p.gy - 720) < 3; }, aId))), 'park: B sees A walking to the spot A tapped');
-    await A.waitForTimeout(1600);
-    ok(await A.evaluate(() => !PKS.me.moving && Math.abs(PKS.me.x - 980) < 3), 'park: A arrived');
-    // the sea stops a walk
-    const stop = await A.evaluate(() => pkReach(800, 900, 800, 100));
-    ok(stop[1] > 420 && stop[1] < 470, 'park: walking stops at the water\'s edge');
-    // the way to the lighthouse goes round by the boardwalk, never over the water; a tap on the sea walks to the shore
-    const way = await A.evaluate(() => { const pts = [[800, 790], ...pkPath(800, 790, 1260, 180)]; let dry = true; for (let i = 1; i < pts.length; i++) if (!pkClear(pts[i - 1][0], pts[i - 1][1], pts[i][0], pts[i][1])) dry = false; return { dry, n: pts.length, end: pts[pts.length - 1] }; });
-    ok(way.dry && way.n >= 3 && Math.hypot(way.end[0] - 1260, way.end[1] - 180) < 2, 'park: a dry way round to the lighthouse — ' + JSON.stringify(way));
-    const sea = await A.evaluate(() => { const pts = pkPath(800, 790, 700, 200); const e = pts[pts.length - 1]; return { land: pkIn(e[0], e[1]), y: e[1] }; });
-    ok(sea.land && sea.y > 400, 'park: tapping the sea walks to the shore');
-    // emote and a speech bubble from the open chat
-    await A.evaluate(() => pkEmote(0));
-    ok(!!(await until(() => B.evaluate(u => { const p = PKS.people.get(u); return p && p.emote && p.emote.e === '👋'; }, aId))), 'park: B sees A wave');
-    await A.fill('#pk-text', '공원 분위기 좋네요'); await A.press('#pk-text', 'Enter');
-    ok(!!(await until(() => B.evaluate(u => { const p = PKS.people.get(u); return p && p.bubble && p.bubble.txt === '공원 분위기 좋네요'; }, aId))), 'park: what A says shows over A\'s head for B');
-    ok(!!(await until(() => B.$$eval('#pk-log li', ns => ns.some(n => n.textContent.includes('공원 분위기 좋네요'))))), 'park: and in the chat lines');
-    await B.waitForTimeout(400); await shot(B, 'l05_park_bubble');
-    // the fishing game at a spot (made easy for the test: a quick bite, no pulls, a small fish)
-    await A.evaluate(() => pkWalk(900, 456));
-    ok(!!(await until(() => A.$('#pk-act [data-pk="fish"]'), 6000)), 'park: at a spot, "fish here" appears');
-    await A.click('#pk-act [data-pk="fish"]'); await A.waitForTimeout(300);
-    ok(await A.$eval('#pk-game', n => !n.hidden), 'game: the panel opens');
-    ok(!!(await until(() => B.evaluate(u => { const p = PKS.people.get(u); return p && p.act === 'fish'; }, aId))), 'game: B sees A fishing');
-    await A.click('#pkg-btn'); await A.waitForTimeout(150);
-    ok(await A.evaluate(() => PKS.game.phase === 'wait'), 'game: cast, waiting for a bite');
-    await A.evaluate(() => Object.assign(PKS.game.f, { wait: .3, nibs: [], win: 3, pulls: [], q: .2 }));
-    ok(!!(await until(() => A.evaluate(() => PKS.game.phase === 'bite'), 3000, 50)), 'game: the float dives (bite)');
-    await shot(A, 'l06_bite');
-    const bb = await A.$eval('#pkg-btn', n => { const r = n.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
-    await A.mouse.move(bb.x, bb.y); await A.mouse.down();
-    ok(!!(await until(() => A.evaluate(() => PKS.game.phase === 'fight'), 1500, 30)), 'game: strike, the fight starts');
-    await A.waitForTimeout(800); await shot(A, 'l07_fight');
-    ok(!!(await until(() => A.evaluate(() => PKS.game.phase === 'got'), 7000, 50)), 'game: reeled in');
-    await A.mouse.up();
-    ok(await A.evaluate(() => PKS.stats.n === 1 && !!PKS.best && SPI[PKS.best.sp].w !== 'F'), 'game: counted, a sea fish, a park best');
-    await shot(A, 'l08_got');
-    await A.click('.pkg-x'); await A.waitForTimeout(300);
-    ok(await A.$eval('#pk-game', n => n.hidden), 'game: closed');
-    // a duel (shortened for the test)
-    await A.evaluate(() => { PK.DUEL = 5000; }); await B.evaluate(() => { PK.DUEL = 5000; });
-    await A.evaluate(u => pkCard(u), bId); await A.waitForTimeout(400);
-    ok(!!(await A.$('[data-pkc="duel"]:not([disabled])')), 'duel: the card offers a duel');
-    ok(!!(await A.$('[data-pkc="dm"]')), 'duel: and a 1:1 message (they are friends)');
-    await A.click('[data-pkc="duel"]'); await A.waitForTimeout(300);
-    ok(!!(await until(() => B.$('[data-pkd="yes"]'))), 'duel: B is asked');
-    await shot(B, 'l09_duel_ask');
-    await B.click('[data-pkd="yes"]');
-    ok(!!(await until(() => A.$('#pk-game.mode-duel:not([hidden])'))), 'duel: A\'s game opens');
-    ok(!!(await until(() => B.$('#pk-game.mode-duel:not([hidden])'))), 'duel: B\'s game opens');
-    ok(await A.evaluate(() => PKS.game.seed) === await B.evaluate(() => PKS.game.seed), 'duel: the same sea for both (same seed)');
-    ok(!!(await until(() => B.evaluate(u => { const p = PKS.people.get(u); return p && p.act === 'duel'; }, aId))), 'duel: others see ⚔️');
-    // A catches one during the duel
-    await until(() => A.evaluate(() => PKS.duel && PKS.duel.state === 'play'), 4500, 50);
-    await A.evaluate(() => Object.assign(PKS.game.f, { wait: .2, nibs: [], win: 3, pulls: [], q: .2 }));
-    await until(() => A.evaluate(() => PKS.game.phase === 'bite'), 2000, 40);
-    const db = await A.$eval('#pkg-btn', n => { const r = n.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
-    await A.mouse.move(db.x, db.y); await A.mouse.down();
-    await until(() => A.evaluate(() => PKS.game && (PKS.game.phase === 'got' || PKS.game.phase === 'over')), 5000, 40); await A.mouse.up();
-    await shot(A, 'l10_duel');
-    ok(!!(await until(() => A.$('.pk-result'), 12000)), 'duel: A gets the result');
-    ok(!!(await until(() => B.$('.pk-result'), 8000)), 'duel: B gets the result');
-    await shot(A, 'l11_result');
-    const sa = await A.evaluate(() => PKS.stats), sb = await B.evaluate(() => PKS.stats);
-    ok(sa.w === 1 && sb.l === 1, 'duel: A won (caught one), B lost — ' + JSON.stringify([sa, sb]));
-    await closeModals(A); await closeModals(B);
-    // leaving the park: the others see it, and the park records are saved to the profile
-    await go(A, 'home', 900);
-    ok(!!(await until(() => B.evaluate(u => !PKS.people.has(u), aId), 6000)), 'park: B sees A leave');
+    /* ---------- 찌릿 라이브: two anglers on the same quay ---------- */
+    const lvCfg = cfg => fetch('http://127.0.0.1:8768/__sb/live_cfg', { method: 'POST', body: JSON.stringify(cfg) }).then(r => r.json());
+    const press = async p => { await p.dispatchEvent('#lv-main', 'pointerdown'); await p.dispatchEvent('#lv-main', 'pointerup'); };
+    const ph = p => p.evaluate(() => LV.phase);
+    await lvCfg({ cfg: { tier: 4, big: false, u: .5, school: 2 } });
+    await go(A, 'park', 2500); // an old link to the park lands on the live sea
+    ok(await A.evaluate(() => location.hash === '#live' && S.route === 'live'), 'live: old park links open the live sea');
+    ok(!!(await until(() => A.$('#lv-cover [data-lv="go-geo"]'), 20000)), 'live: the first visit explains the game and asks about location');
+    ok(/이 기기에서만/.test(await A.$eval('#lv-cover .lv-priv', n => n.textContent)), 'live: and says what happens to the location');
+    await shot(A, 'l04_live_intro');
+    await A.click('[data-lv="go-geo"]');
+    ok(!!(await until(() => A.evaluate(() => LV.mode === 'site' && !!LV.stand && LV.site), 20000)), 'live: by the water → fishing on the spot');
+    ok(await A.evaluate(() => LV.near && LV.near.d > 5 && LV.near.d < 100 && LV.near.kind === 'fresh'), 'live: the lake is a cast away (fresh water)');
+    ok(!!(await until(() => A.evaluate(() => LV.schools.length > 0 && LV.schools.every(s => LMAP.waterAt(LV.water, s.lng, s.lat))), 8000)), 'live: schools show, only on water');
+    ok(/현장/.test(await A.$eval('#lv-chips', n => n.textContent)) && /캐스팅/.test(await A.$eval('#lv-mtxt', n => n.textContent)), 'live: the chips say "on the spot", the button says "cast"');
+    ok(await A.$eval('#lv-fx', n => n.width > 300 && n.height > 300) && !!(await A.$('.lv-me .avatar')), 'live: my marker stands on the map');
+    await A.waitForTimeout(600); await shot(A, 'l04b_live_site');
+    await go(B, 'live', 2500); await until(() => B.$('#lv-cover [data-lv="go-geo"]'), 20000); await B.click('[data-lv="go-geo"]');
+    ok(!!(await until(() => B.evaluate(() => LV.mode === 'site' && !!LV.stand), 20000)), 'live: B is on the quay too');
+    // a tap on the water aims there; a tap on land does not
+    const aim = await A.evaluate(() => { const t0 = lvAim(); lvTap(LV.stand.lng, LV.stand.lat); const onLand = LV.target; lvTap(t0.lng, t0.lat); return { onLand: !!onLand, d: LMAP.dist(LV.stand, LV.target), kind: LV.target.kind }; });
+    ok(!aim.onLand && aim.d > 5 && aim.d <= 60 && aim.kind === 'fresh', 'live: a tap on the water aims within the rod\'s reach — ' + JSON.stringify(aim));
+    // A casts: B sees the float
+    await press(A);
+    ok(!!(await until(async () => (await ph(A)) === 'wait', 8000)), 'live: A\'s float is in the water');
+    ok(!!(await until(() => B.evaluate(u => { const o = LV.others.get(u); return o && o.f === 'float_basic' && o.n === '갯바위왕' && Math.abs(o.y - 47.366) < .01; }, aId), 8000)), 'live: B sees A\'s float on the same water');
+    ok(/찌 1개/.test(await B.$eval('#lv-chips', n => n.textContent)), 'live: B\'s chips count the floats');
+    // B strikes too early: the fish is gone
+    await press(B); await until(async () => (await ph(B)) === 'wait', 8000); await B.waitForTimeout(150); await press(B);
+    ok(!!(await until(async () => (await ph(B)) === 'idle', 4000)) && /너무 빨랐어요/.test(await B.$eval('#lv-hint', n => n.textContent)), 'live: striking before the bite loses the fish');
+    // A: the bite → strike → fight → land
+    ok(!!(await until(async () => (await ph(A)) === 'bite', 8000, 50)), 'live: the bite comes');
+    const biteUi = await A.evaluate(() => [$('#lv-banner').textContent, $('#lv-mtxt').textContent]);
+    await press(A);
+    ok(/찌릿!/.test(biteUi[0]) && /챔질!/.test(biteUi[1]), 'live: "찌릿!" and the button says strike');
+    await shot(A, 'l05_live_bite');
+    ok(!!(await until(async () => (await ph(A)) === 'fight', 6000)), 'live: a good strike hooks the fish');
+    ok(await A.evaluate(() => !!LV.k.sp && SPI[LV.k.sp].w !== 'S' && SPI[LV.k.sp].r <= 4 && LV.k.cm > 5), 'live: a freshwater fish of that region, no higher than the class rolled');
+    await A.evaluate(() => { window.__bot = setInterval(() => { if (LV.phase !== 'fight' || !LV.f) return; LV.hold = LV.f.T < 60 ? true : LV.f.T > 76 ? false : LV.hold; }, 30); });
+    await A.waitForTimeout(900); ok(await A.$eval('#lv-fight', n => !n.hidden && /m|놓으세요|감으세요/.test(n.textContent)), 'live: the fight shows how far the fish is');
+    await shot(A, 'l05b_live_fight');
+    ok(!!(await until(async () => (await ph(A)) === 'result', 60000)), 'live: reeled in');
+    await A.evaluate(() => clearInterval(window.__bot));
+    const res = await A.$eval('#lv-res', n => n.textContent);
+    ok(/cm/.test(res) && /\+22P/.test(res) && /도감 첫 등록/.test(res) && /현장/.test(res) && /1등/.test(res), 'live: the catch card — size, 12 + 10 points, new in the book, on the spot, first on the board');
+    await A.waitForTimeout(700); await shot(A, 'l06_live_catch');
+    ok(!!(await until(() => B.$$eval('.lv-tick', ns => ns.some(n => /갯바위왕/.test(n.textContent) && /cm/.test(n.textContent))), 8000)), 'live: B\'s ticker tells of A\'s catch');
+    ok(!!(await until(() => B.evaluate(u => !LV.others.has(u), aId), 8000)), 'live: and A\'s float is gone from B\'s map');
+    const stA = await A.evaluate(() => APP_AUTH.live.state());
+    ok(stA.dex.length === 1 && stA.me && stA.me.r === 1 && stA.bal === 22 && stA.day.fish === 1 && stA.feed[0].a === aId, 'live: the server kept the fish, the points and the board');
+    ok(/22/.test(await A.$eval('#lv-wallet', n => n.textContent)), 'live: the wallet on the map shows the points');
+    // the book: my fish, the board, how it works
+    await A.click('[data-lv="book"]'); await A.waitForTimeout(700);
+    ok(await A.$$eval('.lv-book .lv-dx.got', ns => ns.length === 1) && /1/.test(await A.$eval('.lv-book .lv-bsum b', n => n.textContent)), 'book: one species caught, the rest are shadows');
+    await shot(A, 'l06b_live_book');
+    await A.click('[data-lvtab="wk"]'); await A.waitForTimeout(700);
+    ok(await A.$$eval('.lv-book .lv-board li.me', ns => ns.length === 1) && /300P/.test(await A.$eval('.lv-book', n => n.textContent)), 'book: the weekly board with me on it and the prizes');
+    await A.click('[data-lvtab="how"]'); await A.waitForTimeout(700);
+    await A.click('.lv-book .lv-opt .sw'); await A.waitForTimeout(200);
+    ok(await A.evaluate(() => LV.anon === true), 'book: "hide my float" can be switched on');
+    await closeModals(A);
+    // hidden: A casts again and B sees nothing
+    await press(A); await until(async () => (await ph(A)) === 'wait', 8000); await B.waitForTimeout(1500);
+    ok(await B.evaluate(u => !LV.others.has(u), aId), 'live: a hidden float does not show on other maps');
+    await until(async () => (await ph(A)) === 'bite', 8000); await A.waitForTimeout(1500);
+    ok(!!(await until(async () => (await ph(A)) === 'idle', 4000)) && /놓쳤어요/.test(await A.$eval('#lv-hint', n => n.textContent)), 'live: a bite left alone is a missed bite');
+    // leaving the page takes the angler off the water
+    await go(A, 'home', 800); await go(B, 'home', 600);
+    ok(/지금 바다에 찌를/.test(await A.$eval('.lt', n => n.textContent)) && !!(await until(() => A.$$eval('.lt-feed li', ns => ns.length >= 1), 5000)), 'home: the door to the live sea shows the latest catch');
     d = await dump();
-    ok(d.T.anglers[aId].data.park && d.T.anglers[aId].data.park.st.n >= 1 && d.T.anglers[aId].data.park.st.w === 1, 'park: A\'s park records saved');
-    await go(B, 'home', 600);
-    d = await dump();
-    ok(!Object.values(d.RT).some(keys => keys.length), 'park: nobody left in the rooms');
+    ok(!Object.values(d.RT).some(keys => keys.length), 'live: nobody left in the rooms');
     logs.push('  realtime messages sent: ' + d.RTSTATS.sent + ', delivered: ' + d.RTSTATS.delivered);
 
     /* ---------- the board: my posts, editing a comment, the operator deleting for good ---------- */
@@ -325,14 +316,35 @@ async function until(fn, ms = 6000, step = 150) { const t0 = Date.now(); let v; 
     /* ---------- a phone ---------- */
     const P = await mk('P', { ctx: { viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true } });
     await onboard(P, '폰낚시꾼');
-    await go(P, 'park', 1800); await shot(P, 'l14_phone_park');
-    ok(await P.$eval('#pk-cv', n => { const r = n.getBoundingClientRect(); return r.width > 300 && r.height > 280; }), 'phone: the park fills the screen');
-    await P.tap('#pk-cv', { position: { x: 200, y: 160 } }); await P.waitForTimeout(400);
-    ok(await P.evaluate(() => PKS.me.moving || Math.hypot(PKS.me.tx - PKS.me.x, PKS.me.ty - PKS.me.y) > 1 || !!PKS.tapAt), 'phone: a tap walks');
+    // a phone with no location: far-away casts only, a few a day
+    await lvCfg({ cfg: { tier: 2, big: false, u: .4, remote: 2 } });
+    await P.evaluate(() => lsSet('liveAt', { lng: 8.53, lat: 47.376 })); // where this phone last looked at the map: in town, a walk from the water
+    await P.click('.tabbar a[data-route="live"]'); await P.waitForTimeout(2500);
+    ok(await P.evaluate(() => S.route === 'live') && await P.$eval('.tabbar a[data-route="live"]', n => n.classList.contains('on')), 'phone: the live tab');
+    await until(() => P.$('#lv-cover [data-lv="go-look"]'), 20000); await P.click('[data-lv="go-look"]');
+    ok(!!(await until(() => P.evaluate(() => LV.mode === 'remote' && !!LV.stand), 25000)), 'phone: without location → a far-away cast, standing at the nearest shore');
+    ok(await P.$eval('.lv', n => { const r = n.getBoundingClientRect(); return r.width >= 389 && r.height > 600 && r.bottom <= innerHeight - 50; }), 'phone: the map fills the screen above the tab bar');
+    ok(/원정 2\/2/.test(await P.$eval('#lv-chips', n => n.textContent)), 'phone: the chip counts the far-away casts');
+    await P.waitForTimeout(800); await shot(P, 'l14_phone_live');
+    // a real tap on the map: on water it aims
+    const pt = await P.evaluate(() => { const t0 = lvAim(), q = LV.map.project([t0.lng, t0.lat]), r = LV.map.getCanvas().getBoundingClientRect(); return { x: r.left + q.x, y: r.top + q.y }; });
+    await P.touchscreen.tap(pt.x, pt.y); await P.waitForTimeout(500);
+    ok(await P.evaluate(() => !!LV.target && LMAP.dist(LV.stand, LV.target) <= 60), 'phone: a tap on the water sets the target');
+    await press(P); ok(!!(await until(async () => (await ph(P)) === 'bite', 12000, 60)), 'phone: far-away cast → bite');
+    await press(P); await until(async () => (await ph(P)) === 'fight', 6000);
+    await P.evaluate(() => { window.__bot = setInterval(() => { if (LV.phase !== 'fight' || !LV.f) return; LV.hold = LV.f.T < 60 ? true : LV.f.T > 76 ? false : LV.hold; }, 30); });
+    ok(!!(await until(async () => (await ph(P)) === 'result', 60000)), 'phone: landed');
+    ok(/\+12P/.test(await P.$eval('#lv-res', n => n.textContent)) && !/현장/.test(await P.$eval('.lv-rtags', n => n.textContent)), 'phone: a far-away catch pays half (2 + 10 for the new species)');
+    await P.waitForTimeout(600); await shot(P, 'l14b_phone_catch');
+    await P.click('[data-lv="again"]'); await P.waitForTimeout(300);
+    await press(P); await until(async () => (await ph(P)) === 'wait', 8000); await press(P); await until(async () => (await ph(P)) === 'idle', 5000);
+    ok(/원정 0\/2/.test(await P.$eval('#lv-chips', n => n.textContent)), 'phone: two casts used');
+    await P.waitForTimeout(2800); await press(P); await P.waitForTimeout(600);
+    ok(/다 썼어요/.test(await P.$eval('#lv-hint', n => n.textContent)) && await P.evaluate(() => LV.phase === 'idle'), 'phone: no far-away casts left today');
     await go(P, 'chat', 1000); await shot(P, 'l15_phone_chat');
     ok(await P.$eval('#chat-text', n => { const r = n.getBoundingClientRect(); return r.bottom < innerHeight - 50; }), 'phone: the chat box sits above the tab bar');
     await P.click('[data-act="more"]'); await P.waitForTimeout(500);
-    ok(await P.$$eval('.more a[href="#park"], .more a[href="#chat"]', ns => ns.length === 2), 'phone: park and chat in the menu sheet');
+    ok(await P.$$eval('.more a[href="#lures"], .more a[href="#chat"]', ns => ns.length === 2) && !(await P.$('.more a[href="#park"], .more a[href="#games"]')), 'phone: the tackle shop and chat in the menu sheet, no park');
     await shot(P, 'l16_phone_more');
   } catch (e) { logs.push('CRASH ' + (e.stack || e)); fails.push('crash'); for (const p of PAGES) { try { await p.screenshot({ path: OUT + 'crash_' + p._name + '.png' }); } catch (x) { } } }
   console.log(logs.join('\n'));

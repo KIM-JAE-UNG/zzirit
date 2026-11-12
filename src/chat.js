@@ -59,7 +59,6 @@ function chatRow(m) {
 }
 /* paint the open chat where it is shown: keeps the scroll where it is unless the reader is already at the bottom */
 function chatPaint(jump) {
-  if (typeof pkLog === 'function') pkLog(); // the park shows the last few lines too
   const log = $('#chat-log'); if (!log) return;
   const near = log.scrollHeight - log.scrollTop - log.clientHeight < 80;
   const list = CHAT.msgs.filter(m => !chatHidden(m.id));

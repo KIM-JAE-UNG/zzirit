@@ -348,7 +348,7 @@ class SeaScene {
     c.strokeStyle = '#ffd84a'; c.lineWidth = 1; c.beginPath(); c.moveTo(fx, fyy - 8); c.lineTo(fx, fyy - 13); c.stroke();
     if (bite > .15) {
       c.strokeStyle = `rgba(255,255,255,${.6 * bite})`; c.lineWidth = 1; for (let k = 1; k <= 2; k++) { c.beginPath(); c.ellipse(fx, hz + 1, 6 * k + bite * 6, 1.6 * k, 0, 0, Math.PI * 2); c.stroke(); }
-      c.save(); c.globalAlpha = Math.min(1, bite * 1.4); c.font = `800 ${Math.round(clamp(this.H * .045, 11, 18))}px "Big Shoulders Display", "IBM Plex Sans KR", sans-serif`; c.textAlign = 'center';
+      c.save(); c.globalAlpha = Math.min(1, bite * 1.4); c.font = `800 ${Math.round(clamp(this.H * .045, 11, 18))}px "Chakra Petch", "IBM Plex Sans KR", sans-serif`; c.textAlign = 'center';
       c.lineWidth = 3; c.strokeStyle = 'rgba(11,34,48,.85)'; const txt = (S.li === 0 ? '찌릿!' : 'ZZIRIT!'); c.strokeText(txt, fx + 4, fyy - 20 - bite * 6); c.fillStyle = '#ffd84a'; c.fillText(txt, fx + 4, fyy - 20 - bite * 6); c.restore();
     }
   }
@@ -369,7 +369,7 @@ class SeaScene {
     c.fillStyle = '#2a3a48'; c.fillRect(13, -33, 10, 8); c.fillRect(27, -33, 10, 8);
     c.fillStyle = 'rgba(255,255,255,.5)'; c.fillRect(14, -32, 3, 6); c.fillRect(28, -32, 3, 6);
     c.strokeStyle = gold ? '#8a5e12' : '#3a3a3a'; c.lineWidth = 1.6; c.beginPath(); c.moveTo(30, -42); c.lineTo(30, -66); c.stroke();
-    c.fillStyle = gold ? '#ffd84a' : '#ff5a1f'; c.beginPath(); c.moveTo(30, -66); c.lineTo(44, -62); c.lineTo(30, -58); c.closePath(); c.fill();
+    c.fillStyle = gold ? '#ffd84a' : '#e8365d'; c.beginPath(); c.moveTo(30, -66); c.lineTo(44, -62); c.lineTo(30, -58); c.closePath(); c.fill();
     if (gold) { const gl = c.createRadialGradient(36, -50, 1, 36, -50, 40); gl.addColorStop(0, `rgba(255,220,120,${.25 + .1 * Math.sin(t * 2)})`); gl.addColorStop(1, 'rgba(255,220,120,0)'); c.fillStyle = gl; c.fillRect(-10, -90, 92, 90); }
     c.restore();
   }
@@ -387,7 +387,7 @@ class SeaScene {
     c.restore();
   }
   floatMobile(c, x, hz, t) {
-    const cols = ['#ff5a1f', '#ffd23f', '#3fb6d8', '#9be15d', '#ff7aa8'];
+    const cols = ['#5aa2ff', '#ffd23f', '#3fb6d8', '#9be15d', '#ff7aa8'];
     for (let i = 0; i < 5; i++) {
       const fx = x + (i - 2) * 16, y = hz + 1 + Math.sin(t * 2 + i) * 2;
       c.strokeStyle = 'rgba(255,255,255,.28)'; c.lineWidth = 1; c.beginPath(); c.moveTo(fx, y + 10); c.lineTo(fx + Math.sin(t + i) * 4, y + 60 + i * 9); c.stroke();

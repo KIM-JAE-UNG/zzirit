@@ -24,6 +24,7 @@ async function until(fn, ms = 6000, step = 80) { const t0 = Date.now(); let v; w
       // headless Chromium keeps reporting a mouse; a phone has none (the payment window shows phone links then)
       if (touch) await ctx.addInitScript(() => { const mm = window.matchMedia.bind(window); window.matchMedia = q => /hover: hover|pointer: fine/.test(q) ? { matches: false, media: q, onchange: null, addEventListener() { }, removeEventListener() { }, addListener() { }, removeListener() { }, dispatchEvent() { return false; } } : mm(q); });
       await ctx.addInitScript(wn => { try { localStorage.setItem('eosin.welcomed', '1'); localStorage.setItem('eosin.wn', JSON.stringify(wn)); } catch (e) { } }, WN);
+      await ctx.addInitScript(() => { window.LIVE_TILES = { tiles: '/tests/fixtures/tiles/{z}/{x}/{y}.pbf', glyphs: '', minzoom: 10 }; });
       await ctx.route('https://cdn.jsdelivr.net/npm/@supabase/**', r => r.fulfill({ contentType: 'text/javascript', body: FAKE }));
       await ctx.route('https://cdn.jsdelivr.net/npm/qrcode-generator**', r => r.fulfill({ contentType: 'text/javascript', body: QRLIB }));
       await ctx.route('https://cdnjs.cloudflare.com/**', r => r.fulfill({ contentType: 'text/javascript', body: LEAF }));
@@ -44,10 +45,8 @@ async function until(fn, ms = 6000, step = 80) { const t0 = Date.now(); let v; w
     const A = await mk('A'); await onboard(A, '루어왕');
     const B = await mk('B'); await onboard(B, '은메달');
     const aId = await A.evaluate(() => S.uid), bId = await B.evaluate(() => S.uid);
-    await go(A, 'games', 1400);
-    ok(/0\s*P/.test(await A.$eval('.zp-wallet', n => n.textContent)), 'games page: my wallet, 0P');
-    ok(!!(await A.$('.gm-shop')), 'games page: a way to the lure shop');
     await go(A, 'lures', 1400);
+    ok(/0\s*P/.test(await A.$eval('.zl-hero .zp-wallet', n => n.textContent)) && await A.$eval('.zl-hero .zp-wallet', n => n.getAttribute('href')) === '#live', 'shop: my wallet, 0P, and the way to earn (the live sea)');
     const cards = await A.$$eval('.zl-card', ns => ns.map(n => n.dataset.zl + ':' + n.querySelector('.zl-tag').textContent.trim()));
     ok(cards.length === 8 && cards[0] === 'jighead:보유' && cards.includes('minnow:1,000P') && cards.includes('jig:800P') && cards.includes('gold:1등 상품'), 'shop: eight lures, the starter one owned, prices, the prize lure — ' + JSON.stringify(cards));
     ok(JSON.stringify(await A.$$eval('.zl-card.sig', ns => ns.map(n => n.dataset.zl))) === '["jig","minnow","gold"]', 'shop: the mark only on the signature lures (and the gold prize)');
@@ -61,10 +60,10 @@ async function until(fn, ms = 6000, step = 80) { const t0 = Date.now(); let v; w
     await A.click('[data-zltab="lure"]'); await A.waitForTimeout(400);
     ok(await A.$$eval('.zl-card img', ns => ns.every(n => n.complete && n.naturalWidth > 0)), 'shop: every lure picture draws');
     await shot(A, 's01_shop', true);
-    ok(await A.evaluate(() => !!document.querySelector('.nav a[data-route="lures"]')), 'the shop is in the menu (play group)');
+    ok(await A.evaluate(() => !!document.querySelector('.nav a[data-route="lures"]')), 'the shop is in the menu');
 
     /* ---------- last week's prizes arrive: once, with a celebration ---------- */
-    await post('/__sb/zp_seed', { weeksAgo: 1, rows: [{ acct: aId, score: 231, best: 200 }, { acct: bId, score: 260, best: 220 }, { acct: 'ffffffff-0000-0000-0000-000000000001', score: 290, best: 250 }, { acct: 'ffffffff-0000-0000-0000-000000000002', score: 400, best: 300 }] });
+    await post('/__sb/live_seed', { weeksAgo: 1, rows: [{ acct: aId, score: 231 }, { acct: aId, score: 180 }, { acct: bId, score: 260 }, { acct: 'ffffffff-0000-0000-0000-000000000001', score: 190 }, { acct: 'ffffffff-0000-0000-0000-000000000002', score: 100 }] });
     await A.reload(); await A.waitForTimeout(1500); await go(A, 'lures', 1200);
     const win = await until(() => A.$('.zp-win'), 8000);
     ok(!!win && /지난주 1등/.test(await A.$eval('.zp-win', n => n.textContent)) && /\+300P/.test(await A.$eval('.zp-win-sum', n => n.textContent)), 'prize: a celebration for last week\'s first place (+300P)');
@@ -73,15 +72,14 @@ async function until(fn, ms = 6000, step = 80) { const t0 = Date.now(); let v; w
     await closeModals(A);
     let d = await dump();
     ok(d.ZPS.wal[aId].bal === 300 && d.ZPS.wal[bId].bal === 200 && (d.ZPS.owned[aId] || []).includes('gold'), 'prize: 300P and the gold lure for 1st, 200P for 2nd');
-    ok(d.ZPS.wal['ffffffff-0000-0000-0000-000000000002'].bal === 20, 'prize: 20P for everyone else who played');
+    ok(d.ZPS.wal['ffffffff-0000-0000-0000-000000000001'].bal === 100 && !d.ZPS.wal['ffffffff-0000-0000-0000-000000000002'], 'prize: 100P for 3rd, nothing for 4th');
     await A.reload(); await A.waitForTimeout(2500); await go(A, 'lures', 1200);
     ok(!(await A.$('.zp-win')), 'prize: celebrated only once');
     ok(/300/.test(await A.$eval('.zl-hero .zp-bal', n => n.textContent)), 'shop: the wallet shows 300P');
     ok((await A.$eval('[data-zl="gold"] .zl-tag', n => n.textContent)).includes('보유'), 'shop: the gold lure is mine');
-    await go(B, 'games', 1600);
-    const pod = await B.$$eval('.rx-podium li', ns => ns.map(n => n.className + ':' + n.textContent));
-    ok(pod.length === 3 && /p1/.test(pod[0]) && /루어왕/.test(pod[0]) && /은메달/.test(pod[1]), 'games page: last week\'s podium — ' + JSON.stringify(pod));
-    await shot(B, 's03_games_podium', true);
+    await go(B, 'live', 3000); await B.evaluate(() => lvBook('wk')); await B.waitForTimeout(900);
+    ok(/지난주/.test(await B.$eval('.lv-blast', n => n.textContent)) && /루어왕/.test(await B.$eval('.lv-blast', n => n.textContent)) && /은메달/.test(await B.$eval('.lv-blast', n => n.textContent)), 'live book: last week\'s first three');
+    await shot(B, 's03_live_last_week');
     await closeModals(B);
 
     /* ---------- buying and equipping ---------- */
@@ -114,15 +112,11 @@ async function until(fn, ms = 6000, step = 80) { const t0 = Date.now(); let v; w
     ok(await B.evaluate(u => charOf(S.anglers.get(u), u).lu === 'tai', aId), 'others see the lure on my line');
     await go(A, 'char', 1200); await shot(A, 's06_char_lure');
 
-    /* ---------- the park: the lure on the line, its help when fishing alone ---------- */
-    await go(A, 'park', 2000);
-    await A.evaluate(() => pkGameOpen('solo', { spot: 'r1' })); await A.waitForTimeout(600);
-    ok(/홍염 타이라바/.test(await A.$eval('.pkg-lure', n => n.textContent).catch(() => '')), 'park: the fishing panel shows the lure');
-    ok(await A.evaluate(() => PKS.game.perk && PKS.game.perk.x === 3 && PKS.game.perk.sp.includes('madai')), 'park: its help applies when fishing alone');
-    const tally = await A.evaluate(() => { let m = 0, m0 = 0; for (let i = 0; i < 400; i++) { if (pkFish(77, i, 4, PKS.game.perk).sp === 'madai') m++; if (pkFish(77, i, 4).sp === 'madai') m0++; } return { m, m0 }; });
-    ok(tally.m > tally.m0, 'park: red sea bream come more often with it — ' + JSON.stringify(tally));
-    await A.click('#pkg-btn'); await A.waitForTimeout(900); await shot(A, 's07_park_lure');
-    await A.evaluate(() => pkGameClose()); await go(A, 'home', 400);
+    /* ---------- the live sea: the lure helps there ---------- */
+    ok(await A.evaluate(() => { const P = ZL.perk(ZL.KINDS.map(myGear)); return P.x === 3 && P.sp.includes('madai'); }), 'live: the lure\'s help is on the line');
+    const tally = await A.evaluate(() => { let m = 0, m0 = 0; const lure = S.me.lure; for (let i = 0; i < 400; i++) { if (lvPick(3, 1000 + i, 'sea', 129.1, 35.1) === 'madai') m++; } S.me.lure = ''; for (let i = 0; i < 400; i++) { if (lvPick(3, 1000 + i, 'sea', 129.1, 35.1) === 'madai') m0++; } S.me.lure = lure; return { m, m0 }; });
+    ok(tally.m > tally.m0, 'live: red sea bream come more often with it — ' + JSON.stringify(tally));
+
 
     /* ---------- the operator gives points ---------- */
     const OP = await mk('OP'); await onboard(OP, '운영자');
@@ -136,7 +130,7 @@ async function until(fn, ms = 6000, step = 80) { const t0 = Date.now(); let v; w
     d = await dump(); ok(d.ZPS.wal[aId].bal === 1500, 'admin: 1,500P on the server');
     const nope = await A.evaluate(async u => { try { await APP_AUTH.zp.grant(u, 99999, 'me'); return 'given'; } catch (e) { return e.code; } }, aId);
     ok(nope === 'not_admin', 'only the operator gives points');
-    await go(A, 'games', 300); await A.evaluate(() => zpLoad(true)); await go(A, 'lures', 1400);
+    await go(A, 'home', 300); await A.evaluate(() => zpLoad(true)); await go(A, 'lures', 1400);
     const gift = await until(() => A.$eval('.zp-win', n => n.textContent).catch(() => ''), 5000);
     ok(/받았어요/.test(gift || '') && /사진 이벤트 1등/.test(gift || '') && /\+1,500P/.test(gift || ''), 'a gift from the operator: told once, with the note');
     await closeModals(A);
@@ -155,10 +149,9 @@ async function until(fn, ms = 6000, step = 80) { const t0 = Date.now(); let v; w
     d = await dump();
     ok(d.ZPS.wal[aId].bal === 150 && d.T.anglers[aId].data.reel === 'reel_lbr' && d.T.anglers[aId].data.float === 'float_ball', 'reel and float bought (1,500 − 1,000 − 250 − 100) and equipped');
     ok(await A.evaluate(() => { const c = charOf(S.me, S.uid); return c.re === 'reel_lbr' && CH.svg(c, 'full').includes('#C9A13A'); }), 'character: the gold LB reel on the rod');
-    await go(A, 'park', 1800); await A.evaluate(() => pkGameOpen('solo', { spot: 'r1' })); await A.waitForTimeout(500);
-    ok(await A.evaluate(() => PKS.game.float === 'float_ball' && PKS.game.perk.win >= .1 && PKS.game.perk.reel > 1.1), 'park: the ball float in the game, the reel and float help together');
-    await A.click('#pkg-btn'); await A.waitForTimeout(1200); await shot(A, 's07b_park_float');
-    await A.evaluate(() => pkGameClose()); await go(A, 'lures', 900); await A.click('[data-zltab="lure"]'); await A.waitForTimeout(300);
+    ok(await A.evaluate(() => { const P = ZL.perk(ZL.KINDS.map(myGear)); return lvFloat() === 'float_ball' && P.win >= .1 && P.reel > 1.1 && lvReach() === 60; }), 'live: the ball float on the water, the reel and float help together, the basic rod casts 60 m');
+    
+    await go(A, 'lures', 900); await A.click('[data-zltab="lure"]'); await A.waitForTimeout(300);
     ok(/사진 이벤트 1등/.test(await A.$eval('.zp-book', n => n.textContent)), 'the book shows the operator\'s note');
 
     /* ---------- a bank transfer in the payment window (only when the operator turns it on) ---------- */
@@ -187,17 +180,18 @@ async function until(fn, ms = 6000, step = 80) { const t0 = Date.now(); let v; w
     const toss = await P.$eval('.pay-bank a.btn-toss', n => n.getAttribute('href')).catch(() => '');
     ok(/^supertoss:\/\/send\?amount=\d+&bank=%EC%8B%A0%ED%95%9C%EC%9D%80%ED%96%89&accountNo=110000000000/.test(toss), 'phone payment: Toss opens with the bank, account and amount filled in — ' + toss);
     await shot(P, 's11_phone_pay'); await closeModals(P);
-    await go(P, 'games', 1200); await shot(P, 's12_phone_games', true);
-    ok(await P.evaluate(() => document.documentElement.scrollWidth <= 391), 'phone: the games page fits the width');
+    await go(P, 'home', 1200); await shot(P, 's12_phone_home', true);
+    ok(await P.evaluate(() => document.documentElement.scrollWidth <= 391) && !!(await P.$('.lt')), 'phone: the home page with the door to the live sea fits the width');
 
     /* ---------- a server without the update: nothing breaks ---------- */
-    await fetch(SRV + '/__sb/feature?zp=0');
-    const Q = await mk('Q'); await onboard(Q, '옛서버'); await go(Q, 'games', 1600);
-    ok(/서버를 준비/.test(await Q.$eval('.rx-week', n => n.textContent)), 'old server: the board says the server is being updated');
-    await Q.click('.gm-rx [data-act="reaction"]'); await Q.waitForTimeout(300); await Q.click('#rx-go');
-    ok(!!(await until(() => Q.evaluate(() => RX.cur.st === 'wait'), 3000)), 'old server: the game still plays');
-    await closeModals(Q); await go(Q, 'lures', 1000);
+    await fetch(SRV + '/__sb/feature?zp=0'); await fetch(SRV + '/__sb/feature?live=0');
+    const Q = await mk('Q'); await onboard(Q, '옛서버'); await go(Q, 'lures', 1600);
     ok((await Q.$$('.zl-card')).length === 8, 'old server: the shop still shows the lures');
+    await go(Q, 'live', 3500);
+    ok(!!(await until(() => Q.$('#lv-cover [data-lv="retry"]'), 20000)) && /서버를 준비/.test(await Q.$eval('#lv-cover', n => n.textContent)), 'old server: the live sea says the server is being updated');
+    await fetch(SRV + '/__sb/feature?live=1');
+    await Q.click('[data-lv="retry"]');
+    ok(!!(await until(() => Q.$('#lv-cover [data-lv="go-geo"]'), 8000)), 'and "try again" opens it once the server is ready');
     await fetch(SRV + '/__sb/feature?zp=1');
   } catch (e) { logs.push('CRASH ' + (e.stack || e)); fails.push('crash'); }
   console.log(logs.join('\n'));
