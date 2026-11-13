@@ -1181,7 +1181,7 @@ function openShareCard(blob, name, text) {
 }
 
 /* ===== What's new: shown once after a big update (website only; needs the matching server update) ===== */
-const WHATS_NEW = '2026-11-12a', WN_TS = Date.parse('2026-11-07T03:00:00Z'); // people who joined after this have nothing to catch up on
+const WHATS_NEW = '2026-11-13a', WN_TS = Date.parse('2026-11-07T03:00:00Z'); // people who joined after this have nothing to catch up on
 const BOOT_AT = Date.now();
 /* what each update brought, newest last; people see what came after the last one they saw (at most 6 lines) */
 const WN_ITEMS = [
@@ -1191,7 +1191,8 @@ const WN_ITEMS = [
   ['2026-10-29c', 'camera', 'wn_fix'], ['2026-10-29c', 'menu', 'wn_menu'],
   ['2026-10-29d', 'chat', 'wn_chat'], ['2026-10-29d', 'board', 'wn_bdmod'], ['2026-10-29d', 'user', 'wn_wd'],
   ['2026-11-06a', 'wave', 'wn_fs2'],
-  ['2026-11-12a', 'live', 'wn_live'], ['2026-11-12a', 'sparkle', 'wn_look']
+  ['2026-11-12a', 'live', 'wn_live'], ['2026-11-12a', 'sparkle', 'wn_look'],
+  ['2026-11-13a', 'user', 'wn_char'], ['2026-11-13a', 'coin', 'wn_mkt'], ['2026-11-13a', 'fish', 'wn_fish']
 ];
 const WN_PART = {};
 function maybeWhatsNew(tries = 0) {

@@ -46,14 +46,19 @@ function zpAward(game, wk) {
   return 1;
 }
 const zpNick = me => { const a = T.anglers[me]; return !!(a && a.data && String(a.data.nick || '').trim()); };
-// 찌릿 라이브 (0019), the same rules as the database: schools, casts, strikes, landings, the fish book, the weekly bag.
+// 찌릿 라이브 (0019, 0021), the same rules as the database: schools, casts, strikes, landings, the fish book, the keepnet
+// and the fish market, the weekly bag.
 // The waits are short here so the browser tests do not sit by the water; /__sb/live_cfg changes them and fixes the rolls.
-const LVS = { cfg: { remote: 5, cap: 80, waitMin: 1300, waitMax: 1700, fightMin: 700, tier: null, big: null, u: null, school: null }, casts: {}, days: {}, catches: [], dex: {}, settled: {}, void: {}, seq: 0 };
+const LVS = { cfg: { remote: 5, cap: 80, waitMin: 1300, waitMax: 1700, fightMin: 700, tier: null, big: null, u: null, school: null, netMax: 30, rate: null }, casts: {}, days: {}, catches: [], dex: {}, settled: {}, void: {}, seq: 0 };
 const LV_SP = (() => { try { const { SP } = new Function(fs.readFileSync(path.join(ROOT, 'src', 'fishdb.js'), 'utf8') + '; return { SP };')(); return Object.fromEntries(SP.map(x => [x.id, { tier: x.r, L: x.L, X: x.X, w: x.w, z: x.z }])); } catch (e) { return {}; } })();
 const LV_PERK = { egi: { win: .3 }, jig: { wait: .7, trophy: 1.3 }, minnow: { trophy: 2 }, gold: { trophy: 2 }, rod_spark: { trophy: 1.2 }, rod_bolt: { trophy: 1.3 }, reel_lbr: { win: .05 }, reel_bolt: { win: .1 }, float_ball: { win: .1 }, float_led: { win: .15, wait: .92 }, float_spark: { win: .2, wait: .88 }, float_bolt: { win: .25, wait: .85 } };
 const lvDay = () => new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10);
 const lvHash = (...a) => { let h = 2166136261; for (const ch of a.join(':')) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); } return (h >>> 0) / 4294967296; };
 const lvSchool = (cx, cy) => { if (LVS.cfg.school != null) return LVS.cfg.school; const thr = .05 + .13 * lvHash('z', Math.floor(cx / 6), Math.floor(cy / 6), Math.floor(Date.now() / 3600e3)), h = lvHash(cx, cy, Math.floor(Date.now() / 600e3)); return h < thr * .18 ? 3 : h < thr * .5 ? 2 : h < thr ? 1 : 0; };
+const LV_RATES = [.8, .9, .9, 1, 1, 1, 1.1, 1.1, 1.2, 1.4];
+const lvRate = sp => (LVS.cfg.rate != null ? LVS.cfg.rate : LV_RATES[Math.min(9, Math.floor(lvHash('mkt', sp, lvDay()) * 10))]);
+const lvPrice = (val, rate) => (val > 0 ? Math.max(1, Math.round(val * rate)) : 0);
+const lvNet = me => LVS.catches.filter(c => c.acct === me && c.val != null && c.soldAt == null).reverse().map(c => ({ id: c.id, sp: c.sp, cm: c.cm, tier: c.tier, big: c.big, on: c.onsite, val: c.val, p: lvPrice(c.val, lvRate(c.sp)), at: c.at }));
 const lvCm = (sp, u, v, big) => Math.round(Math.min(sp.X, big && sp.X > sp.L * 1.05 ? sp.L * 1.05 + (sp.X - sp.L * 1.05) * Math.pow(v, 1.7) : sp.L * (.55 + .5 * u)) * 10) / 10;
 function lvBoard(wk) {
   const by = {};
@@ -302,6 +307,7 @@ http.createServer(async (req, res) => {
         for (const w of new Set(LVS.catches.filter(c => c.wk < wk).map(c => c.wk))) lvAward(w);
         const b = lvBoard(wk), mine = b.find(x => x.a === me), l = lvBoard(zpAddDays(wk, -7));
         return send({ data: { on: true, wk, now: Date.now(), tide: .6, day: { pts: d.pts, cap: C.cap, fish: d.fish, remote: d.remote, remoteMax: C.remote }, bal: (ZPS.wal[me] || { bal: 0 }).bal,
+          net: lvNet(me), netMax: C.netMax, mkt: Object.fromEntries(Object.keys(LV_SP).map(id => [id, lvRate(id)])), mktUntil: Date.parse(lvDay() + 'T00:00:00+09:00') + 86400e3,
           dex: Object.entries(LVS.dex[me] || {}).map(([sp, x]) => ({ sp, n: x.n, best: x.best })),
           top: b.slice(0, 10).map(({ a, s, n, sp, cm }) => ({ a, s, n, sp, cm })), n: b.length, me: mine ? { s: mine.s, n: mine.n, r: mine.r, sp: mine.sp, cm: mine.cm } : null,
           last: l.slice(0, 3).map(({ a, s, r, sp, cm }) => ({ a, s, r, sp, cm })),
@@ -344,12 +350,24 @@ http.createServer(async (req, res) => {
         if (!sp || sp.tier > k.tier || (k.water === 'sea' && !(['S', 'B'].includes(sp.w) && ['shore', 'coast', 'brack', 'shelf'].includes(sp.z))) || (k.water === 'fresh' && !['F', 'B'].includes(sp.w))) return send({ data: { err: 'bad_species' } });
         const cm = lvCm(sp, k.u, k.v, k.big), score = Math.round(100 * cm / sp.X * [1, 1.3, 1.7, 2.3, 3][sp.tier - 1]);
         let pts = [1, 3, 6, 12, 30][sp.tier - 1]; if (k.big) pts = Math.ceil(pts * 1.5); if (!k.onsite) pts = Math.max(1, Math.ceil(pts * .5));
-        const capped = Math.max(0, Math.min(pts, C.cap - d.pts)), dx = LVS.dex[me] || (LVS.dex[me] = {}), old = dx[A.p_sp], first = !old, best = !!old && cm > old.best, bonus = first ? 10 : 0;
+        const keep = lvNet(me).length < C.netMax, dx = LVS.dex[me] || (LVS.dex[me] = {}), old = dx[A.p_sp], first = !old, best = !!old && cm > old.best, bonus = first ? 10 : 0;
         dx[A.p_sp] = { n: (old ? old.n : 0) + 1, best: Math.max(old ? old.best : 0, cm) };
-        const row = { id: ++LVS.seq, acct: me, sp: A.p_sp, cm, tier: sp.tier, big: k.big, score, pts: capped + bonus, onsite: k.onsite, anon: k.anon, gx: Math.floor(k.cx / 8), gy: Math.floor(k.cy / 10), wk, at: Date.now() };
-        LVS.catches.push(row); d.pts += capped; d.fish++; lvEarn(me, capped + bonus, 'day:' + day);
+        const row = { id: ++LVS.seq, acct: me, sp: A.p_sp, cm, tier: sp.tier, big: k.big, score, pts: bonus, onsite: k.onsite, anon: k.anon, gx: Math.floor(k.cx / 8), gy: Math.floor(k.cy / 10), wk, at: Date.now(), val: pts, soldAt: keep ? null : Date.now(), soldFor: keep ? null : 0 };
+        LVS.catches.push(row); d.fish++; lvEarn(me, bonus, 'day:' + day);
         const mine = lvBoard(wk).find(x => x.a === me);
-        return send({ data: { id: row.id, sp: A.p_sp, cm, tier: sp.tier, big: k.big, score, pts: capped + bonus, first, best, capped: capped < pts, onsite: k.onsite, day: { pts: d.pts, cap: C.cap, fish: d.fish }, wk: { s: mine ? mine.s : 0, r: mine ? mine.r : null }, bal: ZPS.wal[me].bal } });
+        return send({ data: { id: row.id, sp: A.p_sp, cm, tier: sp.tier, big: k.big, score, pts: bonus, first, best, capped: false, onsite: k.onsite, val: pts, rate: lvRate(A.p_sp), price: lvPrice(pts, lvRate(A.p_sp)), kept: keep, net: lvNet(me).length, netMax: C.netMax, day: { pts: d.pts, cap: C.cap, fish: d.fish }, wk: { s: mine ? mine.s : 0, r: mine ? mine.r : null }, bal: (ZPS.wal[me] || { bal: 0 }).bal } });
+      }
+      if (q.name === 'live_sell') {
+        const ids = A.p_ids == null ? null : [].concat(A.p_ids).map(Number), rel = !!A.p_release;
+        const list = LVS.catches.filter(c => c.acct === me && c.val != null && c.soldAt == null && (!ids || ids.includes(c.id))).map(c => ({ c, p: lvPrice(c.val, lvRate(c.sp)) })).sort((x, y) => y.p - x.p || x.c.id - y.c.id);
+        let left = Math.max(0, C.cap - d.pts), sum = 0, n = 0, over = 0; const sold = [];
+        for (const { c, p } of list) {
+          if (rel) { c.soldAt = Date.now(); c.soldFor = 0; n++; }
+          else if (p <= left) { c.soldAt = Date.now(); c.soldFor = p; left -= p; sum += p; n++; sold.push({ id: c.id, sp: c.sp, cm: c.cm, p }); }
+          else over++;
+        }
+        if (sum > 0) { d.pts += sum; lvEarn(me, sum, 'day:' + day); }
+        return send({ data: { n, sum, over, sold, released: rel, day: { pts: d.pts, cap: C.cap }, net: lvNet(me), netMax: C.netMax, bal: (ZPS.wal[me] || { bal: 0 }).bal } });
       }
       if (q.name === 'live_void') { if (!isAdmin(uid)) return err('not_allowed'); LVS.void[A.p_wk + acct(A.p_acct)] = A.p_void !== false; return send({ data: true }); }
       return err('no_function');

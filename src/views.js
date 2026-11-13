@@ -22,7 +22,7 @@ function tideInfo(rg) {
 function spCard(id, extra = '') {
   const sp = SPI[id]; if (!sp) return '';
   return `<button class="sp-card" data-sp="${id}">
-    <span class="sp-thumb tone-${sp.w}"><img src="${FD.thumb(sp, 200, 110)}" alt="" width="200" height="110" loading="lazy"></span>
+    <span class="sp-thumb tone-${sp.w}"><img ${FD.lazy(sp, 200, 110)} alt="" width="200" height="110" loading="lazy"></span>
     <span class="sp-name">${esc(spName(sp))}</span>
     <span class="sp-sci">${esc(sp.sci)}</span>
     <span class="sp-chips">${toxChip(sp)}${isClosed(sp) ? `<span class="chip chip-closed">${t('closed_now')}</span>` : ''}${extra}</span>

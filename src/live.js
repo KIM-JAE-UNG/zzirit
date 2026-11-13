@@ -10,7 +10,8 @@ const LV = {
   mode: 'look', stand: null, target: null, water: [], waterAt: 0,
   phase: 'idle', k: null, f: null, busy: false,
   others: new Map(), schools: [], schUntil: 0, schKey: '', fx: [], ticks: [],
-  room: null, roomKey: '', anon: false, me: null, hold: false, lastT: 0, palAt: 0
+  room: null, roomKey: '', anon: false, hold: false, lastT: 0, palAt: 0,
+  ang: { at: null, to: null, yaw: 0, act: 'idle', t0: 0, tip: null, lose: 0, mode: 'look' }
 };
 const LV_TIERS = ['', 'lv_t1', 'lv_t2', 'lv_t3', 'lv_t4', 'lv_t5'];
 const lvOn = () => window.APP_RT === 'web' && !!(window.APP_AUTH && APP_AUTH.live);
@@ -45,6 +46,7 @@ const LVS = {
     else if (k === 'snap') { this.noise(.2, .16, 3200); this.tone(300, 80, .25, .1, 'sawtooth'); }
     else if (k === 'miss') this.tone(260, 150, .3, .08);
     else if (k === 'land') [523, 659, 784, 1047].forEach((f, i) => this.tone(f, f, .22, .13, 'triangle', i * .09));
+    else if (k === 'coin') { this.tone(1568, 1568, .09, .1, 'triangle'); this.tone(2093, 2093, .22, .11, 'triangle', .07); }
     else if (k === 'rare') [523, 659, 784, 1047, 1319, 1568].forEach((f, i) => this.tone(f, f, .3, .13, 'triangle', i * .08));
   },
   buzz(p) { try { if (navigator.vibrate) navigator.vibrate(p); } catch (e) { } }
@@ -104,6 +106,7 @@ function lvBuild(el) {
     </div>
     <div class="lv-side">
       <button class="lv-sbtn" id="lv-loc" aria-label="${esc(t('lv_locate'))}">${icon('locate')}</button>
+      <button class="lv-sbtn" id="lv-net" aria-label="${esc(t('lv_net'))}">${icon('fish')}<b class="lv-nb num" id="lv-nb" hidden></b></button>
       <button class="lv-sbtn" id="lv-book" aria-label="${esc(t('lv_book'))}">${icon('book')}</button>
       <a class="lv-sbtn" href="#lures" aria-label="${esc(t('nav_lures'))}">${icon('lure')}</a>
       <button class="lv-sbtn" id="lv-snd" aria-label="${esc(t('lv_sound'))}" aria-pressed="${LVS.on}">${icon('megaphone')}</button>
@@ -131,6 +134,7 @@ function lvBuild(el) {
   main.addEventListener('contextmenu', e => e.preventDefault());
   $('#lv-loc', el).addEventListener('click', () => lvLocate(true));
   $('#lv-book', el).addEventListener('click', () => lvBook());
+  $('#lv-net', el).addEventListener('click', () => lvBook('net'));
   $('#lv-snd', el).addEventListener('click', e => { LVS.on = !LVS.on; lsSet('liveSnd', LVS.on); e.currentTarget.setAttribute('aria-pressed', LVS.on); if (LVS.on) LVS.play('nib'); });
   $('#lv-sub', el).addEventListener('click', e => { const b = e.target.closest('[data-lv]'); if (b) lvSub(b.dataset.lv); });
   $('#lv-cover', el).addEventListener('click', e => { const b = e.target.closest('[data-lv]'); if (b) lvSub(b.dataset.lv); });
@@ -153,7 +157,7 @@ function lvMap(gl) {
   map.on('load', () => { LV.ready = true; (LV.stP || Promise.resolve()).then(() => lvStart()); });
   map.on('idle', () => lvWater());
   map.on('click', e => lvTap(e.lngLat.lng, e.lngLat.lat));
-  map.on('moveend', () => { const m = map.getCenter(); lsSet('liveAt', { lng: +m.lng.toFixed(4), lat: +m.lat.toFixed(4) }); });
+  map.on('moveend', () => { const m = map.getCenter(); lsSet('liveAt', { lng: +m.lng.toFixed(4), lat: +m.lat.toFixed(4) }); lvClear(); });
   let errN = 0; map.on('error', () => { if (!LV.ready && ++errN > 6) lvCover('maperr'); });
 }
 // the map is there: the intro the first time, then the place
@@ -244,25 +248,55 @@ function lvWater() {
     if (sh) { LV.remoteSeek = false; LV.stand = { lng: sh.lng, lat: sh.lat }; lvMe(); lvFace(); lvSchools(); lvRoom(); }
   }
   lvHud();
-  if (nowMs() - LV.palAt > 240e3) { LV.palAt = nowMs(); const c = LV.map.getCenter(), p = LMAP.phaseOf(c.lng, c.lat, nowMs()); if (p !== LV.pal) { LV.pal = p; LV.map.setStyle(LMAP.style(p, S.lang)); } }
+  if (nowMs() - LV.palAt > 240e3) { LV.palAt = nowMs(); const c = LV.map.getCenter(), p = LMAP.phaseOf(c.lng, c.lat, nowMs()); if (p !== LV.pal) { LV.pal = p; LV.map.setStyle(LMAP.style(p, S.lang)); LV.map.once('styledata', () => { LV.map.__bldKey = ''; lvClear(); }); } }
 }
-// look out over the water from where I stand
+// look across the cast: the camera stands behind the angler's shoulder, so the angler, the line and the float sit side
+// by side on the screen (seen from straight behind, the float would hide behind the angler)
 function lvFace() {
   if (!LV.stand || !LV.map) return;
-  const n = LV.target || LMAP.nearest(LV.water, LV.stand.lng, LV.stand.lat, 400);
-  const o = { center: [LV.stand.lng, LV.stand.lat], zoom: Math.max(16.4, Math.min(17.2, LV.map.getZoom())), duration: 900 };
-  if (n && (n.lng !== LV.stand.lng || n.lat !== LV.stand.lat)) o.bearing = LMAP.bearing(LV.stand, n);
-  LV.map.easeTo(o);
+  const st = LV.stand, R = lvReach(); let to = (LV.k && LV.k.to) || LV.target;
+  if (!to) { const n = LMAP.nearest(LV.water, st.lng, st.lat, 400); if (n && !n.inside) to = LMAP.toward(st, n, Math.max(n.d + 8, R * .7)); }
+  if (!to || (to.lng === st.lng && to.lat === st.lat)) { LV.map.easeTo({ center: [st.lng, st.lat], zoom: Math.max(17, Math.min(17.8, LV.map.getZoom())), duration: 900 }); return; }
+  const d = Math.max(35, LMAP.dist(st, to)), W = LV.w || 390, span = clamp(W * .42, 130, 250);
+  const zoom = clamp(Math.log2(span * 40075016.7 * Math.cos(st.lat * Math.PI / 180) / (d * .78 * 512)), 16.8, 18.4), mid = LMAP.toward(st, to, LMAP.dist(st, to) * .5);
+  LV.map.easeTo({ center: [mid.lng, mid.lat], zoom, bearing: LMAP.bearing(st, to) - 52, duration: 900 });
 }
-// my marker: my face where I stand
+// my angler: the character stands where I stand (it walks there when that is near, and simply is there when it is far)
 function lvMe() {
-  const gl = window.maplibregl; if (!gl || !LV.map) return;
-  const at = LV.stand || LV.pos;
-  if (!at) { if (LV.me) { LV.me.remove(); LV.me = null; } return; }
-  if (!LV.me) { const el = document.createElement('div'); LV.me = new gl.Marker({ element: el, anchor: 'bottom' }).setLngLat([at.lng, at.lat]).addTo(LV.map); }
-  LV.me.setLngLat([at.lng, at.lat]);
-  const el = LV.me.getElement(), k = LV.mode + '|' + (S.me && S.me.upd);
-  if (el.dataset.k !== k) { el.dataset.k = k; el.innerHTML = `<div class="lv-me ${LV.mode}"><span class="lv-me-av">${avatar(S.me, 40)}</span><i></i></div>`; }
+  const at = LV.stand || LV.pos, A = LV.ang;
+  if (!at) { A.at = null; A.to = null; lvClear(); return; }
+  if (!A.at || LMAP.dist(A.at, at) > 260) { A.at = { lng: at.lng, lat: at.lat }; A.face = null; }
+  A.to = { lng: at.lng, lat: at.lat }; A.mode = LV.mode === 'site' ? 'site' : 'remote';
+  lvClear();
+}
+// buildings between the camera and my line step down
+function lvClear() {
+  if (!LV.map || !LV.ready) return;
+  const st = LV.stand, k = LV.k;
+  if (!st || LV.map.getZoom() < 14.5) return LMAP.clear(LV.map, null);
+  let to = (k && k.to) || LV.target;
+  if (!to) { const n = LMAP.nearest(LV.water, st.lng, st.lat, 400); if (n && !n.inside) to = LMAP.toward(st, n, Math.max(n.d + 10, lvReach() * .8)); }
+  LMAP.clear(LV.map, st, to || st, LV.map.getBearing());
+}
+// what the angler is doing right now, and which way it looks
+function lvAngStep(dt, now) {
+  const A = LV.ang, ph = LV.phase, k = LV.k, G = LV.f; if (!A.at) return null;
+  const d = A.to ? LMAP.dist(A.at, A.to) : 0, free = ph === 'idle' || ph === 'result';
+  let yawTo = null;
+  if (d > .8 && free && d <= 260) { A.at = LMAP.toward(A.at, A.to, Math.min(d, Math.max(42, d / 1.1) * dt)); yawTo = LMAP.bearing(A.at, A.to); A.walk = Math.min(1, (A.walk || 0) + dt * 6); A.face = null; }
+  else { if (A.to && d > 0) A.at = { lng: A.to.lng, lat: A.to.lat }; A.walk = Math.max(0, (A.walk || 0) - dt * 6); }
+  const walking = A.walk > .05 && free;
+  let act = walking ? 'walk' : ph === 'idle' ? (now < A.lose ? 'lose' : 'idle') : ph;
+  if (ph === 'result') { act = walking ? 'walk' : 'result'; if (!walking) yawTo = LV.map.getBearing() + 180; }
+  else if (!walking) {
+    const to = ph === 'fight' || ph === 'landing' ? lvFishAt() : (k && k.to) || LV.target;
+    if (to) yawTo = LMAP.bearing(A.at, to);
+    else { if (!A.face || A.faceAt !== LV.waterAt) { const n = LMAP.nearest(LV.water, A.at.lng, A.at.lat, 400); A.face = n && !n.inside ? LMAP.bearing(A.at, n) : A.face || LV.map.getBearing(); A.faceAt = LV.waterAt; } yawTo = A.face; }
+  }
+  if (yawTo != null) { const dy = ((yawTo - A.yaw + 540) % 360) - 180; A.yaw += dy * Math.min(1, dt * (walking ? 14 : 9)); }
+  if (act !== A.act) { A.act = act; A.t0 = now; }
+  const t = ph === 'cast' && k ? (now - k.t0) / 1000 : ph === 'bite' && k ? (now - k.biteAt) / 1000 : (now - A.t0) / 1000;
+  return { act, t, T: now / 1000, walk: A.walk, tension: G ? G.T / 100 : 0, pull: !!(G && G.pull > 0), reel: !!(G && LV.hold), side: G ? G.side : 0, dip: k && ph === 'wait' ? Math.min(1, (k.dip || 0) / 5) : 0 };
 }
 
 /* --- schools: shared by everyone, moved by the server every ten minutes --- */
@@ -339,6 +373,7 @@ function lvSub(k) {
   if (k === 'go-geo' || k === 'go-look') { lsSet('liveOk', true); lsSet('liveGeo', k === 'go-geo'); lvCover(''); if (k === 'go-geo') lvGeo(); lvHud(); lvRoom(); if (k === 'go-look') lvSub('remote'); return; }
   if (k === 'again') { $('#lv-res').hidden = true; LV.phase = 'idle'; lvHud(); return; }
   if (k === 'book') { $('#lv-res').hidden = true; LV.phase = 'idle'; lvHud(); lvBook(); return; }
+  if (k === 'sellnow') { const r = LV.res; if (!r || LV.selling) return; lvSell([r.id]).then(x => { if (!x) return; $('#lv-res').hidden = true; LV.phase = 'idle'; lvHud(); }); return; }
   if (LV.phase !== 'idle') return;
   if (k === 'site') lvLocate(true);
   else if (k === 'geo') { lsSet('liveGeo', true); lvGeo(); }
@@ -369,7 +404,7 @@ function lvCast() {
   const tg = LV.target, st = LV.stand, [cx, cy] = LMAP.cellOf(tg.lng, tg.lat), site = LV.mode === 'site';
   LV.phase = 'cast'; LV.busy = true; LV.k = { t0: performance.now(), from: st, to: tg, fly: 0, site };
   LVS.play('cast'); lvFace(); lvHud();
-  const anim = new Promise(r => setTimeout(r, 720));
+  const anim = new Promise(r => setTimeout(r, 900));
   Promise.all([APP_AUTH.live.cast(cx, cy, tg.kind, site, LV.anon), anim]).then(([r]) => {
     LV.busy = false;
     if (!r || r.err) { LV.phase = 'idle'; LV.k = null; if (r && r.err === 'remote_out' && LV.st) LV.st.day.remote = LV.st.day.remoteMax; lvSay(t(r && r.err === 'remote_out' ? 'lv_remote_out' : 'lv_err')); lvHud(); return; }
@@ -381,7 +416,7 @@ function lvCast() {
     LV.phase = 'wait'; LVS.play('plop'); lvFx('splash', tg, 1); lvTrack(); lvHud();
   }).catch(e => { LV.busy = false; LV.phase = 'idle'; LV.k = null; lvSay(t(e && e.code === 'slow' ? 'lv_slow' : e && e.code === 'no_profile' ? 'lv_need_nick' : 'lv_err')); lvHud(); });
 }
-function lvEnd(msgKey, snd) { LV.phase = 'idle'; LV.k = null; LV.f = null; LV.busy = false; LV.target = null; $('#lv-fight').hidden = true; if (snd) LVS.play(snd); lvTrack(); lvLoad(true); if (msgKey) lvSay(t(msgKey), 3200); lvHud(); }
+function lvEnd(msgKey, snd) { if (msgKey && LV.phase !== 'idle') LV.ang.lose = performance.now() + 1500; LV.phase = 'idle'; LV.k = null; LV.f = null; LV.busy = false; LV.target = null; $('#lv-fight').hidden = true; if (snd) LVS.play(snd); lvTrack(); lvLoad(true); if (msgKey) lvSay(t(msgKey), 3200); lvHud(); }
 function lvEarly() {
   const k = LV.k; if (!k || !k.token) return;
   APP_AUTH.live.strike(k.token).catch(() => null); // the server ends the cast
@@ -431,17 +466,17 @@ function lvLand() {
   setTimeout(() => APP_AUTH.live.land(k.token, k.sp, true).then(r => {
     LV.busy = false;
     if (!r || r.err || r.lost) return lvEnd('lv_err', 'miss');
-    if (LV.st) { LV.st.day = Object.assign(LV.st.day, r.day); LV.st.bal = r.bal; }
+    if (LV.st) { LV.st.day = Object.assign(LV.st.day, r.day); LV.st.bal = r.bal; if (r.kept && LV.st.net) LV.st.net.unshift({ id: r.id, sp: r.sp, cm: r.cm, tier: r.tier, big: r.big, on: r.onsite, val: r.val, p: r.price, at: nowMs() }); }
     if (typeof ZP !== 'undefined' && ZP.st) ZP.st.bal = r.bal;
-    LV.phase = 'result'; LV.target = null; LVS.play(r.tier >= 4 || r.big ? 'rare' : 'land'); LVS.buzz(r.tier >= 4 ? [60, 40, 60, 40, 160] : [50, 40, 90]);
-    lvFx('splash', k.to, 1.2); lvResult(r);
+    LV.res = r; LV.phase = 'result'; LV.target = null; LVS.play(r.tier >= 4 || r.big ? 'rare' : 'land'); LVS.buzz(r.tier >= 4 ? [60, 40, 60, 40, 160] : [50, 40, 90]);
+    lvFx('splash', k.to, 1.2); clearTimeout(LV.resT); LV.resT = setTimeout(() => { if (LV.phase === 'result' && LV.res === r) lvResult(r); }, 1150);
     if (!LV.anon && LV.room) LV.room.send('catch', { u: myId(), n: S.me.nick, sp: r.sp, cm: r.cm, tier: r.tier, big: r.big, x: +k.to.lng.toFixed(5), y: +k.to.lat.toFixed(5), on: k.site ? 1 : 0 });
     LV.k = null; LV.f = null; lvTrack(); lvLoad(true); lvHud();
   }).catch(() => { LV.busy = false; lvEnd('lv_err', 'miss'); }), waitMs);
 }
 function lvResult(r) {
   const sp = SPI[r.sp], el = $('#lv-res'); if (!el || !sp) return;
-  const tags = [r.first ? `<b class="lv-tag new">${t('lv_new')}</b>` : '', r.best ? `<b class="lv-tag">${t('lv_best')}</b>` : '', r.big ? `<b class="lv-tag">${t('lv_big')}</b>` : '', r.onsite ? `<b class="lv-tag site">${t('lv_site')}</b>` : ''].join('');
+  const mk = r.val != null, tags = [r.first ? `<b class="lv-tag new">${t('lv_new')}</b>` : '', r.best ? `<b class="lv-tag">${t('lv_best')}</b>` : '', r.big ? `<b class="lv-tag">${t('lv_big')}</b>` : '', r.onsite ? `<b class="lv-tag site">${t('lv_site')}</b>` : ''].join('');
   el.hidden = false; el.className = 'lv-res t' + r.tier;
   el.innerHTML = `<div class="lv-rcard" role="dialog" aria-label="${esc(spName(sp))}">
     <p class="lv-rtier">${t(LV_TIERS[r.tier])}</p>
@@ -450,13 +485,45 @@ function lvResult(r) {
     <p class="lv-rcm"><b class="num">${fmtN(r.cm, 1)}</b><span>cm</span></p>
     <p class="lv-rtags">${tags}</p>
     <dl class="lv-rstat">
-      <div><dt>${t('lv_r_pts')}</dt><dd class="num">+${fmtN(r.pts)}P</dd></div>
+      <div><dt>${t(mk ? 'lv_r_price' : 'lv_r_pts')}</dt><dd class="num">${mk ? fmtN(r.price) + 'P' + (lvRateTag(r.rate) ? `<small>${lvRateTag(r.rate)}</small>` : '') : '+' + fmtN(r.pts) + 'P'}</dd></div>
       <div><dt>${t('lv_r_score')}</dt><dd class="num">${fmtN(r.score)}</dd></div>
       <div><dt>${t('lv_r_week')}</dt><dd class="num">${fmtN(r.wk.s)}${r.wk.r ? `<small>${t('lv_rank_n', { n: r.wk.r })}</small>` : ''}</dd></div>
     </dl>
-    ${r.capped ? `<p class="lv-rnote">${t('lv_capped', { n: r.day.cap })}</p>` : ''}
-    <div class="lv-rbtn"><button class="btn btn-primary btn-lg" data-lv="again">${t('lv_again')}</button><button class="btn btn-glass btn-lg" data-lv="book">${t('lv_book')}</button></div>
+    ${mk && !r.kept ? `<p class="lv-rnote">${t('lv_net_full_note')}</p>` : ''}
+    <div class="lv-rbtn${mk && r.kept ? ' three' : ''}"><button class="btn btn-primary btn-lg" data-lv="again">${t(mk && r.kept ? 'lv_keep_again' : 'lv_again')}</button>${mk && r.kept ? `<button class="btn btn-light btn-lg" data-lv="sellnow">${icon('coin')}${t('lv_sell_now', { p: fmtN(r.price) })}</button>` : ''}<button class="btn btn-glass btn-lg" data-lv="book">${t('lv_book')}</button></div>
   </div>`;
+}
+
+/* --- the keepnet and the fish market: a landed fish is kept, and sold for the day's price --- */
+const lvNet = () => (LV.st && LV.st.net) || [];
+const lvRateTag = x => (+x > 1.001 ? `<i class="lv-up">▲ ×${+x}</i>` : +x < .999 ? `<i class="lv-dn">▼ ×${+x}</i>` : '');
+function lvSell(ids, release) {
+  if (LV.selling) return Promise.resolve(null);
+  LV.selling = true;
+  return APP_AUTH.live.sell(ids, release).then(r => {
+    if (!r || r.err) { toast(t('lv_err'), 'warn'); return null; }
+    if (LV.st) { LV.st.net = r.net || []; LV.st.day = Object.assign(LV.st.day, r.day); LV.st.bal = r.bal; }
+    if (typeof ZP !== 'undefined' && ZP.st) ZP.st.bal = r.bal;
+    if (r.released) toast(t('lv_released', { n: r.n }), 'info');
+    else if (r.sum > 0) { LVS.play('coin'); toast(t(r.over ? 'lv_sold_over' : 'lv_sold', { n: r.n, p: fmtN(r.sum), m: r.over }), 'ok', r.over ? 5200 : 3600); }
+    else toast(t(r.over ? 'lv_sell_cap' : 'lv_sell_none', { n: r.day.cap }), 'warn', 4800);
+    lvHud(); return r;
+  }).catch(e => { toast(t(e && e.code === 'slow' ? 'lv_slow' : e && e.code === 'need_update' ? 'zp_err_server' : 'lv_err'), 'warn'); return null; }).finally(() => { LV.selling = false; });
+}
+function lvNetHTML(st) {
+  const net = st.net || [], sum = net.reduce((n, f) => n + f.p, 0), left = Math.max(0, st.day.cap - st.day.pts), mkt = st.mkt || {};
+  const m = new Date().getMonth() + 1, at = LV.stand || LV.pos || (LV.map && { lng: LV.map.getCenter().lng, lat: LV.map.getCenter().lat });
+  const near = at ? GEO.regionPrior(GEO.region(at.lng, at.lat, true), m).map(x => x.id) : [];
+  const hot = [...new Set([...net.map(f => f.sp), ...near])].filter(id => SPI[id] && +mkt[id] >= 1.2).sort((a, b) => mkt[b] - mkt[a]).slice(0, 4);
+  const row = f => { const sp = SPI[f.sp]; if (!sp) return ''; return `<li class="t${f.tier}"><span class="lv-nph tone-${sp.w}"><img ${FD.lazy(sp, 200, 110)} alt="" loading="lazy"></span>
+      <span class="lv-nme"><b>${esc(spName(sp))}</b><small><i class="num">${fmtN(f.cm, 1)}</i>cm${f.big ? ' · ' + t('lv_big') : ''}${f.on ? ' · ' + t('lv_site') : ''}</small></span>
+      <span class="lv-npr"><b class="num">${fmtN(f.p)}P</b>${lvRateTag(mkt[f.sp])}</span>
+      <span class="lv-nact"><button class="btn btn-sm btn-primary" data-lvsell="${f.id}">${t('lv_sell')}</button><button class="lv-nfree" data-lvfree="${f.id}">${t('lv_free')}</button></span></li>`; };
+  return `<div class="lv-nhead"><p class="lv-bsum"><b class="num">${net.length}</b> / ${st.netMax || 30} ${t('lv_net_sum')}</p><p class="lv-nleft">${icon('coin')}${t('lv_mkt_left', { n: fmtN(left) })}</p></div>
+    ${hot.length ? `<p class="lv-nhot"><b>${t('lv_mkt_hot')}</b>${hot.map(id => `<span>${esc(spName(SPI[id]))} <i class="lv-up">×${+mkt[id]}</i></span>`).join('')}</p>` : ''}
+    ${net.length ? `<ul class="lv-netl">${net.map(row).join('')}</ul>
+      <button class="btn btn-primary btn-lg btn-block lv-nall" data-lvsellall="1" ${left ? '' : 'disabled'}>${icon('coin')}${t('lv_sell_all', { p: fmtN(sum) })}</button>` : `<p class="empty">${t('lv_net_empty')}</p>`}
+    <p class="lv-nhow">${t('lv_mkt_how')}</p>`;
 }
 // where the fish is right now (between the float and me, swinging)
 function lvFishAt() {
@@ -511,6 +578,7 @@ function lvHud() {
   if (LV.others.size) chips.push(`<span class="lv-chip">${icon('users')}${t('lv_floats', { n: LV.others.size })}</span>`);
   const ch = $('#lv-chips'), html = chips.join(''); if (ch.dataset.h !== html) { ch.dataset.h = html; ch.innerHTML = html; }
   const w = $('#lv-wallet'), wh = st ? `${icon('coin')}<b class="num">${fmtN(st.bal)}</b><small>${t('lv_today', { n: st.day.pts, m: st.day.cap })}</small>` : ''; if (w.dataset.h !== wh) { w.dataset.h = wh; w.innerHTML = wh; }
+  const nb = $('#lv-nb'), nn = lvNet().length; if (nb) { nb.hidden = !nn; nb.textContent = nn || ''; nb.classList.toggle('full', !!st && nn >= (st.netMax || 30)); }
   // the button and the line above it
   let label = t('lv_cast'), hint = '', cls = ph;
   if (ph === 'idle') {
@@ -521,7 +589,7 @@ function lvHud() {
       else if (LV.remoteSeek || LV.mode === 'remote') { label = t('lv_remote'); hint = t('lv_tap_shore'); }
       else { label = t('lv_remote'); hint = t(LV.geo === 'denied' ? 'lv_geo_denied' : 'lv_look'); }
       if (!lvLeft() && !(LV.geo === 'on' && LV.site)) { hint = t('lv_remote_out'); cls = 'idle off'; }
-    } else hint = tg ? t('lv_ready') : t(LV.mode === 'site' ? 'lv_pick' : 'lv_pick_remote');
+    } else hint = st && st.net && st.net.length >= (st.netMax || 30) ? t('lv_net_full') : tg ? t('lv_ready') : t(LV.mode === 'site' ? 'lv_pick' : 'lv_pick_remote');
   } else if (ph === 'cast') { label = t('lv_cast'); hint = ''; }
   else if (ph === 'wait') { label = t('lv_strike'); hint = t(LV.k && LV.k.school ? 'lv_wait_school' : 'lv_wait'); }
   else if (ph === 'bite' || ph === 'hook') { label = t('lv_strike_now'); hint = ''; }
@@ -540,9 +608,12 @@ function lvHud() {
     else if (LV.geo === 'off' || LV.geo === 'none') sub.push(`<button class="lv-pill" data-lv="geo">${icon('locate')}${t('lv_geo_on')}</button>`);
   }
   const sb = $('#lv-sub'), sh = sub.join(''); if (sb.dataset.h !== sh) { sb.dataset.h = sh; sb.innerHTML = sh; }
+  lvClear();
 }
 
 /* --- drawing on top of the map --- */
+// how big the angler is drawn: about as tall as a low building, a little smaller when the map is far
+const lvAngK = () => clamp(6.6 * Math.pow(2, ((LV.map ? LV.map.getZoom() : 17) - 17) * .5), 4.8, 9.2);
 function lvSize() { const cv = LV.cv; if (!cv) return; const r = cv.getBoundingClientRect(), d = Math.min(2, window.devicePixelRatio || 1); if (cv.width !== Math.round(r.width * d) || cv.height !== Math.round(r.height * d)) { cv.width = Math.round(r.width * d); cv.height = Math.round(r.height * d); } LV.dpr = d; LV.w = r.width; LV.h = r.height; }
 // a point on the ground and how many pixels a metre east / north is there
 function lvG(p) {
@@ -606,25 +677,43 @@ function lvFrame(now) {
   if (LV.target && ph === 'idle') {
     const g = lvG(LV.target), p = .5 + .5 * Math.sin(T * 4);
     lvRingPath(c, g, 3.2 + p * 1.2); c.strokeStyle = '#FFFFFF'; c.lineWidth = 2; c.stroke(); lvRingPath(c, g, 1); c.fillStyle = '#7CC4FF'; c.fill();
-    const a = lvG(LV.stand); c.beginPath(); c.moveTo(a.x, a.y - 34); c.quadraticCurveTo((a.x + g.x) / 2, Math.min(a.y, g.y) - 70, g.x, g.y); c.setLineDash([3, 6]); c.strokeStyle = 'rgba(227,243,255,.7)'; c.lineWidth = 1.4; c.stroke(); c.setLineDash([]);
+    const a = lvG(LV.ang.at || LV.stand), ah = lvAngK() * 6; c.beginPath(); c.moveTo(a.x, a.y - ah); c.quadraticCurveTo((a.x + g.x) / 2, Math.min(a.y - ah, g.y) - 46, g.x, g.y); c.setLineDash([3, 6]); c.strokeStyle = 'rgba(227,243,255,.7)'; c.lineWidth = 1.4; c.stroke(); c.setLineDash([]);
   }
   // everyone else's floats
   for (const [id, o] of LV.others) {
     if (!o.f || !ZL.BY[o.f]) continue; const g = lvG({ lng: o.x, lat: o.y }); if (g.x < -60 || g.x > LV.w + 60 || g.y < -60 || g.y > LV.h + 60) continue;
     lvFloatDraw(c, g, o.f, o.ph === 'bite' || o.ph === 'fight' ? 8 : 0, T + (o.t % 7), .92, String(o.n || '').slice(0, 10));
   }
-  // my line and float
+  // my angler, then the line from the rod's tip to the float
+  let tip = null;
+  if (LV.ang.at) {
+    const A = LV.ang, inp = lvAngStep(dt, now), g = lvG(A.at), lk = (S.me && S.me.upd) + '|' + myGear('rod');
+    if (A.lookK !== lk) { A.lookK = lk; A.look = ANG.look(charOf(S.me, myId())); }
+    if (inp && g.x > -120 && g.x < LV.w + 120 && g.y > -120 && g.y < LV.h + 160) tip = ANG.draw(c, { x: g.x, y: g.y, k: lvAngK(), yaw: A.yaw, bearing: map.getBearing(), pitch: map.getPitch(), look: A.look, mode: A.mode, in: inp, fish: LV.res && ph === 'result' ? { sp: SPI[LV.res.sp] } : null });
+    A.tip = tip;
+  }
   if (k) {
-    const a = lvG(k.from), tipX = a.x, tipY = a.y - 36;
+    const a = lvG(k.from), tipX = tip ? tip.x : a.x, tipY = tip ? tip.y : a.y - 36;
     if (ph === 'cast') {
-      const s = clamp((now - k.t0) / 700, 0, 1), b = lvG(k.to), x = tipX + (b.x - tipX) * s, y = tipY + (b.y - tipY) * s - Math.sin(s * Math.PI) * 90;
-      c.beginPath(); c.moveTo(tipX, tipY); c.quadraticCurveTo((tipX + x) / 2, Math.min(tipY, y) - 30 * Math.sin(s * Math.PI), x, y); c.strokeStyle = 'rgba(255,255,255,.75)'; c.lineWidth = 1.1; c.stroke();
-      c.beginPath(); c.arc(x, y, 3.2, 0, 6.2832); c.fillStyle = '#fff'; c.fill();
+      const s = clamp((now - k.t0 - 400) / 500, 0, 1), b = lvG(k.to), x = tipX + (b.x - tipX) * s, y = tipY + (b.y - tipY) * s - Math.sin(s * Math.PI) * 90;
+      if (now - k.t0 > 400) {
+        c.beginPath(); c.moveTo(tipX, tipY); c.quadraticCurveTo((tipX + x) / 2, Math.min(tipY, y) - 30 * Math.sin(s * Math.PI), x, y); c.strokeStyle = 'rgba(5,10,19,.4)'; c.lineWidth = 2.6; c.stroke(); c.strokeStyle = 'rgba(255,255,255,.85)'; c.lineWidth = 1.2; c.stroke();
+        c.beginPath(); c.arc(x, y, 3.2, 0, 6.2832); c.fillStyle = '#fff'; c.fill();
+      }
     } else if (['wait', 'bite', 'hook', 'fight', 'landing'].includes(ph)) {
       k.dip = ph === 'wait' ? k.dip * .9 : 14;
       const at = ph === 'fight' || ph === 'landing' ? lvFishAt() : k.to, b = lvG(at), G = LV.f, taut = G ? G.T / 100 : ph === 'bite' ? .7 : 0;
-      c.beginPath(); c.moveTo(tipX, tipY); c.quadraticCurveTo((tipX + b.x) / 2, (tipY + b.y) / 2 + 26 * (1 - taut), b.x, b.y - (ph === 'fight' ? 0 : 14));
-      c.strokeStyle = G && G.T > 85 ? '#FF6B7E' : `rgba(255,255,255,${.6 + .35 * taut})`; c.lineWidth = 1.1 + taut * .6; c.stroke();
+      const ex = b.x, ey = b.y - (ph === 'fight' ? 0 : 14), qx = (tipX + ex) / 2, qy = (tipY + ey) / 2 + 26 * (1 - taut);
+      c.beginPath(); c.moveTo(tipX, tipY); c.quadraticCurveTo(qx, qy, ex, ey);
+      c.strokeStyle = 'rgba(5,10,19,.42)'; c.lineWidth = 2.6 + taut * .6; c.stroke();
+      c.strokeStyle = G && G.T > 85 ? '#FF6B7E' : `rgba(255,255,255,${.78 + .2 * taut})`; c.lineWidth = 1.2 + taut * .6; c.stroke();
+      // 찌릿: the bite runs up the line to the angler
+      if (ph === 'bite' || ph === 'hook') {
+        const u0 = 1 - (((now - k.biteAt) / 300) % 1), pt = u => { const v = 1 - u; return [v * v * tipX + 2 * v * u * qx + u * u * ex, v * v * tipY + 2 * v * u * qy + u * u * ey]; };
+        c.save(); c.lineJoin = 'miter'; c.beginPath();
+        for (let i = 0; i <= 6; i++) { const u = clamp(u0 - .16 + i * .16 / 6 * 2, 0, 1), p = pt(u), n = (i % 2 ? 1 : -1) * (i === 0 || i === 6 ? 0 : 5); i ? c.lineTo(p[0] + n * .5, p[1] + n) : c.moveTo(p[0], p[1]); }
+        c.strokeStyle = 'rgba(90,162,255,.6)'; c.lineWidth = 5; c.stroke(); c.strokeStyle = '#fff'; c.lineWidth = 1.6; c.stroke(); c.restore();
+      }
       if (ph === 'fight' || ph === 'landing') { const p = .5 + .5 * Math.sin(T * 9); lvRingPath(c, b, 2.4 + p * 1.4 + (G && G.pull > 0 ? 2 : 0)); c.strokeStyle = 'rgba(227,243,255,.85)'; c.lineWidth = 1.6; c.stroke(); if (G && G.pull > 0 && Math.random() < .2) lvFx('ring', at, .5); }
       else lvFloatDraw(c, b, lvFloat(), k.dip, T, 1);
     }
@@ -653,7 +742,7 @@ function lvBook(tab) {
     const cur = tab || 'dex', dex = new Map(st.dex.map(d => [d.sp, d]));
     const m = new Date().getMonth() + 1, at = LV.stand || LV.pos, near = at ? GEO.regionPrior(GEO.region(at.lng, at.lat, true), m).filter(x => SPI[x.id] && lvFits(SPI[x.id], 'sea')).map(x => x.id) : [];
     const ids = [...new Set([...st.dex.map(d => d.sp), ...near, ...SP.filter(sp => lvFits(sp, 'sea') || lvFits(sp, 'fresh')).map(sp => sp.id)])];
-    const dexH = `<p class="lv-bsum"><b class="num">${st.dex.length}</b> / ${ids.length} ${t('lv_dex_n')}</p><div class="lv-dex">${ids.map(id => { const sp = SPI[id], d = dex.get(id); return `<div class="lv-dx${d ? ' got' : ''} t${sp.r}"><span class="tone-${sp.w}"><img src="${FD.thumb(sp, 200, 110)}" alt="" loading="lazy"></span><b>${d ? esc(spName(sp)) : '???'}</b><small>${d ? `<i class="num">${fmtN(d.best, 1)}</i>cm · ${t('lv_dex_x', { n: d.n })}` : t(LV_TIERS[sp.r])}</small></div>`; }).join('')}</div>`;
+    const dexH = `<p class="lv-bsum"><b class="num">${st.dex.length}</b> / ${ids.length} ${t('lv_dex_n')}</p><div class="lv-dex">${ids.map(id => { const sp = SPI[id], d = dex.get(id); return `<div class="lv-dx${d ? ' got' : ''} t${sp.r}"><span class="tone-${sp.w}"><img ${FD.lazy(sp, 200, 110)} alt="" loading="lazy"></span><b>${d ? esc(spName(sp)) : '???'}</b><small>${d ? `<i class="num">${fmtN(d.best, 1)}</i>cm · ${t('lv_dex_x', { n: d.n })}` : t(LV_TIERS[sp.r])}</small></div>`; }).join('')}</div>`;
     const row = (b, i) => `<li class="${b.a === myId() ? 'me' : ''}"><b class="num">${i + 1}</b>${avatar(anglerOf(b.a), 30)}<span><strong>${esc(lvNick(b.a))}</strong><small>${b.sp && SPI[b.sp] ? esc(spName(SPI[b.sp])) + ' ' + fmtN(b.cm, 1) + 'cm' : ''}</small></span><em class="num">${fmtN(b.s)}</em>${S.isOwner ? `<button class="btn btn-sm btn-line" data-zpvoid="${esc(b.a)}|${esc(st.wk)}">${t('zp_void')}</button>` : ''}</li>`;
     const wkH = `<p class="lv-bsum">${t('lv_wk_how')}</p>
       <ul class="zp-prizes lv-prz"><li class="p1"><b class="num">300P</b><span>${t('lv_wk_p1')}</span></li><li class="p2"><b class="num">200P</b><span>${t('lv_rank_n', { n: 2 })}</span></li><li class="p3"><b class="num">100P</b><span>${t('lv_rank_n', { n: 3 })}</span></li></ul>
@@ -670,9 +759,16 @@ function lvBook(tab) {
       <label class="switch lv-opt"><input type="checkbox" id="lv-anon" ${LV.anon ? 'checked' : ''}><span class="sw"></span><span><b>${t('lv_anon_h')}</b><small>${t('lv_anon_p')}</small></span></label>
       <p class="lv-priv">${icon('lock')}<span>${t('lv_priv')}</span></p>`;
     const w = openModal(`<div class="lv-book"><h2>${t('lv_book')}</h2>
-      <div class="seg" role="tablist">${[['dex', 'lv_tab_dex'], ['wk', 'lv_tab_wk'], ['how', 'lv_tab_how']].map(([k, l]) => `<button role="tab" aria-selected="${k === cur}" data-lvtab="${k}">${t(l)}</button>`).join('')}</div>
-      <div class="lv-bbody">${cur === 'dex' ? dexH : cur === 'wk' ? wkH : howH}</div></div>`, { wide: true, label: t('lv_book') });
-    w.addEventListener('click', e => { const b = e.target.closest('[data-lvtab]'); if (b) { closeModal(w); setTimeout(() => lvBook(b.dataset.lvtab), 30); } });
+      <div class="seg" role="tablist">${[['net', 'lv_net'], ['dex', 'lv_tab_dex'], ['wk', 'lv_tab_wk'], ['how', 'lv_tab_how']].map(([k, l]) => `<button role="tab" aria-selected="${k === cur}" data-lvtab="${k}">${t(l)}${k === 'net' && lvNet().length ? ` <i class="num">${lvNet().length}</i>` : ''}</button>`).join('')}</div>
+      <div class="lv-bbody" id="lv-bbody">${cur === 'net' ? lvNetHTML(st) : cur === 'dex' ? dexH : cur === 'wk' ? wkH : howH}</div></div>`, { wide: true, label: t('lv_book') });
+    w.addEventListener('click', e => {
+      const b = e.target.closest('[data-lvtab]'); if (b) { closeModal(w); setTimeout(() => lvBook(b.dataset.lvtab), 30); return; }
+      const again = () => { const body = $('#lv-bbody', w); if (body && LV.st) body.innerHTML = lvNetHTML(LV.st); const n = $('[data-lvtab="net"] i', w); if (n) n.textContent = lvNet().length || ''; };
+      const one = e.target.closest('[data-lvsell]'), all = e.target.closest('[data-lvsellall]'), free = e.target.closest('[data-lvfree]');
+      if (one) lvSell([+one.dataset.lvsell]).then(again);
+      else if (all) lvSell(null).then(again);
+      else if (free) { if (free.classList.contains('armed')) lvSell([+free.dataset.lvfree], true).then(again); else { $$('.lv-nfree.armed', w).forEach(x => { x.classList.remove('armed'); x.textContent = t('lv_free'); }); free.classList.add('armed'); free.textContent = t('lv_free_sure'); } }
+    });
     w.addEventListener('change', e => { if (e.target.id === 'lv-anon') { LV.anon = e.target.checked; lsSet('liveAnon', LV.anon); lvTrack(); } });
   });
 }

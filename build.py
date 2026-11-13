@@ -24,7 +24,7 @@ WEB = {
     'supabase_js': 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.js',
 }
 
-APP_JS = ['i18n.js', 'i18n-more.js', 'i18n-live.js', 'fishdb.js', 'fishdraw.js', 'scene.js', 'geo.js', 'map.js', 'core.js', 'flows.js', 'views.js', 'lures.js', 'char.js', 'community.js', 'news.js', 'points.js', 'notify.js', 'weather.js', 'badges.js', 'stats.js', 'contest.js', 'push.js', 'chat.js', 'shop.js', 'livemap.js', 'live.js', 'boot.js']
+APP_JS = ['i18n.js', 'i18n-more.js', 'i18n-live.js', 'fishdb.js', 'fishdraw.js', 'scene.js', 'geo.js', 'map.js', 'core.js', 'flows.js', 'views.js', 'lures.js', 'char.js', 'community.js', 'news.js', 'points.js', 'notify.js', 'weather.js', 'badges.js', 'stats.js', 'contest.js', 'push.js', 'chat.js', 'shop.js', 'livemap.js', 'angler.js', 'live.js', 'boot.js']
 
 
 def read(name):

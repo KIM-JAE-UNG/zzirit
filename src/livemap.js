@@ -100,6 +100,30 @@ const LMAP = (() => {
     };
   }
 
+  /* --- buildings step down where they would hide the angler, the line or the float ---
+     Seen from the tilted camera, a building h metres high hides the ground behind it for about 1.7 × h. So every building
+     that stands that close to the line from the angler to the float — and not on its far side — is drawn as a low slab. */
+  const BH = ['coalesce', ['get', 'render_height'], 6], BB = ['coalesce', ['get', 'render_min_height'], 0];
+  const bldZoom = v => ['interpolate', ['linear'], ['zoom'], 14.5, 0, 15.3, v];
+  let clearKey = '';
+  function clear(map, from, to, bearingDeg) {
+    if (!map || !map.getLayer || !map.getLayer('bld')) return;
+    let key = '';
+    if (from) { const b = Math.round((bearingDeg || 0) / 30) * 30, t = to || from; key = [from.lng.toFixed(5), from.lat.toFixed(5), t.lng.toFixed(5), t.lat.toFixed(5), b].join(); }
+    if (key === clearKey && map.__bldKey === key) return;
+    clearKey = key; map.__bldKey = key;
+    try {
+      if (!from) { map.setPaintProperty('bld', 'fill-extrusion-height', bldZoom(BH)); map.setPaintProperty('bld', 'fill-extrusion-base', bldZoom(BB)); return; }
+      const t = to || from, mLon = M_LAT * Math.cos(from.lat * Math.PI / 180), br = (Math.round((bearingDeg || 0) / 30) * 30) * Math.PI / 180, sh = 34;
+      const dx = -Math.sin(br) * sh / mLon, dy = -Math.cos(br) * sh / M_LAT; // toward the camera
+      const seg = [[from.lng, from.lat], [t.lng, t.lat]], line = { type: 'LineString', coordinates: seg[0][0] === seg[1][0] && seg[0][1] === seg[1][1] ? [seg[0], [seg[0][0] + 1e-6, seg[0][1]]] : seg };
+      const near = { type: 'LineString', coordinates: line.coordinates.map(p => [p[0] + dx, p[1] + dy]) };
+      const hide = ['all', ['<', ['distance', line], ['+', 16, ['*', 1.9, BH]]], ['<', ['distance', near], ['+', ['distance', line], 10]]];
+      map.setPaintProperty('bld', 'fill-extrusion-height', bldZoom(['case', hide, ['min', BH, 1.4], BH]));
+      map.setPaintProperty('bld', 'fill-extrusion-base', bldZoom(['case', hide, 0, BB]));
+    } catch (e) { clearKey = ''; }
+  }
+
   /* --- water out of the tiles --- */
   const M_LAT = 111320;
   const kindOf = cls => (cls === 'ocean' || cls === 'dock' ? 'sea' : 'fresh');
@@ -168,5 +192,5 @@ const LMAP = (() => {
   const cellOf = (lng, lat) => [Math.floor(lng / CW), Math.floor(lat / CH)];
   const cellMid = (cx, cy) => ({ lng: (cx + .5) * CW, lat: (cy + .5) * CH });
 
-  return { lib, style, PAL, sunAlt, phaseOf, solarHour, feeding, water, waterAt, nearest, shoreBy, edges, dist, bearing, toward, cellOf, cellMid, kindOf, CW, CH };
+  return { lib, style, clear, PAL, sunAlt, phaseOf, solarHour, feeding, water, waterAt, nearest, shoreBy, edges, dist, bearing, toward, cellOf, cellMid, kindOf, CW, CH };
 })();

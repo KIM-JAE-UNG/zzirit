@@ -1,5 +1,6 @@
-// 0019 찌릿 라이브: schools, casting (on the spot and from far away), striking, landing, the fish book, the daily cap,
-// the weekly bag of five and its prizes — on a database with every migration.
+// 0019 찌릿 라이브 + 0021 the fish market: schools, casting (on the spot and from far away), striking, landing, the
+// fish book, the keepnet and selling (the day's price, the day's limit), the weekly bag of five and its prizes — on a
+// database with every migration.
 import { PGlite } from '@electric-sql/pglite';
 import { pgcrypto } from '@electric-sql/pglite/contrib/pgcrypto';
 import fs from 'fs';
@@ -46,6 +47,7 @@ const rpc = (uid, sql, params) => as(uid, async () => (await q(sql, params)).row
 const state = uid => rpc(uid, `select public.live_state() s`).then(r => r.s);
 const cast = (uid, cx = 103295, cy = 35153, water = 'sea', onsite = true, anon = false) => rpc(uid, `select public.live_cast($1, $2, $3, $4, $5) r`, [cx, cy, water, onsite, anon]).then(r => r.r);
 const strike = (uid, tok) => rpc(uid, `select public.live_strike($1) r`, [tok]).then(r => r.r);
+const sell = (uid, ids = null, release = false) => rpc(uid, `select public.live_sell($1::bigint[], $2) r`, [ids, release]).then(r => r.r);
 const land = (uid, tok, sp, okk = true) => rpc(uid, `select public.live_land($1, $2, $3) r`, [tok, sp, okk]).then(r => r.r);
 // the test does not wait: move the cast (and the hook) back in time
 const ageCast = (uid, ms) => q(`update private.live_casts set cast_at = clock_timestamp() - make_interval(secs => $2::numeric / 1000) where acct = $1`, [uid, ms]);
@@ -101,13 +103,14 @@ const fish = async (uid, sp, o = {}) => {
   await q(`delete from private.login_tries`);
   let r = await fish(B, 'kurodai', { tier: 4, u: 0.5, big: false });
   const cmWant = +(await q(`select private.live_cm(l_typ, l_max, 0.5, 0, false) c from public.live_species where id = 'kurodai'`)).rows[0].c;
-  check(r.sp === 'kurodai' && +r.cm === cmWant && r.tier === 4 && r.pts === 12 + 10 && r.first === true && r.score > 0 && r.bal === 22, 'a class-4 fish pays 12 points, a new species 10 more: ' + J(r));
+  check(r.sp === 'kurodai' && +r.cm === cmWant && r.tier === 4 && r.val === 12 && r.pts === 10 && r.first === true && r.score > 0 && r.bal === 10 && r.kept === true && r.net === 1, 'a class-4 fish is worth 12 points and goes into the net; a new species pays 10 at once: ' + J(r));
+  check([0.8, 0.9, 1, 1.1, 1.2, 1.4].includes(+r.rate) && r.price === Math.max(1, Math.round(12 * r.rate)), 'the answer says the day\'s price: ' + J({ rate: r.rate, price: r.price }));
   r = await fish(B, 'kurodai', { tier: 4, u: 0.9, big: false });
-  check(r.pts === 12 && r.first === false && r.best === true && r.bal === 34, 'the second one pays 12 and is a personal best: ' + J({ pts: r.pts, best: r.best, bal: r.bal }));
+  check(r.val === 12 && r.pts === 0 && r.first === false && r.best === true && r.bal === 10 && r.net === 2, 'the second one pays nothing by itself and is a personal best: ' + J({ pts: r.pts, best: r.best, bal: r.bal }));
   r = await fish(B, 'kurodai', { tier: 2 });
   check(r.err === 'bad_species', 'a fish of a higher class than the roll is refused');
   r = await fish(B, 'maaji', { tier: 4, u: 0.5, big: true, v: 0.5 });
-  check(r.tier === 1 && r.big === true && r.pts === 2 + 10, 'a lower class is fine and pays as its own class (a big one half as much again): ' + J({ tier: r.tier, pts: r.pts }));
+  check(r.tier === 1 && r.big === true && r.val === 2 && r.pts === 10, 'a lower class is fine and is worth what its own class is (a big one half as much again): ' + J({ tier: r.tier, val: r.val }));
   r = await fish(B, 'funa', { tier: 3 });
   check(r.err === 'bad_species', 'a freshwater fish does not come out of the sea');
   r = await fish(B, 'funa', { tier: 3, water: 'fresh', u: 0.2, big: false });
@@ -119,9 +122,10 @@ const fish = async (uid, sp, o = {}) => {
   r = await fish(B, 'maaji', { ok: false });
   check(r.lost === true, 'a lost fight ends the cast with nothing');
   const st = await state(B);
-  check(st.dex.length === 3 && st.dex.find(x => x.sp === 'kurodai').n === 2 && st.day.fish === 4 && st.bal === 34 + 12 + 13, 'the fish book counts each species: ' + J(st.dex) + ' ' + st.bal);
+  check(st.dex.length === 3 && st.dex.find(x => x.sp === 'kurodai').n === 2 && st.day.fish === 4 && st.bal === 30 && st.day.pts === 0, 'the fish book counts each species: ' + J(st.dex) + ' ' + st.bal);
+  check(st.net.length === 4 && st.netMax === 30 && st.net[0].sp === 'funa' && st.net.every(f => f.id && f.val >= 1 && f.p >= 1) && Object.keys(st.mkt).length > 100 && st.mktUntil > Date.now(), 'the state lists the keepnet (newest first) and the day\'s prices');
   const led = (await q(`select delta, reason, ref from public.zp_ledger where acct = $1`, [B])).rows;
-  check(led.length === 1 && led[0].reason === 'join' && /^day:\d{4}-\d\d-\d\d$/.test(led[0].ref) && led[0].delta === st.bal, 'the day\'s catch points are one growing line in the book: ' + J(led));
+  check(led.length === 1 && led[0].reason === 'join' && /^day:\d{4}-\d\d-\d\d$/.test(led[0].ref) && led[0].delta === st.bal, 'the day\'s points are one growing line in the book: ' + J(led));
 }
 
 // ---------- from far away: five casts a day, half the points, no legends ----------
@@ -135,24 +139,59 @@ const fish = async (uid, sp, o = {}) => {
   check((await cast(C, 103295, 35153, 'sea', true)).token, 'on the spot there is no such limit');
   await q(`update private.live_days set remote = 0 where acct = $1`, [C]);
   const r = await fish(C, 'kurodai', { tier: 4, u: 0.5, big: false, onsite: false });
-  check(r.pts === 6 + 10 && r.onsite === false, 'a far-away catch pays half: ' + J({ pts: r.pts }));
+  check(r.val === 6 && r.pts === 10 && r.onsite === false, 'a far-away catch is worth half: ' + J({ val: r.val }));
   // no class 5 from far away: many strikes, never a legend
   let top = 0;
   for (let i = 0; i < 60; i++) { await q(`delete from private.login_tries`); await q(`update private.live_days set remote = 0 where acct = $1`, [C]); const c = await cast(C, 103295, 35153, 'sea', false); await ageCast(C, c.wait + 100); const s = await strike(C, c.token); top = Math.max(top, s.tier); }
   check(top >= 1 && top <= 4, 'the legends only bite on the spot (highest class in 60 far-away strikes: ' + top + ')');
 }
 
-// ---------- the daily cap ----------
+// ---------- the fish market: selling from the keepnet ----------
 {
   await q(`delete from private.login_tries`);
-  await q(`update private.live_days set pts = 75 where acct = $1`, [B]);
-  const before = (await state(B)).bal;
-  let r = await fish(B, 'kurodai', { tier: 4, u: 0.3, big: false });
-  check(r.pts === 5 && r.capped === true && r.day.pts === 80, 'the cap of 80 points a day cuts the pay: ' + J({ pts: r.pts, day: r.day }));
-  r = await fish(B, 'kurodai', { tier: 4, u: 0.3, big: false });
-  check(r.pts === 0 && r.bal === before + 5, 'past the cap a catch pays nothing');
-  r = await fish(B, 'mebaru', { tier: 4, u: 0.3, big: false });
-  check(r.pts === 10 && r.first, 'but a new species still pays its 10');
+  const day = (await q(`select (now() at time zone 'Asia/Seoul')::date::text d`)).rows[0].d;
+  const rate = async sp => +(await q(`select private.live_rate($1, $2::date) r`, [sp, day])).rows[0].r;
+  const price = (val, rt) => Math.max(1, Math.round(val * rt));
+  let st = await state(B); const before = st.bal, net0 = st.net;
+  check(net0.every(f => f.p === price(f.val, +st.mkt[f.sp])), 'each fish in the net shows its worth times the day\'s price');
+  // one fish
+  const one = net0.find(f => f.sp === 'kurodai');
+  let r = await sell(B, [one.id]);
+  check(r.n === 1 && r.sum === one.p && r.bal === before + one.p && r.day.pts === one.p && r.net.length === net0.length - 1 && !r.net.find(f => f.id === one.id), 'selling one fish pays its price and takes it out of the net: ' + J({ sum: r.sum, bal: r.bal }));
+  r = await sell(B, [one.id]);
+  check(r.n === 0 && r.sum === 0 && r.bal === before + one.p, 'a fish is sold once');
+  // somebody else's fish
+  const mine = (await state(C)).net[0];
+  r = await sell(B, [mine.id]);
+  check(r.n === 0 && (await state(C)).net.find(f => f.id === mine.id), 'nobody sells another angler\'s fish');
+  // the price moves with the day and is the same for everyone
+  const rs = (await q(`select private.live_rate('kurodai', d::date) r from generate_series('2026-01-01'::date, '2026-03-31'::date, '1 day') d`)).rows.map(x => +x.r);
+  check(new Set(rs).size >= 4 && Math.min(...rs) === 0.8 && Math.max(...rs) === 1.4 && Math.abs(rs.reduce((a, b) => a + b, 0) / rs.length - 1.04) < 0.08, 'the price of a fish moves from day to day between ×0.8 and ×1.4: ' + J([...new Set(rs)].sort()));
+  check(+(await state(C)).mkt.kurodai === await rate('kurodai'), 'and is the same for everyone that day');
+  // everything, dearest first, up to the day's limit
+  await q(`update private.live_days set pts = 80 - $2 where acct = $1`, [B, 13]);
+  st = await state(B);
+  const order = st.net.slice().sort((x, y) => y.p - x.p || x.id - y.id); let left = 13, want = 0, wantN = 0;
+  for (const f of order) if (f.p <= left) { left -= f.p; want += f.p; wantN++; }
+  r = await sell(B);
+  check(r.sum === want && r.n === wantN && r.over === st.net.length - wantN && r.day.pts === 80 - 13 + want && r.net.length === st.net.length - wantN, 'the market buys no more than 80 points a day; what is over stays in the net: ' + J({ sum: r.sum, n: r.n, over: r.over }));
+  check(r.over > 0 && (await sell(B)).sum <= left, 'the rest waits for tomorrow');
+  // letting fish go
+  const keep = (await state(B)).net;
+  r = await sell(B, [keep[0].id], true);
+  check(r.n === 1 && r.sum === 0 && r.released === true && r.net.length === keep.length - 1, 'a fish can be let go for nothing');
+  // a full net: the fish counts for the book and the board and is let go
+  await q(`update private.live_cfg set net_max = (select count(*) from public.live_catches where acct = $1 and val is not null and sold_at is null)`, [B]);
+  const sc = (await state(B)).me.s;
+  r = await fish(B, 'mebaru', { tier: 4, u: 0.9, big: false });
+  check(r.kept === false && r.first === true && r.pts === 10 && (await state(B)).net.length === r.net && (await state(B)).me.s > sc, 'a full net lets the new fish go, but the book and the board still count it: ' + J({ kept: r.kept, net: r.net }));
+  await q(`update private.live_cfg set net_max = 30`);
+  // fish from before the market are nobody's to sell
+  await q(`insert into public.live_catches (acct, sp, cm, tier, score, pts, onsite, gx, gy, wk) values ($1, 'maaji', 20, 1, 40, 1, true, 1, 1, private.zp_week())`, [F]);
+  check((await state(F)).net.length === 0 && (await sell(F)).n === 0, 'fish landed before the market are not in the net');
+  check(/permission denied|not_signed_in/.test(await fails(() => asRole('anon', '', () => q(`select public.live_sell(null, false)`))) || ''), 'a visitor who is not signed in cannot sell');
+  const led = (await q(`select count(*)::int n, sum(delta)::int d from public.zp_ledger where acct = $1 and reason = 'join'`, [B])).rows[0];
+  check(led.n === 1 && led.d === (await state(B)).bal, 'sales and first-catch points share the day\'s one line in the book: ' + J(led));
 }
 
 // ---------- gear: only what is owned counts ----------
