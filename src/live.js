@@ -53,6 +53,10 @@ const LVS = {
 };
 
 /* --- server state --- */
+// the Korean day, and the first day of the strong tides (사리): the server's own formula (private.live_tide) at Korean noon
+const lvDayKST = (ms = nowMs()) => new Date(ms + 9 * 3600e3).toISOString().slice(0, 10);
+function lvTideAt(ms) { const P = 29.530588861, age = (((ms / 864e5 + 2440587.5 - 2451550.09766) % P) + P) % P; return Math.max(0, Math.min(1, .55 + .45 * Math.cos(2 * ((age - 1.5) / 29.53) * 2 * Math.PI))); }
+function lvSpringToday(ms = nowMs()) { const noon = Date.parse(lvDayKST(ms) + 'T12:00:00+09:00'); return lvTideAt(noon) >= .85 && lvTideAt(noon - 864e5) < .85; }
 function lvLoad(force) {
   if (!lvOn()) return Promise.resolve(null);
   if (!force && LV.st && nowMs() - LV.stAt < 30e3) return Promise.resolve(LV.st);
@@ -64,7 +68,7 @@ function lvLoad(force) {
     return LV.st;
   })
     .catch(e => { LV.err = (e && e.code) || 'unavailable'; return LV.st; })
-    .finally(() => { LV.stP = null; lvHud(); });
+    .finally(() => { LV.stP = null; lvHud(); if (typeof notiScan === 'function') setTimeout(notiScan, 0); });
   return LV.stP;
 }
 

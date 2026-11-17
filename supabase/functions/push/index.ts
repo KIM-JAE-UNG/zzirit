@@ -1,8 +1,11 @@
 // Phone notifications (Web Push). The app asks this function to tell someone about something it just did — a reply, a 1:1 message,
 // a friend request, a team request, the operator's notice or a confirmed payment. The database checks that it really
 // happened (push_check), that it goes out only once and that no one sends too many (push_once). The automatic
-// reviewer calls it with the server key to report review results. The VAPID key pair is made here once and kept in
-// Vault; only the public half ever leaves the server. Messages are short and in the reader's language.
+// reviewer calls it with the server key to report review results. Every morning a schedule asks for the morning round
+// (op "morning"): the database says who has something to hear today — a fish in the keepnet that sells dear, the first
+// strong-tide day, last week's prize — and writes it down first, so nobody hears it twice; outside 07:30–09:00 Korean
+// time it says nobody. The VAPID key pair is made here once and kept in Vault; only the public half ever leaves the
+// server. Messages are short and in the reader's language.
 import { createClient } from "npm:@supabase/supabase-js@2.117.3";
 import { genVapid, sendPush, PUSH_HOSTS } from "./webpush.js";
 
@@ -50,6 +53,20 @@ const W: Record<string, string[]> = {
   dm: ["{nick}님이 메시지를 보냈어요", "{nick} sent you a message", "{nick}さんからメッセージが届きました", "{nick} 给你发了消息"],
 };
 const TITLE = ["찌릿 ZZIRIT", "ZZIRIT", "찌릿 ZZIRIT", "찌릿 ZZIRIT"];
+// the morning notice: up to three short parts, joined
+const AM: Record<string, string[]> = {
+  rank: ["지난주 찌릿 라이브 {r}등! {p}P를 받았어요", "#{r} in last week's ZZIRIT Live: {p}P is yours!", "先週のZZIRITライブで{r}位!{p}Pを獲得しました", "上周ZZIRIT实况第{r}名！获得{p}P"],
+  prize: ["지난주 찌릿 라이브 상금 {p}P를 받았어요", "Last week's ZZIRIT Live prize: {p}P is yours!", "先週のZZIRITライブの賞金{p}Pを獲得しました", "获得上周ZZIRIT实况奖金{p}P"],
+  mkt: ["살림망의 {fish} 시세가 오늘 ×{x}예요. 지금 팔면 {p}P", "The {fish} in your keepnet sells at ×{x} today: {p}P now", "スカリの{fish}、今日の相場は×{x}。今売れば{p}P", "鱼护里的{fish}今日行情×{x}，现在卖得{p}P"],
+  tide: ["오늘부터 사리 물때예요. 물살이 세서 입질이 빨라요", "Spring tides start today: strong currents, quicker bites", "今日から大潮。潮が速く、アタリが早くなります", "今天起进入大潮，水流强，咬钩更快"],
+};
+type AmItem = { k: string; r?: number | null; p?: number; x?: number; n?: string[] };
+const amText = (items: AmItem[], li: number) => items.map((it) => {
+  if (it.k === "rank") return fill(AM[it.r ? "rank" : "prize"][li], { r: String(it.r ?? ""), p: String(it.p ?? "") }, li);
+  if (it.k === "mkt") return fill(AM.mkt[li], { fish: Array.isArray(it.n) ? it.n : [""], x: String(it.x ?? ""), p: String(it.p ?? "") }, li);
+  if (it.k === "tide") return AM.tide[li];
+  return "";
+}).filter(Boolean).join(" · ");
 // a value may differ by language ([ko, en, ja, zh]), like a fish name
 type Vars = Record<string, string | string[]>;
 const fill = (s: string, v: Vars, li: number) => s.replace(/\{(\w+)\}/g, (_, k) => { const x = v[k]; return String((Array.isArray(x) ? x[li] ?? x[0] : x) ?? "").slice(0, 140); });
@@ -58,6 +75,10 @@ async function deliver(to: string, kind: string, ref: string, from: string | nul
   const { data: first, error: oe } = await admin.rpc("push_once", { p_to: to, p_kind: kind, p_ref: ref, p_from: from });
   if (oe) throw new Error(oe.message);
   if (!first) return { sent: 0, skipped: "once" };
+  return await sendTo(to, kind, (li) => fill(W[words][li], vars, li), url, tag);
+}
+// to every device of one account (the zero id: everyone), in each device's language
+async function sendTo(to: string, kind: string, text: (li: number) => string, url: string, tag: string) {
   const { data: subs, error: te } = await admin.rpc("push_targets", { p_acct: to });
   if (te) throw new Error(te.message);
   if (!subs || !subs.length) return { sent: 0 };
@@ -68,7 +89,7 @@ async function deliver(to: string, kind: string, ref: string, from: string | nul
     await Promise.all(list.slice(i, i + 20).map(async (s) => {
       if (!PUSH_HOSTS.test(s.endpoint)) return;
       const li = L[s.lang] ?? 0;
-      const msg = { t: TITLE[li], b: fill(W[words][li], vars, li), u: url, tag };
+      const msg = { t: TITLE[li], b: text(li).slice(0, 200), u: url, tag };
       try {
         const st = await sendPush(s, JSON.stringify(msg), keys, SITE);
         if (st === 404 || st === 410) { gone++; await admin.rpc("push_gone", { p_endpoint: s.endpoint }); }
@@ -89,6 +110,18 @@ Deno.serve(async (req: Request) => {
   try {
     // the public half of the key, for browsers that switch notices on
     if (body.op === "key") return json({ key: (await vapid()).pub });
+    // the morning round (the schedule; harmless to call: the database decides, and only once a morning)
+    if (body.op === "morning") {
+      const { data: rows, error: me } = await admin.rpc("push_morning", { p_limit: 300 });
+      if (me) throw new Error(me.message);
+      let n = 0, sent = 0;
+      for (const r of (rows || []) as { acct: string; items: AmItem[] }[]) {
+        if (!Array.isArray(r.items) || !r.items.length) continue;
+        const res = await sendTo(r.acct, "am", (li) => amText(r.items, li), "#live", "am");
+        n++; sent += res.sent || 0;
+      }
+      return json({ n, sent });
+    }
     if (body.op !== "send") return json({ error: "unknown op" }, 400);
     const token = (req.headers.get("authorization") || "").replace(/^Bearer\s+/i, "");
     // the reviewer (server key): review results

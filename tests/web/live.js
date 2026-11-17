@@ -347,6 +347,10 @@ async function until(fn, ms = 6000, step = 150) { const t0 = Date.now(); let v; 
     ok(await P.$$eval('#lv-res .lv-rbtn .btn', ns => ns.every(b => { const r = b.getBoundingClientRect(); return r.right <= innerWidth - 8 && b.scrollWidth <= b.clientWidth + 1; })), 'phone: the three buttons fit');
     await P.waitForTimeout(600); await shot(P, 'l14b_phone_catch');
     await P.click('[data-lv="again"]'); await P.waitForTimeout(300);
+    // the bell: the dear fish shows up as this morning's news (what the morning phone note says)
+    await P.evaluate(() => notiScan());
+    ok(await P.evaluate(() => notiList().some(x => x.k === 'lvmkt' && x.x === 1.25 && x.p === 3) && /×1\.25/.test(notiText(notiList().find(x => x.k === 'lvmkt')))), 'bell: a fish that sells dear today is in the notifications');
+    ok(await P.evaluate(() => { const a = lvTideAt(Date.parse('2026-11-24T03:00:00Z')), b = lvTideAt(Date.parse('2026-11-17T03:00:00Z')); return a >= 0 && a <= 1 && b >= 0 && b <= 1 && typeof lvSpringToday() === 'boolean'; }), 'the tide-day helper works');
     // the keepnet: the fish is there with its price; let one go needs two taps; selling pays
     await P.click('#lv-net'); await P.waitForTimeout(700);
     ok(await P.$$eval('.lv-netl li', ns => ns.length === 1 && /3P/.test(ns[0].textContent) && /×1\.25/.test(ns[0].textContent)) && /모두 팔기 \+3P/.test(await P.$eval('.lv-nall', n => n.textContent)), 'net: the fish with today\'s price, and "sell all"');

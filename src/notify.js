@@ -59,6 +59,15 @@ function notiScan() {
   // 1:1 messages not read yet: one line per friend, for their latest message
   // (one line per friend until it is read: the line belongs to the read mark it started from)
   if (typeof DMS !== 'undefined' && DMS.loaded) { const rd = dmReads(); for (const th of dmThreads().values()) if (th.unread && th.last && th.last.sender !== me) add('dm:' + th.peer + ':' + (rd[th.peer] || 0), 'dm', Date.parse(th.last.created_at) || nowMs(), { who: th.peer, body: String(th.last.body || '').slice(0, 60) }); }
+  // 찌릿 라이브: this morning's news — what the morning phone note says, here for everyone
+  if (typeof LV !== 'undefined' && LV.st) {
+    const L2 = LV.st, day = lvDayKST(), mkt = L2.mkt || {};
+    const dear = (L2.net || []).filter(f => +mkt[f.sp] >= 1.2).sort((a, b) => b.p - a.p || a.id - b.id)[0];
+    if (dear) add('lvm:' + day, 'lvmkt', nowMs(), { sp: dear.sp, x: +mkt[dear.sp], p: dear.p });
+    if ((L2.dex || []).length && lvSpringToday()) add('lvt:' + day, 'lvtide', nowMs(), {});
+    const won = (L2.last || []).find(w => w.a === me);
+    if (won && L2.wk) add('lvp:' + L2.wk, 'lvprize', nowMs(), { r: won.r, p: [300, 200, 100][won.r - 1] || 0 });
+  }
   if (first) { lsSet('notiInit', 1); changed = true; }
   lsSet('notiState', st);
   if (changed) { list.sort((a, b) => a.t - b.t); lsSet('noti', list.slice(-NOTI_MAX)); }
@@ -88,11 +97,14 @@ function notiText(x) {
     case 'badge': return t('nt_badge', { name: t('bdg_' + x.badge) });
     case 'wk': return t('nt_wk', { rank: x.rank, fish });
     case 'paid': return t('nt_paid', { item: x.ref === 'donate' ? t('donate_btn') : esc(dict((SHOPI[x.ref] || {}).n) || x.ref) });
+    case 'lvmkt': return t('nt_lvmkt', { fish: esc(nameOf(x.sp)), x: x.x, p: fmtN(x.p) });
+    case 'lvtide': return t('nt_lvtide');
+    case 'lvprize': return t('nt_lvprize', { r: x.r, p: fmtN(x.p) });
     case 'dm': return t('nt_dm', { who }) + (x.body ? `<span class="nt-q">${esc(chatClean(x.body))}</span>` : '');
     default: return '';
   }
 }
-const NT_ICON = { dm: 'chat', cmt: 'chat', cmt2: 'chat', like: 'heart', freq: 'user-plus', facc: 'user-check', rok: 'check', rno: 'x', rlog: 'log', rhold: 'clock', tjoin: 'flag', notice: 'megaphone', paid: 'heart', badge: 'medal', wk: 'trophy' };
+const NT_ICON = { dm: 'chat', cmt: 'chat', cmt2: 'chat', like: 'heart', freq: 'user-plus', facc: 'user-check', rok: 'check', rno: 'x', rlog: 'log', rhold: 'clock', tjoin: 'flag', notice: 'megaphone', paid: 'heart', badge: 'medal', wk: 'trophy', lvmkt: 'coin', lvtide: 'live', lvprize: 'trophy' };
 function openNoti() {
   notiScan();
   const seen = lsGet('notiSeen', 0) || 0;
@@ -117,6 +129,8 @@ function openNoti() {
     else if (x.k === 'paid') location.hash = 'sea';
     else if (x.k === 'badge') { S.seaTab = 'badges'; S.viewUid = null; location.hash = 'sea'; }
     else if (x.k === 'wk') openWeekly();
+    else if (x.k === 'lvmkt') { location.hash = 'live'; setTimeout(() => { if (typeof LV !== 'undefined' && LV.st) lvBook('net'); }, 700); }
+    else if (x.k === 'lvtide' || x.k === 'lvprize') location.hash = 'live';
     else if (x.k === 'dm') dmOpen(x.who);
   });
 }

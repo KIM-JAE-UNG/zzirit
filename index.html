@@ -1349,6 +1349,19 @@ div.more-acct:hover { filter: none; }
 .push-row .switch > span:last-child { display: flex; flex-direction: column; gap: 2px; }
 .noti .push-row { margin: 8px 0 4px; padding: 10px 12px; border-radius: 12px; background: var(--surface-2); }
 .noti .push-row.note { background: var(--sea-soft); }
+/* the morning note: which kinds */
+.push-kinds { margin: 12px 0 0; padding: 12px 0 0; border: 0; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 8px; min-width: 0; }
+.push-kinds[hidden] { display: none; }
+.push-kinds legend { float: left; width: 100%; margin: 0 0 2px; padding: 0; display: flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 600; color: var(--ink-2); }
+.push-kinds legend .ic { width: 15px; height: 15px; color: var(--accent); }
+.push-kinds .pk { position: relative; display: inline-flex; cursor: pointer; }
+.push-kinds .pk input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.push-kinds .pk span { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 6px 12px; border-radius: 999px; font-size: 13px; font-weight: 600; color: var(--ink-3); background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--line); transition: background .15s, color .15s, box-shadow .15s; }
+.push-kinds .pk span .ic { width: 15px; height: 15px; }
+.push-kinds .pk input:checked + span { color: var(--accent-ink); background: var(--accent); box-shadow: none; }
+.push-kinds .pk input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
+.push-kinds:disabled .pk span { opacity: .55; cursor: progress; }
+.noti .push-kinds { border-top-color: var(--line); }
 .wk-nm .team-tag { margin-left: 0; }
 /* menu groups: side menu */
 .nav-grp { display: flex; flex-direction: column; }
@@ -1709,7 +1722,7 @@ body[data-route="live"] #main { padding-left: 0; padding-right: 0; }
 .lv-bottom > * { pointer-events: auto; }
 .lv-hint { margin: 0; min-height: 20px; max-width: 34ch; text-align: center; font-size: 14px; font-weight: 500; line-height: 1.4; color: #E3F3FF; text-shadow: 0 1px 6px rgba(5,10,19,.9); text-wrap: balance; }
 .lv-hint.say { color: #fff; font-weight: 700; }
-:lang(ko) .lv-hint, :lang(ko) .lv-rstat dt, :lang(ko) .lv-cover p { word-break: keep-all; }
+:lang(ko) .lv-hint, :lang(ko) .lv-rstat dt, :lang(ko) .lv-cover p, :lang(ko) .nt-txt, :lang(ko) .push-sub { word-break: keep-all; }
 .lv-main { position: relative; width: 104px; height: 104px; border-radius: 50%; border: 0; cursor: pointer; color: #fff; font: 700 19px/1.1 var(--f-body); letter-spacing: -.03em; display: grid; place-items: center; padding: 0;
   background: radial-gradient(circle at 35% 28%, #2B5BB8, #12305F 55%, var(--night-2)); box-shadow: 0 0 0 1px rgba(160,205,255,.35) inset, 0 12px 28px rgba(0,0,0,.5); transition: transform .1s, box-shadow .2s, background .2s; -webkit-tap-highlight-color: transparent; touch-action: none; }
 .lv-main:active { transform: scale(.95); }
@@ -2107,7 +2120,9 @@ body[data-route="live"] #main { padding-left: 0; padding-right: 0; }
     async key() { const j = await fnPost('push', { op: 'key' }, false); if (!j.key) throw mkErr('unavailable', 'no key'); return j.key; },
     subscribe: (endpoint, p256dh, auth, lang) => rpcOrThrow('push_subscribe', { p_endpoint: endpoint, p_p256dh: p256dh, p_auth: auth, p_lang: lang }),
     unsubscribe: endpoint => rpcOrThrow('push_unsubscribe', { p_endpoint: endpoint }),
-    send: (kind, ref) => fnPost('push', { op: 'send', kind, ref }, true)
+    send: (kind, ref) => fnPost('push', { op: 'send', kind, ref }, true),
+    prefs: () => rpcOrThrow('push_prefs', {}),
+    prefsSet: (market, tide, rank) => rpcOrThrow('push_prefs_set', { p_market: !!market, p_tide: !!tide, p_rank: !!rank })
   };
   // the automatic reviewer runs on its own every few minutes; a fresh catch just nudges it (it ignores extra nudges)
   const review = { ping: () => callFn('review').catch(() => false) };
@@ -3456,7 +3471,7 @@ Object.assign(T, {
   /* phone notifications */
   push_card: ['폰 알림', 'Phone notifications', 'スマホ通知', '手机通知'],
   push_title: ['폰으로 알림 받기', 'Get notifications on this device', 'この端末で通知を受け取る', '在此设备接收通知'],
-  push_sub: ['앱을 닫아 둬도 댓글·친구 요청·검토 결과·공지를 알려 드려요', 'Replies, friend requests, review results and notices, even with the app closed', 'アプリを閉じていてもコメント・友だち申請・審査結果・お知らせを通知します', '即使关闭应用，也会通知评论、好友请求、审核结果和公告'],
+  push_sub: ['앱을 닫아 둬도 댓글·친구 요청·검토 결과·공지, 그리고 아침 낚시 소식을 알려 드려요', 'Replies, friend requests, review results, notices and a morning fishing note, even with the app closed', 'アプリを閉じていてもコメント・友だち申請・審査結果・お知らせ、朝の釣り情報をお知らせします', '即使关闭应用，也会通知评论、好友请求、审核结果、公告和早间钓鱼消息'],
   push_hint: ['기기마다 따로 켜요. 로그아웃하면 그 기기의 알림은 꺼져요.', 'Switch it on per device. Logging out switches it off on that device.', '端末ごとにオンにします。ログアウトするとその端末の通知はオフになります。', '每台设备单独开启。退出登录后该设备的通知会关闭。'],
   push_need_install: ['아이폰·아이패드는 홈 화면에 추가한 앱에서만 알림을 받을 수 있어요.', 'On iPhone and iPad, notifications work only in the app added to the home screen.', 'iPhone・iPadでは、ホーム画面に追加したアプリでのみ通知を受け取れます。', '在iPhone和iPad上，只有添加到主屏幕的应用才能接收通知。'],
   push_unsupported: ['이 브라우저는 알림을 지원하지 않아요. Chrome·Edge·Safari(홈 화면 앱)에서 켤 수 있어요.', 'This browser does not support notifications. Use Chrome, Edge or Safari (home-screen app).', 'このブラウザは通知に対応していません。Chrome・Edge・Safari(ホーム画面アプリ)で使えます。', '此浏览器不支持通知，请使用Chrome、Edge或Safari（主屏幕应用）。'],
@@ -4018,6 +4033,17 @@ Object.assign(T, {
   wn_mkt_p: ['낚은 고기는 살림망에 담기고, 팔면 포인트를 받아요. 값은 고기마다 날마다 달라서 비쌀 때 팔면 이득이에요.', 'Fish go into your keepnet and sell for points. Prices differ by fish and by day, so selling on a good day pays more.', '釣った魚はスカリに入り、売るとポイントになります。値段は魚ごと・日ごとに変わるので、高い日に売るとお得です。', '钓到的鱼放进鱼护，卖出得积分。价格因鱼因日而异，高价时卖更划算。'],
   wn_fish_h: ['물고기 그림을 실제처럼', 'Fish drawn true to life', '魚の絵をリアルに', '更写实的鱼图'],
   wn_fish_p: ['모든 물고기를 비늘·지느러미·빛까지 도감 그림처럼 다시 그렸어요.', 'Every fish is redrawn like a field-guide plate, with scales, fin rays and light.', 'すべての魚を、鱗・ヒレ・光まで図鑑の絵のように描き直しました。', '所有鱼都重新绘制，鳞片、鳍条和光泽如同图鉴。'],
+  /* the morning notice: on the phone (the server) and in the bell (this device) */
+  push_am: ['아침 알림 · 하루 한 번, 오전 7시 반~9시', 'Morning note · once a day, 7:30–9:00 (Korea)', '朝の通知 · 1日1回、午前7時半〜9時', '早间通知 · 每天一次，上午7:30–9:00'],
+  push_k_mkt: ['살림망 고기가 비싼 날', 'A keepnet fish sells dear', 'スカリの魚が高い日', '鱼护里的鱼卖价高'],
+  push_k_tide: ['사리 물때가 시작되는 날', 'Spring tides begin', '大潮が始まる日', '大潮开始'],
+  push_k_rank: ['주간 순위 상금을 받은 날', 'I won a weekly prize', '週間賞金をもらった日', '获得每周奖金'],
+  push_k_saved: ['알림 설정을 저장했어요', 'Notice settings saved', '通知設定を保存しました', '通知设置已保存'],
+  nt_lvmkt: ['살림망의 {fish} 시세가 오늘 <b>×{x}</b>예요. 지금 팔면 {p}P', 'The {fish} in your keepnet sells at <b>×{x}</b> today: {p}P now', 'スカリの{fish}、今日の相場は<b>×{x}</b>。今売れば{p}P', '鱼护里的{fish}今日行情<b>×{x}</b>，现在卖得{p}P'],
+  nt_lvtide: ['오늘부터 사리 물때예요. 물살이 세서 입질이 빨라요', 'Spring tides start today: strong currents, quicker bites', '今日から大潮。潮が速く、アタリが早くなります', '今天起进入大潮，水流强，咬钩更快'],
+  nt_lvprize: ['지난주 찌릿 라이브 <b>{r}등</b>! {p}P를 받았어요', '<b>#{r}</b> in last week\'s ZZIRIT Live: {p}P is yours!', '先週のZZIRITライブで<b>{r}位</b>!{p}Pを獲得', '上周ZZIRIT实况<b>第{r}名</b>！获得{p}P'],
+  wn_am_h: ['아침 낚시 알림', 'A morning fishing note', '朝の釣り通知', '早间钓鱼通知'],
+  wn_am_p: ['살림망 고기가 비싸게 팔리는 날, 사리가 시작되는 날, 주간 상금을 받은 날이면 아침에 한 번 알려 드려요. 폰 알림을 켜 두면 앱을 닫아도 오고, 알림 종에서도 볼 수 있어요.', 'On a day when a keepnet fish sells dear, spring tides begin, or you won a weekly prize, you get one note in the morning — on your phone if notices are on, and in the bell.', 'スカリの魚が高く売れる日、大潮が始まる日、週間賞金をもらった日は、朝に一度お知らせします。通知をオンにすればアプリを閉じていても届き、ベルでも見られます。', '鱼护里的鱼卖价高、大潮开始、获得每周奖金的日子，早上通知你一次。开启通知后即使关闭应用也会收到，铃铛里也能看到。'],
   ng_mine: ['내 기록·장비', 'My records & gear', '記録・タックル', '我的记录·装备'],
   credits_map: ['라이브 지도', 'Live map', 'ライブ地図', '实况地图'],
 });
@@ -8143,7 +8169,7 @@ function openShareCard(blob, name, text) {
 }
 
 /* ===== What's new: shown once after a big update (website only; needs the matching server update) ===== */
-const WHATS_NEW = '2026-11-13a', WN_TS = Date.parse('2026-11-07T03:00:00Z'); // people who joined after this have nothing to catch up on
+const WHATS_NEW = '2026-11-17a', WN_TS = Date.parse('2026-11-07T03:00:00Z'); // people who joined after this have nothing to catch up on
 const BOOT_AT = Date.now();
 /* what each update brought, newest last; people see what came after the last one they saw (at most 6 lines) */
 const WN_ITEMS = [
@@ -8154,9 +8180,11 @@ const WN_ITEMS = [
   ['2026-10-29d', 'chat', 'wn_chat'], ['2026-10-29d', 'board', 'wn_bdmod'], ['2026-10-29d', 'user', 'wn_wd'],
   ['2026-11-06a', 'wave', 'wn_fs2'],
   ['2026-11-12a', 'live', 'wn_live'], ['2026-11-12a', 'sparkle', 'wn_look'],
-  ['2026-11-13a', 'user', 'wn_char'], ['2026-11-13a', 'coin', 'wn_mkt'], ['2026-11-13a', 'fish', 'wn_fish']
+  ['2026-11-13a', 'user', 'wn_char'], ['2026-11-13a', 'coin', 'wn_mkt'], ['2026-11-13a', 'fish', 'wn_fish'],
+  ['2026-11-17a', 'bell', 'wn_am']
 ];
-const WN_PART = {};
+// the new look already says the fish were redrawn
+const WN_PART = { wn_fish: 'wn_look' };
 function maybeWhatsNew(tries = 0) {
   if (window.APP_RT !== 'web' || lsGet('wn', '') === WHATS_NEW || tries > 6) return;
   if (!S.ready || $('.modal-wrap.in')) { setTimeout(() => maybeWhatsNew(tries + 1), 4000); return; }
@@ -11136,6 +11164,15 @@ function notiScan() {
   // 1:1 messages not read yet: one line per friend, for their latest message
   // (one line per friend until it is read: the line belongs to the read mark it started from)
   if (typeof DMS !== 'undefined' && DMS.loaded) { const rd = dmReads(); for (const th of dmThreads().values()) if (th.unread && th.last && th.last.sender !== me) add('dm:' + th.peer + ':' + (rd[th.peer] || 0), 'dm', Date.parse(th.last.created_at) || nowMs(), { who: th.peer, body: String(th.last.body || '').slice(0, 60) }); }
+  // 찌릿 라이브: this morning's news — what the morning phone note says, here for everyone
+  if (typeof LV !== 'undefined' && LV.st) {
+    const L2 = LV.st, day = lvDayKST(), mkt = L2.mkt || {};
+    const dear = (L2.net || []).filter(f => +mkt[f.sp] >= 1.2).sort((a, b) => b.p - a.p || a.id - b.id)[0];
+    if (dear) add('lvm:' + day, 'lvmkt', nowMs(), { sp: dear.sp, x: +mkt[dear.sp], p: dear.p });
+    if ((L2.dex || []).length && lvSpringToday()) add('lvt:' + day, 'lvtide', nowMs(), {});
+    const won = (L2.last || []).find(w => w.a === me);
+    if (won && L2.wk) add('lvp:' + L2.wk, 'lvprize', nowMs(), { r: won.r, p: [300, 200, 100][won.r - 1] || 0 });
+  }
   if (first) { lsSet('notiInit', 1); changed = true; }
   lsSet('notiState', st);
   if (changed) { list.sort((a, b) => a.t - b.t); lsSet('noti', list.slice(-NOTI_MAX)); }
@@ -11165,11 +11202,14 @@ function notiText(x) {
     case 'badge': return t('nt_badge', { name: t('bdg_' + x.badge) });
     case 'wk': return t('nt_wk', { rank: x.rank, fish });
     case 'paid': return t('nt_paid', { item: x.ref === 'donate' ? t('donate_btn') : esc(dict((SHOPI[x.ref] || {}).n) || x.ref) });
+    case 'lvmkt': return t('nt_lvmkt', { fish: esc(nameOf(x.sp)), x: x.x, p: fmtN(x.p) });
+    case 'lvtide': return t('nt_lvtide');
+    case 'lvprize': return t('nt_lvprize', { r: x.r, p: fmtN(x.p) });
     case 'dm': return t('nt_dm', { who }) + (x.body ? `<span class="nt-q">${esc(chatClean(x.body))}</span>` : '');
     default: return '';
   }
 }
-const NT_ICON = { dm: 'chat', cmt: 'chat', cmt2: 'chat', like: 'heart', freq: 'user-plus', facc: 'user-check', rok: 'check', rno: 'x', rlog: 'log', rhold: 'clock', tjoin: 'flag', notice: 'megaphone', paid: 'heart', badge: 'medal', wk: 'trophy' };
+const NT_ICON = { dm: 'chat', cmt: 'chat', cmt2: 'chat', like: 'heart', freq: 'user-plus', facc: 'user-check', rok: 'check', rno: 'x', rlog: 'log', rhold: 'clock', tjoin: 'flag', notice: 'megaphone', paid: 'heart', badge: 'medal', wk: 'trophy', lvmkt: 'coin', lvtide: 'live', lvprize: 'trophy' };
 function openNoti() {
   notiScan();
   const seen = lsGet('notiSeen', 0) || 0;
@@ -11194,6 +11234,8 @@ function openNoti() {
     else if (x.k === 'paid') location.hash = 'sea';
     else if (x.k === 'badge') { S.seaTab = 'badges'; S.viewUid = null; location.hash = 'sea'; }
     else if (x.k === 'wk') openWeekly();
+    else if (x.k === 'lvmkt') { location.hash = 'live'; setTimeout(() => { if (typeof LV !== 'undefined' && LV.st) lvBook('net'); }, 700); }
+    else if (x.k === 'lvtide' || x.k === 'lvprize') location.hash = 'live';
     else if (x.k === 'dm') dmOpen(x.who);
   });
 }
@@ -11695,7 +11737,24 @@ function pushRowHTML() {
   if (st === 'install') return `<div class="push-row note">${icon('phone')}<span>${t('push_need_install')}</span><button class="btn btn-line btn-sm" id="push-inst">${icon('download')}${t('inst_btn')}</button></div>`;
   if (st === 'unsupported') return `<p class="push-row muted small">${icon('phone')} ${t('push_unsupported')}</p>`;
   if (st === 'denied') return `<p class="push-row note warn">${icon('warn')} ${t('push_blocked')}</p>`;
-  return `<div class="push-row"><label class="switch"><input type="checkbox" id="push-sw" ${st === 'on' ? 'checked' : ''}><span class="sw"></span><span><b>${t('push_title')}</b><span class="muted small push-sub">${t('push_sub')}</span></span></label></div>`;
+  return `<div class="push-row"><label class="switch"><input type="checkbox" id="push-sw" ${st === 'on' ? 'checked' : ''}><span class="sw"></span><span><b>${t('push_title')}</b><span class="muted small push-sub">${t('push_sub')}</span></span></label>${st === 'on' && window.APP_AUTH.push.prefs ? pushKindsHTML() : ''}</div>`;
+}
+/* which morning notes this account wants (kept on the server, so every device of the account follows it) */
+const PUSH_KINDS = [['market', 'push_k_mkt', 'coin'], ['tide', 'push_k_tide', 'live'], ['rank', 'push_k_rank', 'trophy']];
+function pushKindsHTML() {
+  return `<fieldset class="push-kinds" id="push-kinds" disabled><legend>${icon('clock')}${t('push_am')}</legend>${PUSH_KINDS.map(([k, l, ic]) => `<label class="pk"><input type="checkbox" data-pk="${k}" checked><span>${icon(ic)}${t(l)}</span></label>`).join('')}</fieldset>`;
+}
+function pushKindsBind(root) {
+  const fs = $('#push-kinds', root); if (!fs) return;
+  window.APP_AUTH.push.prefs().then(p => { if (!fs.isConnected) return; $$('[data-pk]', fs).forEach(x => { x.checked = !p || p[x.dataset.pk] !== false; }); fs.disabled = false; })
+    .catch(() => { fs.hidden = true; }); // a server without the morning notice yet
+  fs.onchange = async () => {
+    const v = {}; $$('[data-pk]', fs).forEach(x => { v[x.dataset.pk] = x.checked; });
+    fs.disabled = true;
+    try { await window.APP_AUTH.push.prefsSet(v.market, v.tide, v.rank); toast(t('push_k_saved'), 'ok'); }
+    catch (e) { toast(t('push_fail'), 'warn'); window.APP_AUTH.push.prefs().then(p => $$('[data-pk]', fs).forEach(x => { x.checked = !p || p[x.dataset.pk] !== false; })).catch(() => { }); }
+    fs.disabled = false;
+  };
 }
 function pushBind(root) {
   const sw = $('#push-sw', root);
@@ -11707,6 +11766,7 @@ function pushBind(root) {
     const row = sw.closest('.push-row'); if (row && row.isConnected) { row.outerHTML = pushRowHTML(); pushBind(root); }
   };
   const ib = $('#push-inst', root); if (ib) ib.onclick = () => { const m = ib.closest('.modal-wrap'); if (m) closeModal(m); openInstall(); };
+  pushKindsBind(root);
 }
 
 /* ===== Live chat (채팅, website): the open chat for everyone online and 1:1 between friends.
@@ -12617,6 +12677,10 @@ const LVS = {
 };
 
 /* --- server state --- */
+// the Korean day, and the first day of the strong tides (사리): the server's own formula (private.live_tide) at Korean noon
+const lvDayKST = (ms = nowMs()) => new Date(ms + 9 * 3600e3).toISOString().slice(0, 10);
+function lvTideAt(ms) { const P = 29.530588861, age = (((ms / 864e5 + 2440587.5 - 2451550.09766) % P) + P) % P; return Math.max(0, Math.min(1, .55 + .45 * Math.cos(2 * ((age - 1.5) / 29.53) * 2 * Math.PI))); }
+function lvSpringToday(ms = nowMs()) { const noon = Date.parse(lvDayKST(ms) + 'T12:00:00+09:00'); return lvTideAt(noon) >= .85 && lvTideAt(noon - 864e5) < .85; }
 function lvLoad(force) {
   if (!lvOn()) return Promise.resolve(null);
   if (!force && LV.st && nowMs() - LV.stAt < 30e3) return Promise.resolve(LV.st);
@@ -12628,7 +12692,7 @@ function lvLoad(force) {
     return LV.st;
   })
     .catch(e => { LV.err = (e && e.code) || 'unavailable'; return LV.st; })
-    .finally(() => { LV.stP = null; lvHud(); });
+    .finally(() => { LV.stP = null; lvHud(); if (typeof notiScan === 'function') setTimeout(notiScan, 0); });
   return LV.stP;
 }
 

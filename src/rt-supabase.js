@@ -94,7 +94,9 @@
     async key() { const j = await fnPost('push', { op: 'key' }, false); if (!j.key) throw mkErr('unavailable', 'no key'); return j.key; },
     subscribe: (endpoint, p256dh, auth, lang) => rpcOrThrow('push_subscribe', { p_endpoint: endpoint, p_p256dh: p256dh, p_auth: auth, p_lang: lang }),
     unsubscribe: endpoint => rpcOrThrow('push_unsubscribe', { p_endpoint: endpoint }),
-    send: (kind, ref) => fnPost('push', { op: 'send', kind, ref }, true)
+    send: (kind, ref) => fnPost('push', { op: 'send', kind, ref }, true),
+    prefs: () => rpcOrThrow('push_prefs', {}),
+    prefsSet: (market, tide, rank) => rpcOrThrow('push_prefs_set', { p_market: !!market, p_tide: !!tide, p_rank: !!rank })
   };
   // the automatic reviewer runs on its own every few minutes; a fresh catch just nudges it (it ignores extra nudges)
   const review = { ping: () => callFn('review').catch(() => false) };

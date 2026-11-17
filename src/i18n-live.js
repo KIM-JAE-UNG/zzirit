@@ -125,6 +125,17 @@ Object.assign(T, {
   wn_mkt_p: ['낚은 고기는 살림망에 담기고, 팔면 포인트를 받아요. 값은 고기마다 날마다 달라서 비쌀 때 팔면 이득이에요.', 'Fish go into your keepnet and sell for points. Prices differ by fish and by day, so selling on a good day pays more.', '釣った魚はスカリに入り、売るとポイントになります。値段は魚ごと・日ごとに変わるので、高い日に売るとお得です。', '钓到的鱼放进鱼护，卖出得积分。价格因鱼因日而异，高价时卖更划算。'],
   wn_fish_h: ['물고기 그림을 실제처럼', 'Fish drawn true to life', '魚の絵をリアルに', '更写实的鱼图'],
   wn_fish_p: ['모든 물고기를 비늘·지느러미·빛까지 도감 그림처럼 다시 그렸어요.', 'Every fish is redrawn like a field-guide plate, with scales, fin rays and light.', 'すべての魚を、鱗・ヒレ・光まで図鑑の絵のように描き直しました。', '所有鱼都重新绘制，鳞片、鳍条和光泽如同图鉴。'],
+  /* the morning notice: on the phone (the server) and in the bell (this device) */
+  push_am: ['아침 알림 · 하루 한 번, 오전 7시 반~9시', 'Morning note · once a day, 7:30–9:00 (Korea)', '朝の通知 · 1日1回、午前7時半〜9時', '早间通知 · 每天一次，上午7:30–9:00'],
+  push_k_mkt: ['살림망 고기가 비싼 날', 'A keepnet fish sells dear', 'スカリの魚が高い日', '鱼护里的鱼卖价高'],
+  push_k_tide: ['사리 물때가 시작되는 날', 'Spring tides begin', '大潮が始まる日', '大潮开始'],
+  push_k_rank: ['주간 순위 상금을 받은 날', 'I won a weekly prize', '週間賞金をもらった日', '获得每周奖金'],
+  push_k_saved: ['알림 설정을 저장했어요', 'Notice settings saved', '通知設定を保存しました', '通知设置已保存'],
+  nt_lvmkt: ['살림망의 {fish} 시세가 오늘 <b>×{x}</b>예요. 지금 팔면 {p}P', 'The {fish} in your keepnet sells at <b>×{x}</b> today: {p}P now', 'スカリの{fish}、今日の相場は<b>×{x}</b>。今売れば{p}P', '鱼护里的{fish}今日行情<b>×{x}</b>，现在卖得{p}P'],
+  nt_lvtide: ['오늘부터 사리 물때예요. 물살이 세서 입질이 빨라요', 'Spring tides start today: strong currents, quicker bites', '今日から大潮。潮が速く、アタリが早くなります', '今天起进入大潮，水流强，咬钩更快'],
+  nt_lvprize: ['지난주 찌릿 라이브 <b>{r}등</b>! {p}P를 받았어요', '<b>#{r}</b> in last week\'s ZZIRIT Live: {p}P is yours!', '先週のZZIRITライブで<b>{r}位</b>!{p}Pを獲得', '上周ZZIRIT实况<b>第{r}名</b>！获得{p}P'],
+  wn_am_h: ['아침 낚시 알림', 'A morning fishing note', '朝の釣り通知', '早间钓鱼通知'],
+  wn_am_p: ['살림망 고기가 비싸게 팔리는 날, 사리가 시작되는 날, 주간 상금을 받은 날이면 아침에 한 번 알려 드려요. 폰 알림을 켜 두면 앱을 닫아도 오고, 알림 종에서도 볼 수 있어요.', 'On a day when a keepnet fish sells dear, spring tides begin, or you won a weekly prize, you get one note in the morning — on your phone if notices are on, and in the bell.', 'スカリの魚が高く売れる日、大潮が始まる日、週間賞金をもらった日は、朝に一度お知らせします。通知をオンにすればアプリを閉じていても届き、ベルでも見られます。', '鱼护里的鱼卖价高、大潮开始、获得每周奖金的日子，早上通知你一次。开启通知后即使关闭应用也会收到，铃铛里也能看到。'],
   ng_mine: ['내 기록·장비', 'My records & gear', '記録・タックル', '我的记录·装备'],
   credits_map: ['라이브 지도', 'Live map', 'ライブ地図', '实况地图'],
 });

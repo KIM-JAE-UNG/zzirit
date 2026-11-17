@@ -74,7 +74,7 @@ function lvEarn(acct, d, ref) {
   if (d <= 0) return; const w = ZPS.wal[acct] || (ZPS.wal[acct] = { bal: 0, earned: 0 }); w.bal += d; w.earned += d;
   const l = ZPS.led.find(x => x.acct === acct && x.r === 'join' && x.ref === ref); if (l) l.d += d; else ZPS.led.push({ id: ++ZPS.seq, acct, d, r: 'join', ref, n: 'live', at: new Date().toISOString() });
 }
-const PUSH = {}, PUSHLOG = []; // phone notices: subscriptions saved through the RPCs, and what the app asked the push function // admin_delete_user present on the "server" (the live one gets it with the SQL update)
+const PUSH = {}, PUSHLOG = [], PUSHPREFS = {}; // phone notices: subscriptions saved through the RPCs, and what the app asked the push function // admin_delete_user present on the "server" (the live one gets it with the SQL update)
 const isAdmin = uid => !!uid && (admins.has(uid) || admins.has(acct(uid)));
 const admins = new Set(); const links = {}; const codes = {};
 const acct = uid => links[uid] || uid;
@@ -430,6 +430,8 @@ http.createServer(async (req, res) => {
       PUSH[q.args.p_endpoint] = { acct: acct(uid), p256dh: q.args.p_p256dh, auth: q.args.p_auth, lang: q.args.p_lang, off: false }; return send({ data: true });
     }
     if (q.name === 'push_unsubscribe') { const x = PUSH[q.args.p_endpoint]; if (x && acct(x.acct) === acct(uid)) { x.off = true; return send({ data: true }); } return send({ data: false }); }
+    if (q.name === 'push_prefs') { if (!uid) return send({ error: { message: 'permission denied for function push_prefs' } }); const p = PUSHPREFS[acct(uid)] || {}; return send({ data: { market: p.market !== false, tide: p.tide !== false, rank: p.rank !== false } }); }
+    if (q.name === 'push_prefs_set') { if (!uid) return send({ error: { message: 'not_signed_in' } }); PUSHPREFS[acct(uid)] = { market: !!q.args.p_market, tide: !!q.args.p_tide, rank: !!q.args.p_rank }; return send({ data: PUSHPREFS[acct(uid)] }); }
     if (q.name === 'push_is_on') { const x = PUSH[q.args.p_endpoint]; return send({ data: !!(x && !x.off && acct(x.acct) === acct(uid)) }); }
     if (q.name === 'admin_logins') {
       if (!isAdmin(uid)) return send({ error: { message: 'not_admin' } });
@@ -470,7 +472,7 @@ http.createServer(async (req, res) => {
   if (u.pathname === '/__sb/live_seed') { const q = await body(req); const wk = zpAddDays(zpWeek(), q.weeksAgo ? -7 * q.weeksAgo : 0); for (const r of q.rows || []) LVS.catches.push({ id: ++LVS.seq, acct: r.acct, sp: r.sp || 'kurodai', cm: r.cm || 40, tier: 4, big: false, score: r.score, pts: 12, onsite: true, anon: false, gx: 1, gy: 1, wk, at: Date.now() - 864e5 * 8 }); return send({ ok: true, wk }); }
   if (u.pathname === '/__sb/live_cfg') { const q = await body(req); Object.assign(LVS.cfg, q.cfg || {}); if (q.weeksBack) for (const c of LVS.catches) c.wk = zpAddDays(c.wk, -7 * q.weeksBack); if (q.reset) { LVS.casts = {}; LVS.days = {}; LVS.catches = []; LVS.dex = {}; LVS.settled = {}; } return send({ cfg: LVS.cfg, n: LVS.catches.length }); }
   if (u.pathname === '/__sb/feature') { for (const [k, v] of u.searchParams) FEATURES[k] = v === '1'; return send(FEATURES); }
-  if (u.pathname === '/__sb/dump') return send({ T, admins: [...admins], links, STATS, PUSH, PUSHLOG, logins: Object.keys(logins), MUTES, RTSTATS, ZPS, RT: Object.fromEntries(Object.entries(RT).map(([k, m]) => [k, [...m.values()].map(x => x.key)])) });
+  if (u.pathname === '/__sb/dump') return send({ T, admins: [...admins], links, STATS, PUSH, PUSHLOG, PUSHPREFS, logins: Object.keys(logins), MUTES, RTSTATS, ZPS, RT: Object.fromEntries(Object.entries(RT).map(([k, m]) => [k, [...m.values()].map(x => x.key)])) });
   if (u.pathname === '/__sb/config') { const q = await body(req); const g = T.admin_docs.config || (T.admin_docs.config = { id: 'config', data: {} }); g.data = Object.assign({}, g.data, q); push('admin_docs', 'UPDATE', g, { id: 'config' }); return send({ ok: true }); }
   if (u.pathname === '/__sb/grant') { const q = await body(req); const g = T.admin_docs.grants || (T.admin_docs.grants = { id: 'grants', data: {} }); g.data[q.uid] = Object.assign({}, g.data[q.uid], { [q.oid]: q.v }); push('admin_docs', 'UPDATE', g, { id: 'grants' }); return send({ ok: true }); }
   const f = u.pathname === '/_leaflet_test.js' ? LEAFLET : path.join(ROOT, decodeURIComponent(u.pathname === '/' ? '/index.html' : u.pathname));

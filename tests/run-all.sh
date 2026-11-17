@@ -13,6 +13,7 @@ echo "== database rules"; node db/rules.test.mjs | tail -3; [ "${PIPESTATUS[0]}"
 echo "== live database before the reset"; node db/before-reset.test.mjs | tail -1; [ "${PIPESTATUS[0]}" = 0 ] || fail=1
 echo "== phone notices: database"; node db/push.test.mjs | tail -1; [ "${PIPESTATUS[0]}" = 0 ] || fail=1
 echo "== phone notices: encryption (RFC 8291)"; node push/webpush.test.mjs | tail -1; [ "${PIPESTATUS[0]}" = 0 ] || fail=1
+echo "== morning notice: database"; node db/morning.test.mjs | tail -1; [ "${PIPESTATUS[0]}" = 0 ] || fail=1
 echo "== live chat, 1:1, leaving: database"; node db/chat.test.mjs | tail -1; [ "${PIPESTATUS[0]}" = 0 ] || fail=1
 echo "== points, weekly board, lure shop: database"; node db/points.test.mjs | tail -1; [ "${PIPESTATUS[0]}" = 0 ] || fail=1
 echo "== 찌릿 라이브: database"; node db/live.test.mjs | tail -1; [ "${PIPESTATUS[0]}" = 0 ] || fail=1

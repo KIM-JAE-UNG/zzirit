@@ -587,7 +587,7 @@ Object.assign(T, {
   /* phone notifications */
   push_card: ['폰 알림', 'Phone notifications', 'スマホ通知', '手机通知'],
   push_title: ['폰으로 알림 받기', 'Get notifications on this device', 'この端末で通知を受け取る', '在此设备接收通知'],
-  push_sub: ['앱을 닫아 둬도 댓글·친구 요청·검토 결과·공지를 알려 드려요', 'Replies, friend requests, review results and notices, even with the app closed', 'アプリを閉じていてもコメント・友だち申請・審査結果・お知らせを通知します', '即使关闭应用，也会通知评论、好友请求、审核结果和公告'],
+  push_sub: ['앱을 닫아 둬도 댓글·친구 요청·검토 결과·공지, 그리고 아침 낚시 소식을 알려 드려요', 'Replies, friend requests, review results, notices and a morning fishing note, even with the app closed', 'アプリを閉じていてもコメント・友だち申請・審査結果・お知らせ、朝の釣り情報をお知らせします', '即使关闭应用，也会通知评论、好友请求、审核结果、公告和早间钓鱼消息'],
   push_hint: ['기기마다 따로 켜요. 로그아웃하면 그 기기의 알림은 꺼져요.', 'Switch it on per device. Logging out switches it off on that device.', '端末ごとにオンにします。ログアウトするとその端末の通知はオフになります。', '每台设备单独开启。退出登录后该设备的通知会关闭。'],
   push_need_install: ['아이폰·아이패드는 홈 화면에 추가한 앱에서만 알림을 받을 수 있어요.', 'On iPhone and iPad, notifications work only in the app added to the home screen.', 'iPhone・iPadでは、ホーム画面に追加したアプリでのみ通知を受け取れます。', '在iPhone和iPad上，只有添加到主屏幕的应用才能接收通知。'],
   push_unsupported: ['이 브라우저는 알림을 지원하지 않아요. Chrome·Edge·Safari(홈 화면 앱)에서 켤 수 있어요.', 'This browser does not support notifications. Use Chrome, Edge or Safari (home-screen app).', 'このブラウザは通知に対応していません。Chrome・Edge・Safari(ホーム画面アプリ)で使えます。', '此浏览器不支持通知，请使用Chrome、Edge或Safari（主屏幕应用）。'],

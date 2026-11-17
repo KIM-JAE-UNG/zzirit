@@ -54,7 +54,24 @@ function pushRowHTML() {
   if (st === 'install') return `<div class="push-row note">${icon('phone')}<span>${t('push_need_install')}</span><button class="btn btn-line btn-sm" id="push-inst">${icon('download')}${t('inst_btn')}</button></div>`;
   if (st === 'unsupported') return `<p class="push-row muted small">${icon('phone')} ${t('push_unsupported')}</p>`;
   if (st === 'denied') return `<p class="push-row note warn">${icon('warn')} ${t('push_blocked')}</p>`;
-  return `<div class="push-row"><label class="switch"><input type="checkbox" id="push-sw" ${st === 'on' ? 'checked' : ''}><span class="sw"></span><span><b>${t('push_title')}</b><span class="muted small push-sub">${t('push_sub')}</span></span></label></div>`;
+  return `<div class="push-row"><label class="switch"><input type="checkbox" id="push-sw" ${st === 'on' ? 'checked' : ''}><span class="sw"></span><span><b>${t('push_title')}</b><span class="muted small push-sub">${t('push_sub')}</span></span></label>${st === 'on' && window.APP_AUTH.push.prefs ? pushKindsHTML() : ''}</div>`;
+}
+/* which morning notes this account wants (kept on the server, so every device of the account follows it) */
+const PUSH_KINDS = [['market', 'push_k_mkt', 'coin'], ['tide', 'push_k_tide', 'live'], ['rank', 'push_k_rank', 'trophy']];
+function pushKindsHTML() {
+  return `<fieldset class="push-kinds" id="push-kinds" disabled><legend>${icon('clock')}${t('push_am')}</legend>${PUSH_KINDS.map(([k, l, ic]) => `<label class="pk"><input type="checkbox" data-pk="${k}" checked><span>${icon(ic)}${t(l)}</span></label>`).join('')}</fieldset>`;
+}
+function pushKindsBind(root) {
+  const fs = $('#push-kinds', root); if (!fs) return;
+  window.APP_AUTH.push.prefs().then(p => { if (!fs.isConnected) return; $$('[data-pk]', fs).forEach(x => { x.checked = !p || p[x.dataset.pk] !== false; }); fs.disabled = false; })
+    .catch(() => { fs.hidden = true; }); // a server without the morning notice yet
+  fs.onchange = async () => {
+    const v = {}; $$('[data-pk]', fs).forEach(x => { v[x.dataset.pk] = x.checked; });
+    fs.disabled = true;
+    try { await window.APP_AUTH.push.prefsSet(v.market, v.tide, v.rank); toast(t('push_k_saved'), 'ok'); }
+    catch (e) { toast(t('push_fail'), 'warn'); window.APP_AUTH.push.prefs().then(p => $$('[data-pk]', fs).forEach(x => { x.checked = !p || p[x.dataset.pk] !== false; })).catch(() => { }); }
+    fs.disabled = false;
+  };
 }
 function pushBind(root) {
   const sw = $('#push-sw', root);
@@ -66,4 +83,5 @@ function pushBind(root) {
     const row = sw.closest('.push-row'); if (row && row.isConnected) { row.outerHTML = pushRowHTML(); pushBind(root); }
   };
   const ib = $('#push-inst', root); if (ib) ib.onclick = () => { const m = ib.closest('.modal-wrap'); if (m) closeModal(m); openInstall(); };
+  pushKindsBind(root);
 }

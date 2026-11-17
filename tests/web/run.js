@@ -10,6 +10,7 @@ const PHOTOS = ['IMG_20261020_063000.jpg', 'IMG_20261027_071500.jpg', 'IMG_20261
 let photoN = 0;
 const logs = []; const fails = [];
 const ok = (c, m) => { logs.push((c ? '✓ ' : '✗ ') + m); if (!c) fails.push(m); };
+const until = async (fn, ms = 5000, step = 100) => { const t0 = Date.now(); while (Date.now() - t0 < ms) { const v = await fn(); if (v) return v; await new Promise(r => setTimeout(r, step)); } return null; };
 let AIMODE = 'fish';
 const AI_FISH = { fish_visible: true, candidates: [{ id: 'kurodai', p: .81 }, { id: 'mejina', p: .1 }], other_en: '', other_sci: '', length_cm: 41, screening: { real_photo: .94, screenshot: 0, ai_generated: .02, stock_or_web: .03, market_or_aquarium: .03, edited: .04 }, verdict: 'pass', reasons: ['실제 촬영 사진'], features: '검은 배지느러미' };
 // Open-Meteo: calm weather near Busan (times in the area's local time, like the real service)
@@ -410,7 +411,7 @@ const AI_NOFISH = { fish_visible: false, candidates: [], other_en: '', other_sci
   await W.waitForTimeout(600); await W.reload(); await W.waitForTimeout(5500);
   ok(!!(await W.$('.wn')), 'an earlier member sees what changed');
   ok(!!(await W.$('#wn-id')), 'update notes offer to create a login ID');
-  ok(await W.$eval('.wn', n => /찌릿 라이브/.test(n.textContent) && /새 디자인/.test(n.textContent) && /걷는 내 캐릭터/.test(n.textContent) && /팔 수 있어요/.test(n.textContent) && /실제처럼/.test(n.textContent) && !/미니게임:|갯바위 공원 개장/.test(n.textContent) && n.querySelectorAll('.wn-list li').length <= 6), 'update notes list the newest features (at most 6 lines)');
+  ok(await W.$eval('.wn', n => /찌릿 라이브/.test(n.textContent) && /새 디자인/.test(n.textContent) && /걷는 내 캐릭터/.test(n.textContent) && /팔 수 있어요/.test(n.textContent) && /아침 낚시 알림/.test(n.textContent) && !/실제처럼/.test(n.textContent) && !/미니게임:|갯바위 공원 개장/.test(n.textContent) && n.querySelectorAll('.wn-list li').length <= 6), 'update notes list the newest features (at most 6 lines)');
   ok(await W.$eval('.wn', n => !/초기화/.test(n.textContent)), 'update notes do not claim a reset that the server has not done');
   await shot(W, 'q04_whatsnew');
   await W.click('#wn-ok'); await W.waitForTimeout(400); await W.reload(); await W.waitForTimeout(5000);
@@ -420,7 +421,10 @@ const AI_NOFISH = { fish_visible: false, candidates: [], other_en: '', other_sci
   ok(await W.$eval('.wn', n => n.querySelectorAll('.wn-list li').length === 5 && /찌릿 라이브/.test(n.textContent) && /새 디자인/.test(n.textContent) && /캐릭터/.test(n.textContent)).catch(() => false), 'someone who last saw the tackle shop gets the live sea, the new look and the three newest notes');
   await W.click('#wn-ok').catch(() => null); await W.waitForTimeout(300);
   await W.evaluate(() => openWhatsNew('someid', '2026-11-12a')); await W.waitForTimeout(500);
-  ok(await W.$eval('.wn', n => n.querySelectorAll('.wn-list li').length === 3 && /캐릭터/.test(n.textContent) && /팔 수 있어요/.test(n.textContent) && /실제처럼/.test(n.textContent) && !/새 디자인/.test(n.textContent)).catch(() => false), 'after the last update, the notes show only the character, the fish market and the new fish pictures');
+  ok(await W.$eval('.wn', n => n.querySelectorAll('.wn-list li').length === 4 && /아침 낚시 알림/.test(n.textContent) && /캐릭터/.test(n.textContent) && /팔 수 있어요/.test(n.textContent) && /실제처럼/.test(n.textContent) && !/새 디자인/.test(n.textContent)).catch(() => false), 'after 11-12, the notes show the morning note, the character, the fish market and the new fish pictures');
+  await W.click('#wn-ok').catch(() => null); await W.waitForTimeout(300);
+  await W.evaluate(() => openWhatsNew('someid', '2026-11-13a')); await W.waitForTimeout(500);
+  ok(await W.$eval('.wn', n => n.querySelectorAll('.wn-list li').length === 1 && /아침 낚시 알림/.test(n.textContent)).catch(() => false), 'after the last update, only the morning note');
   await W.click('#wn-ok'); await W.waitForTimeout(400);
   // photo cache: a second visit doesn't download the same photos again
   const P = await mk('P');
@@ -651,6 +655,13 @@ const AI_NOFISH = { fish_visible: false, candidates: [], other_en: '', other_sci
   ok(nSub && nSub.acct === nId && !nSub.off && nSub.lang === 'ko', 'switching on saves this device for the account: ' + JSON.stringify(nSub));
   ok(await N.evaluate(() => window.__subOpts && window.__subOpts.uv === true && window.__subOpts.keyLen === 65), 'subscribed with the server\'s public key (visible notices only)');
   ok(await N.$eval('#push-sw', n => n.checked), 'the switch stays on');
+  // the morning note: three kinds, all on at first, kept on the server for the whole account
+  ok(!!(await until(() => N.$eval('#push-kinds', n => !n.disabled && n.querySelectorAll('[data-pk]:checked').length === 3).catch(() => false), 4000)), 'morning note: three kinds, all on');
+  await N.click('#push-kinds label.pk:has([data-pk="tide"])'); await N.waitForTimeout(900);
+  d = await dump(); ok(d.PUSHPREFS[nId] && d.PUSHPREFS[nId].tide === false && d.PUSHPREFS[nId].market === true && d.PUSHPREFS[nId].rank === true, 'switching the tide note off is saved for the account: ' + JSON.stringify(d.PUSHPREFS[nId]));
+  await go(N, 'home', 500); await go(N, 'prefs', 1200);
+  ok(!!(await until(() => N.$eval('#push-kinds', n => !n.disabled && !n.querySelector('[data-pk="tide"]').checked && n.querySelector('[data-pk="market"]').checked).catch(() => false), 4000)), 'and stays off when the page is opened again');
+  await N.click('#push-kinds label.pk:has([data-pk="tide"])'); await N.waitForTimeout(700);
   await shot(N, 'w03_push_on');
   const postKey = await N.evaluate(() => [...boardIndex().posts.keys()].find(k => !k.startsWith(myId() + '|')));
   await N.evaluate(k => openPost(k), postKey); await N.waitForTimeout(800);
