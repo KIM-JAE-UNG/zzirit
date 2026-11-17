@@ -103,7 +103,7 @@ check((await round(plain + ' 06:50')).length === 0 && (await round(plain + ' 09:
   check(pf.rank === false && pf.market === true && pf.tide === true, 'B switches prize notices off: ' + J(pf));
   { const c = await rpc(C, `select public.push_prefs() p`).then(r => r.p); check(c.market === true && c.tide === true && c.rank === true, 'everything is on until changed: ' + J(c)); }
   await q(`insert into public.zp_ledger (acct, delta, reason, ref, note, created_at) values ($1, 300, 'prize', 'live:2026-11-16', '1', ($2::timestamp at time zone 'Asia/Seoul') - interval '7 hours')`, [B, nextDay(nextDay(d2)) + ' 07:40']);
-  check(!(await round(nextDay(nextDay(d2)) + ' 07:40')).find(r => r.acct === B), 'switched off: no prize notice');
+  { const rr = await round(nextDay(nextDay(d2)) + ' 07:40'); check(!rr.find(r => r.acct === B && r.items.some(i => i.k === 'rank')), 'switched off: no prize notice (the day\'s prices are random, so only the prize line counts): ' + J(rr)); }
   await rpc(B, `select public.push_prefs_set(true, true, true) p`);
   // a prize from long ago is old news
   await q(`insert into public.zp_ledger (acct, delta, reason, ref, note, created_at) values ($1, 100, 'prize', 'live:2026-10-05', '3', now() - interval '40 days')`, [C]);

@@ -46,6 +46,7 @@ const LVS = {
     else if (k === 'snap') { this.noise(.2, .16, 3200); this.tone(300, 80, .25, .1, 'sawtooth'); }
     else if (k === 'miss') this.tone(260, 150, .3, .08);
     else if (k === 'land') [523, 659, 784, 1047].forEach((f, i) => this.tone(f, f, .22, .13, 'triangle', i * .09));
+    else if (k === 'clap') { for (let i = 0; i < 5; i++) this.noise(.05, .09, 2400 + i * 180, i * .07 + Math.random() * .02); }
     else if (k === 'coin') { this.tone(1568, 1568, .09, .1, 'triangle'); this.tone(2093, 2093, .22, .11, 'triangle', .07); }
     else if (k === 'rare') [523, 659, 784, 1047, 1319, 1568].forEach((f, i) => this.tone(f, f, .3, .13, 'triangle', i * .08));
   },
@@ -112,6 +113,7 @@ function lvBuild(el) {
       <button class="lv-sbtn" id="lv-loc" aria-label="${esc(t('lv_locate'))}">${icon('locate')}</button>
       <button class="lv-sbtn" id="lv-net" aria-label="${esc(t('lv_net'))}">${icon('fish')}<b class="lv-nb num" id="lv-nb" hidden></b></button>
       <button class="lv-sbtn" id="lv-book" aria-label="${esc(t('lv_book'))}">${icon('book')}</button>
+      <button class="lv-sbtn" id="lv-inv" aria-label="${esc(t('lv_inv'))}">${icon('user-plus')}</button>
       <a class="lv-sbtn" href="#lures" aria-label="${esc(t('nav_lures'))}">${icon('lure')}</a>
       <button class="lv-sbtn" id="lv-snd" aria-label="${esc(t('lv_sound'))}" aria-pressed="${LVS.on}">${icon('megaphone')}</button>
     </div>
@@ -138,6 +140,8 @@ function lvBuild(el) {
   main.addEventListener('contextmenu', e => e.preventDefault());
   $('#lv-loc', el).addEventListener('click', () => lvLocate(true));
   $('#lv-book', el).addEventListener('click', () => lvBook());
+  $('#lv-inv', el).addEventListener('click', () => lvInvite());
+  $('#lv-ticker', el).addEventListener('click', e => { const b = e.target.closest('[data-clap]'); if (b) lvClap(b); });
   $('#lv-net', el).addEventListener('click', () => lvBook('net'));
   $('#lv-snd', el).addEventListener('click', e => { LVS.on = !LVS.on; lsSet('liveSnd', LVS.on); e.currentTarget.setAttribute('aria-pressed', LVS.on); if (LVS.on) LVS.play('nib'); });
   $('#lv-sub', el).addEventListener('click', e => { const b = e.target.closest('[data-lv]'); if (b) lvSub(b.dataset.lv); });
@@ -171,11 +175,11 @@ function lvStart() {
   if (!lsGet('liveOk', false)) return lvCover('intro');
   lvCover('');
   if (lsGet('liveGeo', true)) lvGeo();
-  lvHud(); lvRoom();
+  lvInvGo(); lvHud(); lvRoom();
 }
 function lvResume() {
   if (LV.map) setTimeout(() => { try { LV.map.resize(); } catch (e) { } lvSize(); }, 60);
-  if (LV.ready && $('#lv-cover') && !$('#lv-cover').dataset.k) { if (lsGet('liveGeo', true) && lsGet('liveOk', false)) lvGeo(); lvRoom(); }
+  if (LV.ready && $('#lv-cover') && !$('#lv-cover').dataset.k) { if (lsGet('liveGeo', true) && lsGet('liveOk', false)) lvGeo(); lvInvGo(); lvRoom(); }
   else if (LV.ready) lvStart();
   lvLoad(); lvHud();
   cancelAnimationFrame(LV.raf); LV.lastT = 0; LV.raf = requestAnimationFrame(lvFrame);
@@ -220,7 +224,7 @@ function lvGeo() {
   LV.watch = navigator.geolocation.watchPosition(p => {
     const first = !LV.pos;
     LV.pos = { lng: p.coords.longitude, lat: p.coords.latitude, acc: p.coords.accuracy || 30, t: nowMs() }; LV.geo = 'on';
-    if (first) lvLocate(false); else { lvSite(); if (LV.mode === 'site' && LV.phase === 'idle') { LV.stand = { lng: LV.pos.lng, lat: LV.pos.lat }; lvMe(); } }
+    if (first && !LV.inv) lvLocate(false); else { lvSite(); if (LV.mode === 'site' && LV.phase === 'idle') { LV.stand = { lng: LV.pos.lng, lat: LV.pos.lat }; lvMe(); } }
     lvHud();
   }, e => { LV.geo = e && e.code === 1 ? 'denied' : (LV.pos ? 'on' : 'none'); if (LV.geo !== 'on') { try { navigator.geolocation.clearWatch(LV.watch); } catch (x) { } LV.watch = null; } lvHud(); },
   { enableHighAccuracy: true, maximumAge: 4000, timeout: 20000 });
@@ -229,6 +233,7 @@ function lvGeo() {
 function lvLocate(byHand) {
   if (!LV.pos) { if (byHand) { if (LV.geo === 'denied') toast(t('lv_geo_denied'), 'warn', 5000); else { lsSet('liveGeo', true); lvGeo(); toast(t('lv_geo_wait'), 'info'); } } return; }
   if (LV.phase !== 'idle') return;
+  if (byHand) LV.inv = null;
   LV.mode = 'look'; LV.stand = null; LV.target = null; LV.wantSite = true;
   LV.map.easeTo({ center: [LV.pos.lng, LV.pos.lat], zoom: 16.6, duration: byHand ? 900 : 0 });
   lvMe(); lvHud();
@@ -374,7 +379,7 @@ function lvPress() {
 function lvSub(k) {
   if (k === 'reload') { location.reload(); return; }
   if (k === 'retry') { lvCover('load'); lvLoad(true).then(() => lvStart()); return; }
-  if (k === 'go-geo' || k === 'go-look') { lsSet('liveOk', true); lsSet('liveGeo', k === 'go-geo'); lvCover(''); if (k === 'go-geo') lvGeo(); lvHud(); lvRoom(); if (k === 'go-look') lvSub('remote'); return; }
+  if (k === 'go-geo' || k === 'go-look') { lsSet('liveOk', true); lsSet('liveGeo', k === 'go-geo'); lvCover(''); if (k === 'go-geo') lvGeo(); if (lvInvGo()) return; lvHud(); lvRoom(); if (k === 'go-look') lvSub('remote'); return; }
   if (k === 'again') { $('#lv-res').hidden = true; LV.phase = 'idle'; lvHud(); return; }
   if (k === 'book') { $('#lv-res').hidden = true; LV.phase = 'idle'; lvHud(); lvBook(); return; }
   if (k === 'sellnow') { const r = LV.res; if (!r || LV.selling) return; lvSell([r.id]).then(x => { if (!x) return; $('#lv-res').hidden = true; LV.phase = 'idle'; lvHud(); }); return; }
@@ -540,17 +545,18 @@ function lvFishAt() {
 /* --- together: everyone's floats and bites, as they happen --- */
 function lvRoom() {
   if (!lvOn() || !APP_AUTH.rt || !LV.ready || !lsGet('liveOk', false)) return;
-  const at = LV.stand || LV.pos || (LV.map && { lng: LV.map.getCenter().lng, lat: LV.map.getCenter().lat }); if (!at) return;
+  const at = LV.stand || (LV.mode !== 'remote' && LV.pos) || (LV.map && { lng: LV.map.getCenter().lng, lat: LV.map.getCenter().lat }); if (!at) return;
   const key = 'live:' + Math.floor(at.lng / .2) + ':' + Math.floor(at.lat / .2);
   if (key === LV.roomKey && LV.room) return;
   lvLeaveRoom(); LV.roomKey = key;
   LV.room = APP_AUTH.rt.room(key, myId(), {
-    events: ['bite', 'catch'],
+    events: ['bite', 'catch', 'clap'],
     sync: st => { const m = new Map(); for (const [id, arr] of Object.entries(st || {})) { const p = arr && arr[arr.length - 1]; if (p && id !== myId() && p.f) m.set(id, p); } LV.others = m; lvHud(); },
     msg: (ev, p) => {
+      if (ev === 'clap') return lvClapGot(p);
       if (!p || typeof p.x !== 'number') return;
       if (ev === 'bite') { lvFx('bolt', { lng: p.x, lat: p.y }, .8); }
-      else if (ev === 'catch' && SPI[p.sp]) { lvFx('splash', { lng: p.x, lat: p.y }, 1); lvTick({ n: String(p.n || '').slice(0, 12), sp: p.sp, cm: +p.cm || 0, tier: p.tier | 0, on: !!p.on }); }
+      else if (ev === 'catch' && SPI[p.sp]) { lvFx('splash', { lng: p.x, lat: p.y }, 1); lvTick({ u: typeof p.u === 'string' ? p.u : '', n: String(p.n || '').slice(0, 12), sp: p.sp, cm: +p.cm || 0, tier: p.tier | 0, on: !!p.on }); }
     },
     status: s => { if (s === 'SUBSCRIBED') lvTrack(); }
   });
@@ -561,12 +567,59 @@ function lvTrack() {
   const k = LV.k, out = k && k.token && !LV.anon && ['wait', 'bite', 'hook', 'fight'].includes(LV.phase);
   LV.room.track({ n: (S.me && S.me.nick) || '', f: out ? lvFloat() : '', x: out ? +k.to.lng.toFixed(5) : 0, y: out ? +k.to.lat.toFixed(5) : 0, ph: out ? LV.phase : '', on: k && k.site ? 1 : 0, t: nowMs() });
 }
+/* --- with friends: invite to this water, see whose float is a friend's, clap for a catch --- */
+const lvIsFr = uid => { try { return typeof relation === 'function' && relation(uid) === 'friend'; } catch (e) { return false; } };
+function lvInvite() {
+  if (!LV.map || !LV.ready) return;
+  const at = LV.stand || LV.target || (LV.map.getZoom() >= 13 ? LV.map.getCenter() : null);
+  if (!at) { lvSay(t('lv_inv_far'), 3600); return; }
+  const nick = (S.me && S.me.nick) || '';
+  const url = (SITE_URL || (location.origin + location.pathname)) + '#live=' + (+at.lng).toFixed(3) + ',' + (+at.lat).toFixed(3) + (nick ? ',' + encodeURIComponent(nick) : '');
+  const msg = t('lv_inv_msg', { n: nick || t('lv_someone') });
+  const w = openModal(`<div class="lv-inv">
+    <h2>${icon('user-plus')} ${t('lv_inv_h')}</h2>
+    <p class="lede">${t('lv_inv_p')}</p>
+    <div class="field lv-invlink"><input class="mono" id="lv-invurl" readonly value="${esc(url)}" aria-label="${esc(t('lv_inv_copy'))}"></div>
+    <p class="lv-priv">${icon('lock')}<span>${t('lv_inv_priv')}</span></p>
+    <div class="actions">${navigator.share ? `<button class="btn btn-primary" id="lv-invsend">${icon('share')}${t('lv_inv_share')}</button>` : ''}<button class="btn ${navigator.share ? 'btn-line' : 'btn-primary'}" data-copy="${esc(url)}">${icon('copy')}${t('lv_inv_copy')}</button></div>
+  </div>`, { label: t('lv_inv_h') });
+  const s = $('#lv-invsend', w); if (s) s.onclick = () => navigator.share({ title: t('lv_title'), text: msg, url }).catch(() => null);
+  const i = $('#lv-invurl', w); if (i) i.onclick = () => i.select();
+}
+// opened from a friend's link: go to that water and stand on its shore (a far-away cast, unless I am really there)
+function lvInvGo() {
+  const v = S.lvInv; if (!v || !LV.ready || !LV.map || LV.phase !== 'idle' || ($('#lv-cover') && $('#lv-cover').dataset.k)) return false;
+  S.lvInv = null; LV.inv = v;
+  LV.mode = 'remote'; LV.stand = null; LV.target = null; LV.wantSite = false; LV.remoteSeek = true;
+  LV.map.jumpTo({ center: [v.lng, v.lat], zoom: 16.4 });
+  lvMe(); lvHud();
+  setTimeout(() => { lvSay(v.n ? t('lv_inv_here', { n: v.n }) : t('lv_inv_here0'), 6500); lvRoom(); }, 400);
+  return true;
+}
+function lvClap(b) {
+  const to = b.dataset.clap; if (!to || b.disabled || !LV.room) return;
+  b.disabled = true; b.classList.add('done'); b.querySelector('span').textContent = t('lv_clapped');
+  LV.room.send('clap', { to, from: myId(), n: (S.me && S.me.nick) || '', sp: b.dataset.sp || '' });
+  LVS.play('clap');
+}
+// someone clapped for my catch: a cheer on the screen (at most one per person every few seconds)
+LV.claps = new Map();
+function lvClapGot(p) {
+  if (!p || p.to !== myId() || typeof p.from !== 'string' || p.from === myId()) return;
+  const last = LV.claps.get(p.from) || 0; if (nowMs() - last < 4000) return; LV.claps.set(p.from, nowMs());
+  const n = String(p.n || '').replace(/[<>&"']/g, '').slice(0, 16) || t('lv_someone');
+  lvSay(t('lv_clap_got', { n }), 4200); LVS.play('clap'); LVS.buzz([20, 60, 20]);
+  const at = LV.ang.at || LV.stand; if (at) { lvFx('ring', at, 1); lvFx('ring', at, .6); }
+  const el = $('#lv-ticker'); if (el) { const d = document.createElement('p'); d.className = 'lv-tick clapgot'; d.innerHTML = `${icon('clap')}<span>${esc(t('lv_clap_got', { n }))}</span>`; el.prepend(d); while (el.children.length > 3) el.lastChild.remove(); setTimeout(() => { d.classList.add('out'); setTimeout(() => d.remove(), 500); }, 5000); }
+}
 function lvTick(o) {
   const el = $('#lv-ticker'); if (!el || !SPI[o.sp]) return;
-  const d = document.createElement('p'); d.className = 'lv-tick t' + (o.tier || 1);
-  d.innerHTML = `${o.on ? `<i class="lv-tsite">${t('lv_site')}</i>` : ''}<b>${esc(o.n || t('lv_someone'))}</b> ${esc(spName(SPI[o.sp]))} <span class="num">${fmtN(o.cm, 1)}cm</span>${o.ago ? `<small>${esc(o.ago)}</small>` : ''}`;
+  // a catch happening now (not from the feed) can be clapped for, once
+  const clap = !o.ago && o.u && o.u !== myId() && !!LV.room, fr = o.u && lvIsFr(o.u);
+  const d = document.createElement('p'); d.className = 'lv-tick t' + (o.tier || 1) + (fr ? ' fr' : '');
+  d.innerHTML = `${o.on ? `<i class="lv-tsite">${t('lv_site')}</i>` : ''}<b>${esc(o.n || t('lv_someone'))}</b> ${esc(spName(SPI[o.sp]))} <span class="num">${fmtN(o.cm, 1)}cm</span>${o.ago ? `<small>${esc(o.ago)}</small>` : ''}${clap ? `<button class="lv-clap" data-clap="${esc(o.u)}" data-sp="${esc(o.sp)}">${icon('clap')}<span>${t('lv_clap')}</span></button>` : ''}`;
   el.prepend(d); while (el.children.length > 3) el.lastChild.remove();
-  setTimeout(() => { d.classList.add('out'); setTimeout(() => d.remove(), 500); }, o.ago ? 9000 : 6500);
+  setTimeout(() => { d.classList.add('out'); setTimeout(() => d.remove(), 500); }, o.ago ? 9000 : clap ? 11000 : 6500);
 }
 
 /* --- what the page says around the map --- */
@@ -580,6 +633,7 @@ function lvHud() {
   if (LV.mode === 'site') chips.push(`<span class="lv-chip site">${icon('pin')}${t('lv_site')}</span>`);
   else if (st) chips.push(`<span class="lv-chip">${icon('globe')}${t('lv_remote_n', { n: lvLeft(), m: st.day.remoteMax })}</span>`);
   if (LV.others.size) chips.push(`<span class="lv-chip">${icon('users')}${t('lv_floats', { n: LV.others.size })}</span>`);
+  { const nf = [...LV.others.keys()].filter(lvIsFr).length; if (nf) chips.push(`<span class="lv-chip fr">${icon('user-check')}${t('lv_fr_n', { n: nf })}</span>`); }
   const ch = $('#lv-chips'), html = chips.join(''); if (ch.dataset.h !== html) { ch.dataset.h = html; ch.innerHTML = html; }
   const w = $('#lv-wallet'), wh = st ? `${icon('coin')}<b class="num">${fmtN(st.bal)}</b><small>${t('lv_today', { n: st.day.pts, m: st.day.cap })}</small>` : ''; if (w.dataset.h !== wh) { w.dataset.h = wh; w.innerHTML = wh; }
   const nb = $('#lv-nb'), nn = lvNet().length; if (nb) { nb.hidden = !nn; nb.textContent = nn || ''; nb.classList.toggle('full', !!st && nn >= (st.netMax || 30)); }
@@ -626,14 +680,15 @@ function lvG(p) {
 }
 function lvRingPath(c, g, r) { const d = LV.dpr; c.setTransform(d * g.ex, d * g.ey, d * g.nx, d * g.ny, d * g.x, d * g.y); c.beginPath(); c.arc(0, 0, r, 0, 6.2832); c.setTransform(d, 0, 0, d, 0, 0); }
 function lvFx(kind, at, power = 1) { if (at) LV.fx.push({ kind, at: { lng: at.lng, lat: at.lat }, t: 0, p: power, seed: Math.random() * 1000 }); if (LV.fx.length > 40) LV.fx.shift(); }
-function lvFloatDraw(c, g, id, dip, t, alpha = 1, name = '') {
+function lvFloatDraw(c, g, id, dip, t, alpha = 1, name = '', fr = false) {
   const im = ZL.img(id, 'game'), k = clamp(g.s * 22, .26, .5), bob = Math.sin(t * 2.2 + g.x * .05) * 1.5;
   c.save(); c.globalAlpha = alpha;
   // the ring the float sits in
   lvRingPath(c, g, 1.6 + (Math.sin(t * 2.2) + 1) * .5); c.strokeStyle = 'rgba(227,243,255,.55)'; c.lineWidth = 1; c.stroke();
+  if (fr) { lvRingPath(c, g, 3.4 + (Math.sin(t * 2.2 + 1.2) + 1) * .6); c.strokeStyle = 'rgba(124,196,255,.85)'; c.lineWidth = 2; c.stroke(); }
   if (im && im.complete && im.naturalWidth) { c.beginPath(); c.rect(g.x - 40, g.y - 120, 80, 120); c.clip(); c.drawImage(im, g.x - 120 * k, g.y - 80 * k + bob + dip, 240 * k, 120 * k); }
   c.restore();
-  if (name) { c.save(); c.globalAlpha = alpha * .95; c.font = '600 11px "IBM Plex Sans KR", sans-serif'; c.textAlign = 'center'; const w = c.measureText(name).width + 12; c.fillStyle = 'rgba(5,10,19,.72)'; c.beginPath(); if (c.roundRect) c.roundRect(g.x - w / 2, g.y + 8, w, 18, 9); else c.rect(g.x - w / 2, g.y + 8, w, 18); c.fill(); c.fillStyle = '#E3F3FF'; c.fillText(name, g.x, g.y + 21); c.restore(); }
+  if (name) { c.save(); c.globalAlpha = alpha * .95; c.font = '600 11px "IBM Plex Sans KR", sans-serif'; c.textAlign = 'center'; const w = c.measureText(name).width + 12; c.fillStyle = fr ? '#7CC4FF' : 'rgba(5,10,19,.72)'; c.beginPath(); if (c.roundRect) c.roundRect(g.x - w / 2, g.y + 8, w, 18, 9); else c.rect(g.x - w / 2, g.y + 8, w, 18); c.fill(); c.fillStyle = fr ? '#06142B' : '#E3F3FF'; c.fillText(name, g.x, g.y + 21); c.restore(); }
 }
 function lvBolt(c, x, y, h, seed, a) {
   c.save(); c.globalAlpha = a; c.lineJoin = 'miter';
@@ -686,7 +741,7 @@ function lvFrame(now) {
   // everyone else's floats
   for (const [id, o] of LV.others) {
     if (!o.f || !ZL.BY[o.f]) continue; const g = lvG({ lng: o.x, lat: o.y }); if (g.x < -60 || g.x > LV.w + 60 || g.y < -60 || g.y > LV.h + 60) continue;
-    lvFloatDraw(c, g, o.f, o.ph === 'bite' || o.ph === 'fight' ? 8 : 0, T + (o.t % 7), .92, String(o.n || '').slice(0, 10));
+    lvFloatDraw(c, g, o.f, o.ph === 'bite' || o.ph === 'fight' ? 8 : 0, T + (o.t % 7), .92, String(o.n || '').slice(0, 10), lvIsFr(id));
   }
   // my angler, then the line from the rod's tip to the float
   let tip = null;

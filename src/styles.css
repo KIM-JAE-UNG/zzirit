@@ -1827,3 +1827,19 @@ body[data-route="live"] #main { padding-left: 0; padding-right: 0; }
 .lt .btn { margin-top: 6px; }
 @media (max-width: 640px) { .lt { min-height: 0; border-radius: 22px; } .lt-body { padding: 150px 20px 22px; } .lt-art { inset: 0 0 auto 0; height: 190px; } .lt-art::after { background: linear-gradient(180deg, rgba(5,10,19,0) 40%, var(--night) 96%); } }
 @media (prefers-reduced-motion: reduce) { .lv-main.bite, .lv-cload { animation: none; } }
+
+/* 찌릿 라이브 with friends: invite, friends' tag, claps */
+.lv-chip.fr { color: var(--night); background: var(--spark); border-color: transparent; } .lv-chip.fr .ic { color: var(--night); }
+.lv-tick.fr { border-left-color: var(--spark); }
+.lv-clap { pointer-events: auto; display: inline-flex; align-items: center; gap: 4px; margin-left: 8px; padding: 4px 9px 4px 7px; border: 0; border-radius: 999px; font: 700 12px/1 var(--f-body, inherit); color: var(--night); background: var(--spark); cursor: pointer; vertical-align: middle; min-height: 26px; }
+.lv-clap .ic { width: 15px; height: 15px; }
+.lv-clap:hover { background: var(--spark-2); }
+.lv-clap.done { color: #E3F3FF; background: rgba(124,196,255,.22); cursor: default; }
+.lv-tick.clapgot { display: flex; align-items: center; gap: 7px; font-weight: 700; color: var(--night); background: var(--spark); border-left-color: #fff; }
+.lv-tick.clapgot .ic { width: 18px; height: 18px; }
+.lv-inv { word-break: keep-all; overflow-wrap: anywhere; }
+.lv-inv h2 { display: flex; align-items: center; gap: 8px; }
+.lv-inv input { word-break: normal; }
+.lv-inv .lv-priv { background: var(--surface-2); color: var(--ink-3); }
+.lv-invlink { margin: 12px 0 10px; } .lv-invlink input { width: 100%; font-size: 13px; }
+.lv-inv .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }

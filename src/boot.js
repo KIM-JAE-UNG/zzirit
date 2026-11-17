@@ -98,6 +98,11 @@ function onHash() {
   if (/^add=/.test(h)) { S.frQ = decodeURIComponent(h.slice(4)).toUpperCase().slice(0, 12); h = 'friends'; try { history.replaceState(null, '', '#friends'); } catch (e) { } }
   if (h === 'shop') { S.seaTab = 'shop'; h = 'sea'; }
   if (h === 'dm') { S.chatTab = 'dm'; S.dmPeer = null; h = 'chat'; try { history.replaceState(null, '', '#chat'); } catch (e) { } } // a 1:1 notice opens the conversations
+  // an invite from a friend in 찌릿 라이브: #live=lng,lat,nick (the rough spot of the water, about 100 m)
+  { const m = /^live=(-?\d{1,3}(?:\.\d+)?),(-?\d{1,2}(?:\.\d+)?)(?:,(.*))?$/.exec(h);
+    if (m) { const lng = +m[1], lat = +m[2]; let n = ''; try { n = decodeURIComponent(m[3] || ''); } catch (e) { }
+      if (Math.abs(lng) <= 180 && Math.abs(lat) <= 85) S.lvInv = { lng, lat, n: n.replace(/[<>&"'\n\r]/g, '').slice(0, 16) };
+      h = 'live'; try { history.replaceState(null, '', '#live'); } catch (e) { } } }
   if (h === 'park' || h === 'games') { h = 'live'; try { history.replaceState(null, '', '#live'); } catch (e) { } } // the old park and mini games became the live sea
   if (h === 'live' && window.APP_RT !== 'web') h = 'map';
   if (!ROUTES.includes(h)) h = 'home';
