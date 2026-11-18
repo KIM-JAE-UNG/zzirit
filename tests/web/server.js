@@ -49,7 +49,7 @@ const zpNick = me => { const a = T.anglers[me]; return !!(a && a.data && String(
 // 찌릿 라이브 (0019, 0021), the same rules as the database: schools, casts, strikes, landings, the fish book, the keepnet
 // and the fish market, the weekly bag.
 // The waits are short here so the browser tests do not sit by the water; /__sb/live_cfg changes them and fixes the rolls.
-const LVS = { cfg: { remote: 5, cap: 80, waitMin: 1300, waitMax: 1700, fightMin: 700, tier: null, big: null, u: null, school: null, netMax: 30, rate: null }, casts: {}, days: {}, catches: [], dex: {}, settled: {}, void: {}, seq: 0 };
+const LVS = { cfg: { remote: 5, cap: 80, waitMin: 1300, waitMax: 1700, fightMin: 700, tier: null, big: null, u: null, school: null, netMax: 30, rate: null, missions: ['fish6', 'sell', 'free'], visitPay: false }, casts: {}, days: {}, catches: [], dex: {}, settled: {}, void: {}, streak: {}, seq: 0 };
 const LV_SP = (() => { try { const { SP } = new Function(fs.readFileSync(path.join(ROOT, 'src', 'fishdb.js'), 'utf8') + '; return { SP };')(); return Object.fromEntries(SP.map(x => [x.id, { tier: x.r, L: x.L, X: x.X, w: x.w, z: x.z }])); } catch (e) { return {}; } })();
 const LV_PERK = { egi: { win: .3 }, jig: { wait: .7, trophy: 1.3 }, minnow: { trophy: 2 }, gold: { trophy: 2 }, rod_spark: { trophy: 1.2 }, rod_bolt: { trophy: 1.3 }, reel_lbr: { win: .05 }, reel_bolt: { win: .1 }, float_ball: { win: .1 }, float_led: { win: .15, wait: .92 }, float_spark: { win: .2, wait: .88 }, float_bolt: { win: .25, wait: .85 } };
 const lvDay = () => new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10);
@@ -69,6 +69,20 @@ function lvBoard(wk) {
 function lvAward(wk) {
   if (wk >= zpWeek() || LVS.settled[wk]) return; LVS.settled[wk] = true;
   for (const x of lvBoard(wk)) if (x.r <= 3) { zpAdd(x.a, [300, 200, 100][x.r - 1], 'prize', 'live:' + wk, String(x.r)); if (x.r === 1) (ZPS.owned[x.a] = ZPS.owned[x.a] || []).includes('gold') || ZPS.owned[x.a].push('gold'); }
+}
+const MS_DEF = { fish3: [3, 10], fish6: [6, 20], rare: [1, 20], big: [1, 20], sell: [3, 10], free: [1, 10], remote: [1, 10], sea: [2, 15], fresh: [2, 15] };
+function lvMissions(acct, day) {
+  let ks = LVS.cfg.missions;
+  if (!ks) { const h = require('crypto').createHash('md5').update(acct + ':' + day + ':mission').digest('hex'), pool = ['rare', 'big', 'sell', 'free', 'remote', 'water'];
+    const a = parseInt(h.slice(0, 4), 16) % 6; let b = parseInt(h.slice(4, 8), 16) % 5; if (b >= a) b++;
+    ks = [parseInt(h.slice(8, 10), 16) % 3 === 0 ? 'fish6' : 'fish3', pool[a], pool[b]].map(k => k === 'water' ? (parseInt(h.slice(10, 12), 16) % 2 === 0 ? 'sea' : 'fresh') : k); }
+  return ks.map(k => ({ k, goal: MS_DEF[k][0], pts: MS_DEF[k][1] }));
+}
+function lvMissionN(acct, day, k) {
+  const t0 = Date.parse(day + 'T00:00:00+09:00'), t1 = t0 + 864e5, c = LVS.catches.filter(x => x.acct === acct && x.at >= t0 && x.at < t1), g = LVS.catches.filter(x => x.acct === acct && x.soldAt != null && x.soldAt >= t0 && x.soldAt < t1 && x.soldAt > x.at);
+  const W = x => (LV_SP[x.sp] || {}).w;
+  return ({ fish3: c.length, fish6: c.length, rare: c.filter(x => x.tier >= 3).length, big: c.filter(x => x.big).length, remote: c.filter(x => !x.onsite).length,
+    sea: c.filter(x => ['S', 'B'].includes(W(x))).length, fresh: c.filter(x => ['F', 'B'].includes(W(x))).length, sell: g.filter(x => x.soldFor > 0).length, free: g.filter(x => x.soldFor === 0).length })[k] || 0;
 }
 function lvEarn(acct, d, ref) {
   if (d <= 0) return; const w = ZPS.wal[acct] || (ZPS.wal[acct] = { bal: 0, earned: 0 }); w.bal += d; w.earned += d;
@@ -330,6 +344,30 @@ http.createServer(async (req, res) => {
         d.casts++; if (!on) d.remote++;
         return send({ data: { token, wait, win, school, feed: false, tide: .6, left: C.remote - d.remote } });
       }
+      // 0023: today's three missions and the visit streak (the same rules as the SQL; cfg.missions fixes the three, and a
+      // visit pays only with cfg.visitPay, so the older wallet checks keep their numbers)
+      if (q.name === 'live_daily' || q.name === 'live_mission_claim') {
+        if (!zpNick(me)) return send({ data: { err: 'no_profile' } });
+        const list = lvMissions(me, day), got = k2 => ZPS.led.some(x => x.acct === me && x.r === 'prize' && x.ref === 'mis:' + day + ':' + k2);
+        if (q.name === 'live_mission_claim') {
+          const k2 = A.p_k; let pts;
+          if (k2 === 'all') { if (!list.every(m => got(m.k))) return send({ data: { err: 'not_done' } }); pts = 20; }
+          else { const m = list.find(x => x.k === k2); if (!m) return send({ data: { err: 'not_today' } }); if (lvMissionN(me, day, k2) < m.goal) return send({ data: { err: 'not_done' } }); pts = m.pts; }
+          if (!zpAdd(me, pts, 'prize', 'mis:' + day + ':' + k2, k2)) return send({ data: { err: 'already' } });
+          return send({ data: { ok: true, k: k2, pts, bal: ZPS.wal[me].bal } });
+        }
+        const v = LVS.streak[me]; let gotP = 0;
+        const prev = new Date(Date.parse(day + 'T00:00:00Z') - 864e5).toISOString().slice(0, 10);
+        if (!v || v.last < day) {
+          const n = v && v.last === prev ? v.streak + 1 : 1;
+          LVS.streak[me] = { last: day, streak: n, best: Math.max(n, v ? v.best : 1), total: (v ? v.total : 0) + 1 };
+          const p = n % 7 === 0 ? 30 : 5; if (C.visitPay && zpAdd(me, p, 'prize', 'visit:' + day, String(n))) gotP = p;
+        }
+        const r = LVS.streak[me];
+        return send({ data: { day, visit: { streak: r.streak, best: r.best, total: r.total, got: gotP, next: (r.streak + 1) % 7 === 0 ? 30 : 5, to7: 7 - (r.streak % 7) },
+          missions: list.map(m => Object.assign({}, m, { n: Math.min(m.goal, lvMissionN(me, day, m.k)), got: got(m.k) })), all: 20, allGot: got('all'),
+          until: Date.parse(day + 'T00:00:00+09:00') + 864e5, bal: (ZPS.wal[me] || { bal: 0 }).bal } });
+      }
       const k = LVS.casts[me];
       if (q.name === 'live_strike') {
         if (!k || k.token !== A.p_token || k.state !== 'wait') return send({ data: { err: 'no_cast' } });
@@ -470,7 +508,7 @@ http.createServer(async (req, res) => {
   }
   if (u.pathname === '/__sb/zp_seed') { const q = await body(req); const wk = q.wk || zpAddDays(zpWeek(), q.weeksAgo ? -7 * q.weeksAgo : 0); for (const r of q.rows || []) ZPS.scores['rx|' + wk + '|' + r.acct] = { game: 'rx', wk, acct: r.acct, score: r.score, best: r.best == null ? null : r.best, void: !!r.void, at: Date.now() - 864e5 * 9 + (r.order || 0) }; return send({ ok: true, wk }); }
   if (u.pathname === '/__sb/live_seed') { const q = await body(req); const wk = zpAddDays(zpWeek(), q.weeksAgo ? -7 * q.weeksAgo : 0); for (const r of q.rows || []) LVS.catches.push({ id: ++LVS.seq, acct: r.acct, sp: r.sp || 'kurodai', cm: r.cm || 40, tier: 4, big: false, score: r.score, pts: 12, onsite: true, anon: false, gx: 1, gy: 1, wk, at: Date.now() - 864e5 * 8 }); return send({ ok: true, wk }); }
-  if (u.pathname === '/__sb/live_cfg') { const q = await body(req); Object.assign(LVS.cfg, q.cfg || {}); if (q.weeksBack) for (const c of LVS.catches) c.wk = zpAddDays(c.wk, -7 * q.weeksBack); if (q.reset) { LVS.casts = {}; LVS.days = {}; LVS.catches = []; LVS.dex = {}; LVS.settled = {}; } return send({ cfg: LVS.cfg, n: LVS.catches.length }); }
+  if (u.pathname === '/__sb/live_cfg') { const q = await body(req); Object.assign(LVS.cfg, q.cfg || {}); if (q.weeksBack) for (const c of LVS.catches) c.wk = zpAddDays(c.wk, -7 * q.weeksBack); if (q.reset) { LVS.casts = {}; LVS.days = {}; LVS.catches = []; LVS.dex = {}; LVS.settled = {}; } if (q.streak) for (const [a, x] of Object.entries(q.streak)) LVS.streak[a] = x; return send({ cfg: LVS.cfg, n: LVS.catches.length }); }
   if (u.pathname === '/__sb/feature') { for (const [k, v] of u.searchParams) FEATURES[k] = v === '1'; return send(FEATURES); }
   if (u.pathname === '/__sb/dump') return send({ T, admins: [...admins], links, STATS, PUSH, PUSHLOG, PUSHPREFS, logins: Object.keys(logins), MUTES, RTSTATS, ZPS, RT: Object.fromEntries(Object.entries(RT).map(([k, m]) => [k, [...m.values()].map(x => x.key)])) });
   if (u.pathname === '/__sb/config') { const q = await body(req); const g = T.admin_docs.config || (T.admin_docs.config = { id: 'config', data: {} }); g.data = Object.assign({}, g.data, q); push('admin_docs', 'UPDATE', g, { id: 'config' }); return send({ ok: true }); }

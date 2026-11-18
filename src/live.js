@@ -113,6 +113,7 @@ function lvBuild(el) {
       <button class="lv-sbtn" id="lv-loc" aria-label="${esc(t('lv_locate'))}">${icon('locate')}</button>
       <button class="lv-sbtn" id="lv-net" aria-label="${esc(t('lv_net'))}">${icon('fish')}<b class="lv-nb num" id="lv-nb" hidden></b></button>
       <button class="lv-sbtn" id="lv-book" aria-label="${esc(t('lv_book'))}">${icon('book')}</button>
+      <button class="lv-sbtn" id="lv-dm" aria-label="${esc(t('dm_title'))}">${icon('target')}<b class="lv-nb num" id="lv-msb" hidden></b></button>
       <button class="lv-sbtn" id="lv-inv" aria-label="${esc(t('lv_inv'))}">${icon('user-plus')}</button>
       <a class="lv-sbtn" href="#lures" aria-label="${esc(t('nav_lures'))}">${icon('lure')}</a>
       <button class="lv-sbtn" id="lv-snd" aria-label="${esc(t('lv_sound'))}" aria-pressed="${LVS.on}">${icon('megaphone')}</button>
@@ -140,6 +141,7 @@ function lvBuild(el) {
   main.addEventListener('contextmenu', e => e.preventDefault());
   $('#lv-loc', el).addEventListener('click', () => lvLocate(true));
   $('#lv-book', el).addEventListener('click', () => lvBook());
+  $('#lv-dm', el).addEventListener('click', () => msOpen());
   $('#lv-inv', el).addEventListener('click', () => lvInvite());
   $('#lv-ticker', el).addEventListener('click', e => { const b = e.target.closest('[data-clap]'); if (b) lvClap(b); });
   $('#lv-net', el).addEventListener('click', () => lvBook('net'));
@@ -175,7 +177,7 @@ function lvStart() {
   if (!lsGet('liveOk', false)) return lvCover('intro');
   lvCover('');
   if (lsGet('liveGeo', true)) lvGeo();
-  lvInvGo(); lvHud(); lvRoom();
+  lvInvGo(); lvHud(); lvRoom(); msLoad();
 }
 function lvResume() {
   if (LV.map) setTimeout(() => { try { LV.map.resize(); } catch (e) { } lvSize(); }, 60);
@@ -480,7 +482,7 @@ function lvLand() {
     LV.res = r; LV.phase = 'result'; LV.target = null; LVS.play(r.tier >= 4 || r.big ? 'rare' : 'land'); LVS.buzz(r.tier >= 4 ? [60, 40, 60, 40, 160] : [50, 40, 90]);
     lvFx('splash', k.to, 1.2); clearTimeout(LV.resT); LV.resT = setTimeout(() => { if (LV.phase === 'result' && LV.res === r) lvResult(r); }, 1150);
     if (!LV.anon && LV.room) LV.room.send('catch', { u: myId(), n: S.me.nick, sp: r.sp, cm: r.cm, tier: r.tier, big: r.big, x: +k.to.lng.toFixed(5), y: +k.to.lat.toFixed(5), on: k.site ? 1 : 0 });
-    LV.k = null; LV.f = null; lvTrack(); lvLoad(true); lvHud();
+    LV.k = null; LV.f = null; lvTrack(); lvLoad(true); lvHud(); msLoad(true);
   }).catch(() => { LV.busy = false; lvEnd('lv_err', 'miss'); }), waitMs);
 }
 function lvResult(r) {
@@ -516,7 +518,7 @@ function lvSell(ids, release) {
     if (r.released) toast(t('lv_released', { n: r.n }), 'info');
     else if (r.sum > 0) { LVS.play('coin'); toast(t(r.over ? 'lv_sold_over' : 'lv_sold', { n: r.n, p: fmtN(r.sum), m: r.over }), 'ok', r.over ? 5200 : 3600); }
     else toast(t(r.over ? 'lv_sell_cap' : 'lv_sell_none', { n: r.day.cap }), 'warn', 4800);
-    lvHud(); return r;
+    lvHud(); msLoad(true); return r;
   }).catch(e => { toast(t(e && e.code === 'slow' ? 'lv_slow' : e && e.code === 'need_update' ? 'zp_err_server' : 'lv_err'), 'warn'); return null; }).finally(() => { LV.selling = false; });
 }
 function lvNetHTML(st) {
@@ -634,8 +636,10 @@ function lvHud() {
   else if (st) chips.push(`<span class="lv-chip">${icon('globe')}${t('lv_remote_n', { n: lvLeft(), m: st.day.remoteMax })}</span>`);
   if (LV.others.size) chips.push(`<span class="lv-chip">${icon('users')}${t('lv_floats', { n: LV.others.size })}</span>`);
   { const nf = [...LV.others.keys()].filter(lvIsFr).length; if (nf) chips.push(`<span class="lv-chip fr">${icon('user-check')}${t('lv_fr_n', { n: nf })}</span>`); }
+  if (MS.st && MS.st.visit && MS.st.visit.streak > 0) chips.push(`<span class="lv-chip streak" title="${esc(t('dm_streak', { n: MS.st.visit.streak }))}">${icon('flame')}${t('dm_streak', { n: MS.st.visit.streak })}</span>`);
   const ch = $('#lv-chips'), html = chips.join(''); if (ch.dataset.h !== html) { ch.dataset.h = html; ch.innerHTML = html; }
   const w = $('#lv-wallet'), wh = st ? `${icon('coin')}<b class="num">${fmtN(st.bal)}</b><small>${t('lv_today', { n: st.day.pts, m: st.day.cap })}</small>` : ''; if (w.dataset.h !== wh) { w.dataset.h = wh; w.innerHTML = wh; }
+  const mb = $('#lv-msb'), mn = msReady(); if (mb) { mb.hidden = !mn; mb.textContent = mn || ''; }
   const nb = $('#lv-nb'), nn = lvNet().length; if (nb) { nb.hidden = !nn; nb.textContent = nn || ''; nb.classList.toggle('full', !!st && nn >= (st.netMax || 30)); }
   // the button and the line above it
   let label = t('lv_cast'), hint = '', cls = ph;

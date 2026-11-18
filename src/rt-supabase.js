@@ -224,6 +224,8 @@
     strike: token => zpRpc('live_strike', { p_token: token }),
     land: (token, sp, ok) => zpRpc('live_land', { p_token: token, p_sp: sp, p_ok: !!ok }),
     sell: (ids, release) => zpRpc('live_sell', { p_ids: ids && ids.length ? ids : null, p_release: !!release }),
+    daily: () => zpRpc('live_daily'),
+    claim: k => zpRpc('live_mission_claim', { p_k: k }),
     void: (wk, uid, on) => zpRpc('live_void', { p_wk: wk, p_acct: uid, p_void: on !== false })
   };
   window.APP_AUTH = { sb, session, acct, link, news, review, admin, ids, push, chat, dm, rt, account, board, zp, live: liveGame, error: () => authErr };

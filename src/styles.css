@@ -1843,3 +1843,39 @@ body[data-route="live"] #main { padding-left: 0; padding-right: 0; }
 .lv-inv .lv-priv { background: var(--surface-2); color: var(--ink-3); }
 .lv-invlink { margin: 12px 0 10px; } .lv-invlink input { width: 100%; font-size: 13px; }
 .lv-inv .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+
+/* ---- 오늘의 미션 and the visit streak ---- */
+.ms-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+.ms-head h2, .ms-modal h2 { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 19px; }
+.ms-head h2 .ic, .ms-modal h2 .ic { width: 22px; height: 22px; color: var(--sea); }
+.ms-modal h2 { margin-bottom: 14px; }
+.ms-streak { display: grid; grid-template-columns: auto 1fr; grid-template-areas: "f t" "w w"; gap: 10px 12px; align-items: center; padding: 14px; border-radius: 14px; color: #E8EDF5; background: linear-gradient(135deg, var(--night-2), var(--night-3)); }
+.ms-flame { grid-area: f; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; width: 54px; height: 58px; border-radius: 16px; background: rgba(124,196,255,.12); border: 1px solid rgba(124,196,255,.3); }
+.ms-flame .ic { width: 22px; height: 22px; fill: rgba(124,196,255,.3); stroke: var(--spark); stroke-width: 1.5; }
+.ms-flame b { font: 700 19px/1 var(--f-disp); color: #fff; }
+.ms-flame.hot { background: rgba(124,196,255,.24); box-shadow: 0 0 22px rgba(90,162,255,.45); }
+.ms-sk { grid-area: t; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.ms-sk b { font: 700 17px/1.25 var(--f-disp); color: #fff; } .ms-sk small { color: var(--steel); font-size: 13px; }
+.ms-week { grid-area: w; display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+.ms-week i { height: 6px; border-radius: 3px; background: rgba(201,211,224,.18); }
+.ms-week i.on { background: var(--spark); box-shadow: 0 0 8px rgba(124,196,255,.55); }
+.ms-week i.d7 { outline: 1px solid rgba(124,196,255,.5); outline-offset: 1px; }
+.ms-list { list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.ms-m { display: grid; grid-template-columns: 36px 1fr auto; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--line-2); }
+.ms-ic { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 11px; color: var(--sea); background: var(--sea-soft); }
+.ms-ic .ic { width: 19px; height: 19px; }
+.ms-m.is-done .ms-ic, .ms-m.is-got .ms-ic { color: #fff; background: var(--sea); }
+.ms-m.is-got { opacity: .72; }
+.ms-txt { display: grid; grid-template-columns: 1fr auto; gap: 5px 8px; align-items: center; min-width: 0; }
+.ms-txt b { grid-column: 1 / -1; font-size: 14.5px; font-weight: 600; line-height: 1.35; word-break: keep-all; overflow-wrap: anywhere; }
+.ms-bar { height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; }
+.ms-bar i { display: block; height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--sea), var(--azure)); }
+.ms-txt small { color: var(--ink-3); font-size: 12px; }
+.ms-pts { font: 700 14px/1 var(--f-disp); color: var(--sea); white-space: nowrap; }
+.ms-pts.is-got { font: 600 12.5px/1 var(--f-body); color: var(--ink-3); }
+.ms-claim { white-space: nowrap; }
+.ms-all { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 8px; padding: 10px 12px; border-radius: 12px; border: 1px dashed var(--line); font-weight: 600; font-size: 14px; }
+.ms-all > span:first-child { display: flex; align-items: center; gap: 8px; } .ms-all .ic { width: 18px; height: 18px; color: var(--sea); }
+.ms-foot { display: flex; align-items: flex-start; gap: 6px; margin: 10px 0 0; word-break: keep-all; } .ms-foot .ic { width: 14px; height: 14px; flex: none; margin-top: 2px; }
+.lv-chip.streak .ic { fill: rgba(124,196,255,.35); }
+@media (max-width: 480px) { .ms-m { grid-template-columns: 32px 1fr auto; gap: 8px; padding: 9px 10px; } .ms-ic { width: 32px; height: 32px; } .ms-head .btn { padding-inline: 10px; } }

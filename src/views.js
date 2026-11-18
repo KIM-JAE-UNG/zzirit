@@ -83,6 +83,7 @@ VIEWS.home = {
       </section>
 
       ${liveTeaserHTML()}
+      ${msCardHTML()}
       ${wxCardHTML()}
       ${idTipHTML() || instTipHTML()}
       ${newsCardHTML()}

@@ -345,7 +345,8 @@ async function until(fn, ms = 6000, step = 150) { const t0 = Date.now(); let v; 
 
     /* ---------- a phone ---------- */
     const P = await mk('P', { ctx: { viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true } });
-    await onboard(P, '폰낚시꾼');
+    await lvCfg({ cfg: { missions: ['fish3', 'remote', 'sell'], visitPay: true } });
+    await onboard(P, '폰낚시꾼'); const pId = await uidOf(P);
     // a phone with no location: far-away casts only, a few a day
     await lvCfg({ cfg: { tier: 2, big: false, u: .4, remote: 2 } });
     await P.evaluate(() => lsSet('liveAt', { lng: 8.53, lat: 47.376 })); // where this phone last looked at the map: in town, a walk from the water
@@ -384,8 +385,27 @@ async function until(fn, ms = 6000, step = 150) { const t0 = Date.now(); let v; 
     await P.click('.lv-nfree'); await P.waitForTimeout(200);
     ok(await P.$eval('.lv-nfree', n => n.classList.contains('armed')) && await P.evaluate(() => LV.st.net.length === 1), 'net: "let go" asks once more first');
     await P.click('[data-lvsell]');
-    ok(!!(await until(() => P.evaluate(() => LV.st.net.length === 0 && LV.st.bal === 13 && !document.querySelector('.lv-netl') && /비어/.test(document.querySelector('#lv-bbody').textContent)), 5000)), 'net: sold — 10 for the new species + 3, and the net is empty');
+    ok(!!(await until(() => P.evaluate(() => LV.st.net.length === 0 && LV.st.bal === 18 && !document.querySelector('.lv-netl') && /비어/.test(document.querySelector('#lv-bbody').textContent)), 5000)), 'net: sold — 10 for the new species + 3, and the net is empty');
     await closeModals(P);
+    // today's missions: the far-away fish is done, one of three landed, one of three sold; the visit paid 5P
+    ok((await dump()).ZPS.led.some(x => x.acct === pId && x.ref === 'visit:' + (new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10)) && x.d === 5), 'missions: the first visit of the day paid 5P');
+    ok(!!(await until(() => P.evaluate(() => $('#lv-msb') && !$('#lv-msb').hidden && $('#lv-msb').textContent === '1'), 6000)), 'missions: the target button shows one mission ready');
+    ok(/1일 연속/.test(await P.$eval('#lv-chips', n => n.textContent)), 'missions: the chips show the streak');
+    await P.click('#lv-dm'); await P.waitForTimeout(600);
+    const msRows = await P.$$eval('.ms-modal .ms-m', ns => ns.map(n => [n.className, n.textContent.replace(/\s+/g, ' ')]));
+    ok(msRows.length === 3 && /고기 3마리 낚기.*1 \/ 3/.test(msRows[0][1]) && /원정 낚시로 1마리/.test(msRows[1][1]) && /is-done/.test(msRows[1][0]) && /1 \/ 3/.test(msRows[2][1]), 'missions: three rows with how far each is — ' + JSON.stringify(msRows));
+    ok(await P.$eval('.ms-modal', n => /1일 연속/.test(n.textContent) && /6일 더 오면 \+30P/.test(n.textContent)) && await P.$$eval('.ms-modal .ms-week i.on', ns => ns.length === 1), 'missions: the streak, the week bar and the next prize');
+    ok(await P.$eval('.modal-wrap.in .modal', n => { const r = n.getBoundingClientRect(); return r.left >= 0 && r.right <= innerWidth; }) && await P.$$eval('.ms-modal .ms-m', ns => ns.every(n => n.scrollWidth <= n.clientWidth + 1)) && await P.$eval('.ms-modal .ms-claim', b => b.getBoundingClientRect().right <= innerWidth - 8), 'missions: the rows fit on a phone');
+    await shot(P, 'l14d_phone_missions');
+    ok(await P.$$eval('.ms-modal [data-msclaim="all"]', ns => ns.length === 0), 'missions: no bonus before all three');
+    await P.click('.ms-modal [data-msclaim="remote"]');
+    ok(!!(await until(() => P.evaluate(() => LV.st.bal === 28 && /받음/.test($('.ms-modal .ms-m:nth-child(2)').textContent) && $('#lv-msb').hidden), 5000)), 'missions: claiming pays 10P once and the button says it was taken');
+    ok((await P.evaluate(() => APP_AUTH.live.claim('remote'))).err === 'already' && (await P.evaluate(() => APP_AUTH.live.claim('sell'))).err === 'not_done', 'missions: the server pays a mission once, and not before it is done');
+    await closeModals(P);
+    await go(P, 'home', 1500);
+    ok(await P.$$eval('.ms-card .ms-m', ns => ns.length === 3) && await P.$eval('.ms-card', n => /오늘의 미션/.test(n.textContent) && /라이브에서 하기/.test(n.textContent) && n.getBoundingClientRect().right <= innerWidth), 'missions: the home page shows today\'s missions');
+    await P.$eval('.ms-card', n => n.scrollIntoView({ block: 'center' })); await P.waitForTimeout(300); await shot(P, 'l14e_phone_home_missions');
+    await go(P, 'live', 2500);
     await press(P); await until(async () => (await ph(P)) === 'wait', 8000); await press(P); await until(async () => (await ph(P)) === 'idle', 5000);
     ok(/원정 0\/2/.test(await P.$eval('#lv-chips', n => n.textContent)), 'phone: two casts used');
     await P.waitForTimeout(2800); await press(P); await P.waitForTimeout(600);

@@ -1869,6 +1869,42 @@ body[data-route="live"] #main { padding-left: 0; padding-right: 0; }
 .lv-invlink { margin: 12px 0 10px; } .lv-invlink input { width: 100%; font-size: 13px; }
 .lv-inv .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
 
+/* ---- 오늘의 미션 and the visit streak ---- */
+.ms-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+.ms-head h2, .ms-modal h2 { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 19px; }
+.ms-head h2 .ic, .ms-modal h2 .ic { width: 22px; height: 22px; color: var(--sea); }
+.ms-modal h2 { margin-bottom: 14px; }
+.ms-streak { display: grid; grid-template-columns: auto 1fr; grid-template-areas: "f t" "w w"; gap: 10px 12px; align-items: center; padding: 14px; border-radius: 14px; color: #E8EDF5; background: linear-gradient(135deg, var(--night-2), var(--night-3)); }
+.ms-flame { grid-area: f; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; width: 54px; height: 58px; border-radius: 16px; background: rgba(124,196,255,.12); border: 1px solid rgba(124,196,255,.3); }
+.ms-flame .ic { width: 22px; height: 22px; fill: rgba(124,196,255,.3); stroke: var(--spark); stroke-width: 1.5; }
+.ms-flame b { font: 700 19px/1 var(--f-disp); color: #fff; }
+.ms-flame.hot { background: rgba(124,196,255,.24); box-shadow: 0 0 22px rgba(90,162,255,.45); }
+.ms-sk { grid-area: t; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.ms-sk b { font: 700 17px/1.25 var(--f-disp); color: #fff; } .ms-sk small { color: var(--steel); font-size: 13px; }
+.ms-week { grid-area: w; display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+.ms-week i { height: 6px; border-radius: 3px; background: rgba(201,211,224,.18); }
+.ms-week i.on { background: var(--spark); box-shadow: 0 0 8px rgba(124,196,255,.55); }
+.ms-week i.d7 { outline: 1px solid rgba(124,196,255,.5); outline-offset: 1px; }
+.ms-list { list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.ms-m { display: grid; grid-template-columns: 36px 1fr auto; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--line-2); }
+.ms-ic { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 11px; color: var(--sea); background: var(--sea-soft); }
+.ms-ic .ic { width: 19px; height: 19px; }
+.ms-m.is-done .ms-ic, .ms-m.is-got .ms-ic { color: #fff; background: var(--sea); }
+.ms-m.is-got { opacity: .72; }
+.ms-txt { display: grid; grid-template-columns: 1fr auto; gap: 5px 8px; align-items: center; min-width: 0; }
+.ms-txt b { grid-column: 1 / -1; font-size: 14.5px; font-weight: 600; line-height: 1.35; word-break: keep-all; overflow-wrap: anywhere; }
+.ms-bar { height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; }
+.ms-bar i { display: block; height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--sea), var(--azure)); }
+.ms-txt small { color: var(--ink-3); font-size: 12px; }
+.ms-pts { font: 700 14px/1 var(--f-disp); color: var(--sea); white-space: nowrap; }
+.ms-pts.is-got { font: 600 12.5px/1 var(--f-body); color: var(--ink-3); }
+.ms-claim { white-space: nowrap; }
+.ms-all { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 8px; padding: 10px 12px; border-radius: 12px; border: 1px dashed var(--line); font-weight: 600; font-size: 14px; }
+.ms-all > span:first-child { display: flex; align-items: center; gap: 8px; } .ms-all .ic { width: 18px; height: 18px; color: var(--sea); }
+.ms-foot { display: flex; align-items: flex-start; gap: 6px; margin: 10px 0 0; word-break: keep-all; } .ms-foot .ic { width: 14px; height: 14px; flex: none; margin-top: 2px; }
+.lv-chip.streak .ic { fill: rgba(124,196,255,.35); }
+@media (max-width: 480px) { .ms-m { grid-template-columns: 32px 1fr auto; gap: 8px; padding: 9px 10px; } .ms-ic { width: 32px; height: 32px; } .ms-head .btn { padding-inline: 10px; } }
+
 </style>
 </head>
 <body>
@@ -1983,6 +2019,8 @@ body[data-route="live"] #main { padding-left: 0; padding-right: 0; }
   <symbol id="i-map" viewBox="0 0 24 24"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14"/></symbol>
   <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M8 4h8v5a4 4 0 0 1-8 0zM8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8 21h8M10 17h4v4h-4z"/></symbol>
   <symbol id="i-live" viewBox="0 0 24 24"><path d="M12 2.5v3"/><path d="M12 5.5c1.8 0 2.8 1.8 2.8 4s-1 4-2.8 4-2.8-1.800-2.800-4 1-4 2.800-4z"/><path d="M12 13.500v3.200"/><path d="M4.500 15.200c.5 2.600 3.600 4.600 7.500 4.600s7-2 7.500-4.600"/><path d="M7.600 15.600c.600 1.200 2.300 2 4.400 2s3.800-.8 4.400-2"/></symbol>
+  <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 21.5c-3.9 0-6.5-2.7-6.5-6.3 0-3.6 2.6-5.6 3.9-8.7.5 1.9 1.4 3 2.6 3.7.3-2.9 1.4-5.2 3.5-7.2-.2 3.3 1 5.1 2.3 7 1 1.5 1.7 3 1.7 5.2 0 3.6-2.6 6.3-7.5 6.3z"/><path d="M12 21.5c-1.7 0-2.9-1.2-2.9-2.9 0-1.8 1.4-2.7 2.1-4.3.9 1.2 1.6 1.6 2.4 2 .9.6 1.3 1.4 1.3 2.4 0 1.6-1.3 2.8-2.9 2.8z"/></symbol>
+  <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.8"/><circle cx="12" cy="12" r="1.3"/></symbol>
   <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13.500 2.500 5.500 13.500h5.200l-1.200 8 8-11h-5.200z"/></symbol>
   <symbol id="i-locate" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="7.500"/><path d="M12 2v2.500M12 19.500V22M2 12h2.500M19.500 12H22"/></symbol>
   <symbol id="i-sea" viewBox="0 0 24 24"><path d="M2 8c2 0 2-2 4-2s2 2 4 2 2-2 4-2 2 2 4 2 2-2 4-2M2 13c2 0 2-2 4-2s2 2 4 2 2-2 4-2 2 2 4 2 2-2 4-2M2 18c2 0 2-2 4-2s2 2 4 2 2-2 4-2 2 2 4 2 2-2 4-2"/></symbol>
@@ -2267,6 +2305,8 @@ body[data-route="live"] #main { padding-left: 0; padding-right: 0; }
     strike: token => zpRpc('live_strike', { p_token: token }),
     land: (token, sp, ok) => zpRpc('live_land', { p_token: token, p_sp: sp, p_ok: !!ok }),
     sell: (ids, release) => zpRpc('live_sell', { p_ids: ids && ids.length ? ids : null, p_release: !!release }),
+    daily: () => zpRpc('live_daily'),
+    claim: k => zpRpc('live_mission_claim', { p_k: k }),
     void: (wk, uid, on) => zpRpc('live_void', { p_wk: wk, p_acct: uid, p_void: on !== false })
   };
   window.APP_AUTH = { sb, session, acct, link, news, review, admin, ids, push, chat, dm, rt, account, board, zp, live: liveGame, error: () => authErr };
@@ -4078,6 +4118,31 @@ Object.assign(T, {
   wn_fr_h: ['친구랑 같이 낚시', 'Fish with friends', '友だちと一緒に釣り', '和好友一起钓鱼'],
   wn_fr_p: ['찌릿 라이브의 「친구 부르기」로 링크를 보내면 친구가 같은 물가로 와요. 친구 찌는 하늘색 이름표로 보이고, 누가 고기를 잡으면 박수를 보낼 수 있어요.', 'Send a link with “Invite a friend” in ZZIRIT Live and your friend lands at the same water. Friends\' floats wear a sky-blue tag, and you can clap when someone lands a fish.', 'ZZIRITライブの「友だちを呼ぶ」でリンクを送ると、友だちが同じ水辺に来ます。友だちのウキは水色の名札、誰かが釣ったら拍手を送れます。', '在ZZIRIT实况用“邀请好友”发送链接，好友就会来到同一片水边。好友的浮漂带天蓝色名牌，有人钓到鱼时可以鼓掌。'],
   ng_mine: ['내 기록·장비', 'My records & gear', '記録・タックル', '我的记录·装备'],
+  dm_title: ['오늘의 미션', "Today's missions", '今日のミッション', '今日任务'],
+  dm_fish: ['고기 {n}마리 낚기', 'Land {n} fish', '魚を{n}匹釣る', '钓到{n}条鱼'],
+  dm_rare: ['귀한 고기 이상 1마리 낚기', 'Land one rare fish or better', 'レア以上を1匹釣る', '钓到1条稀有以上的鱼'],
+  dm_big: ['대물 1마리 낚기', 'Land one big fish', '大物を1匹釣る', '钓到1条大鱼'],
+  dm_sell: ['살림망 고기 {n}마리 팔기', 'Sell {n} fish from the keepnet', 'ビクの魚を{n}匹売る', '卖掉鱼护里的{n}条鱼'],
+  dm_free: ['고기 1마리 놓아주기', 'Let one fish go', '魚を1匹リリースする', '放生1条鱼'],
+  dm_remote: ['원정 낚시로 1마리 낚기', 'Land one fish from far away', '遠征釣りで1匹釣る', '远征钓到1条鱼'],
+  dm_sea: ['바다 고기 {n}마리 낚기', 'Land {n} sea fish', '海の魚を{n}匹釣る', '钓到{n}条海鱼'],
+  dm_fresh: ['민물 고기 {n}마리 낚기', 'Land {n} freshwater fish', '淡水魚を{n}匹釣る', '钓到{n}条淡水鱼'],
+  dm_claim: ['받기', 'Claim', '受け取る', '领取'], dm_got: ['받음', 'Claimed', '受取済み', '已领取'],
+  dm_all: ['3개 모두 하면', 'All three done', '3つ全部で', '三个全部完成'],
+  dm_streak: ['{n}일 연속', '{n}-day streak', '{n}日連続', '连续{n}天'],
+  dm_streak_p: ['매일 들어오면 +5P, 7일째마다 +30P', 'Come every day: +5P, and +30P every 7th day', '毎日来ると+5P、7日目ごとに+30P', '每天来+5P，每第7天+30P'],
+  dm_to7: ['{n}일 더 오면 +30P', '+30P in {n} more days', 'あと{n}日で+30P', '再来{n}天得+30P'],
+  dm_to7_0: ['오늘 7일째! +30P', 'Day 7 today! +30P', '今日で7日目！+30P', '今天第7天！+30P'],
+  dm_new_at: ['밤 12시(한국 시간)에 새 미션', 'New missions at midnight (Korea time)', '夜12時（韓国時間）に新ミッション', '午夜12点（韩国时间）更新任务'],
+  dm_visit: ['출석 {n}일째! +{p}P', 'Day {n} in a row! +{p}P', '連続{n}日目！+{p}P', '连续第{n}天！+{p}P'],
+  dm_done: ['미션 완료! 포인트를 받으세요', 'Mission done! Claim your points', 'ミッション達成！ポイントを受け取ろう', '任务完成！领取积分吧'],
+  dm_claimed: ['+{p}P 받았어요', 'Got +{p}P', '+{p}P受け取りました', '获得+{p}P'],
+  dm_go: ['라이브에서 하기', 'Go to Live', 'ライブでやる', '去实况'],
+  dm_need_profile: ['프로필을 만들면 미션을 할 수 있어요.', 'Make a profile to play missions.', 'プロフィールを作るとミッションができます。', '创建个人资料后即可做任务。'],
+  zp_r_visit: ['연속 출석 {n}일째', 'Visit streak, day {n}', '連続ログイン{n}日目', '连续签到第{n}天'],
+  zp_r_mis: ['오늘의 미션', "Today's mission", '今日のミッション', '今日任务'],
+  wn_dm_h: ['오늘의 미션과 연속 출석', 'Daily missions and streaks', '今日のミッションと連続ログイン', '今日任务和连续签到'],
+  wn_dm_p: ['라이브에서 날마다 미션 3개를 하면 포인트를 받아요. 매일 들어오면 불꽃 숫자가 커지고, 7일째마다 +30P.', 'Do three small missions in Live each day for points. Come back every day to grow your flame — every 7th day pays +30P.', 'ライブで毎日3つのミッションをするとポイント。毎日来ると炎の数字が増え、7日目ごとに+30P。', '每天在实况完成3个任务可得积分。每天来访火焰数字会增长，每第7天+30P。'],
   credits_map: ['라이브 지도', 'Live map', 'ライブ地図', '实况地图'],
 });
 
@@ -8202,7 +8267,7 @@ function openShareCard(blob, name, text) {
 }
 
 /* ===== What's new: shown once after a big update (website only; needs the matching server update) ===== */
-const WHATS_NEW = '2026-11-18a', WN_TS = Date.parse('2026-11-07T03:00:00Z'); // people who joined after this have nothing to catch up on
+const WHATS_NEW = '2026-11-19a', WN_TS = Date.parse('2026-11-07T03:00:00Z'); // people who joined after this have nothing to catch up on
 const BOOT_AT = Date.now();
 /* what each update brought, newest last; people see what came after the last one they saw (at most 6 lines) */
 const WN_ITEMS = [
@@ -8215,7 +8280,8 @@ const WN_ITEMS = [
   ['2026-11-12a', 'live', 'wn_live'], ['2026-11-12a', 'sparkle', 'wn_look'],
   ['2026-11-13a', 'user', 'wn_char'], ['2026-11-13a', 'coin', 'wn_mkt'], ['2026-11-13a', 'fish', 'wn_fish'],
   ['2026-11-17a', 'bell', 'wn_am'],
-  ['2026-11-18a', 'users', 'wn_fr']
+  ['2026-11-18a', 'users', 'wn_fr'],
+  ['2026-11-19a', 'target', 'wn_dm']
 ];
 // the new look already says the fish were redrawn
 const WN_PART = { wn_fish: 'wn_look' };
@@ -8381,6 +8447,7 @@ VIEWS.home = {
       </section>
 
       ${liveTeaserHTML()}
+      ${msCardHTML()}
       ${wxCardHTML()}
       ${idTipHTML() || instTipHTML()}
       ${newsCardHTML()}
@@ -12088,7 +12155,7 @@ const zlSpec = L => Array.isArray(L.spec) ? dict(L.spec) : L.spec;
 function zpNews() {
   const led = (ZP.st && ZP.st.led) || []; if (!led.length || !zpMine()) return;
   const top = Math.max(...led.map(x => +x.id || 0)), seen = lsGet('zpSeen', null);
-  const fresh = led.filter(x => +x.id > (+seen || 0) && x.d > 0 && x.r !== 'buy' && !/^day:/.test(x.ref || '') && (seen != null || nowMs() - Date.parse(x.at) < 3 * DAY_MS));
+  const fresh = led.filter(x => +x.id > (+seen || 0) && x.d > 0 && x.r !== 'buy' && !/^(day|mis|visit):/.test(x.ref || '') && (seen != null || nowMs() - Date.parse(x.at) < 3 * DAY_MS));
   lsSet('zpSeen', top);
   if (fresh.length) setTimeout(() => zpCelebrate(fresh), 700);
 }
@@ -12097,6 +12164,8 @@ function zpWhy(x) {
   const wk = String(x.ref || '').split(':')[1] || '';
   const live = /^live:/.test(x.ref || '');
   if (/^day:/.test(x.ref || '')) return t('zp_r_live');
+  if (/^visit:/.test(x.ref || '')) return t('zp_r_visit', { n: x.n });
+  if (/^mis:/.test(x.ref || '')) return t('zp_r_mis');
   if (x.r === 'prize') return t(live ? 'zp_r_prize_live' : 'zp_r_prize', { n: x.n, w: zpWeekName(wk) });
   if (x.r === 'join') return t('zp_r_join', { w: zpWeekName(wk) });
   if (x.r === 'buy') return t('zp_r_buy', { name: zlName(x.ref) });
@@ -12771,6 +12840,7 @@ function lvBuild(el) {
       <button class="lv-sbtn" id="lv-loc" aria-label="${esc(t('lv_locate'))}">${icon('locate')}</button>
       <button class="lv-sbtn" id="lv-net" aria-label="${esc(t('lv_net'))}">${icon('fish')}<b class="lv-nb num" id="lv-nb" hidden></b></button>
       <button class="lv-sbtn" id="lv-book" aria-label="${esc(t('lv_book'))}">${icon('book')}</button>
+      <button class="lv-sbtn" id="lv-dm" aria-label="${esc(t('dm_title'))}">${icon('target')}<b class="lv-nb num" id="lv-msb" hidden></b></button>
       <button class="lv-sbtn" id="lv-inv" aria-label="${esc(t('lv_inv'))}">${icon('user-plus')}</button>
       <a class="lv-sbtn" href="#lures" aria-label="${esc(t('nav_lures'))}">${icon('lure')}</a>
       <button class="lv-sbtn" id="lv-snd" aria-label="${esc(t('lv_sound'))}" aria-pressed="${LVS.on}">${icon('megaphone')}</button>
@@ -12798,6 +12868,7 @@ function lvBuild(el) {
   main.addEventListener('contextmenu', e => e.preventDefault());
   $('#lv-loc', el).addEventListener('click', () => lvLocate(true));
   $('#lv-book', el).addEventListener('click', () => lvBook());
+  $('#lv-dm', el).addEventListener('click', () => msOpen());
   $('#lv-inv', el).addEventListener('click', () => lvInvite());
   $('#lv-ticker', el).addEventListener('click', e => { const b = e.target.closest('[data-clap]'); if (b) lvClap(b); });
   $('#lv-net', el).addEventListener('click', () => lvBook('net'));
@@ -12833,7 +12904,7 @@ function lvStart() {
   if (!lsGet('liveOk', false)) return lvCover('intro');
   lvCover('');
   if (lsGet('liveGeo', true)) lvGeo();
-  lvInvGo(); lvHud(); lvRoom();
+  lvInvGo(); lvHud(); lvRoom(); msLoad();
 }
 function lvResume() {
   if (LV.map) setTimeout(() => { try { LV.map.resize(); } catch (e) { } lvSize(); }, 60);
@@ -13138,7 +13209,7 @@ function lvLand() {
     LV.res = r; LV.phase = 'result'; LV.target = null; LVS.play(r.tier >= 4 || r.big ? 'rare' : 'land'); LVS.buzz(r.tier >= 4 ? [60, 40, 60, 40, 160] : [50, 40, 90]);
     lvFx('splash', k.to, 1.2); clearTimeout(LV.resT); LV.resT = setTimeout(() => { if (LV.phase === 'result' && LV.res === r) lvResult(r); }, 1150);
     if (!LV.anon && LV.room) LV.room.send('catch', { u: myId(), n: S.me.nick, sp: r.sp, cm: r.cm, tier: r.tier, big: r.big, x: +k.to.lng.toFixed(5), y: +k.to.lat.toFixed(5), on: k.site ? 1 : 0 });
-    LV.k = null; LV.f = null; lvTrack(); lvLoad(true); lvHud();
+    LV.k = null; LV.f = null; lvTrack(); lvLoad(true); lvHud(); msLoad(true);
   }).catch(() => { LV.busy = false; lvEnd('lv_err', 'miss'); }), waitMs);
 }
 function lvResult(r) {
@@ -13174,7 +13245,7 @@ function lvSell(ids, release) {
     if (r.released) toast(t('lv_released', { n: r.n }), 'info');
     else if (r.sum > 0) { LVS.play('coin'); toast(t(r.over ? 'lv_sold_over' : 'lv_sold', { n: r.n, p: fmtN(r.sum), m: r.over }), 'ok', r.over ? 5200 : 3600); }
     else toast(t(r.over ? 'lv_sell_cap' : 'lv_sell_none', { n: r.day.cap }), 'warn', 4800);
-    lvHud(); return r;
+    lvHud(); msLoad(true); return r;
   }).catch(e => { toast(t(e && e.code === 'slow' ? 'lv_slow' : e && e.code === 'need_update' ? 'zp_err_server' : 'lv_err'), 'warn'); return null; }).finally(() => { LV.selling = false; });
 }
 function lvNetHTML(st) {
@@ -13292,8 +13363,10 @@ function lvHud() {
   else if (st) chips.push(`<span class="lv-chip">${icon('globe')}${t('lv_remote_n', { n: lvLeft(), m: st.day.remoteMax })}</span>`);
   if (LV.others.size) chips.push(`<span class="lv-chip">${icon('users')}${t('lv_floats', { n: LV.others.size })}</span>`);
   { const nf = [...LV.others.keys()].filter(lvIsFr).length; if (nf) chips.push(`<span class="lv-chip fr">${icon('user-check')}${t('lv_fr_n', { n: nf })}</span>`); }
+  if (MS.st && MS.st.visit && MS.st.visit.streak > 0) chips.push(`<span class="lv-chip streak" title="${esc(t('dm_streak', { n: MS.st.visit.streak }))}">${icon('flame')}${t('dm_streak', { n: MS.st.visit.streak })}</span>`);
   const ch = $('#lv-chips'), html = chips.join(''); if (ch.dataset.h !== html) { ch.dataset.h = html; ch.innerHTML = html; }
   const w = $('#lv-wallet'), wh = st ? `${icon('coin')}<b class="num">${fmtN(st.bal)}</b><small>${t('lv_today', { n: st.day.pts, m: st.day.cap })}</small>` : ''; if (w.dataset.h !== wh) { w.dataset.h = wh; w.innerHTML = wh; }
+  const mb = $('#lv-msb'), mn = msReady(); if (mb) { mb.hidden = !mn; mb.textContent = mn || ''; }
   const nb = $('#lv-nb'), nn = lvNet().length; if (nb) { nb.hidden = !nn; nb.textContent = nn || ''; nb.classList.toggle('full', !!st && nn >= (st.netMax || 30)); }
   // the button and the line above it
   let label = t('lv_cast'), hint = '', cls = ph;
@@ -13531,6 +13604,85 @@ function liveArtSVG() {
     <circle cx="356" cy="200" r="8" fill="#050A13" stroke="#7CC4FF" stroke-width="2.4"/><circle cx="356" cy="200" r="2.8" fill="#fff"/>
   </svg>`;
 }
+
+/* ===== 오늘의 미션 and the visit streak (찌릿 라이브, website). The server picks today's three missions, counts how far
+   each is from the game's own tables and pays each one once; opening the app once a day is a visit (5P, 30P every 7th
+   day in a row). Nothing here decides a mission is done: the phone only shows what the server says. ===== */
+const MS = { st: null, p: null, at: 0, err: null };
+const MS_IC = { fish3: 'fish', fish6: 'fish', rare: 'sparkle', big: 'trophy', sell: 'coin', free: 'heart', remote: 'globe', sea: 'wave', fresh: 'wave' };
+const msLabel = m => t('dm_' + (m.k === 'fish3' || m.k === 'fish6' ? 'fish' : m.k), { n: m.goal });
+const msReady = (st = MS.st) => !st ? 0 : st.missions.filter(m => m.n >= m.goal && !m.got).length + (st.missions.every(m => m.got) && !st.allGot ? 1 : 0);
+function msLoad(force) {
+  if (typeof lvOn !== 'function' || !lvOn() || !S.me || !S.me.nick) return Promise.resolve(null);
+  if (MS.p) return MS.p;
+  if (!force && MS.st && nowMs() - MS.at < 60e3 && MS.st.until > nowMs()) return Promise.resolve(MS.st);
+  MS.p = APP_AUTH.live.daily().then(r => {
+    if (!r || r.err) { MS.err = (r && r.err) || 'x'; return null; }
+    const before = MS.st; MS.st = r; MS.at = nowMs(); MS.err = null;
+    if (r.visit && r.visit.got > 0) { const v = r.visit; setTimeout(() => toast(t('dm_visit', { n: v.streak, p: v.got }), 'ok', 4200), 900); msBal(r.bal); }
+    // a mission that just got done (the fish just landed or sold): say so once
+    if (before && before.day === r.day && r.missions.some(m => m.n >= m.goal && !m.got && !before.missions.some(b => b.k === m.k && b.n >= b.goal))) toast(t('dm_done'), 'ok', 4200);
+    msPaint(); return r;
+  }).catch(e => { MS.err = (e && e.code) || 'x'; return null; }).finally(() => { MS.p = null; });
+  return MS.p;
+}
+function msBal(bal) {
+  if (bal == null) return;
+  if (typeof LV !== 'undefined' && LV.st) LV.st.bal = bal;
+  if (typeof ZP !== 'undefined' && ZP.st) ZP.st.bal = bal;
+}
+// the missions, the bonus and the streak (the same on the home page and in the live game)
+function msBodyHTML(st = MS.st) {
+  if (!st) return '';
+  const v = st.visit || { streak: 0, to7: 7 }, allDone = st.missions.every(m => m.got);
+  const row = m => {
+    const done = m.n >= m.goal, pc = Math.round(100 * Math.min(1, m.n / m.goal));
+    return `<li class="ms-m${m.got ? ' is-got' : done ? ' is-done' : ''}"><span class="ms-ic">${icon(m.got || done ? 'check' : MS_IC[m.k] || 'target')}</span>
+      <span class="ms-txt"><b>${esc(msLabel(m))}</b><span class="ms-bar" role="progressbar" aria-valuemin="0" aria-valuemax="${m.goal}" aria-valuenow="${m.n}"><i style="width:${pc}%"></i></span><small class="num">${m.n} / ${m.goal}</small></span>
+      ${m.got ? `<span class="ms-pts is-got">${t('dm_got')}</span>` : done ? `<button class="btn btn-primary btn-sm ms-claim" data-msclaim="${esc(m.k)}">${t('dm_claim')} +${m.pts}P</button>` : `<span class="ms-pts num">+${m.pts}P</span>`}</li>`;
+  };
+  return `<div class="ms-streak">
+      <span class="ms-flame${v.streak >= 7 ? ' hot' : ''}">${icon('flame')}<b class="num">${v.streak}</b></span>
+      <span class="ms-sk"><b>${t('dm_streak', { n: v.streak })}</b><small>${v.to7 === 7 && v.streak > 0 ? t('dm_to7_0') : t('dm_to7', { n: v.to7 })}</small></span>
+      <span class="ms-week" aria-hidden="true">${[1, 2, 3, 4, 5, 6, 7].map(i => `<i class="${i <= ((v.streak - 1) % 7) + 1 && v.streak > 0 ? 'on' : ''}${i === 7 ? ' d7' : ''}"></i>`).join('')}</span>
+    </div>
+    <ul class="ms-list">${st.missions.map(row).join('')}</ul>
+    <div class="ms-all${st.allGot ? ' is-got' : ''}"><span>${icon('star')}${t('dm_all')}</span>${st.allGot ? `<span class="ms-pts is-got">${t('dm_got')}</span>` : allDone ? `<button class="btn btn-primary btn-sm ms-claim" data-msclaim="all">${t('dm_claim')} +${st.all}P</button>` : `<span class="ms-pts num">+${st.all}P</span>`}</div>
+    <p class="ms-foot muted small">${icon('clock')}${t('dm_new_at')} · ${t('dm_streak_p')}</p>`;
+}
+// on the home page, under the door to the live game
+function msCardHTML() {
+  if (typeof lvOn !== 'function' || !lvOn() || !S.me || !S.me.nick) return '';
+  if (!MS.st && !MS.p && !MS.err) msLoad();
+  if (!MS.st) return '';
+  return `<section class="card ms-card" aria-label="${esc(t('dm_title'))}"><div class="ms-head"><h2>${icon('target')}${t('dm_title')}</h2>${S.route !== 'live' ? `<a class="btn btn-line btn-sm" href="#live">${icon('live')}${t('dm_go')}</a>` : ''}</div><div data-msbody>${msBodyHTML()}</div></section>`;
+}
+// everything that shows the missions, again
+function msPaint() {
+  $$('[data-msbody]').forEach(el => { el.innerHTML = msBodyHTML(); });
+  if (S.route === 'home' && !$('.ms-card') && MS.st) rerenderSoon();
+  const b = $('#lv-msb'); if (b) { const n = msReady(); b.hidden = !n; b.textContent = n || ''; }
+  if (typeof lvHud === 'function' && $('#lv')) lvHud();
+}
+function msOpen() {
+  msLoad().then(st => {
+    if (!st) { toast(t(MS.err === 'no_profile' ? 'dm_need_profile' : 'lv_err'), 'warn'); return; }
+    openModal(`<div class="ms-modal"><h2>${icon('target')}${t('dm_title')}</h2><div data-msbody>${msBodyHTML()}</div></div>`, { label: t('dm_title') });
+  });
+}
+function msClaim(btn) {
+  if (MS.busy) return; MS.busy = true; btn.disabled = true;
+  const k = btn.dataset.msclaim;
+  APP_AUTH.live.claim(k).then(r => {
+    if (!r || r.err) { toast(t('lv_err'), 'warn'); return msLoad(true); }
+    if (typeof LVS !== 'undefined') LVS.play('coin');
+    toast(t('dm_claimed', { p: r.pts }), 'ok');
+    msBal(r.bal);
+    if (MS.st) { if (k === 'all') MS.st.allGot = true; else MS.st.missions.forEach(m => { if (m.k === k) m.got = true; }); MS.st.bal = r.bal; }
+    msPaint();
+  }).catch(() => toast(t('lv_err'), 'warn')).finally(() => { MS.busy = false; btn.disabled = false; });
+}
+document.addEventListener('click', e => { const b = e.target.closest('[data-msclaim]'); if (b) { e.preventDefault(); msClaim(b); } });
 
 /* ===== Router, global events, boot ===== */
 const QR_PATH = 'M0 0h7v1h-7zM8 0h2v1h-2zM11 0h3v1h-3zM17 0h1v1h-1zM21 0h2v1h-2zM26 0h7v1h-7zM0 1h1v1h-1zM6 1h1v1h-1zM8 1h7v1h-7zM16 1h1v1h-1zM18 1h2v1h-2zM21 1h2v1h-2zM26 1h1v1h-1zM32 1h1v1h-1zM0 2h1v1h-1zM2 2h3v1h-3zM6 2h1v1h-1zM8 2h3v1h-3zM13 2h2v1h-2zM16 2h1v1h-1zM20 2h2v1h-2zM24 2h1v1h-1zM26 2h1v1h-1zM28 2h3v1h-3zM32 2h1v1h-1zM0 3h1v1h-1zM2 3h3v1h-3zM6 3h1v1h-1zM9 3h1v1h-1zM11 3h1v1h-1zM14 3h1v1h-1zM16 3h4v1h-4zM21 3h2v1h-2zM24 3h1v1h-1zM26 3h1v1h-1zM28 3h3v1h-3zM32 3h1v1h-1zM0 4h1v1h-1zM2 4h3v1h-3zM6 4h1v1h-1zM8 4h3v1h-3zM13 4h1v1h-1zM15 4h4v1h-4zM22 4h1v1h-1zM26 4h1v1h-1zM28 4h3v1h-3zM32 4h1v1h-1zM0 5h1v1h-1zM6 5h1v1h-1zM12 5h1v1h-1zM15 5h3v1h-3zM20 5h5v1h-5zM26 5h1v1h-1zM32 5h1v1h-1zM0 6h7v1h-7zM8 6h1v1h-1zM10 6h1v1h-1zM12 6h1v1h-1zM14 6h1v1h-1zM16 6h1v1h-1zM18 6h1v1h-1zM20 6h1v1h-1zM22 6h1v1h-1zM24 6h1v1h-1zM26 6h7v1h-7zM9 7h1v1h-1zM12 7h2v1h-2zM15 7h2v1h-2zM18 7h3v1h-3zM22 7h2v1h-2zM0 8h1v1h-1zM3 8h6v1h-6zM11 8h4v1h-4zM17 8h1v1h-1zM19 8h1v1h-1zM23 8h3v1h-3zM28 8h1v1h-1zM30 8h3v1h-3zM0 9h1v1h-1zM2 9h2v1h-2zM7 9h1v1h-1zM9 9h1v1h-1zM13 9h2v1h-2zM17 9h4v1h-4zM22 9h2v1h-2zM28 9h3v1h-3zM0 10h4v1h-4zM5 10h4v1h-4zM10 10h1v1h-1zM12 10h2v1h-2zM15 10h3v1h-3zM21 10h1v1h-1zM23 10h1v1h-1zM28 10h5v1h-5zM1 11h1v1h-1zM5 11h1v1h-1zM7 11h1v1h-1zM9 11h1v1h-1zM12 11h2v1h-2zM16 11h2v1h-2zM20 11h1v1h-1zM22 11h1v1h-1zM24 11h2v1h-2zM27 11h1v1h-1zM30 11h3v1h-3zM1 12h1v1h-1zM3 12h2v1h-2zM6 12h1v1h-1zM9 12h3v1h-3zM13 12h1v1h-1zM15 12h1v1h-1zM17 12h2v1h-2zM20 12h2v1h-2zM24 12h1v1h-1zM26 12h2v1h-2zM31 12h2v1h-2zM1 13h2v1h-2zM7 13h3v1h-3zM13 13h2v1h-2zM18 13h1v1h-1zM22 13h6v1h-6zM0 14h3v1h-3zM4 14h3v1h-3zM10 14h1v1h-1zM12 14h1v1h-1zM15 14h1v1h-1zM18 14h5v1h-5zM24 14h1v1h-1zM26 14h1v1h-1zM28 14h2v1h-2zM1 15h1v1h-1zM3 15h1v1h-1zM7 15h1v1h-1zM11 15h2v1h-2zM16 15h1v1h-1zM19 15h1v1h-1zM23 15h3v1h-3zM27 15h4v1h-4zM32 15h1v1h-1zM0 16h1v1h-1zM6 16h3v1h-3zM13 16h1v1h-1zM15 16h2v1h-2zM20 16h1v1h-1zM22 16h7v1h-7zM30 16h1v1h-1zM1 17h2v1h-2zM4 17h1v1h-1zM9 17h1v1h-1zM12 17h1v1h-1zM14 17h9v1h-9zM25 17h2v1h-2zM28 17h1v1h-1zM30 17h1v1h-1zM32 17h1v1h-1zM0 18h1v1h-1zM3 18h1v1h-1zM5 18h2v1h-2zM8 18h1v1h-1zM10 18h1v1h-1zM15 18h5v1h-5zM21 18h4v1h-4zM27 18h1v1h-1zM29 18h2v1h-2zM32 18h1v1h-1zM0 19h1v1h-1zM3 19h3v1h-3zM8 19h1v1h-1zM12 19h1v1h-1zM18 19h1v1h-1zM22 19h2v1h-2zM26 19h1v1h-1zM28 19h5v1h-5zM3 20h1v1h-1zM6 20h2v1h-2zM10 20h1v1h-1zM12 20h1v1h-1zM14 20h3v1h-3zM18 20h1v1h-1zM20 20h2v1h-2zM23 20h1v1h-1zM28 20h2v1h-2zM0 21h2v1h-2zM4 21h2v1h-2zM8 21h3v1h-3zM17 21h2v1h-2zM21 21h3v1h-3zM25 21h1v1h-1zM27 21h2v1h-2zM30 21h1v1h-1zM0 22h1v1h-1zM3 22h5v1h-5zM11 22h2v1h-2zM14 22h1v1h-1zM17 22h1v1h-1zM22 22h2v1h-2zM26 22h1v1h-1zM28 22h5v1h-5zM0 23h1v1h-1zM2 23h3v1h-3zM7 23h1v1h-1zM12 23h1v1h-1zM14 23h2v1h-2zM17 23h4v1h-4zM23 23h3v1h-3zM28 23h1v1h-1zM30 23h1v1h-1zM32 23h1v1h-1zM0 24h2v1h-2zM4 24h4v1h-4zM10 24h2v1h-2zM13 24h1v1h-1zM20 24h1v1h-1zM22 24h1v1h-1zM24 24h6v1h-6zM32 24h1v1h-1zM8 25h1v1h-1zM10 25h9v1h-9zM21 25h1v1h-1zM24 25h1v1h-1zM28 25h1v1h-1zM30 25h1v1h-1zM32 25h1v1h-1zM0 26h7v1h-7zM8 26h1v1h-1zM11 26h1v1h-1zM15 26h1v1h-1zM17 26h1v1h-1zM19 26h3v1h-3zM23 26h2v1h-2zM26 26h1v1h-1zM28 26h1v1h-1zM30 26h1v1h-1zM0 27h1v1h-1zM6 27h1v1h-1zM8 27h1v1h-1zM14 27h2v1h-2zM17 27h4v1h-4zM24 27h1v1h-1zM28 27h3v1h-3zM0 28h1v1h-1zM2 28h3v1h-3zM6 28h1v1h-1zM8 28h1v1h-1zM12 28h3v1h-3zM16 28h2v1h-2zM20 28h9v1h-9zM32 28h1v1h-1zM0 29h1v1h-1zM2 29h3v1h-3zM6 29h1v1h-1zM8 29h2v1h-2zM16 29h1v1h-1zM18 29h1v1h-1zM20 29h4v1h-4zM25 29h1v1h-1zM27 29h1v1h-1zM30 29h3v1h-3zM0 30h1v1h-1zM2 30h3v1h-3zM6 30h1v1h-1zM11 30h1v1h-1zM13 30h1v1h-1zM15 30h1v1h-1zM18 30h3v1h-3zM23 30h2v1h-2zM27 30h3v1h-3zM31 30h2v1h-2zM0 31h1v1h-1zM6 31h1v1h-1zM10 31h1v1h-1zM12 31h3v1h-3zM25 31h1v1h-1zM27 31h6v1h-6zM0 32h7v1h-7zM8 32h1v1h-1zM10 32h1v1h-1zM15 32h4v1h-4zM23 32h2v1h-2zM27 32h2v1h-2z';
