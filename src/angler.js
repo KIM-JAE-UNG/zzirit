@@ -69,6 +69,22 @@ const ANG = (() => {
       // turned to the camera, the fish held up, a few hops
       const d = Math.exp(-t * .9), h = Math.abs(Math.sin(t * 6.5)) * .75 * d;
       P.hop = h; P.cheer = 1; P.hr = [1.7, .55, 3.6]; P.elev = 80 * RAD; P.hl = [-2.5, .5, 7.0 + h * .3]; P.head = 0; P.nod = -.12; P.hip[2] += .05;
+    } else if (a === 'wave') {
+      // 손 흔들기: the free hand up high, waving; the rod rests in the other
+      const u = ease(t / .3) * (1 - ease((t - 2.1) / .3)), w = Math.sin(t * 10);
+      P.cheer = 1; P.happy = 1; P.hl = [mixn(-1.8, -2.25 + w * .55, u), mixn(.15, .55, u), mixn(2.8, 7.1, u)]; P.head = Math.sin(t * 3) * .18 * u; P.lean = -.04 * u; P.hip[2] += Math.abs(w) * .04 * u;
+    } else if (a === 'bow') {
+      // 인사: a slow bow from the hips, the free hand on the belly
+      const u = ease(t / .55) * (1 - ease((t - 1.35) / .55));
+      P.cheer = 1; P.happy = 1; P.lean = .62 * u; P.nod = .32 * u; P.head = 0; P.hl = [-1.0, mixn(.15, .95, u), mixn(2.8, 3.25, u)]; P.elev = mixn(78, 62, u) * RAD; P.hr = [1.75, .7 + .3 * u, 3.5];
+    } else if (a === 'dance' || a === 'zzirit') {
+      // 춤: hips and arms to a beat; the 찌릿 dance spins once and throws sparks
+      const zz = a === 'zzirit', w = t * (zz ? 8.5 : 7), s = Math.sin(w), b = Math.abs(Math.sin(w)), in0 = ease(t / .25) * (1 - ease((t - (zz ? 3.1 : 2.9)) / .3));
+      P.cheer = 1; P.happy = 1; P.hip = [s * .42 * in0, 0, 2.6 + b * .18 * in0]; P.hop = b * (zz ? .5 : .32) * in0;
+      P.fl = [-.85 - Math.max(0, s) * .25 * in0, 0, Math.max(0, -s) * .45 * in0]; P.fr = [.85 + Math.max(0, -s) * .25 * in0, 0, Math.max(0, s) * .45 * in0];
+      P.hl = [-2.2 + s * .3, .45, mixn(2.8, 5.6 + Math.sin(w + 1.6) * 1.5, in0)]; P.hr = [1.85, .55, mixn(3.5, 4.4 - Math.sin(w + 1.6) * .9, in0)]; P.elev = (72 + Math.sin(w + 1.6) * 14 * in0) * RAD;
+      P.head = s * .32 * in0; P.lean = Math.sin(w * .5) * .08 * in0; P.yaw = s * .25 * in0;
+      if (zz) { P.spin = ease((t - .45) / .7) * 360; P.spark = t > 1.1 && t < 3.1 ? .55 + .45 * Math.abs(Math.sin(t * 9)) : 0; }
     } else if (a === 'lose') {
       const u = ease(t / .35);
       P.elev = mixn(60, 12, u) * RAD; P.hr = [1.6, .9, 3.2 - .3 * u]; P.hl = [-1.7, .3, 2.5]; P.lean = .16 * u; P.nod = .5 * u; P.head = 0; P.hip[2] -= .12 * u;
@@ -94,8 +110,8 @@ const ANG = (() => {
           look, mode ('site' | 'remote'), in (pose input), fish: { sp } }
      returns the rod tip on the screen: { x, y } */
   function draw(c, o) {
-    const K = o.k, L = o.look, th = cl(o.pitch, 0, 80) * RAD, ct = Math.cos(th), st = Math.sin(th), al = (o.yaw - o.bearing) * RAD, ca = Math.cos(al), sa = Math.sin(al);
     const P = pose(o.in), T = o.in.T; P.hip = add(P.hip, [0, 0, .3]);
+    const K = o.k, L = o.look, th = cl(o.pitch, 0, 80) * RAD, ct = Math.cos(th), st = Math.sin(th), al = (o.yaw + (P.spin || 0) - o.bearing) * RAD, ca = Math.cos(al), sa = Math.sin(al);
     // figure → screen. depth grows toward the camera.
     const pr = p => { const r = p[0] * ca + p[1] * sa, f = -p[0] * sa + p[1] * ca; return [o.x + K * r, o.y - K * (f * ct + p[2] * st), -f * st + p[2] * ct]; };
     const vv = p => (-(-p[0] * sa + p[1] * ca)) * st + p[2] * ct; // how much a direction points at the camera
@@ -178,14 +194,14 @@ const ANG = (() => {
           const f0 = pr(add(headC, mul(fw, R * .8))), rx = sx(rt), uy = sx(unit(upv));
           c.save(); c.beginPath(); c.arc(hc[0], hc[1], Rk - .6, 0, TAU); c.clip();
           c.transform(rx[0], rx[1], -uy[0], -uy[1], f0[0], f0[1]); c.globalAlpha = cl(facing * 3, 0, 1);
-          const blink = (T % 3.7) < .12 || o.in.act === 'result';
+          const blink = (T % 3.7) < .12 || o.in.act === 'result' || P.happy;
           c.fillStyle = 'rgba(255,120,120,.4)'; c.beginPath(); c.ellipse(-1.22, .42, .42, .26, 0, 0, TAU); c.ellipse(1.22, .42, .42, .26, 0, 0, TAU); c.fill();
           c.strokeStyle = OL; c.fillStyle = OL; c.lineWidth = .2; c.lineCap = 'round';
           if (blink) { for (const s of [-1, 1]) { c.beginPath(); c.arc(s * .78, -.02, .3, Math.PI * 1.1, Math.PI * 1.9); c.stroke(); } }
           else if (o.in.act === 'bite') { for (const s of [-1, 1]) { c.beginPath(); c.arc(s * .78, -.1, .4, 0, TAU); c.fillStyle = '#fff'; c.fill(); c.stroke(); c.beginPath(); c.arc(s * .78, -.1, .14, 0, TAU); c.fillStyle = OL; c.fill(); } }
           else { for (const s of [-1, 1]) { c.beginPath(); c.ellipse(s * .78, -.08, .26, .33, 0, 0, TAU); c.fill(); } c.fillStyle = '#fff'; for (const s of [-1, 1]) { c.beginPath(); c.arc(s * .78 + .09, -.19, .09, 0, TAU); c.fill(); } }
           c.strokeStyle = OL; c.lineWidth = .18; c.beginPath();
-          if (o.in.act === 'bite') c.ellipse(0, .62, .2, .26, 0, 0, TAU); else if (o.in.act === 'result') { c.moveTo(-.42, .5); c.quadraticCurveTo(0, 1.05, .42, .5); c.closePath(); c.fillStyle = '#8A2B3C'; c.fill(); } else if (o.in.act === 'lose') c.arc(0, .86, .3, Math.PI * 1.15, Math.PI * 1.85); else c.arc(0, .42, .32, Math.PI * .15, Math.PI * .85);
+          if (o.in.act === 'bite') c.ellipse(0, .62, .2, .26, 0, 0, TAU); else if (o.in.act === 'result' || P.happy) { c.moveTo(-.42, .5); c.quadraticCurveTo(0, 1.05, .42, .5); c.closePath(); c.fillStyle = '#8A2B3C'; c.fill(); } else if (o.in.act === 'lose') c.arc(0, .86, .3, Math.PI * 1.15, Math.PI * 1.85); else c.arc(0, .42, .32, Math.PI * .15, Math.PI * .85);
           c.stroke(); c.restore();
         }
         if (hatK !== 'beanie') ballCap(c, hc[0], hc[1], Rk * 1.03, hp[0] / K, hp[1] / K, hpv, .02, L.hair);
@@ -211,7 +227,7 @@ const ANG = (() => {
     c.save();
     c.beginPath(); c.ellipse(o.x, o.y, K * 2.6, K * 2.6 * ct, 0, 0, TAU); c.fillStyle = 'rgba(5,10,19,.34)'; c.fill();
     const pu = .5 + .5 * Math.sin(T * 2.6);
-    c.beginPath(); c.ellipse(o.x, o.y, K * (3.3 + pu * .5), K * (3.3 + pu * .5) * ct, 0, 0, TAU); c.strokeStyle = o.mode === 'site' ? `rgba(124,196,255,${.85 - pu * .4})` : `rgba(201,211,224,${.7 - pu * .3})`; c.lineWidth = 1.8; if (o.mode !== 'site') c.setLineDash([4, 4]); c.stroke(); c.setLineDash([]);
+    if (!o.noRing) { c.beginPath(); c.ellipse(o.x, o.y, K * (3.3 + pu * .5), K * (3.3 + pu * .5) * ct, 0, 0, TAU); c.strokeStyle = o.mode === 'site' ? `rgba(124,196,255,${.85 - pu * .4})` : `rgba(201,211,224,${.7 - pu * .3})`; c.lineWidth = 1.8; if (o.mode !== 'site') c.setLineDash([4, 4]); c.stroke(); c.setLineDash([]); }
     parts.sort((a, b) => a.d - b.d); for (const p of parts) p.f();
     // 찌릿: sparks over the head when the bite runs up the line
     if (P.spark > 0) {

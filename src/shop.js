@@ -102,19 +102,21 @@ function zlCardHTML(L) {
     <span class="zl-meta"><b>${esc(zlName(L.id))}</b><span class="small">${esc(t('zl_t_' + L.id))} · ${esc(zlSpec(L))}</span></span>${tag}</button>`;
 }
 const ZL_TAB_ART = { lure: 'minnow', rod: 'rod_bolt', reel: 'reel_bolt', float: 'float_spark' };
+const ZL_TABS = [...ZL.KINDS, 'emote'];
 VIEWS.lures = {
   render(el) {
     zpEnsure();
-    const tab = ZL.KINDS.includes(S.shopTab) ? S.shopTab : (S.shopTab = lsGet('shopTab', 'lure'), ZL.KINDS.includes(S.shopTab) ? S.shopTab : (S.shopTab = 'lure'));
+    const tab = ZL_TABS.includes(S.shopTab) ? S.shopTab : (S.shopTab = lsGet('shopTab', 'lure'), ZL_TABS.includes(S.shopTab) ? S.shopTab : (S.shopTab = 'lure'));
     const items = ZL.LIST.filter(L => L.kind === tab);
     el.innerHTML = `<div class="page lures-page">
       <header class="zl-hero">
         <div class="zl-hero-t"><p class="eyebrow"><span class="zl-hero-mark">${ZL.mark('silver', 'hero')}</span>ZZIRIT TACKLE</p><h1>${t('zl_title')}</h1><p class="lede">${t('zl_sub')}</p></div>
-        <div class="zl-hero-art${tab === 'float' ? ' float' : ''}" aria-hidden="true"><img src="${ZL.url(ZL_TAB_ART[tab], 'game')}" alt=""></div>
+        <div class="zl-hero-art${tab === 'float' ? ' float' : ''}${tab === 'emote' ? ' emo' : ''}" aria-hidden="true"><img src="${tab === 'emote' ? emoArt('zzirit') : ZL.url(ZL_TAB_ART[tab], 'game')}" alt=""></div>
         ${zpWalletHTML('shop')}
       </header>
-      <div class="chips zl-tabs" role="tablist">${ZL.KINDS.map(k => `<button class="chip${k === tab ? ' on' : ''}" role="tab" aria-selected="${k === tab}" data-zltab="${k}">${t('shop_t_' + k)}${myGear(k) && k !== 'lure' ? '<i class="zl-dot"></i>' : ''}</button>`).join('')}</div>
-      <div class="zl-grid">${items.map(L => zlCardHTML(L)).join('')}</div>
+      <div class="chips zl-tabs" role="tablist">${ZL_TABS.map(k => `<button class="chip${k === tab ? ' on' : ''}" role="tab" aria-selected="${k === tab}" data-zltab="${k}">${t('shop_t_' + k)}${myGear(k) && k !== 'lure' ? '<i class="zl-dot"></i>' : ''}</button>`).join('')}</div>
+      ${tab === 'emote' ? `<p class="muted small emo-note">${icon('users')}${t('emo_note')}</p>` : ''}
+      <div class="zl-grid">${tab === 'emote' ? EMO.map(emoCardHTML).join('') : items.map(L => zlCardHTML(L)).join('')}</div>
       <p class="muted small zl-signote">${ZL.mark('silver', 'note')}${t('zl_sig_note')}</p>
       ${zpMine() && ZP.st ? zpBookHTML() : ''}
       <p class="fine">${t('zp_fine')}</p>

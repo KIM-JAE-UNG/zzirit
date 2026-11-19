@@ -151,7 +151,26 @@ async function until(fn, ms = 6000, step = 80) { const t0 = Date.now(); let v; w
     ok(await A.evaluate(() => { const c = charOf(S.me, S.uid); return c.re === 'reel_lbr' && CH.svg(c, 'full').includes('#C9A13A'); }), 'character: the gold LB reel on the rod');
     ok(await A.evaluate(() => { const P = ZL.perk(ZL.KINDS.map(myGear)); return lvFloat() === 'float_ball' && P.win >= .1 && P.reel > 1.1 && lvReach() === 60; }), 'live: the ball float on the water, the reel and float help together, the basic rod casts 60 m');
     
-    await go(A, 'lures', 900); await A.click('[data-zltab="lure"]'); await A.waitForTimeout(300);
+    // emotes: a fifth section — waving free, the rest for points, drawn with my own character
+    await go(A, 'lures', 900); await A.click('[data-zltab="emote"]'); await A.waitForTimeout(500);
+    const emo = await A.$$eval('.zl-card', ns => ns.map(n => n.dataset.emo + (n.classList.contains('sig') ? '*' : '') + ':' + n.querySelector('.zl-tag').textContent.trim()));
+    ok(JSON.stringify(emo) === JSON.stringify(['wave:무료', 'bow:150P', 'dance:300P', 'zzirit*:800P']), 'emotes: wave free, bow 150, dance 300, the 찌릿 dance a signature 800 — ' + JSON.stringify(emo));
+    ok(await A.$$eval('.zl-card img', ns => ns.every(n => n.complete && n.naturalWidth > 0)) && /라이브에서 내 캐릭터가 움직여요/.test(await A.$eval('.emo-note', n => n.textContent)), 'emotes: every picture draws, and the section says what they are');
+    await shot(A, 's07_shop_emote', true);
+    await A.click('[data-emo="bow"]'); await A.waitForTimeout(700);
+    ok(await A.$eval('.emo-cv', c => { const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let n = 0; for (let i = 3; i < d.length; i += 16) if (d[i] > 0) n++; return n > 500; }), 'emote page: my character bows on the stage');
+    ok(/위치는 보내지 않아요/.test(await A.$eval('.emo-detail', n => n.textContent)), 'emote page: says the place is not sent');
+    await A.click('[data-emb="buy"]'); await A.waitForTimeout(250);
+    d = await dump(); ok(d.ZPS.wal[aId].bal === 150, 'emote: nothing spent on the first tap');
+    await A.click('[data-emb="buy"]');
+    ok(!!(await until(() => A.$('.emo-detail a[href="#live"]'), 4000)), 'emote: bought, and the page now leads to Live');
+    d = await dump(); ok(d.ZPS.wal[aId].bal === 0 && d.ZPS.owned[aId].includes('emo_bow') && d.ZPS.led.some(x => x.acct === aId && x.ref === 'emo_bow' && x.d === -150), 'emote: 150P came off on the server, the bow is owned');
+    await shot(A, 's07b_emote_bought'); await closeModals(A); await A.waitForTimeout(300);
+    ok(await A.$eval('[data-emo="bow"] .zl-tag', n => /보유/.test(n.textContent)) && await A.evaluate(() => emoOwns('bow') && emoOwns('wave') && !emoOwns('dance')), 'emote: the card says owned');
+    await A.click('[data-emo="dance"]'); await A.waitForTimeout(500);
+    ok(await A.$eval('.emo-detail [data-emb], .emo-detail .btn[disabled]', n => n.disabled).catch(() => false) && /300P 더/.test(await A.$eval('.emo-detail', n => n.textContent)), 'emote: not enough points for the dance — says how many more');
+    await closeModals(A);
+    await A.click('[data-zltab="lure"]'); await A.waitForTimeout(300);
     ok(/사진 이벤트 1등/.test(await A.$eval('.zp-book', n => n.textContent)), 'the book shows the operator\'s note');
 
     /* ---------- a bank transfer in the payment window (only when the operator turns it on) ---------- */
@@ -176,6 +195,13 @@ async function until(fn, ms = 6000, step = 80) { const t0 = Date.now(); let v; w
     await P.tap('[data-zl="minnow"]'); await P.waitForTimeout(600); await shot(P, 's10_phone_lure');
     ok(await P.$eval('.zl-detail', n => n.getBoundingClientRect().width <= 390), 'phone: the lure page fits');
     await closeModals(P);
+    await P.tap('[data-zltab="emote"]'); await P.waitForTimeout(600);
+    ok(await P.evaluate(() => document.documentElement.scrollWidth <= 391) && (await P.$$('.emo-card')).length === 4, 'phone: the emote section fits the width');
+    await shot(P, 's10b_phone_emotes', true);
+    await P.tap('[data-emo="zzirit"]'); await P.waitForTimeout(1600);
+    ok(await P.$eval('.zl-detail', n => n.getBoundingClientRect().width <= 390 && n.getBoundingClientRect().left >= 0) && await P.$eval('.emo-cv', c => c.getBoundingClientRect().width > 200), 'phone: the 찌릿 dance page fits, the stage shows');
+    await shot(P, 's10c_phone_emote_zzirit'); await closeModals(P);
+    await P.tap('[data-zltab="lure"]'); await P.waitForTimeout(300);
     await P.evaluate(() => openDonate()); await P.waitForTimeout(700);
     const toss = await P.$eval('.pay-bank a.btn-toss', n => n.getAttribute('href')).catch(() => '');
     ok(/^supertoss:\/\/send\?amount=\d+&bank=%EC%8B%A0%ED%95%9C%EC%9D%80%ED%96%89&accountNo=110000000000/.test(toss), 'phone payment: Toss opens with the bank, account and amount filled in — ' + toss);

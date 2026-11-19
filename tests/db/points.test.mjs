@@ -62,7 +62,8 @@ check(s.bal === 0 && s.earned === 0 && J(s.owned) === '[]', 'a new angler: no po
 const price = Object.fromEntries(s.items.map(i => [i.id, i.price]));
 check(price.spoon === 100 && price.vib === 150 && price.egi === 200 && price.tai === 300 && price.gold === null, 'the shop lists the lures with their prices (the gold one not for sale): ' + J(s.items));
 check(price.jig === 800 && price.minnow === 1000 && price.rod_bolt === 1200 && price.reel_bolt === 1200 && price.rod_spark === 900 && price.reel_spark === 900 && price.float_spark === 800 && price.float_bolt === 1000, 'the signature pieces cost a few weeks of winning (800–1,200)');
-check(price.rod_iso === 150 && price.rod_wine === 250 && price.reel_red === 180 && price.reel_lbr === 250 && price.float_ball === 100 && price.float_led === 200 && s.items.length === 19, 'rods, reels and floats are on the shelf too');
+check(price.rod_iso === 150 && price.rod_wine === 250 && price.reel_red === 180 && price.reel_lbr === 250 && price.float_ball === 100 && price.float_led === 200 && s.items.length === 22, 'rods, reels and floats are on the shelf too');
+check(price.emo_bow === 150 && price.emo_dance === 300 && price.emo_zzirit === 800 && !('emo_wave' in price) && !('wave' in price), 'emotes on the shelf: bow 150, dance 300, the 찌릿 dance 800 (waving is free, nothing to buy)');
 check(J(s.rx.top) === '[]' && s.rx.n === 0 && s.rx.me === null && J(s.rx.last) === '[]', 'empty boards');
 check(/not_signed_in/.test(await fails(() => asRole('authenticated', '', () => q(`select public.zp_state()`)))), 'signed out: no state');
 check((await fails(() => asRole('anon', '', () => q(`select public.zp_state()`)))) !== null, 'anon cannot call it');
@@ -169,6 +170,12 @@ check(await grant(ADM, E, 50) === 550, 'to a linked phone means to its account')
 r = await buy(A, 'reel_lbr');
 check(r.bal === 300 && await owns(A, 'reel_lbr'), 'a reel from the new sections: 250 off');
 check(/not_enough/.test(await fails(() => buy(A, 'rod_bolt'))), 'a signature rod needs 1,200');
+r = await buy(A, 'emo_dance');
+check(r.bal === 0 && await owns(A, 'emo_dance') && await bal(A) === 0, 'an emote is bought like gear: 300 off, the dance is mine');
+check(/owned/.test(await fails(() => buy(A, 'emo_dance'))) && /not_enough/.test(await fails(() => buy(A, 'emo_bow'))), 'the same emote twice: no; the bow with no points: no');
+check(/no_item/.test(await fails(() => buy(A, 'wave'))) && /no_item/.test(await fails(() => buy(A, 'emo_wave'))), 'waving is not sold');
+check(J((await q(`select perk from public.zp_items where id like 'emo_%'`)).rows.map(x => x.perk)) === J([{}, {}, {}]), 'emotes do nothing in the game (no perk)');
+check(await grant(ADM, A, 300) === 300, 'points back for the rest of the test');
 check(await grant(ADM, A, -9999) === 0 && await bal(A) === 0, 'taking points stops at zero');
 check(/bad_amount/.test(await fails(() => grant(ADM, A, 0))) && /no_account/.test(await fails(() => grant(ADM, '12345678-1234-1234-1234-123456789012', 10))), 'zero, or nobody: refused');
 s = await state(A);

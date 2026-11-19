@@ -1887,6 +1887,32 @@ body[data-route="live"] #main { padding-left: 0; padding-right: 0; }
 .lv-chip.streak .ic { fill: rgba(124,196,255,.35); }
 @media (max-width: 480px) { .ms-m { grid-template-columns: 32px 1fr auto; gap: 8px; padding: 9px 10px; } .ms-ic { width: 32px; height: 32px; } .ms-head .btn { padding-inline: 10px; } }
 
+/* ===== 감정 표현 (emotes): the shop section and the picker in 찌릿 라이브 ===== */
+.zl-hero-art.emo { width: min(34%, 260px); right: 6%; }
+.zl-hero-art.emo img { transform: none; }
+@media (max-width: 760px) { .zl-hero-art.emo { width: 54%; } }
+.emo-note { display: flex; align-items: center; gap: 7px; margin: -2px 0 12px; }
+.emo-note .ic { width: 16px; height: 16px; flex: none; color: var(--azure); }
+.emo-card .zl-art img { filter: drop-shadow(0 6px 8px rgba(0,0,0,.4)); }
+.emo-card:hover .zl-art img { transform: scale(1.05); }
+.zl-detail.emo-detail .zl-stage { aspect-ratio: auto; padding-top: 6px; }
+.emo-cv { display: block; width: min(100%, 280px); height: auto; aspect-ratio: 560 / 440; }
+.lv-emo { position: absolute; z-index: 6; right: 62px; top: 76px; width: min(300px, calc(100% - 86px)); padding: 10px; border-radius: 18px; color: #E3F3FF; background: rgba(5,10,19,.86); border: 1px solid rgba(160,205,255,.18); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); box-shadow: 0 14px 30px rgba(0,0,0,.35); animation: lvin .25s ease both; }
+.lv-emo[hidden] { display: none; }
+.lv-emoh { margin: 2px 4px 8px; font-size: 12.5px; font-weight: 700; letter-spacing: .02em; color: rgba(227,243,255,.75); }
+.lv-emol { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+.lv-emob { position: relative; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 4px 4px 8px; border-radius: 14px; border: 1px solid rgba(160,205,255,.16); background: radial-gradient(120% 100% at 30% 10%, #1A2A44, #0A1322); color: #fff; font: inherit; cursor: pointer; }
+.lv-emob.sig { background: radial-gradient(120% 100% at 30% 10%, #10285E, #040B1E); border-color: rgba(124,196,255,.4); }
+.lv-emob:hover { border-color: var(--azure); }
+.lv-emob img { display: block; width: 100%; aspect-ratio: 2 / 1; object-fit: contain; }
+.lv-emob b { font-size: 13px; }
+.lv-emob small { display: inline-flex; align-items: center; gap: 3px; font-size: 11.5px; color: var(--spark); }
+.lv-emob small .ic { width: 12px; height: 12px; }
+.lv-emob.lock img { opacity: .55; filter: grayscale(.4); }
+.lv-emon { margin: 8px 4px 0; font-size: 12px; color: rgba(227,243,255,.65); }
+.lv-tick.emo span { color: rgba(227,243,255,.85); }
+.lv-emob small.ok { color: rgba(227,243,255,.6); }
+
 </style>
 <div class="app">
   <aside class="rail">
@@ -2045,6 +2071,7 @@ body[data-route="live"] #main { padding-left: 0; padding-right: 0; }
   <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
   <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8.5" r="3.5"/><path d="M2.5 20c1-3.6 3.6-5.5 6.5-5.5s5.5 1.9 6.5 5.5"/><path d="M15.5 5.3a3.5 3.5 0 0 1 0 6.4M17.6 14.9c2 .7 3.3 2.4 3.9 5.1"/></symbol>
   <symbol id="i-clap" viewBox="0 0 24 24"><path d="M9.6 21c-2.9 0-5.1-2.3-5.1-5.3v-4.4a1.2 1.2 0 0 1 2.4 0v2.2V6.7a1.2 1.2 0 0 1 2.4 0v5.1V5.4a1.2 1.2 0 0 1 2.4 0v6.4V7a1.2 1.2 0 0 1 2.4 0v8.4c0 3.1-1.9 5.6-4.5 5.6z"/><path d="M17.6 4.2l1-1.6M19.4 7.3l1.8-.5M18.6 10.4l1.7.7"/></symbol>
+  <symbol id="i-smile" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 14.2c1 1.5 2.4 2.3 4 2.3s3-.8 4-2.3M9 9.6v.6M15 9.6v.6"/></symbol>
   <symbol id="i-user-plus" viewBox="0 0 24 24"><circle cx="10" cy="8" r="4"/><path d="M2.5 20.5c1.5-4 4.4-6 7.5-6 1.6 0 3 .5 4.3 1.4M18.5 13.5v6M15.5 16.5h6"/></symbol>
   <symbol id="i-user-check" viewBox="0 0 24 24"><circle cx="10" cy="8" r="4"/><path d="M2.5 20.5c1.5-4 4.4-6 7.5-6 1.6 0 3 .5 4.3 1.4M15 17.5l2 2 4-4.5"/></symbol>
   <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></symbol>
@@ -3631,6 +3658,25 @@ Object.assign(T, {
   zp_r_mis: ['오늘의 미션', "Today's mission", '今日のミッション', '今日任务'],
   wn_dm_h: ['오늘의 미션과 연속 출석', 'Daily missions and streaks', '今日のミッションと連続ログイン', '今日任务和连续签到'],
   wn_dm_p: ['라이브에서 날마다 미션 3개를 하면 포인트를 받아요. 매일 들어오면 불꽃 숫자가 커지고, 7일째마다 +30P.', 'Do three small missions in Live each day for points. Come back every day to grow your flame — every 7th day pays +30P.', 'ライブで毎日3つのミッションをするとポイント。毎日来ると炎の数字が増え、7日目ごとに+30P。', '每天在实况完成3个任务可得积分。每天来访火焰数字会增长，每第7天+30P。'],
+  shop_t_emote: ['감정 표현', 'Emotes', 'エモート', '表情动作'],
+  emo_title: ['감정 표현', 'Emotes', 'エモート', '表情动作'],
+  emo_n_wave: ['손 흔들기', 'Wave', '手を振る', '挥手'], emo_n_bow: ['인사', 'Bow', 'おじぎ', '鞠躬'], emo_n_dance: ['춤', 'Dance', 'ダンス', '跳舞'], emo_n_zzirit: ['찌릿 댄스', 'ZZIRIT dance', 'ZZIRITダンス', 'ZZIRIT舞'],
+  emo_say_wave: ['안녕!', 'Hi!', 'やあ！', '嗨！'], emo_say_bow: ['반가워요', 'Nice to meet you', 'よろしく', '你好呀'], emo_say_dance: ['신난다!', 'Woo-hoo!', 'やったー！', '好开心！'], emo_say_zzirit: ['찌릿!', 'ZZIRIT!', 'ZZIRIT！', 'ZZIRIT！'],
+  emo_tick_wave: ['님이 손을 흔들었어요', 'waved at everyone', 'さんが手を振りました', '挥了挥手'], emo_tick_bow: ['님이 인사했어요', 'bowed hello', 'さんがおじぎしました', '鞠了个躬'], emo_tick_dance: ['님이 춤을 췄어요', 'danced', 'さんが踊りました', '跳了支舞'], emo_tick_zzirit: ['님이 찌릿 댄스를 췄어요', 'did the ZZIRIT dance', 'さんがZZIRITダンスを踊りました', '跳了ZZIRIT舞'],
+  emo_d_wave: ['내 캐릭터가 손을 크게 흔들어요. 같은 물가 사람들에게 「안녕!」 말풍선이 떠요. 누구나 무료.', 'Your character waves big, and people at the same water see a “Hi!” bubble. Free for everyone.', 'キャラクターが大きく手を振り、同じ水辺の人に「やあ！」の吹き出しが出ます。誰でも無料。', '你的角色用力挥手，同一片水边的人会看到“嗨！”气泡。所有人免费。'],
+  emo_d_bow: ['허리를 숙여 꾸벅 인사해요. 처음 만난 낚시꾼에게 딱 좋아요.', 'A polite bow from the waist. Just right for an angler you just met.', '腰を曲げてぺこりとおじぎ。初めて会った釣り人にぴったり。', '弯腰鞠个躬，见到新钓友时正合适。'],
+  emo_d_dance: ['엉덩이와 팔을 흔들며 신나게 춤춰요. 대물을 잡은 날에 어울려요.', 'Swing your hips and arms to a beat. Made for the day you land a big one.', '腰と腕を振って楽しく踊ります。大物を釣った日にぴったり。', '扭动身体开心跳舞，钓到大鱼的日子最合适。'],
+  emo_d_zzirit: ['한 바퀴 돌고 머리 위로 번개가 튀는 찌릿 시그니처 춤이에요.', 'Spin once and dance with sparks over your head — the ZZIRIT signature move.', 'くるっと一回転して頭上に稲妻が走る、ZZIRITのシグネチャーダンス。', '转一圈，头顶闪出电光——ZZIRIT签名舞。'],
+  emo_where: ['찌릿 라이브에서 웃는 얼굴 버튼으로 써요. 같은 물가 사람들에게 말풍선으로 보여요 (내 위치는 보내지 않아요).', 'Use it in ZZIRIT Live with the smile button. People at the same water see a bubble (your location is not sent).', 'ZZIRITライブの笑顔ボタンで使います。同じ水辺の人に吹き出しで見えます（位置は送りません）。', '在ZZIRIT实况中点笑脸按钮使用。同一片水边的人会看到气泡（不发送你的位置）。'],
+  emo_note: ['라이브에서 내 캐릭터가 움직여요. 손 흔들기는 무료, 나머지는 포인트로 살 수 있어요.', 'Your character moves in Live. Waving is free; the rest you can buy with points.', 'ライブでキャラクターが動きます。手を振るは無料、ほかはポイントで買えます。', '在实况中你的角色会动。挥手免费，其他可用积分购买。'],
+  emo_free: ['무료', 'Free', '無料', '免费'],
+  emo_use: ['라이브에서 하기', 'Use it in Live', 'ライブで使う', '去实况使用'],
+  emo_bought: ['{name}을(를) 배웠어요! 라이브에서 해 보세요', 'You learned {name}! Try it in Live', '{name}を覚えました！ライブでやってみよう', '学会了{name}！去实况试试'],
+  emo_need_stand: ['물가를 골라 서면 할 수 있어요', 'Pick a spot by the water first', '水辺を選んで立つとできます', '先在水边选个位置站好'],
+  emo_busy: ['고기와 싸우는 중이에요. 끝나고 해요!', 'You are fighting a fish — after that!', '魚とファイト中です。終わってから！', '正在和鱼搏斗，结束后再来！'],
+  emo_hidden: ['「내 찌 숨기기」가 켜져 있어서 나만 보여요.', '“Hide my float” is on, so only you see it.', '「自分のウキを隠す」がオンなので自分だけに見えます。', '已开启“隐藏我的浮漂”，只有你能看到。'],
+  wn_emo_h: ['캐릭터 감정 표현', 'Character emotes', 'キャラクターのエモート', '角色表情动作'],
+  wn_emo_p: ['라이브에서 웃는 얼굴 버튼을 누르면 내 캐릭터가 손을 흔들고, 인사하고, 춤춰요. 같은 물가 사람에게 말풍선이 보여요. 인사·춤은 낚시점에서 포인트로.', 'Tap the smile button in Live and your character waves, bows or dances — people at the same water see a bubble. Bows and dances are in the tackle shop for points.', 'ライブの笑顔ボタンでキャラクターが手を振ったり、おじぎしたり、踊ったり。同じ水辺の人に吹き出しが見えます。おじぎ・ダンスは釣具店でポイントで。', '在实况点笑脸按钮，角色会挥手、鞠躬、跳舞，同一片水边的人能看到气泡。鞠躬和舞蹈可在渔具店用积分购买。'],
   credits_map: ['라이브 지도', 'Live map', 'ライブ地図', '实况地图'],
 });
 
@@ -7755,7 +7801,7 @@ function openShareCard(blob, name, text) {
 }
 
 /* ===== What's new: shown once after a big update (website only; needs the matching server update) ===== */
-const WHATS_NEW = '2026-11-19a', WN_TS = Date.parse('2026-11-07T03:00:00Z'); // people who joined after this have nothing to catch up on
+const WHATS_NEW = '2026-11-20a', WN_TS = Date.parse('2026-11-07T03:00:00Z'); // people who joined after this have nothing to catch up on
 const BOOT_AT = Date.now();
 /* what each update brought, newest last; people see what came after the last one they saw (at most 6 lines) */
 const WN_ITEMS = [
@@ -7769,7 +7815,8 @@ const WN_ITEMS = [
   ['2026-11-13a', 'user', 'wn_char'], ['2026-11-13a', 'coin', 'wn_mkt'], ['2026-11-13a', 'fish', 'wn_fish'],
   ['2026-11-17a', 'bell', 'wn_am'],
   ['2026-11-18a', 'users', 'wn_fr'],
-  ['2026-11-19a', 'target', 'wn_dm']
+  ['2026-11-19a', 'target', 'wn_dm'],
+  ['2026-11-20a', 'smile', 'wn_emo']
 ];
 // the new look already says the fish were redrawn
 const WN_PART = { wn_fish: 'wn_look' };
@@ -11701,19 +11748,21 @@ function zlCardHTML(L) {
     <span class="zl-meta"><b>${esc(zlName(L.id))}</b><span class="small">${esc(t('zl_t_' + L.id))} · ${esc(zlSpec(L))}</span></span>${tag}</button>`;
 }
 const ZL_TAB_ART = { lure: 'minnow', rod: 'rod_bolt', reel: 'reel_bolt', float: 'float_spark' };
+const ZL_TABS = [...ZL.KINDS, 'emote'];
 VIEWS.lures = {
   render(el) {
     zpEnsure();
-    const tab = ZL.KINDS.includes(S.shopTab) ? S.shopTab : (S.shopTab = lsGet('shopTab', 'lure'), ZL.KINDS.includes(S.shopTab) ? S.shopTab : (S.shopTab = 'lure'));
+    const tab = ZL_TABS.includes(S.shopTab) ? S.shopTab : (S.shopTab = lsGet('shopTab', 'lure'), ZL_TABS.includes(S.shopTab) ? S.shopTab : (S.shopTab = 'lure'));
     const items = ZL.LIST.filter(L => L.kind === tab);
     el.innerHTML = `<div class="page lures-page">
       <header class="zl-hero">
         <div class="zl-hero-t"><p class="eyebrow"><span class="zl-hero-mark">${ZL.mark('silver', 'hero')}</span>ZZIRIT TACKLE</p><h1>${t('zl_title')}</h1><p class="lede">${t('zl_sub')}</p></div>
-        <div class="zl-hero-art${tab === 'float' ? ' float' : ''}" aria-hidden="true"><img src="${ZL.url(ZL_TAB_ART[tab], 'game')}" alt=""></div>
+        <div class="zl-hero-art${tab === 'float' ? ' float' : ''}${tab === 'emote' ? ' emo' : ''}" aria-hidden="true"><img src="${tab === 'emote' ? emoArt('zzirit') : ZL.url(ZL_TAB_ART[tab], 'game')}" alt=""></div>
         ${zpWalletHTML('shop')}
       </header>
-      <div class="chips zl-tabs" role="tablist">${ZL.KINDS.map(k => `<button class="chip${k === tab ? ' on' : ''}" role="tab" aria-selected="${k === tab}" data-zltab="${k}">${t('shop_t_' + k)}${myGear(k) && k !== 'lure' ? '<i class="zl-dot"></i>' : ''}</button>`).join('')}</div>
-      <div class="zl-grid">${items.map(L => zlCardHTML(L)).join('')}</div>
+      <div class="chips zl-tabs" role="tablist">${ZL_TABS.map(k => `<button class="chip${k === tab ? ' on' : ''}" role="tab" aria-selected="${k === tab}" data-zltab="${k}">${t('shop_t_' + k)}${myGear(k) && k !== 'lure' ? '<i class="zl-dot"></i>' : ''}</button>`).join('')}</div>
+      ${tab === 'emote' ? `<p class="muted small emo-note">${icon('users')}${t('emo_note')}</p>` : ''}
+      <div class="zl-grid">${tab === 'emote' ? EMO.map(emoCardHTML).join('') : items.map(L => zlCardHTML(L)).join('')}</div>
       <p class="muted small zl-signote">${ZL.mark('silver', 'note')}${t('zl_sig_note')}</p>
       ${zpMine() && ZP.st ? zpBookHTML() : ''}
       <p class="fine">${t('zp_fine')}</p>
@@ -12054,6 +12103,22 @@ const ANG = (() => {
       // turned to the camera, the fish held up, a few hops
       const d = Math.exp(-t * .9), h = Math.abs(Math.sin(t * 6.5)) * .75 * d;
       P.hop = h; P.cheer = 1; P.hr = [1.7, .55, 3.6]; P.elev = 80 * RAD; P.hl = [-2.5, .5, 7.0 + h * .3]; P.head = 0; P.nod = -.12; P.hip[2] += .05;
+    } else if (a === 'wave') {
+      // 손 흔들기: the free hand up high, waving; the rod rests in the other
+      const u = ease(t / .3) * (1 - ease((t - 2.1) / .3)), w = Math.sin(t * 10);
+      P.cheer = 1; P.happy = 1; P.hl = [mixn(-1.8, -2.25 + w * .55, u), mixn(.15, .55, u), mixn(2.8, 7.1, u)]; P.head = Math.sin(t * 3) * .18 * u; P.lean = -.04 * u; P.hip[2] += Math.abs(w) * .04 * u;
+    } else if (a === 'bow') {
+      // 인사: a slow bow from the hips, the free hand on the belly
+      const u = ease(t / .55) * (1 - ease((t - 1.35) / .55));
+      P.cheer = 1; P.happy = 1; P.lean = .62 * u; P.nod = .32 * u; P.head = 0; P.hl = [-1.0, mixn(.15, .95, u), mixn(2.8, 3.25, u)]; P.elev = mixn(78, 62, u) * RAD; P.hr = [1.75, .7 + .3 * u, 3.5];
+    } else if (a === 'dance' || a === 'zzirit') {
+      // 춤: hips and arms to a beat; the 찌릿 dance spins once and throws sparks
+      const zz = a === 'zzirit', w = t * (zz ? 8.5 : 7), s = Math.sin(w), b = Math.abs(Math.sin(w)), in0 = ease(t / .25) * (1 - ease((t - (zz ? 3.1 : 2.9)) / .3));
+      P.cheer = 1; P.happy = 1; P.hip = [s * .42 * in0, 0, 2.6 + b * .18 * in0]; P.hop = b * (zz ? .5 : .32) * in0;
+      P.fl = [-.85 - Math.max(0, s) * .25 * in0, 0, Math.max(0, -s) * .45 * in0]; P.fr = [.85 + Math.max(0, -s) * .25 * in0, 0, Math.max(0, s) * .45 * in0];
+      P.hl = [-2.2 + s * .3, .45, mixn(2.8, 5.6 + Math.sin(w + 1.6) * 1.5, in0)]; P.hr = [1.85, .55, mixn(3.5, 4.4 - Math.sin(w + 1.6) * .9, in0)]; P.elev = (72 + Math.sin(w + 1.6) * 14 * in0) * RAD;
+      P.head = s * .32 * in0; P.lean = Math.sin(w * .5) * .08 * in0; P.yaw = s * .25 * in0;
+      if (zz) { P.spin = ease((t - .45) / .7) * 360; P.spark = t > 1.1 && t < 3.1 ? .55 + .45 * Math.abs(Math.sin(t * 9)) : 0; }
     } else if (a === 'lose') {
       const u = ease(t / .35);
       P.elev = mixn(60, 12, u) * RAD; P.hr = [1.6, .9, 3.2 - .3 * u]; P.hl = [-1.7, .3, 2.5]; P.lean = .16 * u; P.nod = .5 * u; P.head = 0; P.hip[2] -= .12 * u;
@@ -12079,8 +12144,8 @@ const ANG = (() => {
           look, mode ('site' | 'remote'), in (pose input), fish: { sp } }
      returns the rod tip on the screen: { x, y } */
   function draw(c, o) {
-    const K = o.k, L = o.look, th = cl(o.pitch, 0, 80) * RAD, ct = Math.cos(th), st = Math.sin(th), al = (o.yaw - o.bearing) * RAD, ca = Math.cos(al), sa = Math.sin(al);
     const P = pose(o.in), T = o.in.T; P.hip = add(P.hip, [0, 0, .3]);
+    const K = o.k, L = o.look, th = cl(o.pitch, 0, 80) * RAD, ct = Math.cos(th), st = Math.sin(th), al = (o.yaw + (P.spin || 0) - o.bearing) * RAD, ca = Math.cos(al), sa = Math.sin(al);
     // figure → screen. depth grows toward the camera.
     const pr = p => { const r = p[0] * ca + p[1] * sa, f = -p[0] * sa + p[1] * ca; return [o.x + K * r, o.y - K * (f * ct + p[2] * st), -f * st + p[2] * ct]; };
     const vv = p => (-(-p[0] * sa + p[1] * ca)) * st + p[2] * ct; // how much a direction points at the camera
@@ -12163,14 +12228,14 @@ const ANG = (() => {
           const f0 = pr(add(headC, mul(fw, R * .8))), rx = sx(rt), uy = sx(unit(upv));
           c.save(); c.beginPath(); c.arc(hc[0], hc[1], Rk - .6, 0, TAU); c.clip();
           c.transform(rx[0], rx[1], -uy[0], -uy[1], f0[0], f0[1]); c.globalAlpha = cl(facing * 3, 0, 1);
-          const blink = (T % 3.7) < .12 || o.in.act === 'result';
+          const blink = (T % 3.7) < .12 || o.in.act === 'result' || P.happy;
           c.fillStyle = 'rgba(255,120,120,.4)'; c.beginPath(); c.ellipse(-1.22, .42, .42, .26, 0, 0, TAU); c.ellipse(1.22, .42, .42, .26, 0, 0, TAU); c.fill();
           c.strokeStyle = OL; c.fillStyle = OL; c.lineWidth = .2; c.lineCap = 'round';
           if (blink) { for (const s of [-1, 1]) { c.beginPath(); c.arc(s * .78, -.02, .3, Math.PI * 1.1, Math.PI * 1.9); c.stroke(); } }
           else if (o.in.act === 'bite') { for (const s of [-1, 1]) { c.beginPath(); c.arc(s * .78, -.1, .4, 0, TAU); c.fillStyle = '#fff'; c.fill(); c.stroke(); c.beginPath(); c.arc(s * .78, -.1, .14, 0, TAU); c.fillStyle = OL; c.fill(); } }
           else { for (const s of [-1, 1]) { c.beginPath(); c.ellipse(s * .78, -.08, .26, .33, 0, 0, TAU); c.fill(); } c.fillStyle = '#fff'; for (const s of [-1, 1]) { c.beginPath(); c.arc(s * .78 + .09, -.19, .09, 0, TAU); c.fill(); } }
           c.strokeStyle = OL; c.lineWidth = .18; c.beginPath();
-          if (o.in.act === 'bite') c.ellipse(0, .62, .2, .26, 0, 0, TAU); else if (o.in.act === 'result') { c.moveTo(-.42, .5); c.quadraticCurveTo(0, 1.05, .42, .5); c.closePath(); c.fillStyle = '#8A2B3C'; c.fill(); } else if (o.in.act === 'lose') c.arc(0, .86, .3, Math.PI * 1.15, Math.PI * 1.85); else c.arc(0, .42, .32, Math.PI * .15, Math.PI * .85);
+          if (o.in.act === 'bite') c.ellipse(0, .62, .2, .26, 0, 0, TAU); else if (o.in.act === 'result' || P.happy) { c.moveTo(-.42, .5); c.quadraticCurveTo(0, 1.05, .42, .5); c.closePath(); c.fillStyle = '#8A2B3C'; c.fill(); } else if (o.in.act === 'lose') c.arc(0, .86, .3, Math.PI * 1.15, Math.PI * 1.85); else c.arc(0, .42, .32, Math.PI * .15, Math.PI * .85);
           c.stroke(); c.restore();
         }
         if (hatK !== 'beanie') ballCap(c, hc[0], hc[1], Rk * 1.03, hp[0] / K, hp[1] / K, hpv, .02, L.hair);
@@ -12196,7 +12261,7 @@ const ANG = (() => {
     c.save();
     c.beginPath(); c.ellipse(o.x, o.y, K * 2.6, K * 2.6 * ct, 0, 0, TAU); c.fillStyle = 'rgba(5,10,19,.34)'; c.fill();
     const pu = .5 + .5 * Math.sin(T * 2.6);
-    c.beginPath(); c.ellipse(o.x, o.y, K * (3.3 + pu * .5), K * (3.3 + pu * .5) * ct, 0, 0, TAU); c.strokeStyle = o.mode === 'site' ? `rgba(124,196,255,${.85 - pu * .4})` : `rgba(201,211,224,${.7 - pu * .3})`; c.lineWidth = 1.8; if (o.mode !== 'site') c.setLineDash([4, 4]); c.stroke(); c.setLineDash([]);
+    if (!o.noRing) { c.beginPath(); c.ellipse(o.x, o.y, K * (3.3 + pu * .5), K * (3.3 + pu * .5) * ct, 0, 0, TAU); c.strokeStyle = o.mode === 'site' ? `rgba(124,196,255,${.85 - pu * .4})` : `rgba(201,211,224,${.7 - pu * .3})`; c.lineWidth = 1.8; if (o.mode !== 'site') c.setLineDash([4, 4]); c.stroke(); c.setLineDash([]); }
     parts.sort((a, b) => a.d - b.d); for (const p of parts) p.f();
     // 찌릿: sparks over the head when the bite runs up the line
     if (P.spark > 0) {
@@ -12330,9 +12395,11 @@ function lvBuild(el) {
       <button class="lv-sbtn" id="lv-book" aria-label="${esc(t('lv_book'))}">${icon('book')}</button>
       <button class="lv-sbtn" id="lv-dm" aria-label="${esc(t('dm_title'))}">${icon('target')}<b class="lv-nb num" id="lv-msb" hidden></b></button>
       <button class="lv-sbtn" id="lv-inv" aria-label="${esc(t('lv_inv'))}">${icon('user-plus')}</button>
+      <button class="lv-sbtn" id="lv-emo-b" aria-label="${esc(t('emo_title'))}">${icon('smile')}</button>
       <a class="lv-sbtn" href="#lures" aria-label="${esc(t('nav_lures'))}">${icon('lure')}</a>
       <button class="lv-sbtn" id="lv-snd" aria-label="${esc(t('lv_sound'))}" aria-pressed="${LVS.on}">${icon('megaphone')}</button>
     </div>
+    <div class="lv-emo" id="lv-emo" hidden></div>
     <div class="lv-ticker" id="lv-ticker" aria-live="polite"></div>
     <div class="lv-banner" id="lv-banner" aria-hidden="true"></div>
     <div class="lv-fight" id="lv-fight" hidden>
@@ -12358,6 +12425,8 @@ function lvBuild(el) {
   $('#lv-book', el).addEventListener('click', () => lvBook());
   $('#lv-dm', el).addEventListener('click', () => msOpen());
   $('#lv-inv', el).addEventListener('click', () => lvInvite());
+  $('#lv-emo-b', el).addEventListener('click', () => emoPick());
+  $('#lv-emo', el).addEventListener('click', e => { const b = e.target.closest('[data-emo-go]'); if (b) emoGo(b.dataset.emoGo); });
   $('#lv-ticker', el).addEventListener('click', e => { const b = e.target.closest('[data-clap]'); if (b) lvClap(b); });
   $('#lv-net', el).addEventListener('click', () => lvBook('net'));
   $('#lv-snd', el).addEventListener('click', e => { LVS.on = !LVS.on; lsSet('liveSnd', LVS.on); e.currentTarget.setAttribute('aria-pressed', LVS.on); if (LVS.on) LVS.play('nib'); });
@@ -12519,6 +12588,8 @@ function lvAngStep(dt, now) {
     if (to) yawTo = LMAP.bearing(A.at, to);
     else { if (!A.face || A.faceAt !== LV.waterAt) { const n = LMAP.nearest(LV.water, A.at.lng, A.at.lat, 400); A.face = n && !n.inside ? LMAP.bearing(A.at, n) : A.face || LV.map.getBearing(); A.faceAt = LV.waterAt; } yawTo = A.face; }
   }
+  // a wave, a bow or a dance (only while standing or waiting for a bite), turned to the camera
+  if (A.emo && now < A.emoEnd && (ph === 'idle' || ph === 'wait') && !walking) { act = A.emo; yawTo = LV.map.getBearing() + 180; } else if (A.emo && now >= A.emoEnd) A.emo = null;
   if (yawTo != null) { const dy = ((yawTo - A.yaw + 540) % 360) - 180; A.yaw += dy * Math.min(1, dt * (walking ? 14 : 9)); }
   if (act !== A.act) { A.act = act; A.t0 = now; }
   const t = ph === 'cast' && k ? (now - k.t0) / 1000 : ph === 'bite' && k ? (now - k.biteAt) / 1000 : (now - A.t0) / 1000;
@@ -12541,6 +12612,7 @@ function lvSchoolsShow() { LV.schools = (LV.schAll || []).filter(s => LMAP.water
 
 /* --- taps on the map: where to stand, where to cast --- */
 function lvTap(lng, lat) {
+  const eb = $('#lv-emo'); if (eb && !eb.hidden) { eb.hidden = true; return; }
   if (LV.phase !== 'idle' || !LV.ready || ($('#lv-cover') && $('#lv-cover').dataset.k)) return;
   if (LV.map.getZoom() < 14.5) { LV.map.easeTo({ center: [lng, lat], zoom: 16.4 }); return; }
   const p = { lng, lat }, kind = LMAP.waterAt(LV.water, lng, lat), R = lvReach();
@@ -12767,10 +12839,11 @@ function lvRoom() {
   if (key === LV.roomKey && LV.room) return;
   lvLeaveRoom(); LV.roomKey = key;
   LV.room = APP_AUTH.rt.room(key, myId(), {
-    events: ['bite', 'catch', 'clap'],
+    events: ['bite', 'catch', 'clap', 'emote'],
     sync: st => { const m = new Map(); for (const [id, arr] of Object.entries(st || {})) { const p = arr && arr[arr.length - 1]; if (p && id !== myId() && p.f) m.set(id, p); } LV.others = m; lvHud(); },
     msg: (ev, p) => {
       if (ev === 'clap') return lvClapGot(p);
+      if (ev === 'emote') return emoGot(p);
       if (!p || typeof p.x !== 'number') return;
       if (ev === 'bite') { lvFx('bolt', { lng: p.x, lat: p.y }, .8); }
       else if (ev === 'catch' && SPI[p.sp]) { lvFx('splash', { lng: p.x, lat: p.y }, 1); lvTick({ u: typeof p.u === 'string' ? p.u : '', n: String(p.n || '').slice(0, 12), sp: p.sp, cm: +p.cm || 0, tier: p.tier | 0, on: !!p.on }); }
@@ -12970,6 +13043,7 @@ function lvFrame(now) {
     if (inp && g.x > -120 && g.x < LV.w + 120 && g.y > -120 && g.y < LV.h + 160) tip = ANG.draw(c, { x: g.x, y: g.y, k: lvAngK(), yaw: A.yaw, bearing: map.getBearing(), pitch: map.getPitch(), look: A.look, mode: A.mode, in: inp, fish: LV.res && ph === 'result' ? { sp: SPI[LV.res.sp] } : null });
     A.tip = tip;
   }
+  emoFrame(c, now);
   if (k) {
     const a = lvG(k.from), tipX = tip ? tip.x : a.x, tipY = tip ? tip.y : a.y - 36;
     if (ph === 'cast') {
@@ -13091,6 +13165,164 @@ function liveArtSVG() {
     <circle cx="356" cy="200" r="16" fill="none" stroke="#7CC4FF" stroke-width="1" opacity=".5"/>
     <circle cx="356" cy="200" r="8" fill="#050A13" stroke="#7CC4FF" stroke-width="2.4"/><circle cx="356" cy="200" r="2.8" fill="#fff"/>
   </svg>`;
+}
+
+/* ===== 찌릿 라이브: 감정 표현 (emotes). The angler on the map waves, bows or dances, and the people at the same water
+   see it: a speech bubble over that person's float (no place is sent — only who and which move; the float is already
+   shared). Waving is free; the others are bought in the 찌릿 낚시점 with points (the server keeps the price and who owns
+   what, like the gear). The shop shows each move with the player's own character. ===== */
+const EMO = [
+  { id: 'wave', item: '', dur: 2.4, bg: ['#1A2A44', '#0A1322'] },
+  { id: 'bow', item: 'emo_bow', price: 150, dur: 2.4, bg: ['#1A2A44', '#0A1322'] },
+  { id: 'dance', item: 'emo_dance', price: 300, dur: 3.2, bg: ['#1A2A44', '#0A1322'] },
+  { id: 'zzirit', item: 'emo_zzirit', price: 800, sig: true, dur: 3.4, bg: ['#10285E', '#040B1E'] }
+];
+const EMO_BY = Object.fromEntries(EMO.map(e => [e.id, e]));
+const emoName = id => t('emo_n_' + id);
+function emoOwns(id) { const e = EMO_BY[id]; if (!e) return false; return !e.item || !!(typeof ZP !== 'undefined' && ZP.st && (ZP.st.owned || []).includes(e.item)); }
+function emoPrice(e) { const it = typeof ZP !== 'undefined' && ZP.st && (ZP.st.items || []).find(x => x.id === e.item); return it ? it.price : e.price || 0; }
+
+/* --- my own character doing a move, on a small canvas (the shop's cards and the detail) --- */
+function emoPaint(cv, id, tSec, opt) {
+  opt = opt || {};
+  const c = cv.getContext('2d'), w = cv.width, h = cv.height, e = EMO_BY[id] || EMO[0];
+  c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, w, h);
+  let look; try { look = ANG.look(charOf(S.me || {}, myId())); } catch (err) { look = ANG.look({}); }
+  const k = h / (opt.tall ? 17.5 : 14);
+  try { ANG.draw(c, { x: w / 2, y: h * (opt.tall ? .9 : .92), k, yaw: 180 + (opt.turn || 0), bearing: 0, pitch: 70, look, mode: 'look', noRing: true, in: { act: e.id, t: tSec, T: tSec + 1 } }); } catch (err) { }
+}
+const _emoArt = new Map();
+function emoArt(id) {
+  const key = id + '|' + (S.me && S.me.upd) + '|' + (typeof myGear === 'function' ? myGear('rod') : '');
+  let u = _emoArt.get(key); if (u) return u;
+  const cv = document.createElement('canvas'); cv.width = 480; cv.height = 240;
+  emoPaint(cv, id, { wave: 1.05, bow: 1.0, dance: 1.2, zzirit: 1.6 }[id] || 1);
+  try { u = cv.toDataURL('image/png'); } catch (err) { u = ''; }
+  if (_emoArt.size > 16) _emoArt.clear(); _emoArt.set(key, u); return u;
+}
+
+/* --- the shop: the emote section --- */
+function emoCardHTML(e) {
+  const own = emoOwns(e.id);
+  const tag = !e.item ? `<span class="zl-tag own">${t('emo_free')}</span>` : own ? `<span class="zl-tag own">${t('zl_owned')}</span>` : `<span class="zl-tag price num">${icon('coin')}${fmtN(emoPrice(e))}P</span>`;
+  return `<button class="zl-card emo-card${own ? ' own' : ''}${e.sig ? ' sig' : ''}" data-emo="${e.id}" style="--zl-a:${e.bg[0]};--zl-b:${e.bg[1]}">
+    ${e.sig ? `<span class="zl-sigb">${ZL.mark('silver', 'be' + e.id)}SIGNATURE</span>` : ''}
+    <span class="zl-art"><img src="${emoArt(e.id)}" alt="" decoding="async"></span>
+    <span class="zl-meta"><b>${esc(emoName(e.id))}</b><span class="small">${esc(t('emo_say_' + e.id))}</span></span>${tag}</button>`;
+}
+function openEmote(id) {
+  const e = EMO_BY[id]; if (!e) return;
+  let armed = 0, fresh = false, raf = 0;
+  const body = () => {
+    const own = emoOwns(id), price = emoPrice(e), bal = typeof zpBal === 'function' ? zpBal() : 0;
+    let act;
+    if (!e.item || own) act = `<a class="btn btn-primary btn-lg btn-block${fresh ? ' pop' : ''}" href="#live">${icon('live')}${t('emo_use')}</a>`;
+    else if (!zpOn()) act = `<p class="muted small">${t('zp_web_only')}</p>`;
+    else if (!zpMine()) act = `<p class="muted small">${t('zp_need_profile')}</p><button class="btn btn-primary btn-lg btn-block" data-act="onboard">${t('onb_go')}</button>`;
+    else if (!ZP.st) act = `<button class="btn btn-primary btn-lg btn-block" disabled>${t(ZP.err ? 'zp_err' : 'loading')}</button>`;
+    else if (bal >= price) act = `<button class="btn btn-primary btn-lg btn-block${armed ? ' armed' : ''}" data-emb="buy">${icon('coin')}${t(armed ? 'zl_buy_sure' : 'zl_buy', { p: fmtN(price) })}</button>`;
+    else act = `<button class="btn btn-primary btn-lg btn-block" disabled>${icon('coin')}${t('zl_buy', { p: fmtN(price) })}</button><p class="hint">${t('zl_short', { n: fmtN(price - bal) })}</p><a class="btn btn-line btn-block" href="#live">${t('zp_earn_more')}</a>`;
+    return `<div class="zl-detail emo-detail" style="--zl-a:${e.bg[0]};--zl-b:${e.bg[1]}">
+      <div class="zl-stage${e.sig ? ' sig' : ''}"><canvas class="emo-cv" width="560" height="440" aria-label="${esc(emoName(id))}"></canvas>${e.sig ? `<span class="zl-badge sig">${ZL.mark('silver', 'de')}SIGNATURE</span>` : ''}${fresh ? `<span class="zl-new">${t('zl_new')}</span>` : ''}</div>
+      <div class="zl-body">
+        <p class="eyebrow no-up">${t('shop_t_emote')}${e.item ? '' : ' · ' + t('emo_free')}</p>
+        <h2>${esc(emoName(id))}</h2>
+        <p class="lede">${t('emo_d_' + id)}</p>
+        <p class="muted small zl-where">${icon('users')} ${t('emo_where')}</p>
+        <div class="zl-act">${act}</div>
+        ${e.item && zpMine() && ZP.st ? `<p class="muted small zl-bal">${icon('coin')} ${t('zp_have', { n: fmtN(bal) })}</p>` : ''}
+      </div></div>`;
+  };
+  const w = openModal(`<div id="emo-box">${body()}</div>`, { label: emoName(id) });
+  const t0 = performance.now();
+  const loop = () => {
+    if (!w.isConnected) return; raf = requestAnimationFrame(loop);
+    const cv = $('.emo-cv', w); if (!cv) return;
+    emoPaint(cv, id, ((performance.now() - t0) / 1000) % (e.dur + .8), { tall: true });
+  };
+  raf = requestAnimationFrame(loop);
+  const paint = () => { const b = $('#emo-box', w); if (b && b.isConnected) b.innerHTML = body(); };
+  if (zpOn() && !ZP.st) zpLoad().then(paint);
+  w.addEventListener('click', async ev => {
+    if (ev.target.closest('[data-act="onboard"]')) { closeModal(w); openOnboarding(); return; }
+    if (ev.target.closest('a[href^="#"]')) { closeModal(w); return; }
+    const b = ev.target.closest('[data-emb]'); if (!b || b.disabled) return;
+    if (!armed) { armed = setTimeout(() => { armed = 0; paint(); }, 3500); paint(); return; }
+    clearTimeout(armed); armed = 0; b.disabled = true;
+    try {
+      const r = await APP_AUTH.zp.buy(e.item);
+      if (ZP.st) { ZP.st.bal = r && typeof r.bal === 'number' ? r.bal : ZP.st.bal; ZP.st.owned = [...new Set([...(ZP.st.owned || []), e.item])]; }
+      fresh = true; paint(); toast(t('emo_bought', { name: emoName(id) }), 'ok');
+      zpLoad(true).then(() => { paint(); if (viewOf(S.route) === 'lures') rerenderSoon(); });
+    } catch (err) {
+      const c = err && err.code;
+      toast(t(c === 'not_enough' ? 'zl_err_short' : c === 'owned' ? 'zl_err_owned' : c === 'no_profile' ? 'zp_need_profile' : c === 'no_item' || c === 'need_update' ? 'zp_err_server' : 'zp_err'), 'warn');
+      zpLoad(true).then(paint);
+    }
+  });
+}
+
+/* --- in 찌릿 라이브: the picker, my move, and everyone else's --- */
+LV.emos = new Map(); LV.emoMe = null; LV.emoNext = 0;
+function emoPick() {
+  const box = $('#lv-emo'); if (!box) return;
+  if (!box.hidden) { box.hidden = true; return; }
+  if (typeof zpEnsure === 'function') zpEnsure();
+  box.innerHTML = `<p class="lv-emoh">${t('emo_title')}</p><div class="lv-emol">${EMO.map(e => { const own = emoOwns(e.id);
+    return `<button class="lv-emob${own ? '' : ' lock'}${e.sig ? ' sig' : ''}" data-emo-go="${e.id}"><img src="${emoArt(e.id)}" alt=""><b>${esc(emoName(e.id))}</b>${!e.item ? `<small class="ok">${t('emo_free')}</small>` : own ? `<small class="ok">${t('zl_owned')}</small>` : `<small class="num">${icon('lock')}${fmtN(emoPrice(e))}P</small>`}</button>`; }).join('')}</div>
+    ${LV.anon ? `<p class="lv-emon">${t('emo_hidden')}</p>` : ''}`;
+  box.hidden = false;
+}
+function emoGo(id) {
+  const box = $('#lv-emo'); if (box) box.hidden = true;
+  const e = EMO_BY[id]; if (!e) return;
+  if (!emoOwns(id)) { S.shopTab = 'emote'; lsSet('shopTab', 'emote'); location.hash = '#lures'; setTimeout(() => openEmote(id), 350); return; }
+  const now = performance.now(), A = LV.ang;
+  if (!A.at || !LV.ready) return lvSay(t('emo_need_stand'), 3200);
+  if (!['idle', 'wait'].includes(LV.phase)) return lvSay(t('emo_busy'), 2600);
+  if (now < LV.emoNext) return;
+  A.emo = id; A.emoEnd = now + e.dur * 1000; LV.emoMe = { e: id, at: now }; LV.emoNext = now + e.dur * 1000 + 600;
+  if (id === 'zzirit') { LVS.play('bite'); LVS.buzz([0, 60, 40, 90]); } else if (id === 'dance') LVS.play('nib');
+  if (!LV.anon && LV.room) LV.room.send('emote', { u: myId(), e: id, n: ((S.me && S.me.nick) || '').slice(0, 12) });
+}
+// someone at this water made a move: a bubble over their float, or a line in the ticker when their float isn't out
+function emoGot(p) {
+  if (!p || typeof p.u !== 'string' || p.u === myId() || !EMO_BY[p.e]) return;
+  const now = performance.now(), last = LV.emos.get(p.u);
+  if (last && now - last.at < 2500) return;
+  const n = String(p.n || '').slice(0, 12) || t('lv_someone'), o = LV.others.get(p.u);
+  LV.emos.set(p.u, { e: p.e, at: now, n });
+  if (o && o.f) return;
+  const el = $('#lv-ticker'); if (!el) return;
+  const d = document.createElement('p'); d.className = 'lv-tick emo' + (lvIsFr(p.u) ? ' fr' : '');
+  d.innerHTML = `<b>${esc(n)}</b> <span>${esc(t('emo_tick_' + p.e))}</span>`;
+  el.prepend(d); while (el.children.length > 3) el.lastChild.remove();
+  setTimeout(() => { d.classList.add('out'); setTimeout(() => d.remove(), 500); }, 4500);
+}
+function emoBubble(c, x, y, txt, u, fr) {
+  const a = u < .12 ? u / .12 : u > .85 ? (1 - u) / .15 : 1, rise = (1 - Math.min(1, u / .12)) * 8;
+  c.save(); c.globalAlpha = Math.max(0, a); c.font = '700 12.5px "IBM Plex Sans KR", sans-serif';
+  const w = Math.ceil(c.measureText(txt).width) + 20, h = 26, bx = x - w / 2, by = y - h - 8 + rise;
+  c.beginPath(); if (c.roundRect) c.roundRect(bx, by, w, h, 13); else c.rect(bx, by, w, h);
+  c.moveTo(x - 6, by + h); c.lineTo(x, by + h + 7); c.lineTo(x + 6, by + h);
+  c.fillStyle = fr ? '#7CC4FF' : '#FFFFFF'; c.shadowColor = 'rgba(5,10,19,.35)'; c.shadowBlur = 8; c.fill(); c.shadowBlur = 0;
+  c.fillStyle = '#0B1530'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(txt, x, by + h / 2 + .5);
+  c.restore();
+}
+// called by the map's frame after the angler is drawn
+function emoFrame(c, now) {
+  if (LV.emoMe) {
+    const e = EMO_BY[LV.emoMe.e], u = (now - LV.emoMe.at) / (e.dur * 1000);
+    if (u >= 1 || !LV.ang.at) LV.emoMe = null;
+    else { const g = lvG(LV.ang.at); emoBubble(c, g.x, g.y - lvAngK() * 14.5, t('emo_say_' + e.id), u, false); }
+  }
+  for (const [id, m] of LV.emos) {
+    const e = EMO_BY[m.e], u = (now - m.at) / (e.dur * 1000 + 600);
+    if (u >= 1) { LV.emos.delete(id); continue; }
+    const o = LV.others.get(id); if (!o || !o.f) continue;
+    const g = lvG({ lng: o.x, lat: o.y }); if (g.x < -60 || g.x > LV.w + 60 || g.y < -60 || g.y > LV.h + 60) continue;
+    emoBubble(c, g.x, g.y - 30, t('emo_say_' + e.id), u, lvIsFr(id));
+  }
 }
 
 /* ===== 오늘의 미션 and the visit streak (찌릿 라이브, website). The server picks today's three missions, counts how far
@@ -13348,6 +13580,7 @@ document.addEventListener('click', e => {
   const sp = tgt.closest('[data-sp]'); if (sp) { openSpecies(sp.dataset.sp); return; }
   const ct = tgt.closest('[data-catch]'); if (ct && !tgt.closest('[data-verdict]')) { const [uid, cid] = ct.dataset.catch.split('|'); openCatch(uid, cid); return; }
   const zl = tgt.closest('[data-zl]'); if (zl) { openLure(zl.dataset.zl); return; }
+  const em = tgt.closest('[data-emo]'); if (em) { openEmote(em.dataset.emo); return; }
   const zt = tgt.closest('[data-zltab]'); if (zt) { S.shopTab = zt.dataset.zltab; lsSet('shopTab', S.shopTab); rerender(); return; }
   const zv = tgt.closest('[data-zpvoid]'); if (zv) { if (!armed(zv, t('zp_void_sure'))) return; const [va, vw] = zv.dataset.zpvoid.split('|'); zpVoid(va, vw); return; }
   const act = tgt.closest('[data-act]');

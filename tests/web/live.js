@@ -176,6 +176,17 @@ async function until(fn, ms = 6000, step = 150) { const t0 = Date.now(); let v; 
     ok(/찌 1개/.test(await B.$eval('#lv-chips', n => n.textContent)), 'live: B\'s chips count the floats');
     await B.evaluate(u => { const o = LV.others.get(u); if (o) LV.map.jumpTo({ center: [o.x, o.y] }); }, aId); await B.waitForTimeout(500); await shot(B, 'l05a_live_friend_float');
     ok(/친구 1/.test(await B.$eval('#lv-chips', n => n.textContent)) && await B.evaluate(u => lvIsFr(u), aId), 'live: A is B\'s friend: the chips say a friend is on the water (and the float gets a sky-blue tag)');
+    // emotes: A waves while waiting; B sees a bubble over A's float (who and which move only, no place)
+    await A.click('#lv-emo-b'); await A.waitForTimeout(400);
+    ok(await A.$$eval('#lv-emo .lv-emob', ns => ns.length === 4 && !ns[0].classList.contains('lock') && ns.slice(1).every(n => n.classList.contains('lock')) && /150P/.test(ns[1].textContent)), 'emote: the picker — waving free, the rest locked with a price');
+    await shot(A, 'l05c_live_emote_pick');
+    await A.click('[data-emo-go="wave"]');
+    ok(await A.$eval('#lv-emo', n => n.hidden) && !!(await until(() => A.evaluate(() => LV.ang.act === 'wave' && !!LV.emoMe), 2000, 50)), 'emote: my angler waves (and the picker closes)');
+    ok(await A.evaluate(() => LV.phase === 'wait'), 'emote: the float stays in the water');
+    ok(!!(await until(() => B.evaluate(u => { const m = LV.emos.get(u); return m && m.e === 'wave' && m.n === '갯바위왕'; }, aId), 5000)), 'emote: B sees A wave over A\'s float');
+    await B.waitForTimeout(300); await shot(B, 'l05d_live_emote_seen'); await A.waitForTimeout(200); await shot(A, 'l05e_live_emote_wave');
+    ok(await B.evaluate(() => { const n0 = LV.emos.size; emoGot({ u: 'x1', e: 'nope', n: 'q' }); emoGot({ u: myId(), e: 'wave' }); emoGot({ e: 'wave' }); return LV.emos.size === n0; }), 'emote: unknown moves, my own echo and nameless ones are ignored');
+    ok(await B.evaluate(() => { emoGot({ u: 'x2', e: 'dance', n: '<b>z</b>' }); emoGot({ u: 'x2', e: 'bow', n: 'z' }); const ts = $$('.lv-tick.emo'); return ts.length === 1 && !ts[0].querySelector('b b') && /춤을 췄어요/.test(ts[0].textContent) && LV.emos.get('x2').e === 'dance'; }), 'emote: someone without a float out shows in the ticker once (spaced out, plain-text names)');
     // B strikes too early: the fish is gone
     await lvCfg({ cfg: { waitMin: 1300, waitMax: 1700 } });
     await press(B); await until(async () => (await ph(B)) === 'wait', 8000); await B.waitForTimeout(150); await press(B);
@@ -410,6 +421,16 @@ async function until(fn, ms = 6000, step = 150) { const t0 = Date.now(); let v; 
     ok(/원정 0\/2/.test(await P.$eval('#lv-chips', n => n.textContent)), 'phone: two casts used');
     await P.waitForTimeout(2800); await press(P); await P.waitForTimeout(600);
     ok(!!(await until(async () => /다 썼어요/.test(await P.$eval('#lv-hint', n => n.textContent)) && await P.evaluate(() => LV.phase === 'idle'), 4000)), 'phone: no far-away casts left today — ' + await P.evaluate(() => JSON.stringify([LV.phase, $('#lv-hint').textContent, LV.st.day, document.querySelectorAll('.modal-wrap.in').length])));
+    // emotes on a phone: the picker fits; a locked one leads to the shop
+    await P.waitForTimeout(500); await P.tap('#lv-emo-b'); await P.waitForTimeout(400);
+    ok(await P.$eval('#lv-emo', n => { const r = n.getBoundingClientRect(); return !n.hidden && r.left >= 0 && r.right <= innerWidth && r.bottom < innerHeight - 60; }) && await P.$eval('#lv-emo-b', n => n.getBoundingClientRect().bottom < innerHeight - 160), 'phone: the emote button and picker fit the screen');
+    await shot(P, 'l14f_phone_emotes');
+    await P.tap('[data-emo-go="wave"]');
+    ok(!!(await until(() => P.evaluate(() => LV.ang.act === 'wave'), 2000, 50)), 'phone: far-away, the angler on the shore waves');
+    await P.waitForTimeout(700); await shot(P, 'l14g_phone_wave');
+    await P.waitForTimeout(2200); await P.tap('#lv-emo-b'); await P.waitForTimeout(300); await P.tap('[data-emo-go="dance"]'); await P.waitForTimeout(1500);
+    ok(await P.evaluate(() => S.route === 'lures' && S.shopTab === 'emote' && !!document.querySelector('.modal-wrap.in .emo-detail')), 'phone: a locked emote opens it in the shop');
+    await closeModals(P);
     await go(P, 'chat', 1000); await shot(P, 'l15_phone_chat');
     ok(await P.$eval('#chat-text', n => { const r = n.getBoundingClientRect(); return r.bottom < innerHeight - 50; }), 'phone: the chat box sits above the tab bar');
     await P.click('[data-act="more"]'); await P.waitForTimeout(500);

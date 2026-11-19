@@ -1879,3 +1879,29 @@ body[data-route="live"] #main { padding-left: 0; padding-right: 0; }
 .ms-foot { display: flex; align-items: flex-start; gap: 6px; margin: 10px 0 0; word-break: keep-all; } .ms-foot .ic { width: 14px; height: 14px; flex: none; margin-top: 2px; }
 .lv-chip.streak .ic { fill: rgba(124,196,255,.35); }
 @media (max-width: 480px) { .ms-m { grid-template-columns: 32px 1fr auto; gap: 8px; padding: 9px 10px; } .ms-ic { width: 32px; height: 32px; } .ms-head .btn { padding-inline: 10px; } }
+
+/* ===== 감정 표현 (emotes): the shop section and the picker in 찌릿 라이브 ===== */
+.zl-hero-art.emo { width: min(34%, 260px); right: 6%; }
+.zl-hero-art.emo img { transform: none; }
+@media (max-width: 760px) { .zl-hero-art.emo { width: 54%; } }
+.emo-note { display: flex; align-items: center; gap: 7px; margin: -2px 0 12px; }
+.emo-note .ic { width: 16px; height: 16px; flex: none; color: var(--azure); }
+.emo-card .zl-art img { filter: drop-shadow(0 6px 8px rgba(0,0,0,.4)); }
+.emo-card:hover .zl-art img { transform: scale(1.05); }
+.zl-detail.emo-detail .zl-stage { aspect-ratio: auto; padding-top: 6px; }
+.emo-cv { display: block; width: min(100%, 280px); height: auto; aspect-ratio: 560 / 440; }
+.lv-emo { position: absolute; z-index: 6; right: 62px; top: 76px; width: min(300px, calc(100% - 86px)); padding: 10px; border-radius: 18px; color: #E3F3FF; background: rgba(5,10,19,.86); border: 1px solid rgba(160,205,255,.18); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); box-shadow: 0 14px 30px rgba(0,0,0,.35); animation: lvin .25s ease both; }
+.lv-emo[hidden] { display: none; }
+.lv-emoh { margin: 2px 4px 8px; font-size: 12.5px; font-weight: 700; letter-spacing: .02em; color: rgba(227,243,255,.75); }
+.lv-emol { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+.lv-emob { position: relative; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 4px 4px 8px; border-radius: 14px; border: 1px solid rgba(160,205,255,.16); background: radial-gradient(120% 100% at 30% 10%, #1A2A44, #0A1322); color: #fff; font: inherit; cursor: pointer; }
+.lv-emob.sig { background: radial-gradient(120% 100% at 30% 10%, #10285E, #040B1E); border-color: rgba(124,196,255,.4); }
+.lv-emob:hover { border-color: var(--azure); }
+.lv-emob img { display: block; width: 100%; aspect-ratio: 2 / 1; object-fit: contain; }
+.lv-emob b { font-size: 13px; }
+.lv-emob small { display: inline-flex; align-items: center; gap: 3px; font-size: 11.5px; color: var(--spark); }
+.lv-emob small .ic { width: 12px; height: 12px; }
+.lv-emob.lock img { opacity: .55; filter: grayscale(.4); }
+.lv-emon { margin: 8px 4px 0; font-size: 12px; color: rgba(227,243,255,.65); }
+.lv-tick.emo span { color: rgba(227,243,255,.85); }
+.lv-emob small.ok { color: rgba(227,243,255,.6); }

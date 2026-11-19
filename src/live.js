@@ -115,9 +115,11 @@ function lvBuild(el) {
       <button class="lv-sbtn" id="lv-book" aria-label="${esc(t('lv_book'))}">${icon('book')}</button>
       <button class="lv-sbtn" id="lv-dm" aria-label="${esc(t('dm_title'))}">${icon('target')}<b class="lv-nb num" id="lv-msb" hidden></b></button>
       <button class="lv-sbtn" id="lv-inv" aria-label="${esc(t('lv_inv'))}">${icon('user-plus')}</button>
+      <button class="lv-sbtn" id="lv-emo-b" aria-label="${esc(t('emo_title'))}">${icon('smile')}</button>
       <a class="lv-sbtn" href="#lures" aria-label="${esc(t('nav_lures'))}">${icon('lure')}</a>
       <button class="lv-sbtn" id="lv-snd" aria-label="${esc(t('lv_sound'))}" aria-pressed="${LVS.on}">${icon('megaphone')}</button>
     </div>
+    <div class="lv-emo" id="lv-emo" hidden></div>
     <div class="lv-ticker" id="lv-ticker" aria-live="polite"></div>
     <div class="lv-banner" id="lv-banner" aria-hidden="true"></div>
     <div class="lv-fight" id="lv-fight" hidden>
@@ -143,6 +145,8 @@ function lvBuild(el) {
   $('#lv-book', el).addEventListener('click', () => lvBook());
   $('#lv-dm', el).addEventListener('click', () => msOpen());
   $('#lv-inv', el).addEventListener('click', () => lvInvite());
+  $('#lv-emo-b', el).addEventListener('click', () => emoPick());
+  $('#lv-emo', el).addEventListener('click', e => { const b = e.target.closest('[data-emo-go]'); if (b) emoGo(b.dataset.emoGo); });
   $('#lv-ticker', el).addEventListener('click', e => { const b = e.target.closest('[data-clap]'); if (b) lvClap(b); });
   $('#lv-net', el).addEventListener('click', () => lvBook('net'));
   $('#lv-snd', el).addEventListener('click', e => { LVS.on = !LVS.on; lsSet('liveSnd', LVS.on); e.currentTarget.setAttribute('aria-pressed', LVS.on); if (LVS.on) LVS.play('nib'); });
@@ -304,6 +308,8 @@ function lvAngStep(dt, now) {
     if (to) yawTo = LMAP.bearing(A.at, to);
     else { if (!A.face || A.faceAt !== LV.waterAt) { const n = LMAP.nearest(LV.water, A.at.lng, A.at.lat, 400); A.face = n && !n.inside ? LMAP.bearing(A.at, n) : A.face || LV.map.getBearing(); A.faceAt = LV.waterAt; } yawTo = A.face; }
   }
+  // a wave, a bow or a dance (only while standing or waiting for a bite), turned to the camera
+  if (A.emo && now < A.emoEnd && (ph === 'idle' || ph === 'wait') && !walking) { act = A.emo; yawTo = LV.map.getBearing() + 180; } else if (A.emo && now >= A.emoEnd) A.emo = null;
   if (yawTo != null) { const dy = ((yawTo - A.yaw + 540) % 360) - 180; A.yaw += dy * Math.min(1, dt * (walking ? 14 : 9)); }
   if (act !== A.act) { A.act = act; A.t0 = now; }
   const t = ph === 'cast' && k ? (now - k.t0) / 1000 : ph === 'bite' && k ? (now - k.biteAt) / 1000 : (now - A.t0) / 1000;
@@ -326,6 +332,7 @@ function lvSchoolsShow() { LV.schools = (LV.schAll || []).filter(s => LMAP.water
 
 /* --- taps on the map: where to stand, where to cast --- */
 function lvTap(lng, lat) {
+  const eb = $('#lv-emo'); if (eb && !eb.hidden) { eb.hidden = true; return; }
   if (LV.phase !== 'idle' || !LV.ready || ($('#lv-cover') && $('#lv-cover').dataset.k)) return;
   if (LV.map.getZoom() < 14.5) { LV.map.easeTo({ center: [lng, lat], zoom: 16.4 }); return; }
   const p = { lng, lat }, kind = LMAP.waterAt(LV.water, lng, lat), R = lvReach();
@@ -552,10 +559,11 @@ function lvRoom() {
   if (key === LV.roomKey && LV.room) return;
   lvLeaveRoom(); LV.roomKey = key;
   LV.room = APP_AUTH.rt.room(key, myId(), {
-    events: ['bite', 'catch', 'clap'],
+    events: ['bite', 'catch', 'clap', 'emote'],
     sync: st => { const m = new Map(); for (const [id, arr] of Object.entries(st || {})) { const p = arr && arr[arr.length - 1]; if (p && id !== myId() && p.f) m.set(id, p); } LV.others = m; lvHud(); },
     msg: (ev, p) => {
       if (ev === 'clap') return lvClapGot(p);
+      if (ev === 'emote') return emoGot(p);
       if (!p || typeof p.x !== 'number') return;
       if (ev === 'bite') { lvFx('bolt', { lng: p.x, lat: p.y }, .8); }
       else if (ev === 'catch' && SPI[p.sp]) { lvFx('splash', { lng: p.x, lat: p.y }, 1); lvTick({ u: typeof p.u === 'string' ? p.u : '', n: String(p.n || '').slice(0, 12), sp: p.sp, cm: +p.cm || 0, tier: p.tier | 0, on: !!p.on }); }
@@ -755,6 +763,7 @@ function lvFrame(now) {
     if (inp && g.x > -120 && g.x < LV.w + 120 && g.y > -120 && g.y < LV.h + 160) tip = ANG.draw(c, { x: g.x, y: g.y, k: lvAngK(), yaw: A.yaw, bearing: map.getBearing(), pitch: map.getPitch(), look: A.look, mode: A.mode, in: inp, fish: LV.res && ph === 'result' ? { sp: SPI[LV.res.sp] } : null });
     A.tip = tip;
   }
+  emoFrame(c, now);
   if (k) {
     const a = lvG(k.from), tipX = tip ? tip.x : a.x, tipY = tip ? tip.y : a.y - 36;
     if (ph === 'cast') {
