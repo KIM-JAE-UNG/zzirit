@@ -241,6 +241,35 @@ async function until(fn, ms = 6000, step = 150) { const t0 = Date.now(); let v; 
     ok(await B.evaluate(u => !LV.others.has(u), aId), 'live: a hidden float does not show on other maps');
     await until(async () => (await ph(A)) === 'bite', 8000); await A.waitForTimeout(1500);
     ok(!!(await until(async () => (await ph(A)) === 'idle', 4000)) && /놓쳤어요/.test(await A.$eval('#lv-hint', n => n.textContent)), 'live: a bite left alone is a missed bite');
+    // the real weather (0025): rain over the lake — drops on the map, a tag that says the bite comes a little sooner,
+    // and the cast tells the server the weather (a server without it yet gets the plain cast)
+    let wxQ = '';
+    await A._ctx.route(/api\.open-meteo\.com/, r => { wxQ = r.request().url(); r.fulfill({ contentType: 'application/json', body: JSON.stringify({ utc_offset_seconds: 3600, current: { temperature_2m: 11.4, weather_code: 63, wind_speed_10m: 3.2, wind_direction_10m: 200, wind_gusts_10m: 5 }, hourly: { time: [], precipitation_probability: [] }, daily: { sunrise: ['2026-11-21T07:40'], sunset: ['2026-11-21T16:50'] } }) }); });
+    await A.evaluate(() => { localStorage.removeItem('eosin.wx2'); LWX.key = ''; lwxRefresh(); });
+    ok(!!(await until(() => A.evaluate(() => LWX.kind === 'rain'), 6000)), 'weather: the live map reads the area\'s weather (rain)');
+    ok(/latitude=47\.400&longitude=8\.500/.test(wxQ), 'weather: asked for the area rounded to about 10 km, not the spot — ' + wxQ.split('?')[1].slice(0, 40));
+    ok(!!(await until(() => A.$eval('#lv-chips .lv-chip.wx', n => /비/.test(n.textContent) && /11°/.test(n.textContent) && /입질 ▲/.test(n.textContent)).catch(() => false), 3000)), 'weather: the tag says rain, the temperature and that bites come sooner');
+    await A.waitForTimeout(600);
+    ok(await A.evaluate(() => LWX.drops.length > 30), 'weather: rain falls on the map');
+    await A.click('#lv-chips .lv-chip.wx'); await A.waitForTimeout(300);
+    ok(/먹이가 떠내려와서/.test(await A.$eval('#lv-hint', n => n.textContent)), 'weather: tapping the tag says why');
+    await shot(A, 'l06c_live_rain');
+    await press(A); await until(async () => (await ph(A)) === 'wait', 8000);
+    const cw = (await lvCfg({})).casts[aId];
+    ok(cw && cw.wx === 'rain' && cw.call === 'live_cast_wx', 'weather: the cast tells the server it is raining — ' + JSON.stringify(cw && { wx: cw.wx, call: cw.call }));
+    ok(/오늘은 입질이 조금 빨라요/.test(await A.$eval('#lv-hint', n => n.textContent)), 'weather: the first cast in the rain says the bite comes sooner');
+    await until(async () => (await ph(A)) === 'idle', 9000);
+    await lvCfg({ cfg: { noWx: true } });
+    await press(A); await until(async () => (await ph(A)) === 'wait', 8000);
+    const cw2 = (await lvCfg({ cfg: { noWx: false } })).casts[aId];
+    ok(cw2 && cw2.call === 'live_cast' && cw2.wx === null && (await ph(A)) === 'wait', 'weather: a server without the weather yet still takes the cast');
+    await until(async () => (await ph(A)) === 'idle', 9000);
+    ok(await A.evaluate(() => ['clear', 'cloud', 'fog', 'rain', 'snow', 'storm', 'wind', 'rain'].join() === [{ code: 0 }, { code: 3 }, { code: 45 }, { code: 81 }, { code: 73 }, { code: 95, wind: 20 }, { code: 61, wind: 9 }, { code: 53 }].map(lwxKind).join() && lwxKind(null) === null), 'weather: the kinds read from the forecast (storm first, then strong wind)');
+    // fog: the far side of the view fades; snow drifts; reduced motion keeps only the still tint
+    await A.evaluate(() => { LWX.d = { code: 45, wind: 1, t: 6, at: nowMs() }; LWX.kind = 'fog'; LWX.at = nowMs(); lvHud(); });
+    await A.waitForTimeout(500); ok(/안개/.test(await A.$eval('#lv-chips .lv-chip.wx', n => n.textContent)), 'weather: fog shows as fog');
+    await shot(A, 'l06d_live_fog');
+    await A.evaluate(() => { LWX.d = { code: 3, wind: 2, t: 9, at: nowMs() }; LWX.kind = 'cloud'; LWX.at = nowMs(); LWX.key = '47.4,8.5'; LWX.asked = nowMs(); lvHud(); });
     // inviting a friend: a link to this water (rough spot, nickname), and B arriving by it
     await A.click('#lv-inv'); await A.waitForTimeout(500);
     const inv = await A.$eval('#lv-invurl', n => n.value).catch(() => '');

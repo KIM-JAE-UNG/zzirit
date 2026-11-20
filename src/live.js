@@ -149,6 +149,7 @@ function lvBuild(el) {
   $('#lv-emo', el).addEventListener('click', e => { const b = e.target.closest('[data-emo-go]'); if (b) emoGo(b.dataset.emoGo); });
   $('#lv-ticker', el).addEventListener('click', e => { const b = e.target.closest('[data-clap]'); if (b) lvClap(b); });
   $('#lv-net', el).addEventListener('click', () => lvBook('net'));
+  $('#lv-chips', el).addEventListener('click', e => { if (e.target.closest('[data-lwx]')) lwxInfo(); });
   $('#lv-snd', el).addEventListener('click', e => { LVS.on = !LVS.on; lsSet('liveSnd', LVS.on); e.currentTarget.setAttribute('aria-pressed', LVS.on); if (LVS.on) LVS.play('nib'); });
   $('#lv-sub', el).addEventListener('click', e => { const b = e.target.closest('[data-lv]'); if (b) lvSub(b.dataset.lv); });
   $('#lv-cover', el).addEventListener('click', e => { const b = e.target.closest('[data-lv]'); if (b) lvSub(b.dataset.lv); });
@@ -256,7 +257,7 @@ function lvSite() {
 function lvWater() {
   if (!LV.map || !LV.ready) return;
   LV.water = LV.map.getZoom() >= 13 ? LMAP.water(LV.map) : []; LV.waterAt = nowMs();
-  lvSite(); lvSchoolsShow();
+  lvSite(); lvSchoolsShow(); lwxRefresh();
   // on the way to a far-away shore: stand at the water's edge as soon as it is in sight
   if (LV.remoteSeek && LV.mode === 'remote' && !LV.stand && LV.phase === 'idle' && LV.map.getZoom() >= 14.5) {
     const c = LV.map.getCenter(), sh = LMAP.shoreBy(LV.water, c.lng, c.lat, 1500);
@@ -423,7 +424,7 @@ function lvCast() {
   LV.phase = 'cast'; LV.busy = true; LV.k = { t0: performance.now(), from: st, to: tg, fly: 0, site };
   LVS.play('cast'); lvFace(); lvHud();
   const anim = new Promise(r => setTimeout(r, 900));
-  Promise.all([APP_AUTH.live.cast(cx, cy, tg.kind, site, LV.anon), anim]).then(([r]) => {
+  Promise.all([APP_AUTH.live.cast(cx, cy, tg.kind, site, LV.anon, lwxNow()), anim]).then(([r]) => {
     LV.busy = false;
     if (!r || r.err) { LV.phase = 'idle'; LV.k = null; if (r && r.err === 'remote_out' && LV.st) LV.st.day.remote = LV.st.day.remoteMax; lvSay(t(r && r.err === 'remote_out' ? 'lv_remote_out' : 'lv_err')); lvHud(); return; }
     if (LV.phase !== 'cast') return;
@@ -432,6 +433,8 @@ function lvCast() {
     for (let i = 0; i < n; i++) nibs.push(1500 + rnd() * Math.max(500, r.wait - 3200));
     Object.assign(LV.k, { token: r.token, wait: r.wait, win: r.win, school: r.school, feed: r.feed, t0: performance.now(), nibs: nibs.sort((a, b) => a - b), nib: 0, dip: 0 });
     LV.phase = 'wait'; LVS.play('plop'); lvFx('splash', tg, 1); lvTrack(); lvHud();
+    // the first cast in a weather that changes the bite says so once
+    if (r.wx && r.wxm != null && +r.wxm !== 1 && LWX.told !== r.wx) { LWX.told = r.wx; lvSay(t(+r.wxm < 1 ? 'lwx_cast_up' : 'lwx_cast_dn', { s: lwxSky() }), 3600); }
   }).catch(e => { LV.busy = false; LV.phase = 'idle'; LV.k = null; lvSay(t(e && e.code === 'slow' ? 'lv_slow' : e && e.code === 'no_profile' ? 'lv_need_nick' : 'lv_err')); lvHud(); });
 }
 function lvEnd(msgKey, snd) { if (msgKey && LV.phase !== 'idle') LV.ang.lose = performance.now() + 1500; LV.phase = 'idle'; LV.k = null; LV.f = null; LV.busy = false; LV.target = null; $('#lv-fight').hidden = true; if (snd) LVS.play(snd); lvTrack(); lvLoad(true); if (msgKey) lvSay(t(msgKey), 3200); lvHud(); }
@@ -640,6 +643,7 @@ function lvHud() {
   const chips = [];
   try { const ti = tideInfo(homeRegion()); chips.push(`<span class="lv-chip">${icon('moon')}${esc(ti.label)} · ${t(ti.st > .7 ? 'lv_tide_hi' : ti.st > .35 ? 'lv_tide_mid' : 'lv_tide_lo')}</span>`); } catch (e) { }
   const fa = LV.stand || (c && { lng: c.lng, lat: c.lat }); if (fa && LMAP.feeding(fa.lng, nowMs())) chips.push(`<span class="lv-chip hot">${icon('bolt')}${t('lv_feed')}</span>`);
+  { const wx = lwxChip(); if (wx) chips.push(wx); }
   if (LV.mode === 'site') chips.push(`<span class="lv-chip site">${icon('pin')}${t('lv_site')}</span>`);
   else if (st) chips.push(`<span class="lv-chip">${icon('globe')}${t('lv_remote_n', { n: lvLeft(), m: st.day.remoteMax })}</span>`);
   if (LV.others.size) chips.push(`<span class="lv-chip">${icon('users')}${t('lv_floats', { n: LV.others.size })}</span>`);
@@ -693,7 +697,7 @@ function lvG(p) {
 function lvRingPath(c, g, r) { const d = LV.dpr; c.setTransform(d * g.ex, d * g.ey, d * g.nx, d * g.ny, d * g.x, d * g.y); c.beginPath(); c.arc(0, 0, r, 0, 6.2832); c.setTransform(d, 0, 0, d, 0, 0); }
 function lvFx(kind, at, power = 1) { if (at) LV.fx.push({ kind, at: { lng: at.lng, lat: at.lat }, t: 0, p: power, seed: Math.random() * 1000 }); if (LV.fx.length > 40) LV.fx.shift(); }
 function lvFloatDraw(c, g, id, dip, t, alpha = 1, name = '', fr = false) {
-  const im = ZL.img(id, 'game'), k = clamp(g.s * 22, .26, .5), bob = Math.sin(t * 2.2 + g.x * .05) * 1.5;
+  const im = ZL.img(id, 'game'), k = clamp(g.s * 22, .26, .5), bob = Math.sin(t * 2.2 + g.x * .05) * 1.5 * lwxSway();
   c.save(); c.globalAlpha = alpha;
   // the ring the float sits in
   lvRingPath(c, g, 1.6 + (Math.sin(t * 2.2) + 1) * .5); c.strokeStyle = 'rgba(227,243,255,.55)'; c.lineWidth = 1; c.stroke();
@@ -727,7 +731,7 @@ function lvFrame(now) {
     else if (LV.phase === 'fight') lvFightStep(dt);
   }
   const k = LV.k, ph = LV.phase, z = map.getZoom();
-  if (z < 14.2) return;
+  if (z < 14.2) { lwxDraw(c, dt, T); return; }
   if (LV.stand && nowMs() > LV.schUntil) lvSchools();
   // schools: soft patches of light that breathe
   for (const s of LV.schools) {
@@ -803,6 +807,7 @@ function lvFrame(now) {
       lvRingPath(c, g, 3 + u * 26 * f.p); c.strokeStyle = `rgba(124,196,255,${(1 - u) * .9})`; c.lineWidth = 2.2; c.stroke();
     }
   }
+  lwxDraw(c, dt, T);
 }
 let lvBanT = 0;
 function lvBanner(txt) { const b = $('#lv-banner'); if (!b) return; b.textContent = txt; b.classList.remove('on'); void b.offsetWidth; b.classList.add('on'); clearTimeout(lvBanT); lvBanT = setTimeout(() => b.classList.remove('on'), 1100); }

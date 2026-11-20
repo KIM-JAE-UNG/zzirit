@@ -1181,7 +1181,7 @@ function openShareCard(blob, name, text) {
 }
 
 /* ===== What's new: shown once after a big update (website only; needs the matching server update) ===== */
-const WHATS_NEW = '2026-11-20a', WN_TS = Date.parse('2026-11-07T03:00:00Z'); // people who joined after this have nothing to catch up on
+const WHATS_NEW = '2026-11-21a', WN_TS = Date.parse('2026-11-07T03:00:00Z'); // people who joined after this have nothing to catch up on
 const BOOT_AT = Date.now();
 /* what each update brought, newest last; people see what came after the last one they saw (at most 6 lines) */
 const WN_ITEMS = [
@@ -1196,7 +1196,8 @@ const WN_ITEMS = [
   ['2026-11-17a', 'bell', 'wn_am'],
   ['2026-11-18a', 'users', 'wn_fr'],
   ['2026-11-19a', 'target', 'wn_dm'],
-  ['2026-11-20a', 'smile', 'wn_emo']
+  ['2026-11-20a', 'smile', 'wn_emo'],
+  ['2026-11-21a', 'cloud', 'wn_lwx']
 ];
 // the new look already says the fish were redrawn
 const WN_PART = { wn_fish: 'wn_look' };

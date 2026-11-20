@@ -220,7 +220,12 @@
   const liveGame = {
     state: () => zpRpc('live_state'),
     schools: (x0, y0, x1, y1) => zpRpc('live_schools', { p_x0: x0, p_y0: y0, p_x1: x1, p_y1: y1 }),
-    cast: (cx, cy, water, onsite, anon) => zpRpc('live_cast', { p_cx: cx, p_cy: cy, p_water: water, p_onsite: !!onsite, p_anon: !!anon }),
+    // with the area's weather (0025); a server without it yet gets the plain cast
+    cast: (cx, cy, water, onsite, anon, wx) => {
+      const a = { p_cx: cx, p_cy: cy, p_water: water, p_onsite: !!onsite, p_anon: !!anon };
+      if (!wx) return zpRpc('live_cast', a);
+      return zpRpc('live_cast_wx', Object.assign({ p_wx: String(wx) }, a)).catch(e => { if (e && e.code === 'need_update') return zpRpc('live_cast', a); throw e; });
+    },
     strike: token => zpRpc('live_strike', { p_token: token }),
     land: (token, sp, ok) => zpRpc('live_land', { p_token: token, p_sp: sp, p_ok: !!ok }),
     sell: (ids, release) => zpRpc('live_sell', { p_ids: ids && ids.length ? ids : null, p_release: !!release }),

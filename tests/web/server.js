@@ -332,17 +332,20 @@ http.createServer(async (req, res) => {
         const cells = []; for (let x = A.p_x0; x <= A.p_x1; x++) for (let y = A.p_y0; y <= A.p_y1; y++) { const sc = LVS.cfg.school != null ? ((x + y) % 4 === 0 ? LVS.cfg.school : 0) : lvSchool(x, y); if (sc > 0) cells.push([x, y, sc]); }
         return send({ data: { until: (Math.floor(Date.now() / 600e3) + 1) * 600e3, feedAt: false, cells } });
       }
-      if (q.name === 'live_cast') {
+      // 0025: live_cast_wx is the same cast with the area's weather (a known kind nudges the wait; the rest counts as none)
+      if (q.name === 'live_cast' || q.name === 'live_cast_wx') {
+        const WXM = { clear: 1, cloud: .92, rain: .88, fog: .95, snow: 1.05, wind: 1.1, storm: 1.2 }, wx = q.name === 'live_cast_wx' && WXM[A.p_wx] ? A.p_wx : null, wxm = wx ? WXM[wx] : 1;
+        if (LVS.cfg.noWx && q.name === 'live_cast_wx') return send({ error: { code: 'PGRST202', message: 'Could not find the function public.live_cast_wx in the schema cache' } });
         if (!zpNick(me)) return err('no_profile');
         if (!['sea', 'fresh'].includes(A.p_water) || !Number.isInteger(A.p_cx) || !Number.isInteger(A.p_cy)) return err('bad_input');
         const on = !!A.p_onsite; if (!on && d.remote >= C.remote) return send({ data: { err: 'remote_out', left: 0 } });
         let waitx = 1, trophy = 1, winx = 0; const a = T.anglers[me], own = ZPS.owned[me] || [];
         for (const k of ['lure', 'rod', 'reel', 'float']) { const id = a && a.data && a.data[k], P = own.includes(id) && LV_PERK[id]; if (P) { waitx *= P.wait || 1; trophy *= P.trophy || 1; winx += P.win || 0; } }
-        const school = lvSchool(A.p_cx, A.p_cy), wait = Math.round((C.waitMin + Math.random() * (C.waitMax - C.waitMin)) * Math.max(waitx, .6)), win = Math.round(850 + Math.min(winx, .6) * 1000);
+        const school = lvSchool(A.p_cx, A.p_cy), wait = Math.round((C.waitMin + Math.random() * (C.waitMax - C.waitMin)) * Math.max(waitx, .6) * wxm), win = Math.round(850 + Math.min(winx, .6) * 1000);
         const token = require('crypto').randomUUID();
-        LVS.casts[me] = { token, cx: A.p_cx, cy: A.p_cy, water: A.p_water, onsite: on, anon: !!A.p_anon, at: Date.now(), wait, win, school, trophy: Math.min(trophy, 2.6), state: 'wait' };
+        LVS.casts[me] = { token, cx: A.p_cx, cy: A.p_cy, water: A.p_water, onsite: on, anon: !!A.p_anon, at: Date.now(), wait, win, school, trophy: Math.min(trophy, 2.6), state: 'wait', wx, call: q.name };
         d.casts++; if (!on) d.remote++;
-        return send({ data: { token, wait, win, school, feed: false, tide: .6, left: C.remote - d.remote } });
+        return send({ data: { token, wait, win, school, feed: false, tide: .6, wx, wxm, left: C.remote - d.remote } });
       }
       // 0023: today's three missions and the visit streak (the same rules as the SQL; cfg.missions fixes the three, and a
       // visit pays only with cfg.visitPay, so the older wallet checks keep their numbers)
@@ -508,7 +511,7 @@ http.createServer(async (req, res) => {
   }
   if (u.pathname === '/__sb/zp_seed') { const q = await body(req); const wk = q.wk || zpAddDays(zpWeek(), q.weeksAgo ? -7 * q.weeksAgo : 0); for (const r of q.rows || []) ZPS.scores['rx|' + wk + '|' + r.acct] = { game: 'rx', wk, acct: r.acct, score: r.score, best: r.best == null ? null : r.best, void: !!r.void, at: Date.now() - 864e5 * 9 + (r.order || 0) }; return send({ ok: true, wk }); }
   if (u.pathname === '/__sb/live_seed') { const q = await body(req); const wk = zpAddDays(zpWeek(), q.weeksAgo ? -7 * q.weeksAgo : 0); for (const r of q.rows || []) LVS.catches.push({ id: ++LVS.seq, acct: r.acct, sp: r.sp || 'kurodai', cm: r.cm || 40, tier: 4, big: false, score: r.score, pts: 12, onsite: true, anon: false, gx: 1, gy: 1, wk, at: Date.now() - 864e5 * 8 }); return send({ ok: true, wk }); }
-  if (u.pathname === '/__sb/live_cfg') { const q = await body(req); Object.assign(LVS.cfg, q.cfg || {}); if (q.weeksBack) for (const c of LVS.catches) c.wk = zpAddDays(c.wk, -7 * q.weeksBack); if (q.reset) { LVS.casts = {}; LVS.days = {}; LVS.catches = []; LVS.dex = {}; LVS.settled = {}; } if (q.streak) for (const [a, x] of Object.entries(q.streak)) LVS.streak[a] = x; return send({ cfg: LVS.cfg, n: LVS.catches.length }); }
+  if (u.pathname === '/__sb/live_cfg') { const q = await body(req); Object.assign(LVS.cfg, q.cfg || {}); if (q.weeksBack) for (const c of LVS.catches) c.wk = zpAddDays(c.wk, -7 * q.weeksBack); if (q.reset) { LVS.casts = {}; LVS.days = {}; LVS.catches = []; LVS.dex = {}; LVS.settled = {}; } if (q.streak) for (const [a, x] of Object.entries(q.streak)) LVS.streak[a] = x; return send({ cfg: LVS.cfg, n: LVS.catches.length, casts: LVS.casts }); }
   if (u.pathname === '/__sb/feature') { for (const [k, v] of u.searchParams) FEATURES[k] = v === '1'; return send(FEATURES); }
   if (u.pathname === '/__sb/dump') return send({ T, admins: [...admins], links, STATS, PUSH, PUSHLOG, PUSHPREFS, logins: Object.keys(logins), MUTES, RTSTATS, ZPS, RT: Object.fromEntries(Object.entries(RT).map(([k, m]) => [k, [...m.values()].map(x => x.key)])) });
   if (u.pathname === '/__sb/config') { const q = await body(req); const g = T.admin_docs.config || (T.admin_docs.config = { id: 'config', data: {} }); g.data = Object.assign({}, g.data, q); push('admin_docs', 'UPDATE', g, { id: 'config' }); return send({ ok: true }); }

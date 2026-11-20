@@ -1671,6 +1671,9 @@ body[data-route="live"] #main { padding-left: 0; padding-right: 0; }
 .lv-chip { display: inline-flex; align-items: center; gap: 5px; padding: 6px 10px; border-radius: 999px; font-size: 12.5px; font-weight: 600; line-height: 1.2; color: #E3F3FF; background: rgba(5,10,19,.66); border: 1px solid rgba(160,205,255,.16); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); white-space: nowrap; }
 .lv-chip .ic { width: 14px; height: 14px; color: var(--spark); }
 .lv-chip.hot { color: var(--night); background: var(--spark); border-color: transparent; } .lv-chip.hot .ic { color: var(--night); fill: var(--night); }
+.lv-chip.wx { cursor: pointer; font-family: inherit; pointer-events: auto; } .lv-chip.wx .lv-up, .lv-chip.wx .lv-dn { margin-left: 2px; }
+.lv-chip.wx .lv-up { color: #7CE0A8; } .lv-chip.wx .lv-dn { color: #FF9AA8; }
+.lv-chip.wx:focus-visible { outline: 2px solid var(--spark); outline-offset: 2px; }
 .lv-chip.site { background: rgba(30,102,229,.85); border-color: rgba(227,243,255,.4); color: #fff; } .lv-chip.site .ic { color: #fff; }
 .lv-wallet { pointer-events: auto; flex: none; display: grid; grid-template-columns: auto auto; column-gap: 6px; align-items: center; padding: 6px 12px 6px 8px; border-radius: 16px; color: #fff; background: rgba(5,10,19,.66); border: 1px solid rgba(160,205,255,.16); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); text-decoration: none; }
 .lv-wallet:hover { text-decoration: none; background: rgba(11,23,48,.8); }

@@ -234,6 +234,27 @@ const fish = async (uid, sp, o = {}) => {
   check(await rpc(ADM, `select public.live_void($2::date, $1, true) r`, [B, wkNow]).then(r => r.r) === true && (await state(B)).me === null, 'the operator strikes a bag out and it leaves the board');
 }
 
+// ---------- 0025: the weather nudges the wait a little ----------
+{
+  const m = async w => +(await q(`select private.live_wx_mult($1) m`, [w])).rows[0].m;
+  check(await m('rain') === 0.88 && await m('cloud') === 0.92 && await m('clear') === 1 && await m('wind') === 1.1 && await m('storm') === 1.2, 'rain and grey skies bite a little sooner, wind and storms later');
+  check(await m('sunny!!') === 1 && await m(null) === 1, 'an unknown weather counts as none');
+  const cw = (uid, wx) => rpc(uid, `select public.live_cast_wx(103295, 35153, 'sea', true, false, $1) r`, [wx]).then(r => r.r);
+  await q(`delete from private.login_tries where k like 'lvc:%'`).catch(() => null);
+  const r1 = await cw(F, 'rain');
+  check(r1.token && r1.wx === 'rain' && +r1.wxm === 0.88 && r1.wait >= 3500, 'a cast in the rain says the weather and its factor');
+  const r2 = await cw(F, '<script>');
+  check(r2.token && r2.wx === null && +r2.wxm === 1, 'a made-up weather is ignored');
+  const r3 = await cast(F);
+  check(r3.token && r3.wx === null && +r3.wxm === 1, 'the old call still casts (no weather)');
+  // the factor is in the wait: with every roll the same, rain waits 0.88 of a clear day
+  const wOf = async wx => { await q(`select setseed(0.42)`); return (await cw(F, wx)).wait; };
+  const wc = await wOf('clear'), wr = await wOf('rain');
+  check(wr < wc && Math.abs(wr / wc - 0.88) < 0.02 || wc === 3500, 'the same roll waits less in the rain — ' + wc + ' → ' + wr);
+  check(/permission denied/.test(await fails(() => asRole('anon', null, () => q(`select public.live_cast_wx(1, 1, 'sea', true, false, 'rain')`))) || ''), 'not for visitors without an account');
+  check(/permission denied/.test(await fails(() => as(A, () => q(`select private.live_wx_mult('rain')`))) || ''), 'the factor itself is private');
+}
+
 // ---------- nobody reads the tables directly ----------
 {
   for (const tb of ['live_catches', 'live_dex', 'live_scores']) check(/permission denied/.test(await fails(() => as(A, () => q(`select * from public.${tb} limit 1`))) || ''), tb + ' is read only through the functions');
