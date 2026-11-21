@@ -391,6 +391,7 @@ function lvSub(k) {
   if (k === 'retry') { lvCover('load'); lvLoad(true).then(() => lvStart()); return; }
   if (k === 'go-geo' || k === 'go-look') { lsSet('liveOk', true); lsSet('liveGeo', k === 'go-geo'); lvCover(''); if (k === 'go-geo') lvGeo(); if (lvInvGo()) return; lvHud(); lvRoom(); if (k === 'go-look') lvSub('remote'); return; }
   if (k === 'again') { $('#lv-res').hidden = true; LV.phase = 'idle'; lvHud(); return; }
+  if (k === 'share') { lvShare(LV.res, $('#lv-res [data-lv="share"]')); return; }
   if (k === 'book') { $('#lv-res').hidden = true; LV.phase = 'idle'; lvHud(); lvBook(); return; }
   if (k === 'sellnow') { const r = LV.res; if (!r || LV.selling) return; lvSell([r.id]).then(x => { if (!x) return; $('#lv-res').hidden = true; LV.phase = 'idle'; lvHud(); }); return; }
   if (LV.phase !== 'idle') return;
@@ -489,6 +490,7 @@ function lvLand() {
     if (!r || r.err || r.lost) return lvEnd('lv_err', 'miss');
     if (LV.st) { LV.st.day = Object.assign(LV.st.day, r.day); LV.st.bal = r.bal; if (r.kept && LV.st.net) LV.st.net.unshift({ id: r.id, sp: r.sp, cm: r.cm, tier: r.tier, big: r.big, on: r.onsite, val: r.val, p: r.price, at: nowMs() }); }
     if (typeof ZP !== 'undefined' && ZP.st) ZP.st.bal = r.bal;
+    r._to = { lng: k.to.lng, lat: k.to.lat, kind: k.to.kind }; r._wx = typeof lwxNow === 'function' ? lwxNow() : null; r._at = nowMs();
     LV.res = r; LV.phase = 'result'; LV.target = null; LVS.play(r.tier >= 4 || r.big ? 'rare' : 'land'); LVS.buzz(r.tier >= 4 ? [60, 40, 60, 40, 160] : [50, 40, 90]);
     lvFx('splash', k.to, 1.2); clearTimeout(LV.resT); LV.resT = setTimeout(() => { if (LV.phase === 'result' && LV.res === r) lvResult(r); }, 1150);
     if (!LV.anon && LV.room) LV.room.send('catch', { u: myId(), n: S.me.nick, sp: r.sp, cm: r.cm, tier: r.tier, big: r.big, x: +k.to.lng.toFixed(5), y: +k.to.lat.toFixed(5), on: k.site ? 1 : 0 });
@@ -500,6 +502,7 @@ function lvResult(r) {
   const mk = r.val != null, tags = [r.first ? `<b class="lv-tag new">${t('lv_new')}</b>` : '', r.best ? `<b class="lv-tag">${t('lv_best')}</b>` : '', r.big ? `<b class="lv-tag">${t('lv_big')}</b>` : '', r.onsite ? `<b class="lv-tag site">${t('lv_site')}</b>` : ''].join('');
   el.hidden = false; el.className = 'lv-res t' + r.tier;
   el.innerHTML = `<div class="lv-rcard" role="dialog" aria-label="${esc(spName(sp))}">
+    <button class="lv-rshare" data-lv="share">${icon('share')}<span>${t('lv_story_btn')}</span></button>
     <p class="lv-rtier">${t(LV_TIERS[r.tier])}</p>
     <div class="lv-rfish tone-${sp.w}"><img src="${FD.thumb(sp, 520, 260)}" alt=""></div>
     <h2>${esc(spName(sp))}</h2>
@@ -513,6 +516,88 @@ function lvResult(r) {
     ${mk && !r.kept ? `<p class="lv-rnote">${t('lv_net_full_note')}</p>` : ''}
     <div class="lv-rbtn${mk && r.kept ? ' three' : ''}"><button class="btn btn-primary btn-lg" data-lv="again">${t(mk && r.kept ? 'lv_keep_again' : 'lv_again')}</button>${mk && r.kept ? `<button class="btn btn-light btn-lg" data-lv="sellnow">${icon('coin')}${t('lv_sell_now', { p: fmtN(r.price) })}</button>` : ''}<button class="btn btn-glass btn-lg" data-lv="book">${t('lv_book')}</button></div>
   </div>`;
+}
+
+/* --- 자랑 카드: one story-sized picture (1080×1920) of the catch, my own character holding the fish up.
+   Drawn on this device. The place is the sea (or the region) at most — never the spot. --- */
+function lvWhere(to) {
+  if (!to) return '';
+  try { if (to.kind === 'sea') return dict(GEO.seaOf(to.lng, to.lat).n) || ''; const rg = GEO.region(to.lng, to.lat, false); return rg ? regionName(rg) : ''; } catch (e) { return ''; }
+}
+async function lvStoryBlob(r) {
+  const sp = SPI[r.sp]; if (!sp) return null;
+  const W = 1080, H = 1920, P = 72, hi = r.tier >= 4;
+  const SANS = '"IBM Plex Sans KR", "IBM Plex Sans JP", "Noto Sans SC", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif';
+  const DISP = '"Chakra Petch", ' + SANS;
+  try { await Promise.race([Promise.all([document.fonts.load(`italic 700 220px ${DISP}`, '0123456789.cm'), document.fonts.load(`700 80px ${SANS}`, spName(sp) + (S.me.nick || '') + t(LV_TIERS[r.tier]))]), new Promise(res => setTimeout(res, 2500))]); } catch (e) { }
+  const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+  const g = cv.getContext('2d');
+  const bg = g.createLinearGradient(0, 0, 0, H); bg.addColorStop(0, '#10285E'); bg.addColorStop(.45, '#0B1730'); bg.addColorStop(1, '#050A13');
+  g.fillStyle = bg; g.fillRect(0, 0, W, H);
+  // the light behind the angler, brighter for the rare ones
+  const cy = 820, glow = g.createRadialGradient(W / 2, cy, 0, W / 2, cy, 620); glow.addColorStop(0, hi ? 'rgba(124,196,255,.55)' : 'rgba(57,137,210,.4)'); glow.addColorStop(1, 'rgba(57,137,210,0)');
+  g.fillStyle = glow; g.fillRect(0, 0, W, H);
+  // ripples under the feet
+  g.save(); g.translate(W / 2, 1200); g.scale(1, .26);
+  for (let i = 0; i < 4; i++) { g.beginPath(); g.arc(0, 0, 170 + i * 110, 0, Math.PI * 2); g.strokeStyle = `rgba(124,196,255,${.34 - i * .07})`; g.lineWidth = 7; g.stroke(); }
+  g.restore();
+  // lightning sparks around: the 찌릿 of the name
+  const rnd = lvRand(FD.hashStr(r.sp + r.cm));
+  g.lineCap = 'round'; g.lineJoin = 'round';
+  for (let i = 0; i < (hi ? 7 : 4); i++) {
+    const a = rnd() * Math.PI * 2, d = 400 + rnd() * 110, x = W / 2 + Math.cos(a) * d, y = Math.max(400, cy - 40 + Math.sin(a) * d * .9), s = 26 + rnd() * 22;
+    g.beginPath(); g.moveTo(x, y - s); g.lineTo(x - s * .35, y + s * .05); g.lineTo(x + s * .1, y + s * .05); g.lineTo(x - s * .2, y + s);
+    g.strokeStyle = `rgba(227,243,255,${.5 + rnd() * .4})`; g.lineWidth = 6; g.stroke();
+  }
+  // top: the brand and the day
+  try { const logo = await imgFrom(LOGO.mark); g.save(); rrect(g, P, 86, 88, 88, 22); g.clip(); g.drawImage(logo, P, 86, 88, 88); g.restore(); } catch (e) { }
+  g.textBaseline = 'middle'; g.fillStyle = '#FFFFFF'; g.font = `800 46px ${SANS}`; g.fillText(t('lv_title'), P + 112, 130);
+  g.textAlign = 'right'; g.fillStyle = '#A9BBCF'; g.font = `500 34px ${SANS}`; g.fillText(fmtDate(r._at || nowMs()), W - P, 130); g.textAlign = 'left';
+  // the class of the fish
+  const tier = t(LV_TIERS[r.tier]) || ''; g.font = `700 40px ${SANS}`;
+  const tw = g.measureText(tier).width + 64; g.fillStyle = hi ? '#E3F3FF' : 'rgba(124,196,255,.2)'; rrect(g, (W - tw) / 2, 250, tw, 76, 38); g.fill();
+  g.fillStyle = hi ? '#050A13' : '#7CC4FF'; g.textAlign = 'center'; g.fillText(tier, W / 2, 289); g.textAlign = 'left';
+  // my character, holding the fish up
+  let drew = false;
+  try {
+    const look = ANG.look(charOf(S.me || {}, myId()));
+    // drawn at the map's size and scaled up, so the outlines grow with it
+    g.save(); g.scale(3.6, 3.6); ANG.draw(g, { x: (W / 2 + 40) / 3.6, y: 1200 / 3.6, k: 18, yaw: 180, bearing: 0, pitch: 70, look, mode: 'look', noRing: true, fish: { sp }, in: { act: 'result', t: 2.4, T: 3.4 } }); g.restore();
+    drew = true;
+  } catch (e) { }
+  if (!drew) { try { const im = await imgFrom(FD.thumb(sp, 900, 450)); g.drawImage(im, (W - 900) / 2, 560, 900, 450); } catch (e) { } }
+  // name and length
+  g.textAlign = 'center'; g.textBaseline = 'alphabetic'; g.fillStyle = '#FFFFFF';
+  g.font = `700 80px ${SANS}`; g.fillText(fitText(g, spName(sp), W - P * 2), W / 2, 1340);
+  const cmTxt = fmtN(r.cm, 1); g.font = `italic 700 230px ${DISP}`; const cw = g.measureText(cmTxt).width; g.font = `italic 700 86px ${DISP}`; const uw = g.measureText('cm').width;
+  const x0 = (W - cw - uw - 18) / 2; g.textAlign = 'left';
+  g.font = `italic 700 230px ${DISP}`; g.fillStyle = '#7CC4FF'; g.shadowColor = 'rgba(124,196,255,.55)'; g.shadowBlur = 30; g.fillText(cmTxt, x0, 1560); g.shadowBlur = 0;
+  g.font = `italic 700 86px ${DISP}`; g.fillStyle = '#FFFFFF'; g.fillText('cm', x0 + cw + 18, 1560);
+  // what made it special
+  const tags = [r.first && t('lv_story_first'), r.best && t('lv_best'), r.big && t('lv_big'), r.onsite && t('lv_site'), r.wk && r.wk.r && r.wk.r <= 10 && t('lv_story_rank', { n: r.wk.r })].filter(Boolean);
+  g.font = `700 34px ${SANS}`; g.textBaseline = 'middle';
+  const ws = tags.map(s => g.measureText(s).width + 48), tot = ws.reduce((a, b) => a + b, 0) + 14 * Math.max(0, ws.length - 1);
+  let x = (W - tot) / 2;
+  tags.forEach((s, i) => { g.fillStyle = i === 0 && r.first ? '#7CC4FF' : 'rgba(124,196,255,.18)'; rrect(g, x, 1612, ws[i], 64, 32); g.fill(); g.fillStyle = i === 0 && r.first ? '#050A13' : '#E3F3FF'; g.fillText(s, x + 24, 1645); x += ws[i] + 14; });
+  // where (the sea or the region only), the weather, who
+  const lv = lvInfo(S.me, myId()).L, wx = r._wx && typeof lwxSky === 'function' ? lwxSky() : '';
+  g.font = `500 36px ${SANS}`; g.fillStyle = '#A9BBCF'; g.textAlign = 'center';
+  g.fillText(fitText(g, [lvWhere(r._to), wx, `${S.me.nick || '?'} · Lv.${lv}`].filter(Boolean).join('  ·  '), W - P * 2), W / 2, tags.length ? 1730 : 1660);
+  // footer
+  g.fillStyle = 'rgba(255,255,255,.14)'; g.fillRect(P, H - 132, W - P * 2, 2);
+  g.textAlign = 'left'; g.fillStyle = '#FFFFFF'; g.font = `800 38px ${SANS}`; g.fillText(`${APP_NAME[0]} ${APP_NAME[1]}`, P, H - 72);
+  g.textAlign = 'right'; g.fillStyle = '#7F95AD'; g.font = `500 30px ${SANS}`; g.fillText(SITE_URL.replace(/^https?:\/\//, '').replace(/\/$/, ''), W - P, H - 72); g.textAlign = 'left';
+  return new Promise(res => cv.toBlob(b => res(b), 'image/jpeg', .9));
+}
+async function lvShare(r, btn) {
+  if (!r || !SPI[r.sp]) return;
+  if (btn) { if (btn.disabled) return; btn.disabled = true; }
+  try {
+    const blob = await lvStoryBlob(r); if (!blob) throw new Error('no card');
+    const text = t('lv_story_text', { name: spName(SPI[r.sp]), len: fmtN(r.cm, 1) + 'cm' });
+    await shareImage(blob, `zzirit-live-${r.sp}-${Math.round(r.cm)}cm.jpg`, text, { tall: true, title: 'lv_story_h', sub: 'lv_story_sub' });
+  } catch (e) { console.warn(e); toast(t('share_fail'), 'warn'); }
+  finally { if (btn) btn.disabled = false; }
 }
 
 /* --- the keepnet and the fish market: a landed fish is kept, and sold for the day's price --- */

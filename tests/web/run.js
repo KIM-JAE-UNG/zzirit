@@ -411,7 +411,7 @@ const AI_NOFISH = { fish_visible: false, candidates: [], other_en: '', other_sci
   await W.waitForTimeout(600); await W.reload(); await W.waitForTimeout(5500);
   ok(!!(await W.$('.wn')), 'an earlier member sees what changed');
   ok(!!(await W.$('#wn-id')), 'update notes offer to create a login ID');
-  ok(await W.$eval('.wn', n => /캐릭터 감정 표현/.test(n.textContent) && /오늘의 미션/.test(n.textContent) && /친구랑 같이 낚시/.test(n.textContent) && /진짜 날씨/.test(n.textContent) && /아침 낚시 알림/.test(n.textContent) && !/실제처럼/.test(n.textContent) && !/미니게임:|갯바위 공원 개장/.test(n.textContent) && n.querySelectorAll('.wn-list li').length <= 6), 'update notes list the newest features (at most 6 lines)');
+  ok(await W.$eval('.wn', n => /캐릭터 감정 표현/.test(n.textContent) && /오늘의 미션/.test(n.textContent) && /친구랑 같이 낚시/.test(n.textContent) && /진짜 날씨/.test(n.textContent) && /자랑 카드/.test(n.textContent) && !/실제처럼/.test(n.textContent) && !/미니게임:|갯바위 공원 개장/.test(n.textContent) && n.querySelectorAll('.wn-list li').length <= 6), 'update notes list the newest features (at most 6 lines)');
   ok(await W.$eval('.wn', n => !/초기화/.test(n.textContent)), 'update notes do not claim a reset that the server has not done');
   await shot(W, 'q04_whatsnew');
   await W.click('#wn-ok'); await W.waitForTimeout(400); await W.reload(); await W.waitForTimeout(5000);
@@ -424,19 +424,22 @@ const AI_NOFISH = { fish_visible: false, candidates: [], other_en: '', other_sci
   ok(await W.$eval('.wn', n => n.querySelectorAll('.wn-list li').length === 6 && /오늘의 미션/.test(n.textContent) && /친구랑 같이 낚시/.test(n.textContent) && /아침 낚시 알림/.test(n.textContent) && /캐릭터 감정 표현/.test(n.textContent) && /진짜 날씨/.test(n.textContent) && !/새 디자인/.test(n.textContent)).catch(() => false), 'after 11-12, the six newest: the weather, emotes, missions, friends, the morning note, the character');
   await W.click('#wn-ok').catch(() => null); await W.waitForTimeout(300);
   await W.evaluate(() => openWhatsNew('someid', '2026-11-13a')); await W.waitForTimeout(500);
-  ok(await W.$eval('.wn', n => n.querySelectorAll('.wn-list li').length === 5 && /진짜 날씨/.test(n.textContent) && /캐릭터 감정 표현/.test(n.textContent) && /아침 낚시 알림/.test(n.textContent) && /친구랑 같이 낚시/.test(n.textContent) && /오늘의 미션/.test(n.textContent)).catch(() => false), 'after 11-13, the morning note, fishing with friends and the daily missions');
+  ok(await W.$eval('.wn', n => n.querySelectorAll('.wn-list li').length === 6 && /자랑 카드/.test(n.textContent) && /진짜 날씨/.test(n.textContent) && /캐릭터 감정 표현/.test(n.textContent) && /아침 낚시 알림/.test(n.textContent) && /친구랑 같이 낚시/.test(n.textContent) && /오늘의 미션/.test(n.textContent)).catch(() => false), 'after 11-13, the morning note, fishing with friends and the daily missions');
   await W.click('#wn-ok'); await W.waitForTimeout(400);
   await W.evaluate(() => openWhatsNew('someid', '2026-11-17a')); await W.waitForTimeout(500);
-  ok(await W.$eval('.wn', n => n.querySelectorAll('.wn-list li').length === 4 && /진짜 날씨/.test(n.textContent) && /캐릭터 감정 표현/.test(n.textContent) && /친구랑 같이 낚시/.test(n.textContent) && /같은 물가/.test(n.textContent) && /오늘의 미션/.test(n.textContent)).catch(() => false), 'after 11-17, fishing with friends and the daily missions');
+  ok(await W.$eval('.wn', n => n.querySelectorAll('.wn-list li').length === 5 && /자랑 카드/.test(n.textContent) && /진짜 날씨/.test(n.textContent) && /캐릭터 감정 표현/.test(n.textContent) && /친구랑 같이 낚시/.test(n.textContent) && /같은 물가/.test(n.textContent) && /오늘의 미션/.test(n.textContent)).catch(() => false), 'after 11-17, fishing with friends and the daily missions');
   await W.click('#wn-ok'); await W.waitForTimeout(400);
   await W.evaluate(() => openWhatsNew('someid', '2026-11-18a')); await W.waitForTimeout(500);
-  ok(await W.$eval('.wn', n => n.querySelectorAll('.wn-list li').length === 3 && /진짜 날씨/.test(n.textContent) && /오늘의 미션과 연속 출석/.test(n.textContent) && /7일째마다 \+30P/.test(n.textContent) && /캐릭터 감정 표현/.test(n.textContent)).catch(() => false), 'after the last update, only the daily missions and the streak');
+  ok(await W.$eval('.wn', n => n.querySelectorAll('.wn-list li').length === 4 && /자랑 카드/.test(n.textContent) && /진짜 날씨/.test(n.textContent) && /오늘의 미션과 연속 출석/.test(n.textContent) && /7일째마다 \+30P/.test(n.textContent) && /캐릭터 감정 표현/.test(n.textContent)).catch(() => false), 'after the last update, only the daily missions and the streak');
   await W.click('#wn-ok'); await W.waitForTimeout(400);
   await W.evaluate(() => openWhatsNew('someid', '2026-11-19a')); await W.waitForTimeout(500);
-  ok(await W.$eval('.wn', n => n.querySelectorAll('.wn-list li').length === 2 && /캐릭터 감정 표현/.test(n.textContent) && /웃는 얼굴 버튼/.test(n.textContent) && /진짜 날씨/.test(n.textContent)).catch(() => false), 'after 11-19, the emotes and the weather');
+  ok(await W.$eval('.wn', n => n.querySelectorAll('.wn-list li').length === 3 && /자랑 카드/.test(n.textContent) && /캐릭터 감정 표현/.test(n.textContent) && /웃는 얼굴 버튼/.test(n.textContent) && /진짜 날씨/.test(n.textContent)).catch(() => false), 'after 11-19, the emotes and the weather');
   await W.click('#wn-ok'); await W.waitForTimeout(400);
   await W.evaluate(() => openWhatsNew('someid', '2026-11-20a')); await W.waitForTimeout(500);
-  ok(await W.$eval('.wn', n => n.querySelectorAll('.wn-list li').length === 1 && /라이브 지도에 진짜 날씨/.test(n.textContent) && /입질이 조금 빠르고/.test(n.textContent)).catch(() => false), 'after the last update, only the real weather on the live map');
+  ok(await W.$eval('.wn', n => n.querySelectorAll('.wn-list li').length === 2 && /라이브 지도에 진짜 날씨/.test(n.textContent) && /입질이 조금 빠르고/.test(n.textContent) && /자랑 카드/.test(n.textContent)).catch(() => false), 'after 11-20, the weather and the brag card');
+  await W.click('#wn-ok'); await W.waitForTimeout(400);
+  await W.evaluate(() => openWhatsNew('someid', '2026-11-21a')); await W.waitForTimeout(500);
+  ok(await W.$eval('.wn', n => n.querySelectorAll('.wn-list li').length === 1 && /잡은 고기 자랑 카드/.test(n.textContent) && /스토리 크기/.test(n.textContent)).catch(() => false), 'after the last update, only the brag card');
   await W.click('#wn-ok'); await W.waitForTimeout(400);
   // photo cache: a second visit doesn't download the same photos again
   const P = await mk('P');

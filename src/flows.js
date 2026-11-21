@@ -1153,25 +1153,29 @@ async function shareCatch(uid, cid, btn) {
     const blob = await catchCardBlob(uid, a, c); if (!blob) throw new Error('no card');
     const name = `zzirit-${SPI[c.sp] ? c.sp : 'catch'}-${Math.round(c.len)}cm.jpg`;
     const text = t('share_text', { name: nameOf(c.sp), len: lenFmt(c.len) });
-    const file = new File([blob], name, { type: 'image/jpeg' });
-    // phones: straight to KakaoTalk, Instagram and the rest; computers: the picture with a save button
-    if (touchDevice() && navigator.canShare && navigator.canShare({ files: [file] })) {
-      try { await navigator.share({ files: [file], text: text + '\n' + SITE_URL }); return; }
-      catch (e) { if (e && e.name === 'AbortError') return; }
-    }
-    openShareCard(blob, name, text);
+    await shareImage(blob, name, text);
   } catch (e) { console.warn(e); toast(t('share_fail'), 'warn'); }
   finally { if (btn) btn.disabled = false; }
 }
-function openShareCard(blob, name, text) {
+// phones: straight to KakaoTalk, Instagram and the rest; computers: the picture with a save button
+async function shareImage(blob, name, text, opt) {
+  const file = new File([blob], name, { type: blob.type || 'image/jpeg' });
+  if (touchDevice() && navigator.canShare && navigator.canShare({ files: [file] })) {
+    try { await navigator.share({ files: [file], text: text + '\n' + SITE_URL }); return 'shared'; }
+    catch (e) { if (e && e.name === 'AbortError') return 'cancel'; }
+  }
+  openShareCard(blob, name, text, opt); return 'card';
+}
+function openShareCard(blob, name, text, opt) {
+  opt = opt || {};
   const url = URL.createObjectURL(blob);
   const web = window.APP_RT === 'web';
-  const w = openModal(`<div class="share-card">
-    <h2>${icon('share')} ${t('share_title')}</h2>
-    <p class="lede">${t('share_sub')}</p>
+  const w = openModal(`<div class="share-card${opt.tall ? ' tall' : ''}">
+    <h2>${icon('share')} ${t(opt.title || 'share_title')}</h2>
+    <p class="lede">${t(opt.sub || 'share_sub')}</p>
     <img class="sc-img" src="${url}" alt="${esc(text)}">
     <div class="actions"><a class="btn btn-primary" id="sc-save" href="${web ? url : '#'}"${web ? ` download="${esc(name)}"` : ''}>${icon('image')}${t('share_save')}</a><button class="btn btn-line" data-copy="${esc(text + ' ' + SITE_URL)}">${icon('copy')}${t('share_copy')}</button></div>
-  </div>`, { label: t('share_title'), onClose: () => setTimeout(() => URL.revokeObjectURL(url), 2000) });
+  </div>`, { label: t(opt.title || 'share_title'), onClose: () => setTimeout(() => URL.revokeObjectURL(url), 2000) });
   // inside Claude a page can't download by itself; it asks through the downloads permission
   if (!web) $('#sc-save', w).onclick = async e => {
     e.preventDefault();
@@ -1181,7 +1185,7 @@ function openShareCard(blob, name, text) {
 }
 
 /* ===== What's new: shown once after a big update (website only; needs the matching server update) ===== */
-const WHATS_NEW = '2026-11-21a', WN_TS = Date.parse('2026-11-07T03:00:00Z'); // people who joined after this have nothing to catch up on
+const WHATS_NEW = '2026-11-22a', WN_TS = Date.parse('2026-11-07T03:00:00Z'); // people who joined after this have nothing to catch up on
 const BOOT_AT = Date.now();
 /* what each update brought, newest last; people see what came after the last one they saw (at most 6 lines) */
 const WN_ITEMS = [
@@ -1197,7 +1201,8 @@ const WN_ITEMS = [
   ['2026-11-18a', 'users', 'wn_fr'],
   ['2026-11-19a', 'target', 'wn_dm'],
   ['2026-11-20a', 'smile', 'wn_emo'],
-  ['2026-11-21a', 'cloud', 'wn_lwx']
+  ['2026-11-21a', 'cloud', 'wn_lwx'],
+  ['2026-11-22a', 'share', 'wn_story']
 ];
 // the new look already says the fish were redrawn
 const WN_PART = { wn_fish: 'wn_look' };

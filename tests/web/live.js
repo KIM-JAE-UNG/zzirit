@@ -208,6 +208,25 @@ async function until(fn, ms = 6000, step = 150) { const t0 = Date.now(); let v; 
     const res = await until(() => A.$eval('#lv-res', n => (n.hidden ? '' : n.textContent)), 5000) || '';
     ok(/cm/.test(res) && /15P/.test(res) && /×1\.25/.test(res) && /도감 첫 등록 \+10P/.test(res) && /현장/.test(res) && /1등/.test(res) && /지금 팔기 \+15P/.test(res), 'live: the catch card — size, today\'s price (12 × 1.25), new in the book, on the spot, first on the board');
     await A.waitForTimeout(700); await shot(A, 'l06_live_catch');
+    // the brag card: a story-sized picture, the character holding the fish, no spot in it
+    ok(await A.$eval('.lv-rshare', n => /자랑하기/.test(n.textContent)).catch(() => false), 'live: the catch card has a share button');
+    const story = await A.evaluate(async () => {
+      const b = await lvStoryBlob(LV.res); const u = URL.createObjectURL(b);
+      const im = await new Promise(r => { const i = new Image(); i.onload = () => r(i); i.src = u; });
+      const c = document.createElement('canvas'); c.width = 108; c.height = 192; const g = c.getContext('2d'); g.drawImage(im, 0, 0, 108, 192);
+      const px = (x, y) => [...g.getImageData(x, y, 1, 1).data];
+      window.__story = await new Promise(r => { const fr = new FileReader(); fr.onload = () => r(fr.result); fr.readAsDataURL(b); });
+      return { type: b.type, size: b.size, w: im.width, h: im.height, mid: px(54, 80), corner: px(2, 190), where: lvWhere(LV.res._to), to: !!LV.res._to };
+    });
+    try { const d = await A.evaluate(() => window.__story); fs.writeFileSync(OUT + '/l06t_story_card.jpg', Buffer.from(d.split(',')[1], 'base64')); } catch (e) { }
+    ok(story.type === 'image/jpeg' && story.w === 1080 && story.h === 1920 && story.size > 40000, 'live: the brag card is a 1080×1920 picture');
+    ok(story.corner[0] < 40 && story.corner[2] < 60 && story.mid.some(v => v > 90), 'live: dark navy around, something drawn in the middle');
+    ok(story.to && typeof story.where === 'string' && !/\d+\.\d{3}/.test(story.where), 'live: the card names the water area at most (no coordinates)');
+    await A.click('.lv-rshare'); await A.waitForTimeout(1500);
+    ok(await A.$eval('.modal-wrap.in .share-card.tall', n => /자랑 카드/.test(n.textContent) && /스토리 크기/.test(n.textContent) && !!n.querySelector('.sc-img') && !!n.querySelector('#sc-save[download]')).catch(() => false), 'live: on a computer, "Share" opens the picture with a save button');
+    await A.waitForTimeout(500); await shot(A, 'l06s_live_story');
+    await A.evaluate(() => { const b = $('.modal-wrap.in [data-close], .modal-wrap.in .modal-x'); if (b) b.click(); else closeModal($('.modal-wrap.in')); }); await A.waitForTimeout(400);
+    ok(await A.$eval('#lv-res', n => !n.hidden), 'live: closing the picture leaves the catch card');
     ok(!!(await until(() => B.$$eval('.lv-tick', ns => ns.some(n => /갯바위왕/.test(n.textContent) && /cm/.test(n.textContent))), 8000)), 'live: B\'s ticker tells of A\'s catch');
     // a friend's catch: B claps, A hears it
     ok(await B.$eval('.lv-tick.fr .lv-clap', n => /박수/.test(n.textContent) && n.dataset.clap.length > 0).catch(() => false), 'live: a friend\'s catch in the ticker has a clap button');
@@ -412,6 +431,10 @@ async function until(fn, ms = 6000, step = 150) { const t0 = Date.now(); let v; 
     ok(/3P/.test(resP) && /살림망에 넣고 한 번 더/.test(resP) && !/현장/.test(await P.$eval('.lv-rtags', n => n.textContent)), 'phone: a far-away catch is worth half (2 × 1.25 → 3P)');
     ok(await P.$$eval('#lv-res .lv-rbtn .btn', ns => ns.every(b => { const r = b.getBoundingClientRect(); return r.right <= innerWidth - 8 && b.scrollWidth <= b.clientWidth + 1; })), 'phone: the three buttons fit');
     await P.waitForTimeout(600); await shot(P, 'l14b_phone_catch');
+    ok(await P.$eval('.lv-rshare', b => { const r = b.getBoundingClientRect(), rg = document.createRange(); rg.selectNodeContents(document.querySelector('.lv-rtier')); const t = rg.getBoundingClientRect(), f = document.querySelector('.lv-rfish').getBoundingClientRect(); return r.right <= innerWidth - 8 && r.height >= 34 && r.left >= t.right && r.bottom <= f.top; }).catch(() => false), 'phone: the share button fits and covers neither the class nor the fish');
+    await P.click('.lv-rshare'); await P.waitForTimeout(1800);
+    ok(await P.$eval('.modal-wrap.in .share-card.tall .sc-img', n => { const r = n.getBoundingClientRect(); return n.naturalWidth === 1080 && r.left >= 0 && r.right <= innerWidth && r.bottom <= innerHeight; }).catch(() => false), 'phone: the brag card fits the screen');
+    await shot(P, 'l14c_phone_story'); await closeModals(P);
     await P.click('[data-lv="again"]'); await P.waitForTimeout(300);
     // the bell: the dear fish shows up as this morning's news (what the morning phone note says)
     await P.evaluate(() => notiScan());

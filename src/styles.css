@@ -1106,6 +1106,7 @@ h1 .beta-chip { font-size: 13px; margin-left: 4px; vertical-align: 6px; }
 .share-card { text-align: center; }
 .share-card .sc-img { display: block; width: 100%; max-width: 360px; margin: 6px auto 14px; border-radius: 16px; box-shadow: 0 10px 30px rgba(7, 12, 22, .28); }
 .share-card .actions { justify-content: center; flex-wrap: wrap; }
+.share-card.tall .sc-img { width: auto; max-width: 100%; max-height: min(62vh, 560px); aspect-ratio: 9 / 16; object-fit: contain; }
 .wn h2 { margin-bottom: 6px; }
 .wn-list { list-style: none; margin: 14px 0 6px; padding: 0; display: grid; gap: 12px; }
 .wn-list li { display: flex; gap: 12px; align-items: flex-start; }
@@ -1749,6 +1750,11 @@ body[data-route="live"] #main { padding-left: 0; padding-right: 0; }
 @keyframes lvfade { from { opacity: 0; } }
 .lv-rcard { width: min(100%, 400px); padding: 18px 20px 20px; border-radius: 26px; text-align: center; color: #E8EDF5; background: linear-gradient(170deg, var(--night-3), var(--night) 70%); border: 1px solid rgba(160,205,255,.22); box-shadow: 0 24px 60px rgba(0,0,0,.6); animation: lvup .45s cubic-bezier(.2,1.2,.3,1) both; }
 @keyframes lvup { from { transform: translateY(40px) scale(.96); opacity: 0; } }
+.lv-rcard { position: relative; }
+.lv-rcard .lv-rtier { min-height: 36px; margin-top: -6px; padding: 0 100px; display: flex; align-items: center; justify-content: center; }
+.lv-rshare { position: absolute; top: 12px; right: 12px; display: inline-flex; align-items: center; gap: 5px; min-height: 36px; padding: 0 12px; border-radius: 18px; border: 1px solid rgba(160,205,255,.3); background: rgba(124,196,255,.14); color: #E3F3FF; font: 700 13px var(--f-body); cursor: pointer; }
+.lv-rshare svg { width: 16px; height: 16px; } .lv-rshare:hover { background: rgba(124,196,255,.26); } .lv-rshare:disabled { opacity: .55; cursor: progress; }
+.lv-rshare:focus-visible { outline: 2px solid var(--spark); outline-offset: 2px; }
 .lv-rtier { margin: 0 0 10px; font-size: 13px; font-weight: 700; color: var(--spark); }
 .lv-res.t4 .lv-rtier, .lv-res.t5 .lv-rtier { color: #fff; text-shadow: 0 0 12px rgba(124,196,255,.9); }
 .lv-res.t5 .lv-rcard { border-color: rgba(255,255,255,.6); box-shadow: 0 0 0 1px rgba(124,196,255,.5), 0 0 60px rgba(57,137,210,.6), 0 24px 60px rgba(0,0,0,.6); }

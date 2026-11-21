@@ -213,5 +213,13 @@ Object.assign(T, {
   lwx_cast_dn: ['{s} — 오늘은 입질이 조금 느려요', '{s} — bites come a little later today', '{s} — 今日はアタリが少し遅め', '{s} — 今天咬钩会慢一点'],
   wn_lwx_h: ['라이브 지도에 진짜 날씨', 'Real weather on the Live map', 'ライブ地図に本物の天気', '实况地图上的真实天气'],
   wn_lwx_p: ['그 지역 날씨대로 비·눈·안개·바람이 보여요. 흐리거나 비 오면 입질이 조금 빠르고, 바람·천둥이면 조금 느려요. 위에 날씨 표시를 누르면 이유를 알려 줘요.', 'Rain, snow, fog and wind show as they are in that area. Grey skies and rain bring bites a little sooner; wind and thunder a little later. Tap the weather tag to see why.', 'その地域の天気どおりに雨・雪・霧・風が見えます。曇りや雨はアタリが少し早く、風・雷は少し遅く。上の天気表示を押すと理由が出ます。', '按当地天气显示雨、雪、雾和风。阴天和雨天咬钩稍快，大风和雷暴稍慢。点上方的天气标签可查看原因。'],
+  lv_story_btn: ['자랑하기', 'Share', '自慢する', '晒一晒'],
+  lv_story_h: ['자랑 카드', 'Brag card', '自慢カード', '炫耀卡'],
+  lv_story_sub: ['인스타그램·카카오톡 스토리 크기예요. 저장해서 올려 보세요. 정확한 자리는 들어가지 않아요.', 'Sized for Instagram and KakaoTalk stories. Save it and post it. The exact spot is never included.', 'インスタグラム・カカオトークのストーリーの大きさです。保存して投稿してみましょう。正確な場所は入りません。', '适合Instagram、KakaoTalk快拍的尺寸。保存后发出去吧。不会包含精确位置。'],
+  lv_story_text: ['찌릿 라이브에서 {name} {len} 낚았어요! 나도 해 보기 →', 'I landed a {name}, {len}, on ZZIRIT Live! Try it →', 'ZZIRITライブで{name} {len}を釣りました!やってみる →', '我在ZZIRIT实况钓到了{name} {len}！来试试 →'],
+  lv_story_first: ['도감 첫 등록', 'New in my book', '図鑑初登録', '图鉴首登'],
+  lv_story_rank: ['이번 주 {n}등', '#{n} this week', '今週{n}位', '本周第{n}名'],
+  wn_story_h: ['잡은 고기 자랑 카드', 'Brag card for your catch', '釣った魚の自慢カード', '渔获炫耀卡'],
+  wn_story_p: ['라이브에서 고기를 낚으면 「자랑하기」로 내 캐릭터가 고기를 든 스토리 크기 그림을 만들어 바로 올릴 수 있어요. 정확한 자리는 안 들어가요.', 'Land a fish in Live and tap "Share": you get a story-sized picture of your character holding it up, ready to post. The exact spot is never included.', 'ライブで魚を釣ったら「自慢する」で、自分のキャラが魚を掲げるストーリーサイズの画像をすぐ投稿できます。正確な場所は入りません。', '在实况钓到鱼后点「晒一晒」，就能生成你的角色举着鱼的快拍尺寸图片，马上发出去。不会包含精确位置。'],
   credits_map: ['라이브 지도', 'Live map', 'ライブ地図', '实况地图'],
 });
