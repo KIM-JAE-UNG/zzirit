@@ -494,7 +494,7 @@ function lvLand() {
     LV.res = r; LV.phase = 'result'; LV.target = null; LVS.play(r.tier >= 4 || r.big ? 'rare' : 'land'); LVS.buzz(r.tier >= 4 ? [60, 40, 60, 40, 160] : [50, 40, 90]);
     lvFx('splash', k.to, 1.2); clearTimeout(LV.resT); LV.resT = setTimeout(() => { if (LV.phase === 'result' && LV.res === r) lvResult(r); }, 1150);
     if (!LV.anon && LV.room) LV.room.send('catch', { u: myId(), n: S.me.nick, sp: r.sp, cm: r.cm, tier: r.tier, big: r.big, x: +k.to.lng.toFixed(5), y: +k.to.lat.toFixed(5), on: k.site ? 1 : 0 });
-    LV.k = null; LV.f = null; lvTrack(); lvLoad(true); lvHud(); msLoad(true);
+    LV.k = null; LV.f = null; lvTrack(); lvLoad(true); lvHud(); msLoad(true); if (typeof lsAfterLand === 'function') lsAfterLand(r.sp);
   }).catch(() => { LV.busy = false; lvEnd('lv_err', 'miss'); }), waitMs);
 }
 function lvResult(r) {
@@ -582,7 +582,7 @@ async function lvStoryBlob(r) {
   // where (the sea or the region only), the weather, who
   const lv = lvInfo(S.me, myId()).L, wx = r._wx && typeof lwxSky === 'function' ? lwxSky() : '';
   g.font = `500 36px ${SANS}`; g.fillStyle = '#A9BBCF'; g.textAlign = 'center';
-  g.fillText(fitText(g, [lvWhere(r._to), wx, `${S.me.nick || '?'} · Lv.${lv}`].filter(Boolean).join('  ·  '), W - P * 2), W / 2, tags.length ? 1730 : 1660);
+  g.fillText(fitText(g, [lvWhere(r._to), wx, `${LSET.st && LSET.st.title ? '「' + lsTitle(LSET.st.title) + '」 ' : ''}${S.me.nick || '?'} · Lv.${lv}`].filter(Boolean).join('  ·  '), W - P * 2), W / 2, tags.length ? 1730 : 1660);
   // footer
   g.fillStyle = 'rgba(255,255,255,.14)'; g.fillRect(P, H - 132, W - P * 2, 2);
   g.textAlign = 'left'; g.fillStyle = '#FFFFFF'; g.font = `800 38px ${SANS}`; g.fillText(`${APP_NAME[0]} ${APP_NAME[1]}`, P, H - 72);
@@ -905,7 +905,7 @@ function lvBook(tab) {
     const m = new Date().getMonth() + 1, at = LV.stand || LV.pos, near = at ? GEO.regionPrior(GEO.region(at.lng, at.lat, true), m).filter(x => SPI[x.id] && lvFits(SPI[x.id], 'sea')).map(x => x.id) : [];
     const ids = [...new Set([...st.dex.map(d => d.sp), ...near, ...SP.filter(sp => lvFits(sp, 'sea') || lvFits(sp, 'fresh')).map(sp => sp.id)])];
     const dexH = `<p class="lv-bsum"><b class="num">${st.dex.length}</b> / ${ids.length} ${t('lv_dex_n')}</p><div class="lv-dex">${ids.map(id => { const sp = SPI[id], d = dex.get(id); return `<div class="lv-dx${d ? ' got' : ''} t${sp.r}"><span class="tone-${sp.w}"><img ${FD.lazy(sp, 200, 110)} alt="" loading="lazy"></span><b>${d ? esc(spName(sp)) : '???'}</b><small>${d ? `<i class="num">${fmtN(d.best, 1)}</i>cm · ${t('lv_dex_x', { n: d.n })}` : t(LV_TIERS[sp.r])}</small></div>`; }).join('')}</div>`;
-    const row = (b, i) => `<li class="${b.a === myId() ? 'me' : ''}"><b class="num">${i + 1}</b>${avatar(anglerOf(b.a), 30)}<span><strong>${esc(lvNick(b.a))}</strong><small>${b.sp && SPI[b.sp] ? esc(spName(SPI[b.sp])) + ' ' + fmtN(b.cm, 1) + 'cm' : ''}</small></span><em class="num">${fmtN(b.s)}</em>${S.isOwner ? `<button class="btn btn-sm btn-line" data-zpvoid="${esc(b.a)}|${esc(st.wk)}">${t('zp_void')}</button>` : ''}</li>`;
+    const row = (b, i) => `<li class="${b.a === myId() ? 'me' : ''}"><b class="num">${i + 1}</b>${avatar(anglerOf(b.a), 30)}<span><strong>${esc(lvNick(b.a))}</strong><em class="ls-chip" data-lvtitle="${esc(b.a)}" hidden></em><small>${b.sp && SPI[b.sp] ? esc(spName(SPI[b.sp])) + ' ' + fmtN(b.cm, 1) + 'cm' : ''}</small></span><em class="num">${fmtN(b.s)}</em>${S.isOwner ? `<button class="btn btn-sm btn-line" data-zpvoid="${esc(b.a)}|${esc(st.wk)}">${t('zp_void')}</button>` : ''}</li>`;
     const wkH = `<p class="lv-bsum">${t('lv_wk_how')}</p>
       <ul class="zp-prizes lv-prz"><li class="p1"><b class="num">300P</b><span>${t('lv_wk_p1')}</span></li><li class="p2"><b class="num">200P</b><span>${t('lv_rank_n', { n: 2 })}</span></li><li class="p3"><b class="num">100P</b><span>${t('lv_rank_n', { n: 3 })}</span></li></ul>
       ${st.top.length ? `<ol class="lv-board">${st.top.map(row).join('')}</ol>` : `<p class="empty">${t('lv_wk_empty')}</p>`}
@@ -921,8 +921,10 @@ function lvBook(tab) {
       <label class="switch lv-opt"><input type="checkbox" id="lv-anon" ${LV.anon ? 'checked' : ''}><span class="sw"></span><span><b>${t('lv_anon_h')}</b><small>${t('lv_anon_p')}</small></span></label>
       <p class="lv-priv">${icon('lock')}<span>${t('lv_priv')}</span></p>`;
     const w = openModal(`<div class="lv-book"><h2>${t('lv_book')}</h2>
-      <div class="seg" role="tablist">${[['net', 'lv_net'], ['dex', 'lv_tab_dex'], ['wk', 'lv_tab_wk'], ['how', 'lv_tab_how']].map(([k, l]) => `<button role="tab" aria-selected="${k === cur}" data-lvtab="${k}">${t(l)}${k === 'net' && lvNet().length ? ` <i class="num">${lvNet().length}</i>` : ''}</button>`).join('')}</div>
-      <div class="lv-bbody" id="lv-bbody">${cur === 'net' ? lvNetHTML(st) : cur === 'dex' ? dexH : cur === 'wk' ? wkH : howH}</div></div>`, { wide: true, label: t('lv_book') });
+      <div class="seg" role="tablist">${[['net', 'lv_net'], ['dex', 'lv_tab_dex'], ...(LSET.off ? [] : [['set', 'ls_tab']]), ['wk', 'lv_tab_wk'], ['how', 'lv_tab_how']].map(([k, l]) => `<button role="tab" aria-selected="${k === cur}" data-lvtab="${k}">${t(l)}${k === 'net' && lvNet().length ? ` <i class="num">${lvNet().length}</i>` : k === 'set' ? ` <i class="num"${lsReady() ? '' : ' hidden'}>${lsReady() || ''}</i>` : ''}</button>`).join('')}</div>
+      <div class="lv-bbody" id="lv-bbody"${cur === 'set' ? ' data-lsbody' : ''}>${cur === 'net' ? lvNetHTML(st) : cur === 'dex' ? dexH : cur === 'set' ? lsBodyHTML() : cur === 'wk' ? wkH : howH}</div></div>`, { wide: true, label: t('lv_book') });
+    if (cur === 'set') lsLoad(true); else lsLoad();
+    if (cur === 'wk') lsBoardTitles(w);
     w.addEventListener('click', e => {
       const b = e.target.closest('[data-lvtab]'); if (b) { closeModal(w); setTimeout(() => lvBook(b.dataset.lvtab), 30); return; }
       const again = () => { const body = $('#lv-bbody', w); if (body && LV.st) body.innerHTML = lvNetHTML(LV.st); const n = $('[data-lvtab="net"] i', w); if (n) n.textContent = lvNet().length || ''; };

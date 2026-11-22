@@ -18,6 +18,7 @@ echo "== live chat, 1:1, leaving: database"; node db/chat.test.mjs | tail -1; [ 
 echo "== points, weekly board, lure shop: database"; node db/points.test.mjs | tail -1; [ "${PIPESTATUS[0]}" = 0 ] || fail=1
 echo "== 찌릿 라이브: database"; node db/live.test.mjs | tail -1; [ "${PIPESTATUS[0]}" = 0 ] || fail=1
 echo "== daily missions and the streak: database"; node db/daily.test.mjs | tail -1; [ "${PIPESTATUS[0]}" = 0 ] || fail=1
+echo "== fish-book sets and titles: database"; node db/sets.test.mjs | tail -1; [ "${PIPESTATUS[0]}" = 0 ] || fail=1
 node web/server.js > out-web-server.log 2>&1 & WS=$!
 node claude/server.js > out-claude-server.log 2>&1 & CS=$!
 trap 'kill $WS $CS 2>/dev/null; rm -f out-web-server.log out-claude-server.log' EXIT

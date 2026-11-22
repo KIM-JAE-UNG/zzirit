@@ -1822,7 +1822,7 @@ body[data-route="live"] #main { padding-left: 0; padding-right: 0; }
 .lv-nact { display: flex; flex-direction: column; align-items: stretch; gap: 2px; }
 .lv-nfree { padding: 2px 4px; border: 0; background: none; font: inherit; font-size: 11.5px; color: var(--ink-3); text-decoration: underline; cursor: pointer; } .lv-nfree.armed { color: var(--poison); font-weight: 700; }
 .lv-nall .ic { width: 18px; height: 18px; } .lv-nhow { margin: 12px 0 0; font-size: 12.5px; color: var(--ink-3); }
-.lv-book .seg { display: grid; grid-template-columns: repeat(4, auto); } .lv-book .seg button { padding-inline: 6px; font-size: 13.5px; white-space: nowrap; }
+.lv-book .seg { display: grid; grid-auto-flow: column; grid-auto-columns: auto; } .lv-book .seg button { padding-inline: 6px; font-size: 13.5px; white-space: nowrap; }
 .lv-book .seg i { font-style: normal; font-size: 11px; font-weight: 700; padding: 1px 6px; border-radius: 8px; background: var(--accent); color: var(--accent-ink); }
 @media (max-width: 420px) { .lv-netl li { grid-template-columns: 64px minmax(0, 1fr) auto auto; gap: 8px; } .lv-nfree.armed { max-width: 76px; white-space: normal; text-align: center; } }
 /* the book */
@@ -1939,6 +1939,32 @@ body[data-route="live"] #main { padding-left: 0; padding-right: 0; }
 .lv-emon { margin: 8px 4px 0; font-size: 12px; color: rgba(227,243,255,.65); }
 .lv-tick.emo span { color: rgba(227,243,255,.85); }
 .lv-emob small.ok { color: rgba(227,243,255,.6); }
+
+/* 도감 세트 and 칭호 */
+.ls-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; margin-bottom: 6px; } .ls-head .lv-bsum { margin: 0; }
+.ls-now { margin: 0; display: flex; align-items: center; gap: 8px; font-size: 14px; } .ls-now > .ic { color: var(--accent); width: 18px; height: 18px; }
+.ls-chip { display: inline-block; padding: 1px 9px; border-radius: 999px; background: var(--accent-soft); color: var(--accent-2); font-size: 12.5px; font-weight: 700; font-style: normal; line-height: 1.6; white-space: nowrap; }
+.lv-board li em.ls-chip { align-self: flex-start; max-width: 100%; margin: 1px 0; font-size: 11.5px; font-style: normal; color: var(--accent-2); overflow: hidden; text-overflow: ellipsis; }
+.ls-how { margin: 0 0 12px; }
+.ls-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 10px; }
+.ls-set { padding: 12px; border-radius: 16px; background: var(--surface-2); display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.ls-set.is-done { box-shadow: inset 0 0 0 1.5px var(--accent); }
+.ls-set.is-wear { background: linear-gradient(135deg, var(--accent-soft), var(--surface-2)); }
+.ls-top { display: flex; align-items: center; gap: 10px; }
+.ls-ic { flex: none; width: 36px; height: 36px; border-radius: 12px; display: grid; place-items: center; background: var(--surface); color: var(--sea); } .ls-ic .ic { width: 20px; height: 20px; }
+.ls-set.is-got .ls-ic { background: var(--accent); color: var(--accent-ink); }
+.ls-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.3; } .ls-txt b { font-size: 15px; } .ls-txt small { font-size: 12px; color: var(--ink-3); }
+.ls-mo { font-style: normal; margin-right: 6px; color: var(--ink-2); } .ls-mo.now { color: var(--accent); font-weight: 700; }
+.ls-pts { font-size: 14px; font-weight: 700; color: var(--ink-2); font-style: italic; }
+.ls-wearing { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 700; color: var(--accent); } .ls-wearing .ic { width: 16px; height: 16px; }
+.ls-prog { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 4px 10px; } .ls-prog small { font-size: 12px; color: var(--ink-2); }
+.ls-title { grid-column: 1 / -1; display: flex; align-items: center; gap: 4px; font-size: 12.5px; color: var(--ink-3); } .ls-title .ic { width: 14px; height: 14px; color: var(--accent); } .ls-title b { color: var(--ink); }
+.ls-fish { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); gap: 6px; }
+.ls-fish li { display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 0; }
+.ls-fish span { width: 100%; aspect-ratio: 20 / 11; border-radius: 8px; overflow: hidden; background: var(--surface); } .ls-fish img { width: 100%; height: 100%; display: block; }
+.ls-fish li:not(.got) img { filter: brightness(0) opacity(.22); }
+.ls-fish small { font-size: 10.5px; color: var(--ink-3); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .ls-fish li.got small { color: var(--ink); }
+@media (max-width: 420px) { .lv-book .seg button { padding-inline: 4px; font-size: 12.5px; } .ls-list { grid-template-columns: 1fr; } }
 
 </style>
 </head>
@@ -2348,6 +2374,11 @@ body[data-route="live"] #main { padding-left: 0; padding-right: 0; }
     sell: (ids, release) => zpRpc('live_sell', { p_ids: ids && ids.length ? ids : null, p_release: !!release }),
     daily: () => zpRpc('live_daily'),
     claim: k => zpRpc('live_mission_claim', { p_k: k }),
+    // 0026: fish-book sets and titles
+    sets: () => zpRpc('live_sets'),
+    setClaim: k => zpRpc('live_set_claim', { p_k: k }),
+    wear: k => zpRpc('live_title_set', { p_k: k || '' }),
+    titles: ids => zpRpc('live_titles', { p_accts: ids }),
     void: (wk, uid, on) => zpRpc('live_void', { p_wk: wk, p_acct: uid, p_void: on !== false })
   };
   window.APP_AUTH = { sb, session, acct, link, news, review, admin, ids, push, chat, dm, rt, account, board, zp, live: liveGame, error: () => authErr };
@@ -4228,6 +4259,53 @@ Object.assign(T, {
   wn_story_h: ['잡은 고기 자랑 카드', 'Brag card for your catch', '釣った魚の自慢カード', '渔获炫耀卡'],
   wn_story_p: ['라이브에서 고기를 낚으면 「자랑하기」로 내 캐릭터가 고기를 든 스토리 크기 그림을 만들어 바로 올릴 수 있어요. 정확한 자리는 안 들어가요.', 'Land a fish in Live and tap "Share": you get a story-sized picture of your character holding it up, ready to post. The exact spot is never included.', 'ライブで魚を釣ったら「自慢する」で、自分のキャラが魚を掲げるストーリーサイズの画像をすぐ投稿できます。正確な場所は入りません。', '在实况钓到鱼后点「晒一晒」，就能生成你的角色举着鱼的快拍尺寸图片，马上发出去。不会包含精确位置。'],
   credits_map: ['라이브 지도', 'Live map', 'ライブ地図', '实况地图'],
+});
+
+/* ===== 도감 세트 and 칭호 (0026) ===== */
+Object.assign(T, {
+  zp_r_set: ['도감 세트 「{s}」 완성', 'Fish-book set "{s}" done', '図鑑セット「{s}」達成', '图鉴套组「{s}」完成'],
+  ls_tab: ['세트', 'Sets', 'セット', '套组'],
+  ls_done_n: ['세트 완성', 'sets done', 'セット達成', '套组已完成'],
+  ls_need: ['서로 다른 {n}종 ({m}종 중)', '{n} different fish (of {m})', '異なる{n}種（{m}種中）', '{n}种不同的鱼（共{m}种）'],
+  ls_now: ['지금 계절', 'in season now', '今の季節', '当季'],
+  ls_title_is: ['칭호', 'Title', '称号', '称号'],
+  ls_wear: ['칭호 달기', 'Wear title', '称号をつける', '佩戴称号'],
+  ls_wearing: ['다는 중', 'Wearing', '着用中', '佩戴中'],
+  ls_my: ['내 칭호', 'My title', '私の称号', '我的称号'],
+  ls_off_btn: ['떼기', 'Take off', '外す', '取下'],
+  ls_none: ['세트를 모으면 칭호를 받아요.', 'Finish a set to get a title.', 'セットを集めると称号がもらえます。', '集齐套组就能获得称号。'],
+  ls_how: ['세트에 있는 고기를 서로 다르게 모으면 완성이에요. 계절 세트는 그 달에 낚은 고기만 세요(한국 날짜). 칭호는 주간 순위와 자랑 카드에 보여요.', 'Catch enough different fish of a set to finish it. Season sets count only fish caught in those months (Korean dates). Your title shows on the weekly board and on brag cards.', 'セットの魚を種類別に集めると達成です。季節セットはその月に釣った魚だけ数えます（韓国の日付）。称号は週間順位と自慢カードに表示されます。', '集齐套组里不同的鱼即可完成。季节套组只计算在那几个月钓到的鱼（按韩国日期）。称号会显示在周排名和炫耀卡上。'],
+  ls_done: ['도감 세트 「{s}」 완성! 도감·순위의 「세트」에서 「{t}」 칭호를 받으세요.', 'Set "{s}" done! Claim the title "{t}" under Sets in the fish book.', '図鑑セット「{s}」達成!図鑑・順位の「セット」で称号「{t}」を受け取りましょう。', '图鉴套组「{s}」完成！到图鉴·排名的「套组」领取称号「{t}」。'],
+  ls_claimed: ['+{p}P! 이제 「{t}」 칭호를 달 수 있어요.', '+{p}P! You can now wear the title "{t}".', '+{p}P!称号「{t}」をつけられます。', '+{p}P！现在可以佩戴称号「{t}」了。'],
+  ls_worn: ['「{t}」 칭호를 달았어요.', 'You are wearing "{t}".', '称号「{t}」をつけました。', '已佩戴称号「{t}」。'],
+  ls_off: ['서버 업데이트 후에 열려요.', 'Opens after the server update.', 'サーバー更新後に使えます。', '服务器更新后开放。'],
+  ls_need_profile: ['프로필을 만들면 세트 보상을 받을 수 있어요.', 'Make a profile to claim set rewards.', 'プロフィールを作るとセット報酬を受け取れます。', '创建个人资料后即可领取套组奖励。'],
+  ls_n_rock: ['갯바위 삼총사', 'Rock trio', '磯の三銃士', '矶钓三剑客'],
+  ls_t_rock: ['갯바위 명인', 'Rock master', '磯の名人', '矶钓名人'],
+  ls_n_west: ['서해 손맛', 'West Sea bites', '黄海の手応え', '黄海手感'],
+  ls_t_west: ['서해 단골', 'West Sea regular', '黄海の常連', '黄海常客'],
+  ls_n_ink: ['문어·오징어', 'Octopus & squid', 'タコ・イカ', '章鱼·鱿鱼'],
+  ls_t_ink: ['먹물 사냥꾼', 'Ink hunter', '墨ハンター', '墨汁猎人'],
+  ls_n_spiky: ['가시·독 조심', 'Spines & venom', 'トゲ・毒に注意', '小心刺和毒'],
+  ls_t_spiky: ['가시 조심', 'Careful hands', 'トゲ名人', '小心刺手'],
+  ls_n_fresh: ['우리 강·저수지', 'Korean rivers & ponds', '韓国の川・ため池', '韩国江河·水库'],
+  ls_t_fresh: ['민물 고수', 'Freshwater ace', '淡水の達人', '淡水高手'],
+  ls_n_tropic: ['열대 바다', 'Tropical seas', '熱帯の海', '热带海洋'],
+  ls_t_tropic: ['열대 원정대', 'Tropic explorer', '熱帯遠征隊', '热带远征队'],
+  ls_n_rivers: ['세계의 강', 'Rivers of the world', '世界の川', '世界之河'],
+  ls_t_rivers: ['세계 강 탐험가', 'River explorer', '世界の川探検家', '世界河流探险家'],
+  ls_n_legend: ['전설 수집', 'Legend collection', '伝説コレクション', '传说收藏'],
+  ls_t_legend: ['전설의 낚시꾼', 'Legendary angler', '伝説の釣り人', '传说钓手'],
+  ls_n_spring: ['봄 바다', 'Spring sea', '春の海', '春之海'],
+  ls_t_spring: ['봄 낚시꾼', 'Spring angler', '春の釣り人', '春季钓手'],
+  ls_n_summer: ['여름 낚시', 'Summer fishing', '夏の釣り', '夏日垂钓'],
+  ls_t_summer: ['여름 사냥꾼', 'Summer hunter', '夏ハンター', '夏日猎手'],
+  ls_n_autumn: ['가을 대물', 'Autumn catch', '秋の大物', '秋季大鱼'],
+  ls_t_autumn: ['가을 손맛', 'Autumn hand', '秋の手応え', '秋日手感'],
+  ls_n_winter: ['겨울 바다', 'Winter sea', '冬の海', '冬之海'],
+  ls_t_winter: ['겨울 낚시꾼', 'Winter angler', '冬の釣り人', '冬季钓手'],
+  wn_sets_h: ['도감 세트와 칭호', 'Fish-book sets & titles', '図鑑セットと称号', '图鉴套组与称号'],
+  wn_sets_p: ['라이브 도감에 세트 12개가 생겼어요. 갯바위·서해·민물·계절 고기를 모으면 포인트와 칭호를 받고, 칭호는 주간 순위와 자랑 카드에 보여요.', 'The Live fish book now has 12 sets. Collect rock, West Sea, freshwater or seasonal fish to get points and a title, shown on the weekly board and on brag cards.', 'ライブ図鑑にセットが12個できました。磯・黄海・淡水・季節の魚を集めるとポイントと称号がもらえ、称号は週間順位と自慢カードに表示されます。', '实况图鉴新增12个套组。集齐矶钓、黄海、淡水或季节鱼就能获得积分和称号，称号会显示在周排名和炫耀卡上。'],
 });
 
 /* ===== Tackle dictionaries: [ko, en, ja, zh] ===== */
@@ -8355,7 +8433,7 @@ function openShareCard(blob, name, text, opt) {
 }
 
 /* ===== What's new: shown once after a big update (website only; needs the matching server update) ===== */
-const WHATS_NEW = '2026-11-22a', WN_TS = Date.parse('2026-11-07T03:00:00Z'); // people who joined after this have nothing to catch up on
+const WHATS_NEW = '2026-11-23a', WN_TS = Date.parse('2026-11-07T03:00:00Z'); // people who joined after this have nothing to catch up on
 const BOOT_AT = Date.now();
 /* what each update brought, newest last; people see what came after the last one they saw (at most 6 lines) */
 const WN_ITEMS = [
@@ -8372,7 +8450,8 @@ const WN_ITEMS = [
   ['2026-11-19a', 'target', 'wn_dm'],
   ['2026-11-20a', 'smile', 'wn_emo'],
   ['2026-11-21a', 'cloud', 'wn_lwx'],
-  ['2026-11-22a', 'share', 'wn_story']
+  ['2026-11-22a', 'share', 'wn_story'],
+  ['2026-11-23a', 'medal', 'wn_sets']
 ];
 // the new look already says the fish were redrawn
 const WN_PART = { wn_fish: 'wn_look' };
@@ -12246,7 +12325,7 @@ const zlSpec = L => Array.isArray(L.spec) ? dict(L.spec) : L.spec;
 function zpNews() {
   const led = (ZP.st && ZP.st.led) || []; if (!led.length || !zpMine()) return;
   const top = Math.max(...led.map(x => +x.id || 0)), seen = lsGet('zpSeen', null);
-  const fresh = led.filter(x => +x.id > (+seen || 0) && x.d > 0 && x.r !== 'buy' && !/^(day|mis|visit):/.test(x.ref || '') && (seen != null || nowMs() - Date.parse(x.at) < 3 * DAY_MS));
+  const fresh = led.filter(x => +x.id > (+seen || 0) && x.d > 0 && x.r !== 'buy' && !/^(day|mis|visit|set):/.test(x.ref || '') && (seen != null || nowMs() - Date.parse(x.at) < 3 * DAY_MS));
   lsSet('zpSeen', top);
   if (fresh.length) setTimeout(() => zpCelebrate(fresh), 700);
 }
@@ -12257,6 +12336,7 @@ function zpWhy(x) {
   if (/^day:/.test(x.ref || '')) return t('zp_r_live');
   if (/^visit:/.test(x.ref || '')) return t('zp_r_visit', { n: x.n });
   if (/^mis:/.test(x.ref || '')) return t('zp_r_mis');
+  if (/^set:/.test(x.ref || '')) return t('zp_r_set', { s: lsName(String(x.ref).slice(4)) });
   if (x.r === 'prize') return t(live ? 'zp_r_prize_live' : 'zp_r_prize', { n: x.n, w: zpWeekName(wk) });
   if (x.r === 'join') return t('zp_r_join', { w: zpWeekName(wk) });
   if (x.r === 'buy') return t('zp_r_buy', { name: zlName(x.ref) });
@@ -13330,7 +13410,7 @@ function lvLand() {
     LV.res = r; LV.phase = 'result'; LV.target = null; LVS.play(r.tier >= 4 || r.big ? 'rare' : 'land'); LVS.buzz(r.tier >= 4 ? [60, 40, 60, 40, 160] : [50, 40, 90]);
     lvFx('splash', k.to, 1.2); clearTimeout(LV.resT); LV.resT = setTimeout(() => { if (LV.phase === 'result' && LV.res === r) lvResult(r); }, 1150);
     if (!LV.anon && LV.room) LV.room.send('catch', { u: myId(), n: S.me.nick, sp: r.sp, cm: r.cm, tier: r.tier, big: r.big, x: +k.to.lng.toFixed(5), y: +k.to.lat.toFixed(5), on: k.site ? 1 : 0 });
-    LV.k = null; LV.f = null; lvTrack(); lvLoad(true); lvHud(); msLoad(true);
+    LV.k = null; LV.f = null; lvTrack(); lvLoad(true); lvHud(); msLoad(true); if (typeof lsAfterLand === 'function') lsAfterLand(r.sp);
   }).catch(() => { LV.busy = false; lvEnd('lv_err', 'miss'); }), waitMs);
 }
 function lvResult(r) {
@@ -13418,7 +13498,7 @@ async function lvStoryBlob(r) {
   // where (the sea or the region only), the weather, who
   const lv = lvInfo(S.me, myId()).L, wx = r._wx && typeof lwxSky === 'function' ? lwxSky() : '';
   g.font = `500 36px ${SANS}`; g.fillStyle = '#A9BBCF'; g.textAlign = 'center';
-  g.fillText(fitText(g, [lvWhere(r._to), wx, `${S.me.nick || '?'} · Lv.${lv}`].filter(Boolean).join('  ·  '), W - P * 2), W / 2, tags.length ? 1730 : 1660);
+  g.fillText(fitText(g, [lvWhere(r._to), wx, `${LSET.st && LSET.st.title ? '「' + lsTitle(LSET.st.title) + '」 ' : ''}${S.me.nick || '?'} · Lv.${lv}`].filter(Boolean).join('  ·  '), W - P * 2), W / 2, tags.length ? 1730 : 1660);
   // footer
   g.fillStyle = 'rgba(255,255,255,.14)'; g.fillRect(P, H - 132, W - P * 2, 2);
   g.textAlign = 'left'; g.fillStyle = '#FFFFFF'; g.font = `800 38px ${SANS}`; g.fillText(`${APP_NAME[0]} ${APP_NAME[1]}`, P, H - 72);
@@ -13741,7 +13821,7 @@ function lvBook(tab) {
     const m = new Date().getMonth() + 1, at = LV.stand || LV.pos, near = at ? GEO.regionPrior(GEO.region(at.lng, at.lat, true), m).filter(x => SPI[x.id] && lvFits(SPI[x.id], 'sea')).map(x => x.id) : [];
     const ids = [...new Set([...st.dex.map(d => d.sp), ...near, ...SP.filter(sp => lvFits(sp, 'sea') || lvFits(sp, 'fresh')).map(sp => sp.id)])];
     const dexH = `<p class="lv-bsum"><b class="num">${st.dex.length}</b> / ${ids.length} ${t('lv_dex_n')}</p><div class="lv-dex">${ids.map(id => { const sp = SPI[id], d = dex.get(id); return `<div class="lv-dx${d ? ' got' : ''} t${sp.r}"><span class="tone-${sp.w}"><img ${FD.lazy(sp, 200, 110)} alt="" loading="lazy"></span><b>${d ? esc(spName(sp)) : '???'}</b><small>${d ? `<i class="num">${fmtN(d.best, 1)}</i>cm · ${t('lv_dex_x', { n: d.n })}` : t(LV_TIERS[sp.r])}</small></div>`; }).join('')}</div>`;
-    const row = (b, i) => `<li class="${b.a === myId() ? 'me' : ''}"><b class="num">${i + 1}</b>${avatar(anglerOf(b.a), 30)}<span><strong>${esc(lvNick(b.a))}</strong><small>${b.sp && SPI[b.sp] ? esc(spName(SPI[b.sp])) + ' ' + fmtN(b.cm, 1) + 'cm' : ''}</small></span><em class="num">${fmtN(b.s)}</em>${S.isOwner ? `<button class="btn btn-sm btn-line" data-zpvoid="${esc(b.a)}|${esc(st.wk)}">${t('zp_void')}</button>` : ''}</li>`;
+    const row = (b, i) => `<li class="${b.a === myId() ? 'me' : ''}"><b class="num">${i + 1}</b>${avatar(anglerOf(b.a), 30)}<span><strong>${esc(lvNick(b.a))}</strong><em class="ls-chip" data-lvtitle="${esc(b.a)}" hidden></em><small>${b.sp && SPI[b.sp] ? esc(spName(SPI[b.sp])) + ' ' + fmtN(b.cm, 1) + 'cm' : ''}</small></span><em class="num">${fmtN(b.s)}</em>${S.isOwner ? `<button class="btn btn-sm btn-line" data-zpvoid="${esc(b.a)}|${esc(st.wk)}">${t('zp_void')}</button>` : ''}</li>`;
     const wkH = `<p class="lv-bsum">${t('lv_wk_how')}</p>
       <ul class="zp-prizes lv-prz"><li class="p1"><b class="num">300P</b><span>${t('lv_wk_p1')}</span></li><li class="p2"><b class="num">200P</b><span>${t('lv_rank_n', { n: 2 })}</span></li><li class="p3"><b class="num">100P</b><span>${t('lv_rank_n', { n: 3 })}</span></li></ul>
       ${st.top.length ? `<ol class="lv-board">${st.top.map(row).join('')}</ol>` : `<p class="empty">${t('lv_wk_empty')}</p>`}
@@ -13757,8 +13837,10 @@ function lvBook(tab) {
       <label class="switch lv-opt"><input type="checkbox" id="lv-anon" ${LV.anon ? 'checked' : ''}><span class="sw"></span><span><b>${t('lv_anon_h')}</b><small>${t('lv_anon_p')}</small></span></label>
       <p class="lv-priv">${icon('lock')}<span>${t('lv_priv')}</span></p>`;
     const w = openModal(`<div class="lv-book"><h2>${t('lv_book')}</h2>
-      <div class="seg" role="tablist">${[['net', 'lv_net'], ['dex', 'lv_tab_dex'], ['wk', 'lv_tab_wk'], ['how', 'lv_tab_how']].map(([k, l]) => `<button role="tab" aria-selected="${k === cur}" data-lvtab="${k}">${t(l)}${k === 'net' && lvNet().length ? ` <i class="num">${lvNet().length}</i>` : ''}</button>`).join('')}</div>
-      <div class="lv-bbody" id="lv-bbody">${cur === 'net' ? lvNetHTML(st) : cur === 'dex' ? dexH : cur === 'wk' ? wkH : howH}</div></div>`, { wide: true, label: t('lv_book') });
+      <div class="seg" role="tablist">${[['net', 'lv_net'], ['dex', 'lv_tab_dex'], ...(LSET.off ? [] : [['set', 'ls_tab']]), ['wk', 'lv_tab_wk'], ['how', 'lv_tab_how']].map(([k, l]) => `<button role="tab" aria-selected="${k === cur}" data-lvtab="${k}">${t(l)}${k === 'net' && lvNet().length ? ` <i class="num">${lvNet().length}</i>` : k === 'set' ? ` <i class="num"${lsReady() ? '' : ' hidden'}>${lsReady() || ''}</i>` : ''}</button>`).join('')}</div>
+      <div class="lv-bbody" id="lv-bbody"${cur === 'set' ? ' data-lsbody' : ''}>${cur === 'net' ? lvNetHTML(st) : cur === 'dex' ? dexH : cur === 'set' ? lsBodyHTML() : cur === 'wk' ? wkH : howH}</div></div>`, { wide: true, label: t('lv_book') });
+    if (cur === 'set') lsLoad(true); else lsLoad();
+    if (cur === 'wk') lsBoardTitles(w);
     w.addEventListener('click', e => {
       const b = e.target.closest('[data-lvtab]'); if (b) { closeModal(w); setTimeout(() => lvBook(b.dataset.lvtab), 30); return; }
       const again = () => { const body = $('#lv-bbody', w); if (body && LV.st) body.innerHTML = lvNetHTML(LV.st); const n = $('[data-lvtab="net"] i', w); if (n) n.textContent = lvNet().length || ''; };
@@ -14167,6 +14249,98 @@ function msClaim(btn) {
   }).catch(() => toast(t('lv_err'), 'warn')).finally(() => { MS.busy = false; btn.disabled = false; });
 }
 document.addEventListener('click', e => { const b = e.target.closest('[data-msclaim]'); if (b) { e.preventDefault(); msClaim(b); } });
+
+/* ===== 도감 세트 and 칭호 (찌릿 라이브, website). A set is a short list of fish that belong together — a kind of water,
+   a part of the world, a season. Catch enough different fish of it and the server pays the set's points once; its
+   title can then be worn, and others see it on the weekly board and on the brag card. The server counts everything
+   (0026): the phone only shows what it says. ===== */
+const LSET = { st: null, p: null, at: 0, off: false, titles: {} };
+const LSET_IC = { rock: 'wave', west: 'sea', ink: 'sparkle', spiky: 'spike', fresh: 'wave', tropic: 'sun', rivers: 'globe', legend: 'star', spring: 'sparkle', summer: 'sun', autumn: 'flame', winter: 'cloud' };
+const lsName = k => t('ls_n_' + k) || k;
+const lsTitle = k => (k && t('ls_t_' + k)) || '';
+const lsReady = (st = LSET.st) => !st ? 0 : st.sets.filter(s => s.n >= s.need && !s.got).length;
+const lsMonth = m => { try { return new Date(2026, m - 1, 15).toLocaleDateString(locale(), { month: 'short' }); } catch (e) { return String(m); } };
+const lsInSeason = (s, mo) => s.m0 != null && (s.m0 <= s.m1 ? mo >= s.m0 && mo <= s.m1 : mo >= s.m0 || mo <= s.m1);
+function lsLoad(force) {
+  if (LSET.off || !APP_AUTH || !APP_AUTH.live || !APP_AUTH.live.sets) return Promise.resolve(null);
+  if (LSET.p) return LSET.p;
+  if (!force && LSET.st && nowMs() - LSET.at < 60e3) return Promise.resolve(LSET.st);
+  LSET.p = APP_AUTH.live.sets().then(r => {
+    if (!r || r.err || !Array.isArray(r.sets)) return null;
+    const before = LSET.st; LSET.st = r; LSET.at = nowMs();
+    if (r.title) LSET.titles[myId()] = r.title; else delete LSET.titles[myId()];
+    // a set that just got done (the fish just landed): say so once
+    if (before) { const s = r.sets.find(x => x.n >= x.need && !x.got && !before.sets.some(b => b.k === x.k && b.n >= b.need)); if (s) setTimeout(() => toast(t('ls_done', { s: lsName(s.k), t: lsTitle(s.k) }), 'ok', 5200), 1400); }
+    lsPaint(); return r;
+  }).catch(e => { if (e && (e.code === 'need_update' || e.code === 'not_granted')) LSET.off = true; return null; }).finally(() => { LSET.p = null; });
+  return LSET.p;
+}
+// after a fish lands: look again only when it can change a set
+function lsAfterLand(sp) {
+  const st = LSET.st; if (!st) { lsLoad(true); return; }
+  if (st.sets.some(s => !s.got && s.sps.includes(sp) && !s.have.includes(sp))) lsLoad(true);
+}
+function lsSetHTML(s, mo) {
+  const done = s.n >= s.need, pc = Math.round(100 * Math.min(1, s.n / s.need)), wear = LSET.st && LSET.st.title === s.k, now = lsInSeason(s, mo);
+  const fish = s.sps.filter(id => SPI[id]).map(id => { const got = s.have.includes(id), sp = SPI[id]; return `<li class="${got ? 'got' : ''}" title="${got ? esc(spName(sp)) : '???'}"><span class="tone-${sp.w}"><img ${FD.lazy(sp, 120, 66)} alt="" loading="lazy"></span><small>${got ? esc(spName(sp)) : '???'}</small></li>`; }).join('');
+  const act = s.got
+    ? (wear ? `<span class="ls-wearing">${icon('check')}${t('ls_wearing')}</span>` : `<button class="btn btn-line btn-sm" data-lswear="${esc(s.k)}">${t('ls_wear')}</button>`)
+    : done ? `<button class="btn btn-primary btn-sm" data-lsclaim="${esc(s.k)}">${t('dm_claim')} +${s.pts}P</button>` : `<span class="ls-pts num">+${s.pts}P</span>`;
+  return `<li class="ls-set${s.got ? ' is-got' : done ? ' is-done' : ''}${wear ? ' is-wear' : ''}" data-lsk="${esc(s.k)}">
+    <div class="ls-top"><span class="ls-ic">${icon(s.got ? 'medal' : LSET_IC[s.k] || 'book')}</span>
+      <span class="ls-txt"><b>${esc(lsName(s.k))}</b><small>${s.m0 != null ? `<i class="ls-mo${now ? ' now' : ''}">${esc(lsMonth(s.m0))}–${esc(lsMonth(s.m1))}${now ? ' · ' + t('ls_now') : ''}</i>` : ''}${t('ls_need', { n: s.need, m: s.sps.length })}</small></span>
+      ${act}</div>
+    <div class="ls-prog"><span class="ms-bar" role="progressbar" aria-valuemin="0" aria-valuemax="${s.need}" aria-valuenow="${s.n}" aria-label="${esc(lsName(s.k))}"><i style="width:${pc}%"></i></span><small class="num">${s.n} / ${s.need}</small>
+      <span class="ls-title">${icon('medal')}${t('ls_title_is')} <b>${esc(lsTitle(s.k))}</b></span></div>
+    <ul class="ls-fish">${fish}</ul></li>`;
+}
+function lsBodyHTML(st = LSET.st) {
+  if (!st) return `<p class="empty">${LSET.off ? t('ls_off') : t('lv_loading')}</p>`;
+  const done = st.sets.filter(s => s.got).length, mo = st.mo || new Date().getMonth() + 1;
+  const sets = st.sets.slice().sort((a, b) => (lsInSeason(b, mo) ? 1 : 0) - (lsInSeason(a, mo) ? 1 : 0)); // this season's set first
+  return `<div class="ls-head"><p class="lv-bsum"><b class="num">${done}</b> / ${st.sets.length} ${t('ls_done_n')}</p>
+      <p class="ls-now">${st.title ? `${icon('medal')}<span>${t('ls_my')} <b class="ls-chip">${esc(lsTitle(st.title))}</b></span><button class="btn btn-line btn-sm" data-lswear="">${t('ls_off_btn')}</button>` : `<span class="muted">${t('ls_none')}</span>`}</p></div>
+    <p class="muted small ls-how">${t('ls_how')}</p>
+    <ul class="ls-list">${sets.map(s => lsSetHTML(s, mo)).join('')}</ul>`;
+}
+function lsPaint() {
+  $$('[data-lsbody]').forEach(el => { el.innerHTML = lsBodyHTML(); });
+  const n = lsReady(); $$('[data-lvtab="set"] i').forEach(i => { i.hidden = !n; i.textContent = n || ''; });
+}
+function lsClaim(btn) {
+  if (LSET.busy) return; LSET.busy = true; btn.disabled = true;
+  const k = btn.dataset.lsclaim;
+  APP_AUTH.live.setClaim(k).then(r => {
+    if (!r || r.err) { toast(t(r && r.err === 'no_profile' ? 'ls_need_profile' : 'lv_err'), 'warn'); return lsLoad(true); }
+    if (typeof LVS !== 'undefined') LVS.play('coin');
+    toast(t('ls_claimed', { p: r.pts, t: lsTitle(k) }), 'ok', 4200);
+    if (typeof msBal === 'function') msBal(r.bal);
+    if (LSET.st) { LSET.st.sets.forEach(s => { if (s.k === k) s.got = true; }); LSET.st.title = r.title || LSET.st.title; if (LSET.st.title) LSET.titles[myId()] = LSET.st.title; }
+    lsPaint();
+  }).catch(() => toast(t('lv_err'), 'warn')).finally(() => { LSET.busy = false; btn.disabled = false; });
+}
+function lsWear(btn) {
+  if (LSET.busy) return; LSET.busy = true; btn.disabled = true;
+  const k = btn.dataset.lswear || '';
+  APP_AUTH.live.wear(k).then(r => {
+    if (!r || r.err) { toast(t('lv_err'), 'warn'); return; }
+    if (LSET.st) LSET.st.title = r.title || null;
+    if (r.title) { LSET.titles[myId()] = r.title; toast(t('ls_worn', { t: lsTitle(r.title) }), 'ok'); } else delete LSET.titles[myId()];
+    lsPaint();
+  }).catch(() => toast(t('lv_err'), 'warn')).finally(() => { LSET.busy = false; btn.disabled = false; });
+}
+// the titles of the people on the weekly board (only what each chose to wear)
+function lsBoardTitles(root) {
+  const els = $$('[data-lvtitle]', root); if (!els.length || LSET.off || !APP_AUTH.live.titles) return;
+  const fill = () => els.forEach(el => { const k = LSET.titles[el.dataset.lvtitle]; el.hidden = !k; el.textContent = k ? lsTitle(k) : ''; });
+  fill();
+  const ids = [...new Set(els.map(el => el.dataset.lvtitle))].slice(0, 50);
+  APP_AUTH.live.titles(ids).then(m => { if (m && typeof m === 'object') { ids.forEach(a => { if (m[a]) LSET.titles[a] = m[a]; else delete LSET.titles[a]; }); fill(); } }).catch(() => null);
+}
+document.addEventListener('click', e => {
+  const c = e.target.closest('[data-lsclaim]'); if (c) { e.preventDefault(); lsClaim(c); return; }
+  const w = e.target.closest('[data-lswear]'); if (w) { e.preventDefault(); lsWear(w); }
+});
 
 /* ===== Router, global events, boot ===== */
 const QR_PATH = 'M0 0h7v1h-7zM8 0h2v1h-2zM11 0h3v1h-3zM17 0h1v1h-1zM21 0h2v1h-2zM26 0h7v1h-7zM0 1h1v1h-1zM6 1h1v1h-1zM8 1h7v1h-7zM16 1h1v1h-1zM18 1h2v1h-2zM21 1h2v1h-2zM26 1h1v1h-1zM32 1h1v1h-1zM0 2h1v1h-1zM2 2h3v1h-3zM6 2h1v1h-1zM8 2h3v1h-3zM13 2h2v1h-2zM16 2h1v1h-1zM20 2h2v1h-2zM24 2h1v1h-1zM26 2h1v1h-1zM28 2h3v1h-3zM32 2h1v1h-1zM0 3h1v1h-1zM2 3h3v1h-3zM6 3h1v1h-1zM9 3h1v1h-1zM11 3h1v1h-1zM14 3h1v1h-1zM16 3h4v1h-4zM21 3h2v1h-2zM24 3h1v1h-1zM26 3h1v1h-1zM28 3h3v1h-3zM32 3h1v1h-1zM0 4h1v1h-1zM2 4h3v1h-3zM6 4h1v1h-1zM8 4h3v1h-3zM13 4h1v1h-1zM15 4h4v1h-4zM22 4h1v1h-1zM26 4h1v1h-1zM28 4h3v1h-3zM32 4h1v1h-1zM0 5h1v1h-1zM6 5h1v1h-1zM12 5h1v1h-1zM15 5h3v1h-3zM20 5h5v1h-5zM26 5h1v1h-1zM32 5h1v1h-1zM0 6h7v1h-7zM8 6h1v1h-1zM10 6h1v1h-1zM12 6h1v1h-1zM14 6h1v1h-1zM16 6h1v1h-1zM18 6h1v1h-1zM20 6h1v1h-1zM22 6h1v1h-1zM24 6h1v1h-1zM26 6h7v1h-7zM9 7h1v1h-1zM12 7h2v1h-2zM15 7h2v1h-2zM18 7h3v1h-3zM22 7h2v1h-2zM0 8h1v1h-1zM3 8h6v1h-6zM11 8h4v1h-4zM17 8h1v1h-1zM19 8h1v1h-1zM23 8h3v1h-3zM28 8h1v1h-1zM30 8h3v1h-3zM0 9h1v1h-1zM2 9h2v1h-2zM7 9h1v1h-1zM9 9h1v1h-1zM13 9h2v1h-2zM17 9h4v1h-4zM22 9h2v1h-2zM28 9h3v1h-3zM0 10h4v1h-4zM5 10h4v1h-4zM10 10h1v1h-1zM12 10h2v1h-2zM15 10h3v1h-3zM21 10h1v1h-1zM23 10h1v1h-1zM28 10h5v1h-5zM1 11h1v1h-1zM5 11h1v1h-1zM7 11h1v1h-1zM9 11h1v1h-1zM12 11h2v1h-2zM16 11h2v1h-2zM20 11h1v1h-1zM22 11h1v1h-1zM24 11h2v1h-2zM27 11h1v1h-1zM30 11h3v1h-3zM1 12h1v1h-1zM3 12h2v1h-2zM6 12h1v1h-1zM9 12h3v1h-3zM13 12h1v1h-1zM15 12h1v1h-1zM17 12h2v1h-2zM20 12h2v1h-2zM24 12h1v1h-1zM26 12h2v1h-2zM31 12h2v1h-2zM1 13h2v1h-2zM7 13h3v1h-3zM13 13h2v1h-2zM18 13h1v1h-1zM22 13h6v1h-6zM0 14h3v1h-3zM4 14h3v1h-3zM10 14h1v1h-1zM12 14h1v1h-1zM15 14h1v1h-1zM18 14h5v1h-5zM24 14h1v1h-1zM26 14h1v1h-1zM28 14h2v1h-2zM1 15h1v1h-1zM3 15h1v1h-1zM7 15h1v1h-1zM11 15h2v1h-2zM16 15h1v1h-1zM19 15h1v1h-1zM23 15h3v1h-3zM27 15h4v1h-4zM32 15h1v1h-1zM0 16h1v1h-1zM6 16h3v1h-3zM13 16h1v1h-1zM15 16h2v1h-2zM20 16h1v1h-1zM22 16h7v1h-7zM30 16h1v1h-1zM1 17h2v1h-2zM4 17h1v1h-1zM9 17h1v1h-1zM12 17h1v1h-1zM14 17h9v1h-9zM25 17h2v1h-2zM28 17h1v1h-1zM30 17h1v1h-1zM32 17h1v1h-1zM0 18h1v1h-1zM3 18h1v1h-1zM5 18h2v1h-2zM8 18h1v1h-1zM10 18h1v1h-1zM15 18h5v1h-5zM21 18h4v1h-4zM27 18h1v1h-1zM29 18h2v1h-2zM32 18h1v1h-1zM0 19h1v1h-1zM3 19h3v1h-3zM8 19h1v1h-1zM12 19h1v1h-1zM18 19h1v1h-1zM22 19h2v1h-2zM26 19h1v1h-1zM28 19h5v1h-5zM3 20h1v1h-1zM6 20h2v1h-2zM10 20h1v1h-1zM12 20h1v1h-1zM14 20h3v1h-3zM18 20h1v1h-1zM20 20h2v1h-2zM23 20h1v1h-1zM28 20h2v1h-2zM0 21h2v1h-2zM4 21h2v1h-2zM8 21h3v1h-3zM17 21h2v1h-2zM21 21h3v1h-3zM25 21h1v1h-1zM27 21h2v1h-2zM30 21h1v1h-1zM0 22h1v1h-1zM3 22h5v1h-5zM11 22h2v1h-2zM14 22h1v1h-1zM17 22h1v1h-1zM22 22h2v1h-2zM26 22h1v1h-1zM28 22h5v1h-5zM0 23h1v1h-1zM2 23h3v1h-3zM7 23h1v1h-1zM12 23h1v1h-1zM14 23h2v1h-2zM17 23h4v1h-4zM23 23h3v1h-3zM28 23h1v1h-1zM30 23h1v1h-1zM32 23h1v1h-1zM0 24h2v1h-2zM4 24h4v1h-4zM10 24h2v1h-2zM13 24h1v1h-1zM20 24h1v1h-1zM22 24h1v1h-1zM24 24h6v1h-6zM32 24h1v1h-1zM8 25h1v1h-1zM10 25h9v1h-9zM21 25h1v1h-1zM24 25h1v1h-1zM28 25h1v1h-1zM30 25h1v1h-1zM32 25h1v1h-1zM0 26h7v1h-7zM8 26h1v1h-1zM11 26h1v1h-1zM15 26h1v1h-1zM17 26h1v1h-1zM19 26h3v1h-3zM23 26h2v1h-2zM26 26h1v1h-1zM28 26h1v1h-1zM30 26h1v1h-1zM0 27h1v1h-1zM6 27h1v1h-1zM8 27h1v1h-1zM14 27h2v1h-2zM17 27h4v1h-4zM24 27h1v1h-1zM28 27h3v1h-3zM0 28h1v1h-1zM2 28h3v1h-3zM6 28h1v1h-1zM8 28h1v1h-1zM12 28h3v1h-3zM16 28h2v1h-2zM20 28h9v1h-9zM32 28h1v1h-1zM0 29h1v1h-1zM2 29h3v1h-3zM6 29h1v1h-1zM8 29h2v1h-2zM16 29h1v1h-1zM18 29h1v1h-1zM20 29h4v1h-4zM25 29h1v1h-1zM27 29h1v1h-1zM30 29h3v1h-3zM0 30h1v1h-1zM2 30h3v1h-3zM6 30h1v1h-1zM11 30h1v1h-1zM13 30h1v1h-1zM15 30h1v1h-1zM18 30h3v1h-3zM23 30h2v1h-2zM27 30h3v1h-3zM31 30h2v1h-2zM0 31h1v1h-1zM6 31h1v1h-1zM10 31h1v1h-1zM12 31h3v1h-3zM25 31h1v1h-1zM27 31h6v1h-6zM0 32h7v1h-7zM8 32h1v1h-1zM10 32h1v1h-1zM15 32h4v1h-4zM23 32h2v1h-2zM27 32h2v1h-2z';

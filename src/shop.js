@@ -44,7 +44,7 @@ const zlSpec = L => Array.isArray(L.spec) ? dict(L.spec) : L.spec;
 function zpNews() {
   const led = (ZP.st && ZP.st.led) || []; if (!led.length || !zpMine()) return;
   const top = Math.max(...led.map(x => +x.id || 0)), seen = lsGet('zpSeen', null);
-  const fresh = led.filter(x => +x.id > (+seen || 0) && x.d > 0 && x.r !== 'buy' && !/^(day|mis|visit):/.test(x.ref || '') && (seen != null || nowMs() - Date.parse(x.at) < 3 * DAY_MS));
+  const fresh = led.filter(x => +x.id > (+seen || 0) && x.d > 0 && x.r !== 'buy' && !/^(day|mis|visit|set):/.test(x.ref || '') && (seen != null || nowMs() - Date.parse(x.at) < 3 * DAY_MS));
   lsSet('zpSeen', top);
   if (fresh.length) setTimeout(() => zpCelebrate(fresh), 700);
 }
@@ -55,6 +55,7 @@ function zpWhy(x) {
   if (/^day:/.test(x.ref || '')) return t('zp_r_live');
   if (/^visit:/.test(x.ref || '')) return t('zp_r_visit', { n: x.n });
   if (/^mis:/.test(x.ref || '')) return t('zp_r_mis');
+  if (/^set:/.test(x.ref || '')) return t('zp_r_set', { s: lsName(String(x.ref).slice(4)) });
   if (x.r === 'prize') return t(live ? 'zp_r_prize_live' : 'zp_r_prize', { n: x.n, w: zpWeekName(wk) });
   if (x.r === 'join') return t('zp_r_join', { w: zpWeekName(wk) });
   if (x.r === 'buy') return t('zp_r_buy', { name: zlName(x.ref) });

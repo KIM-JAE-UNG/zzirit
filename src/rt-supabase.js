@@ -231,6 +231,11 @@
     sell: (ids, release) => zpRpc('live_sell', { p_ids: ids && ids.length ? ids : null, p_release: !!release }),
     daily: () => zpRpc('live_daily'),
     claim: k => zpRpc('live_mission_claim', { p_k: k }),
+    // 0026: fish-book sets and titles
+    sets: () => zpRpc('live_sets'),
+    setClaim: k => zpRpc('live_set_claim', { p_k: k }),
+    wear: k => zpRpc('live_title_set', { p_k: k || '' }),
+    titles: ids => zpRpc('live_titles', { p_accts: ids }),
     void: (wk, uid, on) => zpRpc('live_void', { p_wk: wk, p_acct: uid, p_void: on !== false })
   };
   window.APP_AUTH = { sb, session, acct, link, news, review, admin, ids, push, chat, dm, rt, account, board, zp, live: liveGame, error: () => authErr };

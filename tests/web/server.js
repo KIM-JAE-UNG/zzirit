@@ -371,6 +371,36 @@ http.createServer(async (req, res) => {
           missions: list.map(m => Object.assign({}, m, { n: Math.min(m.goal, lvMissionN(me, day, m.k)), got: got(m.k) })), all: 20, allGot: got('all'),
           until: Date.parse(day + 'T00:00:00+09:00') + 864e5, bal: (ZPS.wal[me] || { bal: 0 }).bal } });
       }
+      // 0026: fish-book sets and titles (the same lists and rules as the SQL; cfg.noSets plays a server without them)
+      if (/^live_(sets|set_claim|title_set|titles)$/.test(q.name)) {
+        if (C.noSets) return send({ error: { code: 'PGRST202', message: 'Could not find the function public.' + q.name + ' in the schema cache' } });
+        const SETS = [['rock', ['kurodai', 'mejina', 'ishidai'], 3, null, null, 80], ['west', ['kurosoi', 'hirame', 'suzuki', 'iidako', 'kouika', 'mahaze'], 5, null, null, 60],
+          ['ink', ['iidako', 'madako', 'mizudako', 'aoriika', 'kensakiika', 'kouika'], 4, null, null, 60], ['spiky', ['kasago', 'onioko', 'minokasago', 'haokoze', 'akaei', 'gonzui', 'aigo', 'kusafugu', 'torafugu'], 4, null, null, 50],
+          ['fresh', ['funa', 'koi', 'bass', 'kerguigyo', 'namazu', 'gigi', 'raigyo'], 5, null, null, 60], ['tropic', ['gt', 'bonefish', 'barracuda', 'lionfish', 'barramundi', 'snook', 'tarpon'], 3, null, null, 100],
+          ['rivers', ['pike', 'walleye', 'muskie', 'wels', 'peacockbass', 'arapaima', 'taimen', 'murraycod'], 3, null, null, 100], ['legend', ['ishidai', 'ishigakidai', 'kue', 'gt', 'tarpon', 'taimen', 'muskie', 'arapaima'], 3, null, null, 200],
+          ['spring', ['makogarei', 'mebaru', 'iidako', 'kouika', 'madai', 'sayori', 'kurodai', 'funa'], 4, 3, 5, 50], ['summer', ['ishidai', 'kensakiika', 'isaki', 'shirogisu', 'minokasago', 'ayu', 'miuy', 'namazu'], 4, 6, 8, 50],
+          ['autumn', ['kurodai', 'tachiuo', 'saba', 'maaji', 'konoshiro', 'mahaze', 'aoriika', 'sawara'], 4, 9, 11, 50], ['winter', ['mebaru', 'usumebaru', 'hokke', 'magarei', 'nishin', 'wakasagi', 'mizudako', 'kurosoi'], 4, 12, 2, 50]];
+        const kmo = ms => +new Date(ms + 9 * 3600e3).toISOString().slice(5, 7);
+        const inS = (m0, m1, m) => m0 <= m1 ? m >= m0 && m <= m1 : m >= m0 || m <= m1;
+        const have = ([, sps, , m0, m1]) => [...new Set(m0 == null ? Object.keys(LVS.dex[me] || {}).filter(x => sps.includes(x)) : LVS.catches.filter(c => c.acct === me && sps.includes(c.sp) && inS(m0, m1, kmo(c.at))).map(c => c.sp))].sort();
+        const got = k2 => ZPS.led.some(x => x.acct === me && x.r === 'prize' && x.ref === 'set:' + k2);
+        LVS.titles = LVS.titles || {};
+        if (q.name === 'live_sets') return send({ data: { sets: SETS.map(x => { const h = have(x); return { k: x[0], sps: x[1], need: x[2], m0: x[3], m1: x[4], pts: x[5], have: h, n: Math.min(h.length, x[2]), got: got(x[0]) }; }), title: LVS.titles[me] || null, mo: kmo(Date.now()) } });
+        if (q.name === 'live_set_claim') {
+          if (!zpNick(me)) return send({ data: { err: 'no_profile' } });
+          const x = SETS.find(y => y[0] === A.p_k); if (!x) return send({ data: { err: 'no_set' } });
+          if (have(x).length < x[2]) return send({ data: { err: 'not_done' } });
+          if (!zpAdd(me, x[5], 'prize', 'set:' + x[0], x[0])) return send({ data: { err: 'already' } });
+          if (!LVS.titles[me]) LVS.titles[me] = x[0];
+          return send({ data: { ok: true, k: x[0], pts: x[5], title: LVS.titles[me], bal: ZPS.wal[me].bal } });
+        }
+        if (q.name === 'live_title_set') {
+          if (!A.p_k) { delete LVS.titles[me]; return send({ data: { ok: true, title: null } }); }
+          if (!got(A.p_k)) return send({ data: { err: 'not_yours' } });
+          LVS.titles[me] = A.p_k; return send({ data: { ok: true, title: A.p_k } });
+        }
+        return send({ data: Object.fromEntries([].concat(A.p_accts || []).slice(0, 50).filter(a => LVS.titles[a]).map(a => [a, LVS.titles[a]])) });
+      }
       const k = LVS.casts[me];
       if (q.name === 'live_strike') {
         if (!k || k.token !== A.p_token || k.state !== 'wait') return send({ data: { err: 'no_cast' } });
@@ -511,6 +541,7 @@ http.createServer(async (req, res) => {
   }
   if (u.pathname === '/__sb/zp_seed') { const q = await body(req); const wk = q.wk || zpAddDays(zpWeek(), q.weeksAgo ? -7 * q.weeksAgo : 0); for (const r of q.rows || []) ZPS.scores['rx|' + wk + '|' + r.acct] = { game: 'rx', wk, acct: r.acct, score: r.score, best: r.best == null ? null : r.best, void: !!r.void, at: Date.now() - 864e5 * 9 + (r.order || 0) }; return send({ ok: true, wk }); }
   if (u.pathname === '/__sb/live_seed') { const q = await body(req); const wk = zpAddDays(zpWeek(), q.weeksAgo ? -7 * q.weeksAgo : 0); for (const r of q.rows || []) LVS.catches.push({ id: ++LVS.seq, acct: r.acct, sp: r.sp || 'kurodai', cm: r.cm || 40, tier: 4, big: false, score: r.score, pts: 12, onsite: true, anon: false, gx: 1, gy: 1, wk, at: Date.now() - 864e5 * 8 }); return send({ ok: true, wk }); }
+  if (u.pathname === '/__sb/live_dex') { const q = await body(req); const dx = LVS.dex[q.acct] || (LVS.dex[q.acct] = {}); for (const sp of q.sps || []) dx[sp] = { n: 1, best: 30 }; return send({ ok: true }); }
   if (u.pathname === '/__sb/live_cfg') { const q = await body(req); Object.assign(LVS.cfg, q.cfg || {}); if (q.weeksBack) for (const c of LVS.catches) c.wk = zpAddDays(c.wk, -7 * q.weeksBack); if (q.reset) { LVS.casts = {}; LVS.days = {}; LVS.catches = []; LVS.dex = {}; LVS.settled = {}; } if (q.streak) for (const [a, x] of Object.entries(q.streak)) LVS.streak[a] = x; return send({ cfg: LVS.cfg, n: LVS.catches.length, casts: LVS.casts }); }
   if (u.pathname === '/__sb/feature') { for (const [k, v] of u.searchParams) FEATURES[k] = v === '1'; return send(FEATURES); }
   if (u.pathname === '/__sb/dump') return send({ T, admins: [...admins], links, STATS, PUSH, PUSHLOG, PUSHPREFS, logins: Object.keys(logins), MUTES, RTSTATS, ZPS, RT: Object.fromEntries(Object.entries(RT).map(([k, m]) => [k, [...m.values()].map(x => x.key)])) });
