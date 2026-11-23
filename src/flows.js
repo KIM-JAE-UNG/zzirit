@@ -1070,6 +1070,11 @@ function openMapPicker(init, cb) {
       <div class="picker-foot"><div id="pk-info" class="muted">${t('pick_hint')}</div><button class="btn btn-primary" id="pk-ok" disabled>${t('pick_ok')}</button></div>
     </div>`, { wide: true, noFocus: true });
   const el = $('#pk-map', w);
+  // the map library comes only when a map is opened: wait for it here, then draw the map in the same window
+  if (!window.L || !window.L.map) { mapWait(el, () => { if (w.isConnected && _modalStack.includes(w)) { el.innerHTML = ''; pickerMap(w, el, init, cb); } }); return; }
+  pickerMap(w, el, init, cb);
+}
+function pickerMap(w, el, init, cb) {
   const map = L.map(el, { zoomControl: true, attributionControl: false, worldCopyJump: true, minZoom: 2, maxZoom: 11 }).setView([init[1], init[0]], 7);
   const LY = MAPX.makeLayers(L);
   new LY.Sat({}).addTo(map);
@@ -1185,7 +1190,7 @@ function openShareCard(blob, name, text, opt) {
 }
 
 /* ===== What's new: shown once after a big update (website only; needs the matching server update) ===== */
-const WHATS_NEW = '2026-11-23a', WN_TS = Date.parse('2026-11-07T03:00:00Z'); // people who joined after this have nothing to catch up on
+const WHATS_NEW = '2026-11-24a', WN_TS = Date.parse('2026-11-07T03:00:00Z'); // people who joined after this have nothing to catch up on
 const BOOT_AT = Date.now();
 /* what each update brought, newest last; people see what came after the last one they saw (at most 6 lines) */
 const WN_ITEMS = [
@@ -1203,7 +1208,8 @@ const WN_ITEMS = [
   ['2026-11-20a', 'smile', 'wn_emo'],
   ['2026-11-21a', 'cloud', 'wn_lwx'],
   ['2026-11-22a', 'share', 'wn_story'],
-  ['2026-11-23a', 'medal', 'wn_sets']
+  ['2026-11-23a', 'medal', 'wn_sets'],
+  ['2026-11-24a', 'bolt', 'wn_fast']
 ];
 // the new look already says the fish were redrawn
 const WN_PART = { wn_fish: 'wn_look' };

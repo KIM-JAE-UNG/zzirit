@@ -269,4 +269,13 @@ Object.assign(T, {
   ls_t_winter: ['겨울 낚시꾼', 'Winter angler', '冬の釣り人', '冬季钓手'],
   wn_sets_h: ['도감 세트와 칭호', 'Fish-book sets & titles', '図鑑セットと称号', '图鉴套组与称号'],
   wn_sets_p: ['라이브 도감에 세트 12개가 생겼어요. 갯바위·서해·민물·계절 고기를 모으면 포인트와 칭호를 받고, 칭호는 주간 순위와 자랑 카드에 보여요.', 'The Live fish book now has 12 sets. Collect rock, West Sea, freshwater or seasonal fish to get points and a title, shown on the weekly board and on brag cards.', 'ライブ図鑑にセットが12個できました。磯・黄海・淡水・季節の魚を集めるとポイントと称号がもらえ、称号は週間順位と自慢カードに表示されます。', '实况图鉴新增12个套组。集齐矶钓、黄海、淡水或季节鱼就能获得积分和称号，称号会显示在周排名和炫耀卡上。'],
+  /* a faster first screen, and no connection (net.js) */
+  net_off: ['인터넷이 끊겼어요.', 'You are offline.', 'オフラインです。', '网络已断开。'],
+  net_off_sub: ['이 기기에 저장된 기록을 보여 드려요.', 'Showing what is saved on this device.', 'この端末に保存された記録を表示しています。', '正在显示本机保存的记录。'],
+  net_back: ['다시 연결됐어요.', 'Back online.', '再接続しました。', '已重新连接。'],
+  net_reload: ['새로 불러오기', 'Refresh', '再読み込み', '刷新'],
+  map_loading: ['지도를 불러오는 중…', 'Loading the map…', '地図を読み込み中…', '正在加载地图…'],
+  map_need_net: ['지도를 열려면 인터넷이 필요해요.', 'The map needs an internet connection.', '地図を開くにはインターネット接続が必要です。', '打开地图需要网络连接。'],
+  wn_fast_h: ['더 빨리 열려요', 'Opens faster', 'すばやく開きます', '打开更快'],
+  wn_fast_p: ['처음 화면에 필요 없는 지도 부품은 지도를 열 때만 받아요. 인터넷이 끊겨도 앱이 열리고, 이 기기에 있는 기록을 볼 수 있어요.', 'Map parts the first screen does not need now load only when you open a map. The app also opens with no connection and shows what is saved on this device.', '最初の画面に要らない地図の部品は、地図を開いたときだけ読み込みます。オフラインでもアプリが開き、この端末の記録を見られます。', '首屏用不到的地图组件只在打开地图时才加载。断网时也能打开应用，查看本机保存的记录。']
 });

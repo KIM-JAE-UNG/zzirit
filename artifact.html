@@ -1947,6 +1947,28 @@ body[data-route="live"] #main { padding-left: 0; padding-right: 0; }
 .ls-fish li:not(.got) img { filter: brightness(0) opacity(.22); }
 .ls-fish small { font-size: 10.5px; color: var(--ink-3); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .ls-fish li.got small { color: var(--ink); }
 @media (max-width: 420px) { .lv-book .seg button { padding-inline: 4px; font-size: 12.5px; } .ls-list { grid-template-columns: 1fr; } }
+/* the connection bar: offline, and back online (net.js) */
+.net-bar { position: fixed; z-index: 400; left: 50%; transform: translateX(-50%); top: calc(env(safe-area-inset-top, 0px) + 12px); width: max-content; max-width: min(560px, calc(100vw - 32px)); box-sizing: border-box; display: flex; align-items: center; gap: 10px; padding: 10px 12px 10px 14px; border-radius: 14px; background: var(--night-2); color: var(--spark-2); border: 1px solid var(--night-3); box-shadow: var(--shadow-lg); font-size: 14px; line-height: 1.4; word-break: keep-all; overflow-wrap: anywhere; }
+.net-bar[hidden] { display: none; }
+.net-bar > .ic { flex: none; width: 20px; height: 20px; color: var(--spark); }
+.net-bar b { font-weight: 600; color: #fff; }
+.net-bar .nb-sub { color: var(--steel); }
+.net-bar.back > .ic { color: #5FD79A; }
+.net-bar .nb-btn { flex: none; display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 12px; border-radius: 999px; border: 0; background: var(--spark); color: var(--night); font: 600 13px var(--f-body); cursor: pointer; }
+.net-bar .nb-btn .ic { width: 16px; height: 16px; }
+.net-bar .nb-x { flex: none; display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; border: 0; background: transparent; color: var(--steel); cursor: pointer; }
+.net-bar .nb-x .ic { width: 16px; height: 16px; }
+.net-bar button:focus-visible { outline: 2px solid var(--spark); outline-offset: 2px; }
+@media (max-width: 1023px) { .net-bar { top: calc(env(safe-area-inset-top, 0px) + var(--top-h) + 8px); } }
+@media (min-width: 1024px) { .net-bar { left: calc(50% + var(--rail-w) / 2); } }
+/* a map that is still loading, or needs a connection */
+.map-wait { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 12px; padding: 24px; text-align: center; color: var(--steel); background: #08202E; font-size: 15px; }
+.map-wait p { margin: 0; }
+.map-wait .spin { width: 28px; height: 28px; border-radius: 50%; border: 3px solid rgba(124,196,255,.25); border-top-color: var(--spark); animation: spin 1s linear infinite; }
+.map-wait > .ic { width: 32px; height: 32px; color: var(--spark); }
+.map-wait .btn { color: var(--spark-2); border-color: var(--night-3); }
+.picker-map { position: relative; }
+@media (prefers-reduced-motion: reduce) { .map-wait .spin { animation-duration: 3s; } }
 
 </style>
 <div class="app">
@@ -3784,6 +3806,15 @@ Object.assign(T, {
   ls_t_winter: ['겨울 낚시꾼', 'Winter angler', '冬の釣り人', '冬季钓手'],
   wn_sets_h: ['도감 세트와 칭호', 'Fish-book sets & titles', '図鑑セットと称号', '图鉴套组与称号'],
   wn_sets_p: ['라이브 도감에 세트 12개가 생겼어요. 갯바위·서해·민물·계절 고기를 모으면 포인트와 칭호를 받고, 칭호는 주간 순위와 자랑 카드에 보여요.', 'The Live fish book now has 12 sets. Collect rock, West Sea, freshwater or seasonal fish to get points and a title, shown on the weekly board and on brag cards.', 'ライブ図鑑にセットが12個できました。磯・黄海・淡水・季節の魚を集めるとポイントと称号がもらえ、称号は週間順位と自慢カードに表示されます。', '实况图鉴新增12个套组。集齐矶钓、黄海、淡水或季节鱼就能获得积分和称号，称号会显示在周排名和炫耀卡上。'],
+  /* a faster first screen, and no connection (net.js) */
+  net_off: ['인터넷이 끊겼어요.', 'You are offline.', 'オフラインです。', '网络已断开。'],
+  net_off_sub: ['이 기기에 저장된 기록을 보여 드려요.', 'Showing what is saved on this device.', 'この端末に保存された記録を表示しています。', '正在显示本机保存的记录。'],
+  net_back: ['다시 연결됐어요.', 'Back online.', '再接続しました。', '已重新连接。'],
+  net_reload: ['새로 불러오기', 'Refresh', '再読み込み', '刷新'],
+  map_loading: ['지도를 불러오는 중…', 'Loading the map…', '地図を読み込み中…', '正在加载地图…'],
+  map_need_net: ['지도를 열려면 인터넷이 필요해요.', 'The map needs an internet connection.', '地図を開くにはインターネット接続が必要です。', '打开地图需要网络连接。'],
+  wn_fast_h: ['더 빨리 열려요', 'Opens faster', 'すばやく開きます', '打开更快'],
+  wn_fast_p: ['처음 화면에 필요 없는 지도 부품은 지도를 열 때만 받아요. 인터넷이 끊겨도 앱이 열리고, 이 기기에 있는 기록을 볼 수 있어요.', 'Map parts the first screen does not need now load only when you open a map. The app also opens with no connection and shows what is saved on this device.', '最初の画面に要らない地図の部品は、地図を開いたときだけ読み込みます。オフラインでもアプリが開き、この端末の記録を見られます。', '首屏用不到的地图组件只在打开地图时才加载。断网时也能打开应用，查看本机保存的记录。']
 });
 
 /* ===== Tackle dictionaries: [ko, en, ja, zh] ===== */
@@ -7796,6 +7827,11 @@ function openMapPicker(init, cb) {
       <div class="picker-foot"><div id="pk-info" class="muted">${t('pick_hint')}</div><button class="btn btn-primary" id="pk-ok" disabled>${t('pick_ok')}</button></div>
     </div>`, { wide: true, noFocus: true });
   const el = $('#pk-map', w);
+  // the map library comes only when a map is opened: wait for it here, then draw the map in the same window
+  if (!window.L || !window.L.map) { mapWait(el, () => { if (w.isConnected && _modalStack.includes(w)) { el.innerHTML = ''; pickerMap(w, el, init, cb); } }); return; }
+  pickerMap(w, el, init, cb);
+}
+function pickerMap(w, el, init, cb) {
   const map = L.map(el, { zoomControl: true, attributionControl: false, worldCopyJump: true, minZoom: 2, maxZoom: 11 }).setView([init[1], init[0]], 7);
   const LY = MAPX.makeLayers(L);
   new LY.Sat({}).addTo(map);
@@ -7911,7 +7947,7 @@ function openShareCard(blob, name, text, opt) {
 }
 
 /* ===== What's new: shown once after a big update (website only; needs the matching server update) ===== */
-const WHATS_NEW = '2026-11-23a', WN_TS = Date.parse('2026-11-07T03:00:00Z'); // people who joined after this have nothing to catch up on
+const WHATS_NEW = '2026-11-24a', WN_TS = Date.parse('2026-11-07T03:00:00Z'); // people who joined after this have nothing to catch up on
 const BOOT_AT = Date.now();
 /* what each update brought, newest last; people see what came after the last one they saw (at most 6 lines) */
 const WN_ITEMS = [
@@ -7929,7 +7965,8 @@ const WN_ITEMS = [
   ['2026-11-20a', 'smile', 'wn_emo'],
   ['2026-11-21a', 'cloud', 'wn_lwx'],
   ['2026-11-22a', 'share', 'wn_story'],
-  ['2026-11-23a', 'medal', 'wn_sets']
+  ['2026-11-23a', 'medal', 'wn_sets'],
+  ['2026-11-24a', 'bolt', 'wn_fast']
 ];
 // the new look already says the fish were redrawn
 const WN_PART = { wn_fish: 'wn_look' };
@@ -8544,6 +8581,8 @@ VIEWS.map = {
     const focus = () => { if (S.mapFocus && this.map) { const [lo, la, z] = S.mapFocus; S.mapFocus = null; this.map.setView([la, lo], z); } };
     if (this.built && el.querySelector('#map')) { this.refreshPanels(); this.drawMine(); setTimeout(() => { if (this.map) { this.map.invalidateSize(); focus(); } }, 60); return; }
     const mp = S.mp;
+    // the map library comes only when a map is opened (not part of the first load)
+    if (!window.L || !window.L.map) { el.innerHTML = '<div class="map-wrap" id="map-wait-box"></div>'; mapWait($('#map-wait-box', el), () => { if (viewOf(S.route) === 'map' && !this.built) rerender(); }); return; }
     el.innerHTML = `
     <div class="map-wrap">
       <div id="map" class="map" aria-label="${esc(t('map_aria'))}"></div>
@@ -13820,6 +13859,78 @@ document.addEventListener('click', e => {
   const w = e.target.closest('[data-lswear]'); if (w) { e.preventDefault(); lsWear(w); }
 });
 
+/* ===== A faster first screen, and a basic screen with no connection =====
+   - The map library (Leaflet) is no longer part of the first load on the website: it comes only when a map is opened.
+   - The service worker (sw.js) keeps a copy of the few libraries the page needs (sign-in library, fonts, map library),
+     so the next launch does not wait for them and the app still opens when the connection is gone.
+   - With no connection, a bar at the top says so; the screen shows what is saved on this device. When the connection
+     comes back, the bar says so and offers to load everything fresh. */
+const LEAFLET_JS = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js';
+let _leafletP = null;
+function needLeaflet() {
+  if (window.L && window.L.map) return Promise.resolve(window.L);
+  if (!_leafletP) _leafletP = new Promise((res, rej) => {
+    const s = document.createElement('script'); s.src = LEAFLET_JS; s.async = true;
+    s.onload = () => (window.L && window.L.map ? res(window.L) : rej(new Error('map_lib')));
+    s.onerror = () => { s.remove(); rej(new Error('map_lib')); };
+    document.head.appendChild(s);
+  }).catch(e => { _leafletP = null; throw e; });
+  return _leafletP;
+}
+// a placeholder for a map that is still on its way (or that needs a connection); `again` runs once the library is here
+function mapWait(el, again) {
+  el.innerHTML = `<div class="map-wait" role="status"><span class="spin" aria-hidden="true"></span><p>${t('map_loading')}</p></div>`;
+  needLeaflet().then(again).catch(() => {
+    el.innerHTML = `<div class="map-wait off" role="status">${icon('cloud')}<p>${t('map_need_net')}</p><button class="btn btn-line" data-net-retry>${icon('refresh')}${t('retry')}</button></div>`;
+    const b = el.querySelector('[data-net-retry]'); if (b) b.onclick = () => mapWait(el, again);
+  });
+}
+
+const NET = { off: false, wasOff: false, hideT: 0 };
+function netBar() {
+  let bar = document.getElementById('net-bar');
+  if (!bar) {
+    bar = document.createElement('div'); bar.id = 'net-bar'; bar.className = 'net-bar'; bar.setAttribute('role', 'status'); bar.setAttribute('aria-live', 'polite'); bar.hidden = true;
+    document.body.appendChild(bar);
+    bar.addEventListener('click', e => {
+      if (e.target.closest('[data-net-reload]')) location.reload();
+      else if (e.target.closest('[data-net-close]')) { bar.hidden = true; document.body.classList.remove('net-on'); }
+    });
+  }
+  return bar;
+}
+function netShow() {
+  if (window.APP_RT !== 'web' && !NET.off) return;
+  const bar = netBar(); clearTimeout(NET.hideT);
+  if (NET.off) {
+    bar.className = 'net-bar off';
+    bar.innerHTML = `${icon('cloud')}<span><b>${t('net_off')}</b> <span class="nb-sub">${t('net_off_sub')}</span></span>`;
+  } else {
+    bar.className = 'net-bar back';
+    bar.innerHTML = `${icon('check')}<span><b>${t('net_back')}</b></span><button class="nb-btn" data-net-reload>${icon('refresh')}${t('net_reload')}</button><button class="nb-x" data-net-close aria-label="${esc(t('close'))}">${icon('x')}</button>`;
+    NET.hideT = setTimeout(() => { bar.hidden = true; document.body.classList.remove('net-on'); }, 12000);
+  }
+  bar.hidden = false; document.body.classList.add('net-on');
+}
+function netSet(off) {
+  if (off === NET.off) return;
+  NET.off = off;
+  if (off) { NET.wasOff = true; netShow(); }
+  else if (NET.wasOff) netShow();
+}
+window.addEventListener('offline', () => netSet(true));
+window.addEventListener('online', () => netSet(false));
+function netStart() {
+  if (navigator.onLine === false) netSet(true);
+  // tell the service worker which libraries this page uses, so a copy is kept from the very first visit
+  if (window.APP_RT === 'web' && 'serviceWorker' in navigator && navigator.onLine !== false) {
+    navigator.serviceWorker.ready.then(r => {
+      const urls = [...document.querySelectorAll('script[src], link[rel="stylesheet"][href]')].map(n => n.src || n.href).filter(u => /^https:\/\/(cdn\.jsdelivr\.net\/npm\/|cdnjs\.cloudflare\.com\/ajax\/libs\/|fonts\.googleapis\.com\/)/.test(u));
+      if (r.active && urls.length) r.active.postMessage({ keep: urls });
+    }).catch(() => { });
+  }
+}
+
 /* ===== Router, global events, boot ===== */
 const QR_PATH = 'M0 0h7v1h-7zM8 0h2v1h-2zM11 0h3v1h-3zM17 0h1v1h-1zM21 0h2v1h-2zM26 0h7v1h-7zM0 1h1v1h-1zM6 1h1v1h-1zM8 1h7v1h-7zM16 1h1v1h-1zM18 1h2v1h-2zM21 1h2v1h-2zM26 1h1v1h-1zM32 1h1v1h-1zM0 2h1v1h-1zM2 2h3v1h-3zM6 2h1v1h-1zM8 2h3v1h-3zM13 2h2v1h-2zM16 2h1v1h-1zM20 2h2v1h-2zM24 2h1v1h-1zM26 2h1v1h-1zM28 2h3v1h-3zM32 2h1v1h-1zM0 3h1v1h-1zM2 3h3v1h-3zM6 3h1v1h-1zM9 3h1v1h-1zM11 3h1v1h-1zM14 3h1v1h-1zM16 3h4v1h-4zM21 3h2v1h-2zM24 3h1v1h-1zM26 3h1v1h-1zM28 3h3v1h-3zM32 3h1v1h-1zM0 4h1v1h-1zM2 4h3v1h-3zM6 4h1v1h-1zM8 4h3v1h-3zM13 4h1v1h-1zM15 4h4v1h-4zM22 4h1v1h-1zM26 4h1v1h-1zM28 4h3v1h-3zM32 4h1v1h-1zM0 5h1v1h-1zM6 5h1v1h-1zM12 5h1v1h-1zM15 5h3v1h-3zM20 5h5v1h-5zM26 5h1v1h-1zM32 5h1v1h-1zM0 6h7v1h-7zM8 6h1v1h-1zM10 6h1v1h-1zM12 6h1v1h-1zM14 6h1v1h-1zM16 6h1v1h-1zM18 6h1v1h-1zM20 6h1v1h-1zM22 6h1v1h-1zM24 6h1v1h-1zM26 6h7v1h-7zM9 7h1v1h-1zM12 7h2v1h-2zM15 7h2v1h-2zM18 7h3v1h-3zM22 7h2v1h-2zM0 8h1v1h-1zM3 8h6v1h-6zM11 8h4v1h-4zM17 8h1v1h-1zM19 8h1v1h-1zM23 8h3v1h-3zM28 8h1v1h-1zM30 8h3v1h-3zM0 9h1v1h-1zM2 9h2v1h-2zM7 9h1v1h-1zM9 9h1v1h-1zM13 9h2v1h-2zM17 9h4v1h-4zM22 9h2v1h-2zM28 9h3v1h-3zM0 10h4v1h-4zM5 10h4v1h-4zM10 10h1v1h-1zM12 10h2v1h-2zM15 10h3v1h-3zM21 10h1v1h-1zM23 10h1v1h-1zM28 10h5v1h-5zM1 11h1v1h-1zM5 11h1v1h-1zM7 11h1v1h-1zM9 11h1v1h-1zM12 11h2v1h-2zM16 11h2v1h-2zM20 11h1v1h-1zM22 11h1v1h-1zM24 11h2v1h-2zM27 11h1v1h-1zM30 11h3v1h-3zM1 12h1v1h-1zM3 12h2v1h-2zM6 12h1v1h-1zM9 12h3v1h-3zM13 12h1v1h-1zM15 12h1v1h-1zM17 12h2v1h-2zM20 12h2v1h-2zM24 12h1v1h-1zM26 12h2v1h-2zM31 12h2v1h-2zM1 13h2v1h-2zM7 13h3v1h-3zM13 13h2v1h-2zM18 13h1v1h-1zM22 13h6v1h-6zM0 14h3v1h-3zM4 14h3v1h-3zM10 14h1v1h-1zM12 14h1v1h-1zM15 14h1v1h-1zM18 14h5v1h-5zM24 14h1v1h-1zM26 14h1v1h-1zM28 14h2v1h-2zM1 15h1v1h-1zM3 15h1v1h-1zM7 15h1v1h-1zM11 15h2v1h-2zM16 15h1v1h-1zM19 15h1v1h-1zM23 15h3v1h-3zM27 15h4v1h-4zM32 15h1v1h-1zM0 16h1v1h-1zM6 16h3v1h-3zM13 16h1v1h-1zM15 16h2v1h-2zM20 16h1v1h-1zM22 16h7v1h-7zM30 16h1v1h-1zM1 17h2v1h-2zM4 17h1v1h-1zM9 17h1v1h-1zM12 17h1v1h-1zM14 17h9v1h-9zM25 17h2v1h-2zM28 17h1v1h-1zM30 17h1v1h-1zM32 17h1v1h-1zM0 18h1v1h-1zM3 18h1v1h-1zM5 18h2v1h-2zM8 18h1v1h-1zM10 18h1v1h-1zM15 18h5v1h-5zM21 18h4v1h-4zM27 18h1v1h-1zM29 18h2v1h-2zM32 18h1v1h-1zM0 19h1v1h-1zM3 19h3v1h-3zM8 19h1v1h-1zM12 19h1v1h-1zM18 19h1v1h-1zM22 19h2v1h-2zM26 19h1v1h-1zM28 19h5v1h-5zM3 20h1v1h-1zM6 20h2v1h-2zM10 20h1v1h-1zM12 20h1v1h-1zM14 20h3v1h-3zM18 20h1v1h-1zM20 20h2v1h-2zM23 20h1v1h-1zM28 20h2v1h-2zM0 21h2v1h-2zM4 21h2v1h-2zM8 21h3v1h-3zM17 21h2v1h-2zM21 21h3v1h-3zM25 21h1v1h-1zM27 21h2v1h-2zM30 21h1v1h-1zM0 22h1v1h-1zM3 22h5v1h-5zM11 22h2v1h-2zM14 22h1v1h-1zM17 22h1v1h-1zM22 22h2v1h-2zM26 22h1v1h-1zM28 22h5v1h-5zM0 23h1v1h-1zM2 23h3v1h-3zM7 23h1v1h-1zM12 23h1v1h-1zM14 23h2v1h-2zM17 23h4v1h-4zM23 23h3v1h-3zM28 23h1v1h-1zM30 23h1v1h-1zM32 23h1v1h-1zM0 24h2v1h-2zM4 24h4v1h-4zM10 24h2v1h-2zM13 24h1v1h-1zM20 24h1v1h-1zM22 24h1v1h-1zM24 24h6v1h-6zM32 24h1v1h-1zM8 25h1v1h-1zM10 25h9v1h-9zM21 25h1v1h-1zM24 25h1v1h-1zM28 25h1v1h-1zM30 25h1v1h-1zM32 25h1v1h-1zM0 26h7v1h-7zM8 26h1v1h-1zM11 26h1v1h-1zM15 26h1v1h-1zM17 26h1v1h-1zM19 26h3v1h-3zM23 26h2v1h-2zM26 26h1v1h-1zM28 26h1v1h-1zM30 26h1v1h-1zM0 27h1v1h-1zM6 27h1v1h-1zM8 27h1v1h-1zM14 27h2v1h-2zM17 27h4v1h-4zM24 27h1v1h-1zM28 27h3v1h-3zM0 28h1v1h-1zM2 28h3v1h-3zM6 28h1v1h-1zM8 28h1v1h-1zM12 28h3v1h-3zM16 28h2v1h-2zM20 28h9v1h-9zM32 28h1v1h-1zM0 29h1v1h-1zM2 29h3v1h-3zM6 29h1v1h-1zM8 29h2v1h-2zM16 29h1v1h-1zM18 29h1v1h-1zM20 29h4v1h-4zM25 29h1v1h-1zM27 29h1v1h-1zM30 29h3v1h-3zM0 30h1v1h-1zM2 30h3v1h-3zM6 30h1v1h-1zM11 30h1v1h-1zM13 30h1v1h-1zM15 30h1v1h-1zM18 30h3v1h-3zM23 30h2v1h-2zM27 30h3v1h-3zM31 30h2v1h-2zM0 31h1v1h-1zM6 31h1v1h-1zM10 31h1v1h-1zM12 31h3v1h-3zM25 31h1v1h-1zM27 31h6v1h-6zM0 32h7v1h-7zM8 32h1v1h-1zM10 32h1v1h-1zM15 32h4v1h-4zM23 32h2v1h-2zM27 32h2v1h-2z';
 const ROUTES = ['home', 'scan', 'past', 'map', 'live', 'lures', 'chat', 'rank', 'friends', 'board', 'teams', 'points', 'sea', 'char', 'dex', 'tackle', 'log', 'help', 'about', 'prefs', 'admin'];
@@ -14093,6 +14204,7 @@ matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', () => { 
   S.unit = lsGet('unit', 'cm');
   S.me = lsGet('me', null);
   onHash();
+  netStart();
   store.init().then(() => { updateStatic(); updateShell(); try { dmStart(); } catch (e) { console.warn(e); } if (zpMine()) setTimeout(() => { zpLoad(); if (typeof lvLoad === 'function') lvLoad(); }, 3000); if (S.route === 'admin' && !S.isOwner) location.hash = 'home'; setTimeout(maybeWhatsNew, 2500); setTimeout(maybeWelcome, 1800); setTimeout(pushSync, 4000); });
   if (window.APP_RT === 'web' && 'serviceWorker' in navigator) navigator.serviceWorker.addEventListener('message', e => { const h = e.data && e.data.go; if (typeof h === 'string' && /^#[a-z]+$/.test(h)) location.hash = h.slice(1); });
   const idle = window.requestIdleCallback || (f => setTimeout(f, 1200));

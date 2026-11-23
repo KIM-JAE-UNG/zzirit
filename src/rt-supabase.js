@@ -47,7 +47,12 @@
     if (!acctP) acctP = (async () => {
       const s = await session(); if (!s) return null;
       authId = s.user.id; acctId = authId;
-      try { const { data, error } = await sb.rpc('my_acct'); if (!error && typeof data === 'string' && data) acctId = data; } catch (e) { }
+      // the last answer is kept: with no connection, a linked device must still know which account it belongs to
+      const AK = 'eosin.acct.last'; let last = null; try { last = JSON.parse(localStorage.getItem(AK) || 'null'); } catch (e) { }
+      let got = false;
+      try { const { data, error } = await sb.rpc('my_acct'); if (!error && typeof data === 'string' && data) { acctId = data; got = true; } } catch (e) { }
+      if (got) { try { localStorage.setItem(AK, JSON.stringify({ a: authId, c: acctId })); } catch (e) { } }
+      else if (last && last.a === authId && last.c) acctId = last.c;
       return acctId;
     })();
     return acctP;

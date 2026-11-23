@@ -532,6 +532,8 @@ VIEWS.map = {
     const focus = () => { if (S.mapFocus && this.map) { const [lo, la, z] = S.mapFocus; S.mapFocus = null; this.map.setView([la, lo], z); } };
     if (this.built && el.querySelector('#map')) { this.refreshPanels(); this.drawMine(); setTimeout(() => { if (this.map) { this.map.invalidateSize(); focus(); } }, 60); return; }
     const mp = S.mp;
+    // the map library comes only when a map is opened (not part of the first load)
+    if (!window.L || !window.L.map) { el.innerHTML = '<div class="map-wrap" id="map-wait-box"></div>'; mapWait($('#map-wait-box', el), () => { if (viewOf(S.route) === 'map' && !this.built) rerender(); }); return; }
     el.innerHTML = `
     <div class="map-wrap">
       <div id="map" class="map" aria-label="${esc(t('map_aria'))}"></div>

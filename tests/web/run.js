@@ -411,38 +411,42 @@ const AI_NOFISH = { fish_visible: false, candidates: [], other_en: '', other_sci
   await W.waitForTimeout(600); await W.reload(); await W.waitForTimeout(5500);
   ok(!!(await W.$('.wn')), 'an earlier member sees what changed');
   ok(!!(await W.$('#wn-id')), 'update notes offer to create a login ID');
-  ok(await W.$eval('.wn', n => /캐릭터 감정 표현/.test(n.textContent) && /오늘의 미션/.test(n.textContent) && /도감 세트와 칭호/.test(n.textContent) && /진짜 날씨/.test(n.textContent) && /자랑 카드/.test(n.textContent) && !/실제처럼/.test(n.textContent) && !/미니게임:|갯바위 공원 개장/.test(n.textContent) && n.querySelectorAll('.wn-list li').length <= 6), 'update notes list the newest features (at most 6 lines)');
+  ok(await W.$eval('.wn', n => /캐릭터 감정 표현/.test(n.textContent) && /더 빨리 열려요/.test(n.textContent) && !/오늘의 미션/.test(n.textContent) && /도감 세트와 칭호/.test(n.textContent) && /진짜 날씨/.test(n.textContent) && /자랑 카드/.test(n.textContent) && !/실제처럼/.test(n.textContent) && !/미니게임:|갯바위 공원 개장/.test(n.textContent) && n.querySelectorAll('.wn-list li').length <= 6), 'update notes list the newest features (at most 6 lines)');
   ok(await W.$eval('.wn', n => !/초기화/.test(n.textContent)), 'update notes do not claim a reset that the server has not done');
   await shot(W, 'q04_whatsnew');
   await W.click('#wn-ok'); await W.waitForTimeout(400); await W.reload(); await W.waitForTimeout(5000);
   ok(!(await W.$('.wn')), 'update notes show only once');
   // someone who saw everything up to the tackle shop gets just the live sea and the new look
   await W.evaluate(() => openWhatsNew('someid', '2026-11-07b')); await W.waitForTimeout(500);
-  ok(await W.$eval('.wn', n => n.querySelectorAll('.wn-list li').length === 6 && /캐릭터 감정 표현/.test(n.textContent) && /오늘의 미션/.test(n.textContent) && /진짜 날씨/.test(n.textContent) && /친구랑 같이 낚시/.test(n.textContent) && !/팔 수 있어요/.test(n.textContent)).catch(() => false), 'someone who last saw the tackle shop gets the six newest notes');
+  ok(await W.$eval('.wn', n => n.querySelectorAll('.wn-list li').length === 6 && /캐릭터 감정 표현/.test(n.textContent) && /오늘의 미션/.test(n.textContent) && /진짜 날씨/.test(n.textContent) && /더 빨리 열려요/.test(n.textContent) && !/친구랑 같이 낚시/.test(n.textContent) && !/팔 수 있어요/.test(n.textContent)).catch(() => false), 'someone who last saw the tackle shop gets the six newest notes');
   await W.click('#wn-ok').catch(() => null); await W.waitForTimeout(300);
   await W.evaluate(() => openWhatsNew('someid', '2026-11-12a')); await W.waitForTimeout(500);
-  ok(await W.$eval('.wn', n => n.querySelectorAll('.wn-list li').length === 6 && /오늘의 미션/.test(n.textContent) && /친구랑 같이 낚시/.test(n.textContent) && /도감 세트/.test(n.textContent) && /캐릭터 감정 표현/.test(n.textContent) && /진짜 날씨/.test(n.textContent) && !/새 디자인/.test(n.textContent)).catch(() => false), 'after 11-12, the six newest: sets, the brag card, the weather, emotes, missions, friends');
+  ok(await W.$eval('.wn', n => n.querySelectorAll('.wn-list li').length === 6 && /오늘의 미션/.test(n.textContent) && /더 빨리 열려요/.test(n.textContent) && /도감 세트/.test(n.textContent) && /캐릭터 감정 표현/.test(n.textContent) && /진짜 날씨/.test(n.textContent) && !/새 디자인/.test(n.textContent)).catch(() => false), 'after 11-12, the six newest: opens faster, sets, the brag card, the weather, emotes, missions');
   await W.click('#wn-ok').catch(() => null); await W.waitForTimeout(300);
   await W.evaluate(() => openWhatsNew('someid', '2026-11-13a')); await W.waitForTimeout(500);
-  ok(await W.$eval('.wn', n => n.querySelectorAll('.wn-list li').length === 6 && /자랑 카드/.test(n.textContent) && /진짜 날씨/.test(n.textContent) && /캐릭터 감정 표현/.test(n.textContent) && /도감 세트/.test(n.textContent) && /친구랑 같이 낚시/.test(n.textContent) && /오늘의 미션/.test(n.textContent)).catch(() => false), 'after 11-13, the six newest (sets first)');
+  ok(await W.$eval('.wn', n => n.querySelectorAll('.wn-list li').length === 6 && /자랑 카드/.test(n.textContent) && /진짜 날씨/.test(n.textContent) && /캐릭터 감정 표현/.test(n.textContent) && /도감 세트/.test(n.textContent) && /더 빨리 열려요/.test(n.textContent) && /오늘의 미션/.test(n.textContent)).catch(() => false), 'after 11-13, the six newest (opens faster first)');
   await W.click('#wn-ok'); await W.waitForTimeout(400);
   await W.evaluate(() => openWhatsNew('someid', '2026-11-17a')); await W.waitForTimeout(500);
-  ok(await W.$eval('.wn', n => n.querySelectorAll('.wn-list li').length === 6 && /도감 세트/.test(n.textContent) && /자랑 카드/.test(n.textContent) && /진짜 날씨/.test(n.textContent) && /캐릭터 감정 표현/.test(n.textContent) && /친구랑 같이 낚시/.test(n.textContent) && /같은 물가/.test(n.textContent) && /오늘의 미션/.test(n.textContent)).catch(() => false), 'after 11-17, fishing with friends and the daily missions');
+  ok(await W.$eval('.wn', n => n.querySelectorAll('.wn-list li').length === 6 && /도감 세트/.test(n.textContent) && /자랑 카드/.test(n.textContent) && /진짜 날씨/.test(n.textContent) && /캐릭터 감정 표현/.test(n.textContent) && /더 빨리 열려요/.test(n.textContent) && !/친구랑 같이 낚시/.test(n.textContent) && /오늘의 미션/.test(n.textContent)).catch(() => false), 'after 11-17, the six newest: opens faster down to the daily missions');
   await W.click('#wn-ok'); await W.waitForTimeout(400);
   await W.evaluate(() => openWhatsNew('someid', '2026-11-18a')); await W.waitForTimeout(500);
-  ok(await W.$eval('.wn', n => n.querySelectorAll('.wn-list li').length === 5 && /도감 세트/.test(n.textContent) && /자랑 카드/.test(n.textContent) && /진짜 날씨/.test(n.textContent) && /오늘의 미션과 연속 출석/.test(n.textContent) && /7일째마다 \+30P/.test(n.textContent) && /캐릭터 감정 표현/.test(n.textContent)).catch(() => false), 'after the last update, only the daily missions and the streak');
+  ok(await W.$eval('.wn', n => n.querySelectorAll('.wn-list li').length === 6 && /더 빨리 열려요/.test(n.textContent) && /도감 세트/.test(n.textContent) && /자랑 카드/.test(n.textContent) && /진짜 날씨/.test(n.textContent) && /오늘의 미션과 연속 출석/.test(n.textContent) && /7일째마다 \+30P/.test(n.textContent) && /캐릭터 감정 표현/.test(n.textContent)).catch(() => false), 'after the last update, only the daily missions and the streak');
   await W.click('#wn-ok'); await W.waitForTimeout(400);
   await W.evaluate(() => openWhatsNew('someid', '2026-11-19a')); await W.waitForTimeout(500);
-  ok(await W.$eval('.wn', n => n.querySelectorAll('.wn-list li').length === 4 && /도감 세트/.test(n.textContent) && /자랑 카드/.test(n.textContent) && /캐릭터 감정 표현/.test(n.textContent) && /웃는 얼굴 버튼/.test(n.textContent) && /진짜 날씨/.test(n.textContent)).catch(() => false), 'after 11-19, the emotes and the weather');
+  ok(await W.$eval('.wn', n => n.querySelectorAll('.wn-list li').length === 5 && /더 빨리 열려요/.test(n.textContent) && /도감 세트/.test(n.textContent) && /자랑 카드/.test(n.textContent) && /캐릭터 감정 표현/.test(n.textContent) && /웃는 얼굴 버튼/.test(n.textContent) && /진짜 날씨/.test(n.textContent)).catch(() => false), 'after 11-19, the emotes and the weather');
   await W.click('#wn-ok'); await W.waitForTimeout(400);
   await W.evaluate(() => openWhatsNew('someid', '2026-11-20a')); await W.waitForTimeout(500);
-  ok(await W.$eval('.wn', n => n.querySelectorAll('.wn-list li').length === 3 && /도감 세트/.test(n.textContent) && /라이브 지도에 진짜 날씨/.test(n.textContent) && /입질이 조금 빠르고/.test(n.textContent) && /자랑 카드/.test(n.textContent)).catch(() => false), 'after 11-20, the weather and the brag card');
+  ok(await W.$eval('.wn', n => n.querySelectorAll('.wn-list li').length === 4 && /더 빨리 열려요/.test(n.textContent) && /도감 세트/.test(n.textContent) && /라이브 지도에 진짜 날씨/.test(n.textContent) && /입질이 조금 빠르고/.test(n.textContent) && /자랑 카드/.test(n.textContent)).catch(() => false), 'after 11-20, the weather and the brag card');
   await W.click('#wn-ok'); await W.waitForTimeout(400);
   await W.evaluate(() => openWhatsNew('someid', '2026-11-21a')); await W.waitForTimeout(500);
-  ok(await W.$eval('.wn', n => n.querySelectorAll('.wn-list li').length === 2 && /잡은 고기 자랑 카드/.test(n.textContent) && /스토리 크기/.test(n.textContent) && /도감 세트/.test(n.textContent)).catch(() => false), 'after 11-21, the brag card and the sets');
+  ok(await W.$eval('.wn', n => n.querySelectorAll('.wn-list li').length === 3 && /더 빨리 열려요/.test(n.textContent) && /잡은 고기 자랑 카드/.test(n.textContent) && /스토리 크기/.test(n.textContent) && /도감 세트/.test(n.textContent)).catch(() => false), 'after 11-21, the brag card and the sets');
   await W.click('#wn-ok'); await W.waitForTimeout(400);
   await W.evaluate(() => openWhatsNew('someid', '2026-11-22a')); await W.waitForTimeout(500);
-  ok(await W.$eval('.wn', n => n.querySelectorAll('.wn-list li').length === 1 && /도감 세트와 칭호/.test(n.textContent) && /12개/.test(n.textContent) && /주간 순위/.test(n.textContent)).catch(() => false), 'after the last update, only the fish-book sets and titles');
+  ok(await W.$eval('.wn', n => n.querySelectorAll('.wn-list li').length === 2 && /더 빨리 열려요/.test(n.textContent) && /도감 세트와 칭호/.test(n.textContent) && /12개/.test(n.textContent) && /주간 순위/.test(n.textContent)).catch(() => false), 'after 11-22, the sets and opening faster');
+  await W.click('#wn-ok'); await W.waitForTimeout(400);
+  await W.evaluate(() => openWhatsNew('someid', '2026-11-23a')); await W.waitForTimeout(500);
+  ok(await W.$eval('.wn', n => n.querySelectorAll('.wn-list li').length === 1 && /더 빨리 열려요/.test(n.textContent) && /인터넷이 끊겨도/.test(n.textContent)).catch(() => false), 'after the last update, only opening faster (and with no connection)');
+  await shot(W, 'q05_whatsnew_fast');
   await W.click('#wn-ok'); await W.waitForTimeout(400);
   // photo cache: a second visit doesn't download the same photos again
   const P = await mk('P');
@@ -563,7 +567,9 @@ const AI_NOFISH = { fish_visible: false, candidates: [], other_en: '', other_sci
   ok(await B.$eval('#pt-wx .fs-mini', n => !!n).catch(() => false) && (await B.$$('#pt-wx .fb-it')).length >= 2, 'a fishing point shows the weather there');
   await shot(B, 'r05_point_detail');
   await closeModals(B);
+  ok(await B.evaluate(() => !window.L && !document.querySelector('script[src*="leaflet"]')), 'first screen: the map library is not loaded until a map is opened');
   await go(B, 'map', 2600);
+  ok(await B.evaluate(() => !!(window.L && window.L.map) && !!document.querySelector('#map.leaflet-container') && !document.querySelector('.map-wait')), 'opening the map brings the map library and draws the map');
   ok((await B.$$('.pt-mark')).length >= 1, 'the shared point is on the map');
   await go(A, 'log', 1200); await A.click('.catch-card'); await A.waitForTimeout(700);
   ok(!!(await A.$('#cd-pt')), 'a catch with a spot can be saved as a point');
@@ -605,25 +611,52 @@ const AI_NOFISH = { fish_visible: false, candidates: [], other_en: '', other_sci
   ok(!!(await K.$('.install a[href^="kakaotalk://web/openExternal?url="]')) && !!(await K.$('.install [data-copy]')), 'KakaoTalk: open in another browser, or copy the link');
   await shot(K, 'z03_kakao_install');
   // the service worker: the page still opens with no connection; anything else gets a friendly offline page
+  // (while "offline", the other sites fail too: only what the service worker kept can be used)
   const SWc = await b.newContext({ viewport: { width: 1280, height: 800 } });
-  await SWc.addInitScript(() => { try { localStorage.setItem('eosin.welcomed', '1'); } catch (e) { } });
-  await SWc.route('https://cdn.jsdelivr.net/npm/@supabase/**', r => r.fulfill({ contentType: 'text/javascript', body: FAKE }));
-  await SWc.route('https://cdn.jsdelivr.net/npm/qrcode-generator**', r => r.fulfill({ contentType: 'text/javascript', body: QRLIB }));
-  await SWc.route('https://cdnjs.cloudflare.com/**', r => r.fulfill({ contentType: 'text/javascript', body: LEAF }));
+  let SWoff = false, SWlib = 0;
+  await SWc.addInitScript(() => { try { localStorage.setItem('eosin.welcomed', '1'); localStorage.setItem('eosin.lang', '"ko"'); } catch (e) { } });
+  await SWc.route('https://cdn.jsdelivr.net/npm/@supabase/**', r => { if (SWoff) return r.abort('internetdisconnected'); SWlib++; r.fulfill({ contentType: 'text/javascript', body: FAKE, headers: { 'access-control-allow-origin': '*' } }); });
+  await SWc.route('https://cdn.jsdelivr.net/npm/qrcode-generator**', r => SWoff ? r.abort('internetdisconnected') : r.fulfill({ contentType: 'text/javascript', body: QRLIB }));
+  await SWc.route('https://cdnjs.cloudflare.com/**', r => SWoff ? r.abort('internetdisconnected') : r.fulfill({ contentType: 'text/javascript', body: LEAF, headers: { 'access-control-allow-origin': '*' } }));
   await SWc.route(/fonts\.(googleapis|gstatic)\.com|open-meteo\.com|supabase\.co\/functions/, r => r.abort());
-  const SWp = await SWc.newPage();
+  const SWp = await SWc.newPage(); const SWerr = [];
+  // (the test's stand-in for the sign-in library throws when its server can't be reached; the real one returns an error)
+  SWp.on('pageerror', e => { if (!(/Failed to fetch/.test(e.message) && /supabase-js/.test(e.stack || ''))) SWerr.push(e.message); });
   await SWp.goto(BASE.replace('index.html', '') + '#home'); await SWp.waitForTimeout(1500);
   const reg = await SWp.evaluate(async () => { await navigator.serviceWorker.register('sw.js'); const r = await navigator.serviceWorker.ready; return !!r.active; });
+  // the first visit loaded the libraries before the worker was in charge: the page asks it to keep a copy
+  await SWp.evaluate(() => netStart()); await SWp.waitForTimeout(1200);
+  const libKept = await SWp.evaluate(async () => { const c = await caches.open('zzirit-lib-v1'); return (await c.keys()).map(r => r.url); });
+  ok(libKept.some(u => /supabase-js@2\.\d+\.\d+/.test(u)), 'first visit: the sign-in library is kept for next time: ' + JSON.stringify(libKept));
   await SWp.reload(); await SWp.waitForTimeout(1500);
   const ctl = await SWp.evaluate(() => !!navigator.serviceWorker.controller);
   ok(reg && ctl, 'service worker installs and takes over the page');
   ok(await SWp.evaluate(async () => !!(await caches.match(new URL('./', location.href).href))), 'a copy of the page is kept for offline use');
-  await SWc.setOffline(true);
-  await SWp.reload().catch(() => null); await SWp.waitForTimeout(1500);
+  const libN = SWlib; await SWp.reload(); await SWp.waitForTimeout(1500);
+  ok(SWlib === libN && await SWp.evaluate(() => window.APP_RT === 'web'), 'next launch: the sign-in library comes from the kept copy, not the network');
+  // a map opened once keeps its library too
+  await SWp.evaluate(() => { location.hash = 'map'; }); await SWp.waitForTimeout(1800);
+  ok(await SWp.evaluate(async () => !!window.L && (await (await caches.open('zzirit-lib-v1')).keys()).some(r => /leaflet/.test(r.url))), 'the map library is kept once a map was opened');
+  await SWp.evaluate(() => { location.hash = 'home'; }); await SWp.waitForTimeout(300);
+  SWoff = true; await SWc.setOffline(true);
+  await SWp.reload().catch(() => null); await SWp.waitForTimeout(2200);
   ok(await SWp.evaluate(() => !!document.querySelector('#main') && /찌릿|ZZIRIT/.test(document.title)).catch(() => false), 'offline: the app page still opens');
+  ok(await SWp.evaluate(() => window.APP_RT === 'web' && !$('#v-home').hidden && $('#v-home').textContent.trim().length > 50 && !$('.nav-web').hidden).catch(() => false), 'offline: the real app starts (home screen, the Live tab is still there)');
+  ok(await SWp.evaluate(() => { const n = $('#net-bar'); return !!n && !n.hidden && n.classList.contains('off') && /인터넷이 끊겼어요/.test(n.textContent); }).catch(() => false), 'offline: a bar says the connection is gone');
+  await shot(SWp, 'z04_offline_bar');
+  // the satellite map needs a connection: it says so instead of breaking (the map library is not in this new page yet)
+  await SWp.evaluate(() => { location.hash = 'map'; }); await SWp.waitForTimeout(1500);
+  ok(await SWp.evaluate(() => !!document.querySelector('#map.leaflet-container') || /인터넷이 필요/.test(($('.map-wait') || {}).textContent || '')).catch(() => false), 'offline: the map opens from the kept copy or says it needs a connection');
+  await SWp.evaluate(() => { location.hash = 'home'; }); await SWp.waitForTimeout(400);
+  SWoff = false; await SWc.setOffline(false); await SWp.waitForTimeout(600);
+  ok(await SWp.evaluate(() => { const n = $('#net-bar'); return !!n && !n.hidden && n.classList.contains('back') && /다시 연결됐어요/.test(n.textContent) && !!n.querySelector('[data-net-reload]'); }).catch(() => false), 'back online: the bar says so and offers to load everything fresh');
+  await SWp.click('#net-bar [data-net-close]'); await SWp.waitForTimeout(200);
+  ok(await SWp.evaluate(() => $('#net-bar').hidden), 'the bar can be closed');
+  SWoff = true; await SWc.setOffline(true);
   await SWp.goto(BASE.replace('index.html', 'nowhere.html')).catch(() => null); await SWp.waitForTimeout(800);
   ok(await SWp.evaluate(() => /인터넷 연결이 없어요/.test(document.body.textContent)).catch(() => false), 'offline: other addresses get a friendly offline page');
-  await SWc.setOffline(false); await SWc.close();
+  ok(!SWerr.length, 'no page errors with or without a connection: ' + SWerr.join(' | '));
+  SWoff = false; await SWc.setOffline(false); await SWc.close();
   /* ---------- 2026-10-29c: catch stats, weekly contest, phone notices ---------- */
   // my catch statistics
   await go(A, 'log', 1200); await A.click('[data-logtab="stats"]'); await A.waitForTimeout(700);

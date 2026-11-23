@@ -271,6 +271,7 @@ matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', () => { 
   S.unit = lsGet('unit', 'cm');
   S.me = lsGet('me', null);
   onHash();
+  netStart();
   store.init().then(() => { updateStatic(); updateShell(); try { dmStart(); } catch (e) { console.warn(e); } if (zpMine()) setTimeout(() => { zpLoad(); if (typeof lvLoad === 'function') lvLoad(); }, 3000); if (S.route === 'admin' && !S.isOwner) location.hash = 'home'; setTimeout(maybeWhatsNew, 2500); setTimeout(maybeWelcome, 1800); setTimeout(pushSync, 4000); });
   if (window.APP_RT === 'web' && 'serviceWorker' in navigator) navigator.serviceWorker.addEventListener('message', e => { const h = e.data && e.data.go; if (typeof h === 'string' && /^#[a-z]+$/.test(h)) location.hash = h.slice(1); });
   const idle = window.requestIdleCallback || (f => setTimeout(f, 1200));

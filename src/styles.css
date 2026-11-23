@@ -1940,3 +1940,25 @@ body[data-route="live"] #main { padding-left: 0; padding-right: 0; }
 .ls-fish li:not(.got) img { filter: brightness(0) opacity(.22); }
 .ls-fish small { font-size: 10.5px; color: var(--ink-3); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .ls-fish li.got small { color: var(--ink); }
 @media (max-width: 420px) { .lv-book .seg button { padding-inline: 4px; font-size: 12.5px; } .ls-list { grid-template-columns: 1fr; } }
+/* the connection bar: offline, and back online (net.js) */
+.net-bar { position: fixed; z-index: 400; left: 50%; transform: translateX(-50%); top: calc(env(safe-area-inset-top, 0px) + 12px); width: max-content; max-width: min(560px, calc(100vw - 32px)); box-sizing: border-box; display: flex; align-items: center; gap: 10px; padding: 10px 12px 10px 14px; border-radius: 14px; background: var(--night-2); color: var(--spark-2); border: 1px solid var(--night-3); box-shadow: var(--shadow-lg); font-size: 14px; line-height: 1.4; word-break: keep-all; overflow-wrap: anywhere; }
+.net-bar[hidden] { display: none; }
+.net-bar > .ic { flex: none; width: 20px; height: 20px; color: var(--spark); }
+.net-bar b { font-weight: 600; color: #fff; }
+.net-bar .nb-sub { color: var(--steel); }
+.net-bar.back > .ic { color: #5FD79A; }
+.net-bar .nb-btn { flex: none; display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 12px; border-radius: 999px; border: 0; background: var(--spark); color: var(--night); font: 600 13px var(--f-body); cursor: pointer; }
+.net-bar .nb-btn .ic { width: 16px; height: 16px; }
+.net-bar .nb-x { flex: none; display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; border: 0; background: transparent; color: var(--steel); cursor: pointer; }
+.net-bar .nb-x .ic { width: 16px; height: 16px; }
+.net-bar button:focus-visible { outline: 2px solid var(--spark); outline-offset: 2px; }
+@media (max-width: 1023px) { .net-bar { top: calc(env(safe-area-inset-top, 0px) + var(--top-h) + 8px); } }
+@media (min-width: 1024px) { .net-bar { left: calc(50% + var(--rail-w) / 2); } }
+/* a map that is still loading, or needs a connection */
+.map-wait { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 12px; padding: 24px; text-align: center; color: var(--steel); background: #08202E; font-size: 15px; }
+.map-wait p { margin: 0; }
+.map-wait .spin { width: 28px; height: 28px; border-radius: 50%; border: 3px solid rgba(124,196,255,.25); border-top-color: var(--spark); animation: spin 1s linear infinite; }
+.map-wait > .ic { width: 32px; height: 32px; color: var(--spark); }
+.map-wait .btn { color: var(--spark-2); border-color: var(--night-3); }
+.picker-map { position: relative; }
+@media (prefers-reduced-motion: reduce) { .map-wait .spin { animation-duration: 3s; } }

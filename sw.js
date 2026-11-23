@@ -2,8 +2,18 @@
    Lets the website be installed as an app and still open without a connection.
    The page always comes from the network first, so an update shows up right away; the last good copy is used only
    when the network fails. Nothing else (data, photos, maps, sign-in) passes through here.
+   It also keeps a copy of the few libraries the page loads from other sites (the sign-in library, the map library,
+   the fonts), so the next launch does not wait for them and the app still opens with no connection. Those addresses
+   carry a version number, so a kept copy never goes stale; the font list is checked again whenever there is a connection.
    It also shows the phone notifications the server sends, and opens the right screen when one is tapped. */
 const CACHE = 'zzirit-page-v1';
+const LIBS = 'zzirit-lib-v1';
+const KEEP = [CACHE, LIBS];
+// versioned files that never change at the same address: use the kept copy first
+const FIXED = /^https:\/\/(cdn\.jsdelivr\.net\/npm\/[^/]+@\d[^/]*\/|cdn\.jsdelivr\.net\/npm\/@[^/]+\/[^/]+@\d[^/]*\/|cdnjs\.cloudflare\.com\/ajax\/libs\/[^/]+\/\d[^/]*\/|fonts\.gstatic\.com\/)/;
+// may change at the same address: fresh from the network, the kept copy only when the network fails
+const FRESH = /^https:\/\/fonts\.googleapis\.com\/css2\?/;
+const libKind = u => (FIXED.test(u) ? 'fixed' : FRESH.test(u) ? 'fresh' : (u.startsWith(SCOPE.href + 'vendor/') ? 'fresh' : null));
 const SCOPE = new URL(self.registration.scope);
 const PAGE = SCOPE.href; // the app's one page ("./" and "./index.html" are the same page)
 const OFFLINE = `<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>찌릿 ZZIRIT</title>
@@ -18,11 +28,12 @@ self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.add(new Request(PAGE, { cache: 'no-cache' }))).catch(() => { }));
 });
 self.addEventListener('activate', e => e.waitUntil((async () => {
-  for (const k of await caches.keys()) if (k.startsWith('zzirit-') && k !== CACHE) await caches.delete(k);
+  for (const k of await caches.keys()) if (k.startsWith('zzirit-') && !KEEP.includes(k)) await caches.delete(k);
   await self.clients.claim();
 })()));
 self.addEventListener('fetch', e => {
   const r = e.request;
+  if (r.method === 'GET' && r.mode !== 'navigate') { const k = libKind(r.url); if (k) e.respondWith(lib(e, r, k)); return; }
   if (r.mode !== 'navigate' || r.method !== 'GET') return; // everything else goes to the network exactly as before
   const page = isPage(new URL(r.url));
   e.respondWith((async () => {
@@ -33,6 +44,37 @@ self.addEventListener('fetch', e => {
     } catch (err) {
       const hit = page ? await caches.match(PAGE) : null;
       return hit || new Response(OFFLINE, { headers: { 'content-type': 'text/html; charset=utf-8' } });
+    }
+  })());
+});
+
+/* the libraries: a kept copy (fixed addresses) or the network first (fonts list, vendor files) */
+const usable = res => res && (res.ok || res.type === 'opaque');
+async function lib(e, r, kind) {
+  const c = await caches.open(LIBS).catch(() => null);
+  if (kind === 'fixed' && c) { const hit = await c.match(r.url); if (hit) return hit; }
+  try {
+    const res = await fetch(r);
+    if (c && usable(res)) { const copy = res.clone(); e.waitUntil(c.put(r.url, copy).catch(() => { })); }
+    return res;
+  } catch (err) {
+    const hit = c ? await c.match(r.url) : null;
+    if (hit) return hit;
+    throw err;
+  }
+}
+// the page says which libraries it loaded before this worker was in charge (the very first visit): keep a copy of them
+self.addEventListener('message', e => {
+  const urls = e.data && Array.isArray(e.data.keep) ? e.data.keep.filter(u => typeof u === 'string' && libKind(u)).slice(0, 12) : [];
+  if (!urls.length) return;
+  e.waitUntil((async () => {
+    const c = await caches.open(LIBS);
+    for (const u of urls) {
+      try {
+        if (await c.match(u)) continue;
+        const res = await fetch(u, { mode: 'cors', credentials: 'omit' }).catch(() => fetch(u, { mode: 'no-cors', credentials: 'omit' }));
+        if (usable(res)) await c.put(u, res);
+      } catch (err) { }
     }
   })());
 });

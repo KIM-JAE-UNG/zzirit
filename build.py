@@ -24,7 +24,7 @@ WEB = {
     'supabase_js': 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.js',
 }
 
-APP_JS = ['i18n.js', 'i18n-more.js', 'i18n-live.js', 'fishdb.js', 'fishdraw.js', 'scene.js', 'geo.js', 'map.js', 'core.js', 'flows.js', 'views.js', 'lures.js', 'char.js', 'community.js', 'news.js', 'points.js', 'notify.js', 'weather.js', 'badges.js', 'stats.js', 'contest.js', 'push.js', 'chat.js', 'shop.js', 'livemap.js', 'angler.js', 'live.js', 'livewx.js', 'emote.js', 'daily.js', 'sets.js', 'boot.js']
+APP_JS = ['i18n.js', 'i18n-more.js', 'i18n-live.js', 'fishdb.js', 'fishdraw.js', 'scene.js', 'geo.js', 'map.js', 'core.js', 'flows.js', 'views.js', 'lures.js', 'char.js', 'community.js', 'news.js', 'points.js', 'notify.js', 'weather.js', 'badges.js', 'stats.js', 'contest.js', 'push.js', 'chat.js', 'shop.js', 'livemap.js', 'angler.js', 'live.js', 'livewx.js', 'emote.js', 'daily.js', 'sets.js', 'net.js', 'boot.js']
 
 
 def read(name):
@@ -36,6 +36,8 @@ def data_uri(name, mime):
     with open(os.path.join(SRC, name), 'rb') as f:
         return f'data:{mime};base64,' + base64.b64encode(f.read()).decode()
 
+
+LEAFLET_TAG = '<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>'
 
 # logo (from the brand image): the mark for headers, the full logo for the brand page — inlined so both builds stay one file
 LOGO = {'__LOGO_MARK__': ('logo-mark.webp', 'image/webp'), '__LOGO_FULL__': ('logo-full.webp', 'image/webp')}
@@ -70,6 +72,9 @@ def build(target):
             '<script>window.APP_CFG = ' + json.dumps({'url': WEB['supabase_url'], 'key': WEB['supabase_key']}) + ';</script>',
         ])
         html = html.replace('<!--__WEB_META__-->', meta).replace('<!--__WEB_HEAD__-->', head)
+        # the map library is not part of the first load on the website: net.js brings it when a map is opened
+        assert LEAFLET_TAG + '\n' in html, 'the map library tag moved: update LEAFLET_TAG'
+        html = html.replace(LEAFLET_TAG + '\n', '')
     else:
         html = html.replace('<!--__WEB_META__-->\n', '').replace('<!--__WEB_HEAD__-->\n', '')
     html = html.replace('/*__CSS__*/', read('styles.css')).replace('/*__JS__*/', js)
