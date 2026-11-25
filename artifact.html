@@ -3811,6 +3811,7 @@ Object.assign(T, {
   net_off_sub: ['이 기기에 저장된 기록을 보여 드려요.', 'Showing what is saved on this device.', 'この端末に保存された記録を表示しています。', '正在显示本机保存的记录。'],
   net_back: ['다시 연결됐어요.', 'Back online.', '再接続しました。', '已重新连接。'],
   net_reload: ['새로 불러오기', 'Refresh', '再読み込み', '刷新'],
+  lang_need_net: ['이 언어는 인터넷이 연결되면 받아 올게요.', 'This language will load once you are online.', 'この言語はインターネットにつながると読み込みます。', '联网后将加载此语言。'],
   map_loading: ['지도를 불러오는 중…', 'Loading the map…', '地図を読み込み中…', '正在加载地图…'],
   map_need_net: ['지도를 열려면 인터넷이 필요해요.', 'The map needs an internet connection.', '地図を開くにはインターネット接続が必要です。', '打开地图需要网络连接。'],
   wn_fast_h: ['더 빨리 열려요', 'Opens faster', 'すばやく開きます', '打开更快'],
@@ -13886,6 +13887,22 @@ function mapWait(el, again) {
   });
 }
 
+/* The screen texts on the website: Korean is in the page, the other languages come from lang/<l>.js only when chosen
+   (build.py). The Claude page has all four inside, so there is nothing to bring. */
+const _langP = {};
+function langReady(l) { return typeof T_SPLIT === 'undefined' || l === 'ko' || !!T_SPLIT.has[l]; }
+function needLang(l) {
+  if (langReady(l)) return Promise.resolve();
+  if (!T_SPLIT.v[l]) return Promise.reject(new Error('lang'));
+  if (!_langP[l]) _langP[l] = new Promise((res, rej) => {
+    const s = document.createElement('script'); s.src = `lang/${l}.js?v=${T_SPLIT.v[l]}`; s.async = true;
+    s.onload = () => { tPackMerge(); T_SPLIT.has[l] ? res() : rej(new Error('lang')); };
+    s.onerror = () => { s.remove(); rej(new Error('lang')); };
+    document.head.appendChild(s);
+  }).catch(e => { delete _langP[l]; throw e; });
+  return _langP[l];
+}
+
 const NET = { off: false, wasOff: false, hideT: 0 };
 function netBar() {
   let bar = document.getElementById('net-bar');
@@ -14008,6 +14025,8 @@ function setLang(l) {
   updateStatic();
   if (VIEWS.map.labels) VIEWS.map.labels.refresh();
   if (VIEWS.map.built) VIEWS.map.refreshPanels();
+  // the website brings another language's texts only when it is chosen (net.js); the screen fills in once they arrive
+  if (!langReady(l)) needLang(l).then(() => { if (S.lang !== l) return; updateStatic(); updateShell(); rerender(); }).catch(() => { if (S.lang === l) toast(t('lang_need_net'), 'warn'); });
 }
 function show(route) {
   const vid = viewOf(route);

@@ -75,6 +75,8 @@ function setLang(l) {
   updateStatic();
   if (VIEWS.map.labels) VIEWS.map.labels.refresh();
   if (VIEWS.map.built) VIEWS.map.refreshPanels();
+  // the website brings another language's texts only when it is chosen (net.js); the screen fills in once they arrive
+  if (!langReady(l)) needLang(l).then(() => { if (S.lang !== l) return; updateStatic(); updateShell(); rerender(); }).catch(() => { if (S.lang === l) toast(t('lang_need_net'), 'warn'); });
 }
 function show(route) {
   const vid = viewOf(route);

@@ -532,7 +532,8 @@ const AI_NOFISH = { fish_visible: false, candidates: [], other_en: '', other_sci
   // before the server update: a clear note instead of the old misleading "operator account" message
   await fetch('http://127.0.0.1:8768/__sb/feature?del=0');
   await A.evaluate(() => { S.adm.at = 0; S.adm.canDelete = undefined; }); await go(A, 'home', 400); await go(A, 'admin', 2000);
-  ok(await A.$$eval('.admin .note', ns => ns.some(n => /서버 업데이트/.test(n.textContent))), 'admin page says deleting needs the server update');
+  // (the page asks the server whether deleting is in; wait for that answer instead of a fixed time)
+  ok(await until(() => A.$$eval('.admin .note', ns => ns.some(n => /서버 업데이트/.test(n.textContent))).catch(() => false), 6000), 'admin page says deleting needs the server update');
   const anyDel = await A.$('[data-deluser]'); ok(!!anyDel && await anyDel.isDisabled(), 'delete buttons wait for the update');
   await A.evaluate(id => adminDeleteUser(id), bId); await A.waitForTimeout(700);
   const tz = await toasts(A); ok(tz.some(x => /서버 업데이트/.test(x)) && !tz.some(x => /운영자 계정은 삭제할 수 없어요/.test(x)), 'a missing server function is explained as such');
@@ -541,7 +542,8 @@ const AI_NOFISH = { fish_visible: false, candidates: [], other_en: '', other_sci
   await go(W, 'claim', 600); await W.fill('#cl-code', 'testcode1234abcd'); await W.click('#cl-go'); await W.waitForTimeout(2600);
   const wId = await W.evaluate(() => S.uid);
   await A.evaluate(() => { S.adm.at = 0; S.adm.canDelete = undefined; }); await go(A, 'home', 400); await go(A, 'admin', 2000);
-  const wDel = await A.$(`[data-deluser="${wId}"]`); ok(!!wDel && !(await wDel.isDisabled()), 'deleting is available after the update');
+  ok(!!(await until(async () => { const x = await A.$(`[data-deluser="${wId}"]`); return x && !(await x.isDisabled()); }, 6000)), 'deleting is available after the update');
+  const wDel = await A.$(`[data-deluser="${wId}"]`);
   if (wDel) { await wDel.click(); await A.waitForTimeout(300); await wDel.click(); await A.waitForTimeout(2000); }
   d = await dump(); ok(!d.T.anglers[wId] && !d.admins.includes(wId), 'another operator account deleted, with its operator rights');
   ok(!(await A.$(`[data-deluser="${aId}"]`)), 'no delete button for the account in use');
@@ -570,7 +572,7 @@ const AI_NOFISH = { fish_visible: false, candidates: [], other_en: '', other_sci
   ok(await B.evaluate(() => !window.L && !document.querySelector('script[src*="leaflet"]')), 'first screen: the map library is not loaded until a map is opened');
   await go(B, 'map', 2600);
   ok(await B.evaluate(() => !!(window.L && window.L.map) && !!document.querySelector('#map.leaflet-container') && !document.querySelector('.map-wait')), 'opening the map brings the map library and draws the map');
-  ok((await B.$$('.pt-mark')).length >= 1, 'the shared point is on the map');
+  ok(!!(await until(async () => (await B.$$('.pt-mark')).length >= 1, 5000)), 'the shared point is on the map');
   await go(A, 'log', 1200); await A.click('.catch-card'); await A.waitForTimeout(700);
   ok(!!(await A.$('#cd-pt')), 'a catch with a spot can be saved as a point');
   await closeModals(A);
@@ -634,6 +636,15 @@ const AI_NOFISH = { fish_visible: false, candidates: [], other_en: '', other_sci
   ok(await SWp.evaluate(async () => !!(await caches.match(new URL('./', location.href).href))), 'a copy of the page is kept for offline use');
   const libN = SWlib; await SWp.reload(); await SWp.waitForTimeout(1500);
   ok(SWlib === libN && await SWp.evaluate(() => window.APP_RT === 'web'), 'next launch: the sign-in library comes from the kept copy, not the network');
+  // another language's texts are kept too, and an older copy of them is dropped
+  const langKept = await SWp.evaluate(async () => {
+    const c = await caches.open('zzirit-lib-v1'), base = new URL('lang/en.js', location.href).href;
+    await c.put(base + '?v=old0000000', new Response('/* old */'));
+    await needLang('en'); await new Promise(r => setTimeout(r, 600));
+    return (await c.keys()).map(r => r.url).filter(u => u.startsWith(base)).map(u => u.slice(base.length));
+  });
+  ok(langKept.length === 1 && langKept[0] === '?v=' + await SWp.evaluate(() => T_SPLIT.v.en), 'the English texts are kept for offline use, the older copy is gone: ' + JSON.stringify(langKept));
+  await SWp.evaluate(() => { setLang('ko'); });
   // a map opened once keeps its library too
   await SWp.evaluate(() => { location.hash = 'map'; }); await SWp.waitForTimeout(1800);
   ok(await SWp.evaluate(async () => !!window.L && (await (await caches.open('zzirit-lib-v1')).keys()).some(r => /leaflet/.test(r.url))), 'the map library is kept once a map was opened');
@@ -735,6 +746,59 @@ const AI_NOFISH = { fish_visible: false, candidates: [], other_en: '', other_sci
   await go(E, 'board', 1200); await shot(E, 'e01_board_dark');
   await go(E, 'char', 1000); await shot(E, 'e02_char_dark');
   await go(E, 'sea', 1500); await E.click('[data-seatab="shop"]'); await E.waitForTimeout(800); await shot(E, 'e03_decor_dark', true);
+  ok(await E.evaluate(() => T_SPLIT.has.en && !T_SPLIT.has.ja && t('nav_home') === 'Home' && !!document.querySelector('script[src^="lang/en.js?v="]')), 'English: only the English texts were brought, in the page\'s first load');
+
+  /* ---------- 2026-11-25: the website brings only the chosen language's texts ---------- */
+  {
+    const html = fs.readFileSync(__dirname + '/../../index.html', 'utf8'), art = fs.readFileSync(__dirname + '/../../artifact.html', 'utf8');
+    const big = ['Brag about catches, ask questions, share tips and gear', '釣果自慢、質問、コツ、道具の話、釣り仲間探しまでここで。', '晒渔获、提问、分享技巧和装备、约钓友，都在这里。'];
+    ok(/조황 자랑, 질문, 꿀팁/.test(html) && big.every(s => !html.includes(s)), 'the website page has the Korean texts only (the others are in lang/)');
+    ok(big.every(s => art.includes(s)), 'the Claude page still has all four languages inside');
+    const packs = ['en', 'ja', 'zh'].map(l => fs.readFileSync(__dirname + `/../../lang/${l}.js`, 'utf8'));
+    ok(big.every((s, i) => packs[i].includes(s)) && !packs[1].includes(big[2]) && !packs[2].includes(big[1]), 'each language file has its own texts only');
+    const langReq = ctx => { const seen = []; ctx.on('request', r => { if (/\/lang\//.test(r.url())) seen.push(r.url().replace(/^.*\/lang\//, '')); }); return seen; };
+    // a Korean visitor brings no language file at all
+    const Kc = await b.newContext({ viewport: { width: 1280, height: 800 }, locale: 'ko-KR' }); const kSeen = langReq(Kc);
+    await Kc.addInitScript(() => { try { localStorage.setItem('eosin.welcomed', '1'); } catch (e) { } });
+    await Kc.route('https://cdn.jsdelivr.net/npm/@supabase/**', r => r.fulfill({ contentType: 'text/javascript', body: FAKE }));
+    await Kc.route(/fonts\.(googleapis|gstatic)\.com|open-meteo\.com|cdnjs\.cloudflare\.com|qrcode-generator/, r => r.abort());
+    const Kp = await Kc.newPage(); const kErr = []; Kp.on('pageerror', e => kErr.push(e.message));
+    await Kp.goto(BASE + '#home'); await Kp.waitForTimeout(1500);
+    ok(!kSeen.length && await Kp.evaluate(() => S.lang === 'ko' && t('nav_home') === '홈' && $('#v-home').textContent.trim().length > 50), 'Korean: no language file is downloaded and the home screen is in Korean');
+    // switching to Chinese brings just that file, and the screen changes once it is here
+    await Kp.evaluate(() => { setLang('zh'); rerender(); }); await Kp.waitForTimeout(1200);
+    ok(kSeen.length === 1 && /^zh\.js\?v=[0-9a-f]{10}$/.test(kSeen[0]) && await Kp.evaluate(() => t('nav_home') === '首页' && [...document.querySelectorAll('[data-t="nav_home"]')].some(n => n.textContent === '首页')), 'switching to Chinese brings only zh.js and the screen turns Chinese: ' + JSON.stringify(kSeen));
+    await Kp.evaluate(() => { setLang('ko'); rerender(); }); await Kp.waitForTimeout(300);
+    ok(await Kp.evaluate(() => t('nav_home') === '홈') && kSeen.length === 1, 'back to Korean without downloading anything');
+    ok(!kErr.length, 'no page errors while switching languages: ' + kErr.join(' | '));
+    await Kc.close();
+    // a Japanese visitor: the page starts in Japanese right away (no Korean flash), with the Japanese file only
+    const Jc = await b.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, locale: 'ja-JP' }); const jSeen = langReq(Jc);
+    await Jc.addInitScript(() => { try { localStorage.setItem('eosin.welcomed', '1'); document.addEventListener('DOMContentLoaded', () => { window.__firstT = typeof t === 'function' ? t('nav_home') : null; }); } catch (e) { } });
+    await Jc.route('https://cdn.jsdelivr.net/npm/@supabase/**', r => r.fulfill({ contentType: 'text/javascript', body: FAKE }));
+    await Jc.route(/fonts\.(googleapis|gstatic)\.com|open-meteo\.com|cdnjs\.cloudflare\.com|qrcode-generator/, r => r.abort());
+    const Jp = await Jc.newPage(); const jErr = []; Jp.on('pageerror', e => jErr.push(e.message));
+    await Jp.goto(BASE + '#home'); await Jp.waitForTimeout(1600);
+    ok(jSeen.length === 1 && /^ja\.js/.test(jSeen[0]) && await Jp.evaluate(() => S.lang === 'ja' && window.__firstT === 'ホーム' && [...document.querySelectorAll('[data-t="tab_home"],[data-t="nav_home"]')].some(n => n.textContent === 'ホーム')), 'Japanese: the texts are there from the first paint, only ja.js is downloaded: ' + JSON.stringify(jSeen));
+    await shot(Jp, 'l01_japanese_phone');
+    ok(!jErr.length, 'no page errors in Japanese: ' + jErr.join(' | '));
+    await Jc.close();
+    // with no connection, a language that was never downloaded says it will come later, and the screen keeps working in Korean
+    const Oc = await b.newContext({ viewport: { width: 1280, height: 800 }, locale: 'ko-KR' });
+    await Oc.addInitScript(() => { try { localStorage.setItem('eosin.welcomed', '1'); } catch (e) { } });
+    await Oc.route('https://cdn.jsdelivr.net/npm/@supabase/**', r => r.fulfill({ contentType: 'text/javascript', body: FAKE }));
+    await Oc.route(/fonts\.(googleapis|gstatic)\.com|open-meteo\.com|cdnjs\.cloudflare\.com|qrcode-generator/, r => r.abort());
+    await Oc.route(/\/lang\//, r => r.abort('internetdisconnected'));
+    const Op = await Oc.newPage(); const oErr = []; Op.on('pageerror', e => oErr.push(e.message));
+    await Op.goto(BASE + '#home'); await Op.waitForTimeout(1200);
+    await Op.evaluate(() => { setLang('ja'); rerender(); }); await Op.waitForTimeout(900);
+    ok(await Op.evaluate(() => [...document.querySelectorAll('.toast')].some(n => /인터넷이 연결되면/.test(n.textContent)) && t('nav_home') === '홈' && !$('#v-home').hidden), 'a language file that cannot come yet: a note, and the screen still works');
+    await Oc.unroute(/\/lang\//);
+    await Op.evaluate(() => { setLang('ja'); rerender(); }); await Op.waitForTimeout(900);
+    ok(await Op.evaluate(() => t('nav_home') === 'ホーム'), 'choosing it again once it can be reached works');
+    ok(!oErr.length, 'no page errors without the language file: ' + oErr.join(' | '));
+    await Oc.close();
+  }
 
   /* ---------- 2026-10-29d: records kept on a phone do not come back after a reset or a deleted account ---------- */
   const RESET = Date.now() - 3600e3;

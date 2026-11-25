@@ -13,7 +13,8 @@ const KEEP = [CACHE, LIBS];
 const FIXED = /^https:\/\/(cdn\.jsdelivr\.net\/npm\/[^/]+@\d[^/]*\/|cdn\.jsdelivr\.net\/npm\/@[^/]+\/[^/]+@\d[^/]*\/|cdnjs\.cloudflare\.com\/ajax\/libs\/[^/]+\/\d[^/]*\/|fonts\.gstatic\.com\/)/;
 // may change at the same address: fresh from the network, the kept copy only when the network fails
 const FRESH = /^https:\/\/fonts\.googleapis\.com\/css2\?/;
-const libKind = u => (FIXED.test(u) ? 'fixed' : FRESH.test(u) ? 'fresh' : (u.startsWith(SCOPE.href + 'vendor/') ? 'fresh' : null));
+// the screen texts in other languages (lang/<l>.js?v=<hash>): a new text gets a new address, so a kept copy is fine
+const libKind = u => (FIXED.test(u) ? 'fixed' : FRESH.test(u) ? 'fresh' : u.startsWith(SCOPE.href + 'vendor/') ? 'fresh' : u.startsWith(SCOPE.href + 'lang/') ? 'fixed' : null);
 const SCOPE = new URL(self.registration.scope);
 const PAGE = SCOPE.href; // the app's one page ("./" and "./index.html" are the same page)
 const OFFLINE = `<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>찌릿 ZZIRIT</title>
@@ -55,7 +56,12 @@ async function lib(e, r, kind) {
   if (kind === 'fixed' && c) { const hit = await c.match(r.url); if (hit) return hit; }
   try {
     const res = await fetch(r);
-    if (c && usable(res)) { const copy = res.clone(); e.waitUntil(c.put(r.url, copy).catch(() => { })); }
+    if (c && usable(res)) {
+      const copy = res.clone();
+      // an older copy of the same language's texts is no longer needed
+      const base = r.url.split('?')[0], old = r.url.startsWith(SCOPE.href + 'lang/') ? (await c.keys()).filter(k => k.url !== r.url && k.url.split('?')[0] === base) : [];
+      e.waitUntil(Promise.all(old.map(k => c.delete(k))).then(() => c.put(r.url, copy)).catch(() => { }));
+    }
     return res;
   } catch (err) {
     const hit = c ? await c.match(r.url) : null;

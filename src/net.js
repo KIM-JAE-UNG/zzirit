@@ -25,6 +25,22 @@ function mapWait(el, again) {
   });
 }
 
+/* The screen texts on the website: Korean is in the page, the other languages come from lang/<l>.js only when chosen
+   (build.py). The Claude page has all four inside, so there is nothing to bring. */
+const _langP = {};
+function langReady(l) { return typeof T_SPLIT === 'undefined' || l === 'ko' || !!T_SPLIT.has[l]; }
+function needLang(l) {
+  if (langReady(l)) return Promise.resolve();
+  if (!T_SPLIT.v[l]) return Promise.reject(new Error('lang'));
+  if (!_langP[l]) _langP[l] = new Promise((res, rej) => {
+    const s = document.createElement('script'); s.src = `lang/${l}.js?v=${T_SPLIT.v[l]}`; s.async = true;
+    s.onload = () => { tPackMerge(); T_SPLIT.has[l] ? res() : rej(new Error('lang')); };
+    s.onerror = () => { s.remove(); rej(new Error('lang')); };
+    document.head.appendChild(s);
+  }).catch(e => { delete _langP[l]; throw e; });
+  return _langP[l];
+}
+
 const NET = { off: false, wasOff: false, hideT: 0 };
 function netBar() {
   let bar = document.getElementById('net-bar');

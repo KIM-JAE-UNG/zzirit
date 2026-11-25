@@ -274,6 +274,7 @@ Object.assign(T, {
   net_off_sub: ['이 기기에 저장된 기록을 보여 드려요.', 'Showing what is saved on this device.', 'この端末に保存された記録を表示しています。', '正在显示本机保存的记录。'],
   net_back: ['다시 연결됐어요.', 'Back online.', '再接続しました。', '已重新连接。'],
   net_reload: ['새로 불러오기', 'Refresh', '再読み込み', '刷新'],
+  lang_need_net: ['이 언어는 인터넷이 연결되면 받아 올게요.', 'This language will load once you are online.', 'この言語はインターネットにつながると読み込みます。', '联网后将加载此语言。'],
   map_loading: ['지도를 불러오는 중…', 'Loading the map…', '地図を読み込み中…', '正在加载地图…'],
   map_need_net: ['지도를 열려면 인터넷이 필요해요.', 'The map needs an internet connection.', '地図を開くにはインターネット接続が必要です。', '打开地图需要网络连接。'],
   wn_fast_h: ['더 빨리 열려요', 'Opens faster', 'すばやく開きます', '打开更快'],

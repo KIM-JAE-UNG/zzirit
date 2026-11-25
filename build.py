@@ -7,7 +7,7 @@ Usage: python3 build.py            (both)
        python3 build.py web        (one target)
 Set CHECK_JS=<path> to also write the concatenated web JS for a syntax check.
 """
-import base64, json, os, sys
+import base64, hashlib, json, os, subprocess, sys
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 SRC = os.path.join(ROOT, 'src')
@@ -43,11 +43,45 @@ LEAFLET_TAG = '<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4
 LOGO = {'__LOGO_MARK__': ('logo-mark.webp', 'image/webp'), '__LOGO_FULL__': ('logo-full.webp', 'image/webp')}
 
 
+I18N_WEB = ['i18n.js', 'i18n-more.js', 'web-texts.js', 'i18n-live.js']
+LANGS = ['ko', 'en', 'ja', 'zh']
+
+
+def brand(s):
+    return s.replace('__APP_KO__', BRAND['ko']).replace('__APP_EN__', BRAND['en']).replace('__SITE__', WEB['site'])
+
+
+def split_texts():
+    """Website only: the screen texts in Korean stay in the page; English, Japanese and Chinese go to lang/<l>.js.
+    The page brings only the language the person chose (a short script in <head>), so nobody downloads all four."""
+    src = '\n'.join(read(f) for f in I18N_WEB)
+    out = subprocess.run(['node', '-e', 'const s=require("fs").readFileSync(0,"utf8");'
+                          'process.stdout.write(JSON.stringify(new Function(s+";return T;")()))'],
+                         input=src, capture_output=True, text=True, check=True).stdout
+    table = json.loads(out)
+    safe = lambda o: json.dumps(o, ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/')
+    # the few texts with no Korean keep their English here too (t() falls back to English, then Korean);
+    # a Japanese or Chinese text that is missing comes as English in its pack, the same as before
+    inline = {k: ([v[0]] if v[0] else [v[0], v[1]]) for k, v in table.items()}
+    packs = {}
+    for i, l in enumerate(LANGS[1:], 1):
+        body = brand(f'(window.T_PACK=window.T_PACK||{{}}).{l}=' + safe({k: v[i] or v[1] for k, v in table.items() if v[i] or (i > 1 and v[1])}) + ';\n')
+        packs[l] = (body, hashlib.sha1(body.encode()).hexdigest()[:10])
+    js = ('/* ===== Screen texts (website build): Korean here; the other languages come from lang/<l>.js (build.py) ===== */\n'
+          'const T = ' + safe(inline) + ';\n'
+          'const T_SPLIT = { v: ' + json.dumps({l: h for l, (_, h) in packs.items()}) + ', has: { ko: 1 } };\n'
+          'function tPackMerge() { const P = window.T_PACK || {}; for (const l in P) { const i = ["ko", "en", "ja", "zh"].indexOf(l); if (i < 1 || T_SPLIT.has[l]) continue; const d = P[l]; for (const k in d) if (T[k]) T[k][i] = d[k]; T_SPLIT.has[l] = 1; } }\n'
+          'tPackMerge();\n')
+    return js, packs
+
+
 def build(target):
     files = list(APP_JS)
+    packs = None
     if target == 'web':
-        files = ['rt-supabase.js', 'i18n.js', 'i18n-more.js', 'web-texts.js'] + APP_JS[2:]
-    js = '\n'.join(read(f) for f in files)
+        files = ['rt-supabase.js', '__TEXTS__'] + APP_JS[3:]
+        texts, packs = split_texts()
+    js = '\n'.join(texts if f == '__TEXTS__' else read(f) for f in files)
     qr = read('qr.txt').strip().split('|', 1)[1]
     js = js.replace('__QR_PATH__', qr)
     html = read('index.src.html')
@@ -70,6 +104,11 @@ def build(target):
         head = '\n'.join([
             f'<script src="{WEB["supabase_js"]}"></script>',
             '<script>window.APP_CFG = ' + json.dumps({'url': WEB['supabase_url'], 'key': WEB['supabase_key']}) + ';</script>',
+            # only the chosen language's texts (Korean is already in the page); the same choice as boot() makes
+            '<script>(function(){var l=null;try{l=JSON.parse(localStorage.getItem("eosin.lang"))}catch(e){}'
+            'if(!l){l=(navigator.language||"ko").slice(0,2);if(["ko","en","ja","zh"].indexOf(l)<0)l="en"}'
+            'var v=' + json.dumps({l: h for l, (_, h) in packs.items()}) + ';'
+            'if(v[l])document.write(\'<script src="lang/\'+l+\'.js?v=\'+v[l]+\'"><\\/script>\')})();</script>',
         ])
         html = html.replace('<!--__WEB_META__-->', meta).replace('<!--__WEB_HEAD__-->', head)
         # the map library is not part of the first load on the website: net.js brings it when a map is opened
@@ -92,6 +131,11 @@ def build(target):
                 '<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">\n'
                 '<style>[hidden]{display:none!important}body{margin:0}</style>\n'
                 + head_part + '</head>\n<body>\n' + body_part + '\n</body>\n</html>\n')
+    if packs:
+        os.makedirs(os.path.join(ROOT, 'lang'), exist_ok=True)
+        for l, (body, _) in packs.items():
+            with open(os.path.join(ROOT, 'lang', l + '.js'), 'w', encoding='utf-8') as f:
+                f.write(body)
     out = os.path.join(ROOT, 'index.html' if target == 'web' else 'artifact.html')
     with open(out, 'w', encoding='utf-8') as f:
         f.write(html)
