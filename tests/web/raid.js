@@ -96,6 +96,49 @@ async function until(fn, ms = 6000, step = 80) { const t0 = Date.now(); let v; w
     await B.evaluate(() => rdClose());
     ok(!(await A.$('#rd')), 'the raid screen closes');
 
+    /* ---------- 레이드 기록과 괴어 칭호 ---------- */
+    await A.evaluate(() => rdOpen()); await A.waitForTimeout(1000);
+    ok(await until(() => A.$eval('[data-rrdot]', n => !n.hidden).catch(() => false), 5000), 'the record button shows a dot: a raid title is ready');
+    await A.click('[data-rropen]'); await A.waitForTimeout(900);
+    const rr = await A.evaluate(() => RR.st);
+    const aMvp = rr && rr.mvp === 1;
+    ok(rr && rr.joined === 1 && rr.won === 1 && rr.dex.kue === 1 && rr.list.length === 1 && rr.list[0].won && rr.list[0].pts >= 30, 'the record: one raid joined and beaten, kue in the book, the points ' + JSON.stringify(rr && { j: rr.joined, w: rr.won, m: rr.mvp }));
+    ok(await A.$eval('.rd-rec', n => /내 레이드 기록/.test(n.textContent) && n.querySelectorAll('.rr-book li').length === 6 && n.querySelectorAll('.rr-book li.got').length === 1 && /1 \/ 6/.test(n.textContent) && /최근 레이드/.test(n.textContent)).catch(() => false), 'the record screen: the monster book (1 of 6 lit) and the last raids');
+    ok(await A.$eval('[data-rrclaim="raid_hunter"]', n => /\+30P/.test(n.textContent)).catch(() => false), 'the monster hunter title is ready to take (+30P)');
+    ok(!(await A.$('[data-rrclaim="raid_veteran"]')) && !(await A.$('[data-rrclaim="raid_all"]')), 'the titles not done cannot be taken');
+    await shot(A, 'r06_record_pc');
+    // the record covers the raid: clicks and keys do not strike
+    const hitsB = (await dump()).ZPS.led.length;
+    await A.keyboard.press(' '); await A.waitForTimeout(300);
+    ok((await dump()).ZPS.led.length === hitsB, 'space on the record screen does not strike');
+    const bal0 = await A.evaluate(() => (typeof ZP !== 'undefined' && ZP.st && ZP.st.bal) || 0);
+    await A.click('[data-rrclaim="raid_hunter"]'); await A.waitForTimeout(900);
+    ok(await A.$eval('.rr-ti.is-wear', n => /괴어 사냥꾼/.test(n.textContent)).catch(() => false), 'taken: the title is worn at once');
+    const led = (await dump()).ZPS.led.filter(x => x.ref === 'set:raid_hunter');
+    ok(led.length === 1 && led[0].d === 30, 'the server paid 30P once');
+    if (aMvp) {
+      await A.click('[data-rrclaim="raid_mvp"]'); await A.waitForTimeout(900);
+      await A.click('[data-rrwear="raid_mvp"]'); await A.waitForTimeout(900);
+      ok(await A.$eval('.rr-ti.is-wear', n => /괴어 MVP/.test(n.textContent)).catch(() => false), 'the MVP title taken and worn instead');
+    } else ok(await A.$eval('.rr-ti:nth-child(2) .rr-pts', n => /\+80P/.test(n.textContent)).catch(() => false), 'not the MVP: the MVP title waits');
+    ok(await A.evaluate(() => !!LSET.titles[myId()] && /괴어/.test(lsTitle(LSET.titles[myId()]))), 'the worn raid title is the one others see');
+    await A.keyboard.press('Escape'); await A.waitForTimeout(400);
+    ok(await A.$('#rd') && await A.$eval('.rd-rec', n => n.hidden).catch(() => true), 'Escape closes the record first, not the raid');
+    await A.evaluate(() => rdClose());
+    // the phone
+    await B.evaluate(() => rdOpen()); await B.waitForTimeout(900);
+    await B.click('[data-rropen]'); await B.waitForTimeout(1000);
+    ok(await B.$eval('.rd-rec', n => { const r = n.getBoundingClientRect(); return r.width <= 390 && document.documentElement.scrollWidth <= 390 && n.querySelectorAll('.rr-book li').length === 6; }).catch(() => false), 'phone: the record fits the screen');
+    await shot(B, 'r07_record_phone');
+    await B.evaluate(() => { const b = document.querySelector('.rr-body'); b.scrollTop = b.scrollHeight; }); await B.waitForTimeout(300);
+    await shot(B, 'r07b_record_phone_end');
+    // a server without the record yet
+    await post('/__sb/live_cfg', { cfg: { noRaidRec: true } });
+    await B.evaluate(() => { RR.st = null; RR.off = false; return rrLoad(true); }); await B.waitForTimeout(500);
+    ok(await B.$eval('.rd-rec', n => /서버 업데이트 뒤/.test(n.textContent)).catch(() => false), 'a server without the record: says it comes after the update');
+    await post('/__sb/live_cfg', { cfg: { noRaidRec: false } });
+    await B.evaluate(() => rdClose());
+
     /* ---------- no raid on: when the next one comes, and the last result ---------- */
     await post('/__sb/live_cfg', { raid: { every: 120, dur: 1 } });
     const off = (Date.now() % (120 * 60e3)) >= 60e3;

@@ -97,7 +97,7 @@ function rdOpen() {
   const el = document.createElement('div'); el.className = 'rd'; el.id = 'rd';
   el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); el.setAttribute('aria-label', t('rd_title'));
   el.innerHTML = `<canvas class="rd-cv" aria-hidden="true"></canvas>
-    <div class="rd-head"><button class="rd-x" data-rdclose aria-label="${esc(t('close'))}">${icon('x')}</button><div class="rd-hd"></div></div>
+    <div class="rd-head"><button class="rd-x" data-rdclose aria-label="${esc(t('close'))}">${icon('x')}</button><div class="rd-hd"></div>${APP_AUTH.live.raidRec ? `<button class="rd-recb" data-rropen>${icon('chart')}<span>${t('rr_btn')}</span><i class="rd-dot" data-rrdot hidden></i></button>` : ''}</div>
     <ol class="rd-top5" aria-label="${esc(t('rd_board'))}"></ol>
     <div class="rd-foot"><p class="rd-hint"></p><button class="rd-strike" data-rdstrike>${icon('bolt')}<span>${t('rd_strike')}</span></button><p class="rd-mine"></p></div>
     <div class="rd-end" hidden></div>`;
@@ -107,11 +107,11 @@ function rdOpen() {
     if (e.target.closest('[data-rdclose]')) rdClose();
     else if (e.target.closest('[data-rdstrike]')) rdStrike();
     else if (e.target.closest('[data-rdshare]')) rdShare(e.target.closest('[data-rdshare]'));
-    else if (e.target.classList.contains('rd-cv')) rdStrike();
+    else if (e.target.classList.contains('rd-cv') && !$('.rd-rec:not([hidden])', el)) rdStrike();
   });
-  RD.key = e => { if (e.key === 'Escape') rdClose(); else if ((e.key === ' ' || e.key === 'Enter') && !e.target.closest('button')) { e.preventDefault(); rdStrike(); } };
+  RD.key = e => { const rec = $('.rd-rec:not([hidden])', el); if (rec) { if (e.key === 'Escape') rrClose(); return; } if (e.key === 'Escape') rdClose(); else if ((e.key === ' ' || e.key === 'Enter') && !e.target.closest('button')) { e.preventDefault(); rdStrike(); } };
   document.addEventListener('keydown', RD.key);
-  rdPanel(); rdLoad(true); rdLoop();
+  rdPanel(); rdLoad(true); rdLoop(); if (typeof rrLoad === 'function') rrLoad();
   setTimeout(() => { const b = $('.rd-strike', el); if (b && !b.disabled) b.focus(); }, 60);
 }
 function rdClose() {
@@ -155,7 +155,7 @@ function rdStrike() {
     rdFx('−' + x.dmg, x.crit, true);
     if (x.crit) { RD.shake = 1; if (typeof LVS !== 'undefined') { LVS.play('snap'); LVS.buzz([25, 30, 25]); } } else if (typeof LVS !== 'undefined') LVS.buzz(15);
     if (RD.room) RD.room.send('hit', { n: S.me.nick, d: x.dmg, c: !!x.crit, hp: x.hp, max: x.max });
-    if (x.beaten && x.raid) { RD.st.raid = x.raid; if (RD.room) RD.room.send('won', {}); if (typeof LVS !== 'undefined') LVS.play('rare'); if (typeof zpLoad === 'function') zpLoad(); }
+    if (x.beaten && x.raid) { RD.st.raid = x.raid; if (RD.room) RD.room.send('won', {}); if (typeof LVS !== 'undefined') LVS.play('rare'); if (typeof zpLoad === 'function') zpLoad(); if (typeof rrLoad === 'function') setTimeout(() => rrLoad(true), 1200); }
     rdPanel();
   }).catch(e => { toast(t(e && e.code === 'need_update' ? 'zp_err_server' : 'lv_err'), 'warn'); }).finally(() => { RD.busy = false; });
 }

@@ -86,8 +86,8 @@ function seasonAct(rg) { // how lively the region's fish are in each month (abun
 function seasonScore(rg, m) { const a = seasonAct(rg); const lo = Math.min(...a), hi = Math.max(...a); return Math.round(hi > lo ? 10 + 20 * (a[m] - lo) / (hi - lo) : 20); }
 function tideScore(st) { return Math.round(30 * Math.max(.35, 1 - Math.abs(st - .62) * 1.4)); } // a moderate current suits most fishing
 function wxScore(d) { const go = wxGo(d); let v = go === 'good' ? 40 : go === 'care' ? 20 : 0; if (d.rain != null) v -= d.rain >= 70 ? 10 : d.rain >= 40 ? 5 : 0; return Math.max(0, v); }
-function fishScore(d, place) {
-  const now = new Date(); const st = TIDE.strength(TIDE.lunar(now).age);
+function fishScore(d, place, now = new Date()) { // now: another day for the week planner (planner.js)
+  const st = TIDE.strength(TIDE.lunar(now).age);
   const se = seasonScore(place.rg, now.getMonth()), ti = place.fresh ? null : tideScore(st), w = d ? wxScore(d) : null;
   let total = null;
   if (w != null) total = place.fresh ? Math.round((w + se) * 100 / 70) : w + ti + se;
@@ -168,6 +168,7 @@ function wxCardHTML() {
       ${places.length > 1 ? `<select id="wx-at" aria-label="${esc(t('wx_where'))}">${places.map(x => `<option value="${esc(x.id)}" ${x.id === sel.id ? 'selected' : ''}>${esc(x.name)}</option>`).join('')}</select>` : `<span class="fs-place">${icon('pin')}${esc(sel.name)}</span>`}
     </div>
     <div class="fs-body" id="fs-body">${fsBodyHTML(d, sel, d ? 'ok' : 'loading')}</div>
+    ${typeof plPeekHTML === 'function' ? plPeekHTML() : ''}
     <p class="hint wx-src">${t('wx_note')} · <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo.com</a></p>
   </section>`;
 }
@@ -175,6 +176,7 @@ function wxHydrate(root) {
   const card = $('#wx-card', root); if (!card) return;
   const place = wxPlaces().find(x => x.id === card.dataset.at) || wxPlaces()[0];
   const body = $('#fs-body', card);
+  if (typeof plPeekLoad === 'function') plPeekLoad(card);
   wxFetch(place.lat, place.lon).then(d => {
     if (!body.isConnected || card.dataset.at !== place.id) return;
     const open = !!$('.fs-how[open]', body);

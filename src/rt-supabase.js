@@ -244,6 +244,9 @@
     // 0027: the legendary monster raid
     raid: () => zpRpc('live_raid'),
     raidHit: (id, q) => zpRpc('live_raid_hit', { p_id: id, p_q: q }),
+    // 0028: my raid record and the raid titles
+    raidRec: () => zpRpc('live_raid_record'),
+    raidTitle: k => zpRpc('live_raid_title_claim', { p_k: k }),
     void: (wk, uid, on) => zpRpc('live_void', { p_wk: wk, p_acct: uid, p_void: on !== false })
   };
   window.APP_AUTH = { sb, session, acct, link, news, review, admin, ids, push, chat, dm, rt, account, board, zp, live: liveGame, error: () => authErr };

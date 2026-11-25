@@ -412,6 +412,31 @@ http.createServer(async (req, res) => {
         }
         return send({ data: { ok: true, dmg, crit, hp: Math.max(0, r.hp), max: r.max, beaten: !!r.beaten, raid: r.beaten ? js(r) : null, me: { d: h.d, hits: h.hits } } });
       }
+      // 0028: my raid record and the raid titles (the same counting as the SQL; cfg.noRaidRec plays a server without it)
+      if (q.name === 'live_raid_record' || q.name === 'live_raid_title_claim') {
+        if (C.noRaidRec) return send({ error: { code: 'PGRST202', message: 'Could not find the function public.' + q.name + ' in the schema cache' } });
+        const R = lvRaid(), MON = ['kue', 'ishidai', 'gt', 'tarpon', 'ishigakidai', 'hiramasa'];
+        const TT = [['raid_hunter', 'won', 1, 30], ['raid_mvp', 'mvp', 1, 80], ['raid_veteran', 'won', 10, 120], ['raid_all', 'all', 6, 200]];
+        const mine = Object.values(R.list).map(r => { const hm = R.hits[r.id] || {}, h = hm[me]; if (!h || !(h.d > 0)) return null; const hs = Object.entries(hm).sort((x, y) => y[1].d - x[1].d || x[1].f - y[1].f); return { r, h, n: hs.length, rk: hs.findIndex(([a]) => a === me) + 1 }; }).filter(Boolean).sort((a, b) => b.r.id - a.r.id);
+        const won = mine.filter(x => x.r.beaten), dex = {}; won.forEach(x => { dex[x.r.sp] = (dex[x.r.sp] || 0) + 1; });
+        const st = { joined: mine.length, won: won.length, mvp: mine.filter(x => x.r.mvp === me).length, dmg: mine.reduce((n, x) => n + x.h.d, 0), hits: mine.reduce((n, x) => n + x.h.hits, 0), crits: mine.reduce((n, x) => n + x.h.c, 0), dex };
+        const b = mine.slice().sort((x, y) => y.h.d - x.h.d || y.r.id - x.r.id)[0];
+        st.best = b ? { id: b.r.id, sp: b.r.sp, d: b.h.d, rk: b.rk } : null;
+        const nOf = m => m === 'won' ? st.won : m === 'mvp' ? st.mvp : Object.keys(dex).filter(k => MON.includes(k)).length;
+        const got = k2 => ZPS.led.some(x => x.acct === me && x.r === 'prize' && x.ref === 'set:' + k2);
+        LVS.titles = LVS.titles || {};
+        if (q.name === 'live_raid_title_claim') {
+          if (!zpNick(me)) return send({ data: { err: 'no_profile' } });
+          const x = TT.find(y => y[0] === A.p_k); if (!x) return send({ data: { err: 'no_title' } });
+          if (nOf(x[1]) < x[2]) return send({ data: { err: 'not_done' } });
+          if (!zpAdd(me, x[3], 'prize', 'set:' + x[0], x[0])) return send({ data: { err: 'already' } });
+          if (!LVS.titles[me]) LVS.titles[me] = x[0];
+          return send({ data: { ok: true, k: x[0], pts: x[3], title: LVS.titles[me], bal: ZPS.wal[me].bal } });
+        }
+        st.list = mine.slice(0, 12).map(x => { const led = ZPS.led.find(l => l.acct === me && l.r === 'prize' && l.ref === 'raid:' + x.r.id); return { id: x.r.id, sp: x.r.sp, spot: x.r.spot, won: !!x.r.beaten, mvp: x.r.mvp === me, d: x.h.d, rk: x.rk, n: x.n, at: x.r.beaten || x.r.ends, pts: led ? led.d : null }; });
+        st.monsters = MON; st.titles = TT.map(([k2, m, goal, pts]) => ({ k: k2, metric: m, goal, pts, n: Math.min(nOf(m), goal), got: got(k2) })); st.title = LVS.titles[me] || null;
+        return send({ data: st });
+      }
       // 0026: fish-book sets and titles (the same lists and rules as the SQL; cfg.noSets plays a server without them)
       if (/^live_(sets|set_claim|title_set|titles)$/.test(q.name)) {
         if (C.noSets) return send({ error: { code: 'PGRST202', message: 'Could not find the function public.' + q.name + ' in the schema cache' } });

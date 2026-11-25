@@ -62,9 +62,9 @@ const put = async (uid, sp, at = null) => {
 
 // ---------- every set is sound: fish the game knows and can land ----------
 {
-  const r = (await q(`select s.k, u.sp, x.id from private.live_sets s cross join unnest(s.sps) u(sp) left join public.live_species x on x.id = u.sp`)).rows;
+  const r = (await q(`select s.k, u.sp, x.id from private.live_sets s cross join unnest(s.sps) u(sp) left join public.live_species x on x.id = u.sp where s.kind = 'fish'`)).rows;
   check(r.every(x => x.id), 'every fish in a set is one the game knows ' + J(r.filter(x => !x.id)));
-  const far = (await q(`select s.k, u.sp from private.live_sets s cross join unnest(s.sps) u(sp) join public.live_species x on x.id = u.sp where x.water = 'S' and x.zone not in ('shore','coast','brack','shelf')`)).rows;
+  const far = (await q(`select s.k, u.sp from private.live_sets s cross join unnest(s.sps) u(sp) join public.live_species x on x.id = u.sp where s.kind = 'fish' and x.water = 'S' and x.zone not in ('shore','coast','brack','shelf')`)).rows;
   check(!far.length, 'no set asks for a far-sea fish that can never be landed ' + J(far));
   const s0 = await sets(A);
   check(s0.sets.length === 12 && s0.sets.every(s => s.n === 0 && !s.got && s.have.length === 0) && s0.title === null, 'at first nothing is done and no title is worn ' + J(s0.sets.length));
