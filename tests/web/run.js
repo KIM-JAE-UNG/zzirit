@@ -411,42 +411,26 @@ const AI_NOFISH = { fish_visible: false, candidates: [], other_en: '', other_sci
   await W.waitForTimeout(600); await W.reload(); await W.waitForTimeout(5500);
   ok(!!(await W.$('.wn')), 'an earlier member sees what changed');
   ok(!!(await W.$('#wn-id')), 'update notes offer to create a login ID');
-  ok(await W.$eval('.wn', n => /캐릭터 감정 표현/.test(n.textContent) && /더 빨리 열려요/.test(n.textContent) && !/오늘의 미션/.test(n.textContent) && /도감 세트와 칭호/.test(n.textContent) && /진짜 날씨/.test(n.textContent) && /자랑 카드/.test(n.textContent) && !/실제처럼/.test(n.textContent) && !/미니게임:|갯바위 공원 개장/.test(n.textContent) && n.querySelectorAll('.wn-list li').length <= 6), 'update notes list the newest features (at most 6 lines)');
+  ok(await W.$eval('.wn', n => n.querySelectorAll('.wn-list li').length <= 6 && /전설의 괴어 레이드/.test(n.textContent) && /나의 낚시 결산/.test(n.textContent) && /더 빨리 열려요/.test(n.textContent) && /도감 세트와 칭호/.test(n.textContent) && /잡은 고기 자랑 카드/.test(n.textContent) && !/캐릭터 감정 표현/.test(n.textContent) && !/오늘의 미션/.test(n.textContent) && !/실제처럼/.test(n.textContent) && !/미니게임:|갯바위 공원 개장/.test(n.textContent)), 'update notes list the newest features (at most 6 lines)');
   ok(await W.$eval('.wn', n => !/초기화/.test(n.textContent)), 'update notes do not claim a reset that the server has not done');
   await shot(W, 'q04_whatsnew');
   await W.click('#wn-ok'); await W.waitForTimeout(400); await W.reload(); await W.waitForTimeout(5000);
   ok(!(await W.$('.wn')), 'update notes show only once');
-  // someone who saw everything up to the tackle shop gets just the live sea and the new look
-  await W.evaluate(() => openWhatsNew('someid', '2026-11-07b')); await W.waitForTimeout(500);
-  ok(await W.$eval('.wn', n => n.querySelectorAll('.wn-list li').length === 6 && /캐릭터 감정 표현/.test(n.textContent) && /오늘의 미션/.test(n.textContent) && /진짜 날씨/.test(n.textContent) && /더 빨리 열려요/.test(n.textContent) && !/친구랑 같이 낚시/.test(n.textContent) && !/팔 수 있어요/.test(n.textContent)).catch(() => false), 'someone who last saw the tackle shop gets the six newest notes');
-  await W.click('#wn-ok').catch(() => null); await W.waitForTimeout(300);
-  await W.evaluate(() => openWhatsNew('someid', '2026-11-12a')); await W.waitForTimeout(500);
-  ok(await W.$eval('.wn', n => n.querySelectorAll('.wn-list li').length === 6 && /오늘의 미션/.test(n.textContent) && /더 빨리 열려요/.test(n.textContent) && /도감 세트/.test(n.textContent) && /캐릭터 감정 표현/.test(n.textContent) && /진짜 날씨/.test(n.textContent) && !/새 디자인/.test(n.textContent)).catch(() => false), 'after 11-12, the six newest: opens faster, sets, the brag card, the weather, emotes, missions');
-  await W.click('#wn-ok').catch(() => null); await W.waitForTimeout(300);
-  await W.evaluate(() => openWhatsNew('someid', '2026-11-13a')); await W.waitForTimeout(500);
-  ok(await W.$eval('.wn', n => n.querySelectorAll('.wn-list li').length === 6 && /자랑 카드/.test(n.textContent) && /진짜 날씨/.test(n.textContent) && /캐릭터 감정 표현/.test(n.textContent) && /도감 세트/.test(n.textContent) && /더 빨리 열려요/.test(n.textContent) && /오늘의 미션/.test(n.textContent)).catch(() => false), 'after 11-13, the six newest (opens faster first)');
-  await W.click('#wn-ok'); await W.waitForTimeout(400);
-  await W.evaluate(() => openWhatsNew('someid', '2026-11-17a')); await W.waitForTimeout(500);
-  ok(await W.$eval('.wn', n => n.querySelectorAll('.wn-list li').length === 6 && /도감 세트/.test(n.textContent) && /자랑 카드/.test(n.textContent) && /진짜 날씨/.test(n.textContent) && /캐릭터 감정 표현/.test(n.textContent) && /더 빨리 열려요/.test(n.textContent) && !/친구랑 같이 낚시/.test(n.textContent) && /오늘의 미션/.test(n.textContent)).catch(() => false), 'after 11-17, the six newest: opens faster down to the daily missions');
-  await W.click('#wn-ok'); await W.waitForTimeout(400);
-  await W.evaluate(() => openWhatsNew('someid', '2026-11-18a')); await W.waitForTimeout(500);
-  ok(await W.$eval('.wn', n => n.querySelectorAll('.wn-list li').length === 6 && /더 빨리 열려요/.test(n.textContent) && /도감 세트/.test(n.textContent) && /자랑 카드/.test(n.textContent) && /진짜 날씨/.test(n.textContent) && /오늘의 미션과 연속 출석/.test(n.textContent) && /7일째마다 \+30P/.test(n.textContent) && /캐릭터 감정 표현/.test(n.textContent)).catch(() => false), 'after the last update, only the daily missions and the streak');
-  await W.click('#wn-ok'); await W.waitForTimeout(400);
-  await W.evaluate(() => openWhatsNew('someid', '2026-11-19a')); await W.waitForTimeout(500);
-  ok(await W.$eval('.wn', n => n.querySelectorAll('.wn-list li').length === 5 && /더 빨리 열려요/.test(n.textContent) && /도감 세트/.test(n.textContent) && /자랑 카드/.test(n.textContent) && /캐릭터 감정 표현/.test(n.textContent) && /웃는 얼굴 버튼/.test(n.textContent) && /진짜 날씨/.test(n.textContent)).catch(() => false), 'after 11-19, the emotes and the weather');
-  await W.click('#wn-ok'); await W.waitForTimeout(400);
-  await W.evaluate(() => openWhatsNew('someid', '2026-11-20a')); await W.waitForTimeout(500);
-  ok(await W.$eval('.wn', n => n.querySelectorAll('.wn-list li').length === 4 && /더 빨리 열려요/.test(n.textContent) && /도감 세트/.test(n.textContent) && /라이브 지도에 진짜 날씨/.test(n.textContent) && /입질이 조금 빠르고/.test(n.textContent) && /자랑 카드/.test(n.textContent)).catch(() => false), 'after 11-20, the weather and the brag card');
-  await W.click('#wn-ok'); await W.waitForTimeout(400);
-  await W.evaluate(() => openWhatsNew('someid', '2026-11-21a')); await W.waitForTimeout(500);
-  ok(await W.$eval('.wn', n => n.querySelectorAll('.wn-list li').length === 3 && /더 빨리 열려요/.test(n.textContent) && /잡은 고기 자랑 카드/.test(n.textContent) && /스토리 크기/.test(n.textContent) && /도감 세트/.test(n.textContent)).catch(() => false), 'after 11-21, the brag card and the sets');
-  await W.click('#wn-ok'); await W.waitForTimeout(400);
-  await W.evaluate(() => openWhatsNew('someid', '2026-11-22a')); await W.waitForTimeout(500);
-  ok(await W.$eval('.wn', n => n.querySelectorAll('.wn-list li').length === 2 && /더 빨리 열려요/.test(n.textContent) && /도감 세트와 칭호/.test(n.textContent) && /12개/.test(n.textContent) && /주간 순위/.test(n.textContent)).catch(() => false), 'after 11-22, the sets and opening faster');
-  await W.click('#wn-ok'); await W.waitForTimeout(400);
-  await W.evaluate(() => openWhatsNew('someid', '2026-11-23a')); await W.waitForTimeout(500);
-  ok(await W.$eval('.wn', n => n.querySelectorAll('.wn-list li').length === 1 && /더 빨리 열려요/.test(n.textContent) && /인터넷이 끊겨도/.test(n.textContent)).catch(() => false), 'after the last update, only opening faster (and with no connection)');
-  await shot(W, 'q05_whatsnew_fast');
+  // what someone sees depends on the last notes they saw: the newest first, at most six lines
+  const wnSeen = async (seen, want, not = []) => {
+    await W.evaluate(x => openWhatsNew('someid', x), seen); await W.waitForTimeout(500);
+    const r = await W.$eval('.wn', (n, [w, x]) => n.querySelectorAll('.wn-list li').length === w.length && w.every(k => n.textContent.includes(k)) && x.every(k => !n.textContent.includes(k)), [want, not]).catch(() => false);
+    await W.click('#wn-ok').catch(() => null); await W.waitForTimeout(300); return r;
+  };
+  for (const seen of ['2026-11-07b', '2026-11-12a', '2026-11-13a', '2026-11-17a', '2026-11-18a', '2026-11-19a'])
+    ok(await wnSeen(seen, ['전설의 괴어 레이드', '나의 낚시 결산', '더 빨리 열려요', '도감 세트', '자랑 카드', '진짜 날씨'], ['캐릭터 감정 표현', '오늘의 미션', '친구랑 같이 낚시', '새 디자인']), 'after ' + seen + ': the six newest (the raid and the recap first)');
+  ok(await wnSeen('2026-11-20a', ['전설의 괴어 레이드', '나의 낚시 결산', '더 빨리 열려요', '도감 세트', '자랑 카드', '진짜 날씨'], ['캐릭터 감정 표현']), 'after 11-20: the weather down to the raid');
+  ok(await wnSeen('2026-11-21a', ['전설의 괴어 레이드', '나의 낚시 결산', '더 빨리 열려요', '도감 세트', '자랑 카드'], ['진짜 날씨']), 'after 11-21: the brag card down to the raid');
+  ok(await wnSeen('2026-11-22a', ['전설의 괴어 레이드', '나의 낚시 결산', '더 빨리 열려요', '도감 세트'], ['잡은 고기 자랑 카드']), 'after 11-22: the sets, opening faster, the raid, the recap');
+  ok(await wnSeen('2026-11-23a', ['전설의 괴어 레이드', '나의 낚시 결산', '더 빨리 열려요'], ['도감 세트와 칭호']), 'after 11-23: opening faster, the raid, the recap');
+  await W.evaluate(() => openWhatsNew('someid', '2026-11-24a')); await W.waitForTimeout(500);
+  ok(await W.$eval('.wn', n => n.querySelectorAll('.wn-list li').length === 2 && /전설의 괴어 레이드/.test(n.textContent) && /2시간마다/.test(n.textContent) && /나의 낚시 결산/.test(n.textContent) && !/더 빨리 열려요/.test(n.textContent)).catch(() => false), 'after the last update: only the raid and the recap');
+  await shot(W, 'q05_whatsnew_raid');
   await W.click('#wn-ok'); await W.waitForTimeout(400);
   // photo cache: a second visit doesn't download the same photos again
   const P = await mk('P');

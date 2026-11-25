@@ -82,8 +82,10 @@ VIEWS.home = {
         </div>
       </section>
 
+      ${raidCardHTML()}
       ${liveTeaserHTML()}
       ${msCardHTML()}
+      ${recapCardHTML()}
       ${wxCardHTML()}
       ${idTipHTML() || instTipHTML()}
       ${newsCardHTML()}
@@ -1013,7 +1015,7 @@ VIEWS.log = {
     el.innerHTML = `
     <div class="page log">
       <header class="page-head"><h1>${t('log_title')}</h1><p class="lede">${t('log_sub')}</p>
-        <div class="hero-cta"><a class="btn btn-primary" href="#scan">${icon('camera')}${t('mode_now')}</a><a class="btn btn-line" href="#past">${icon('clock')}${t('mode_past')}</a></div></header>
+        <div class="hero-cta"><a class="btn btn-primary" href="#scan">${icon('camera')}${t('mode_now')}</a><a class="btn btn-line" href="#past">${icon('clock')}${t('mode_past')}</a><button class="btn btn-line" data-rcopen>${icon('sparkle')}${t('rc_title', { y: rcYear() })}</button></div></header>
       ${cs.length ? `<div class="seg log-tabs" role="tablist">${['list', 'stats'].map(k => `<button role="tab" aria-pressed="${(S.logTab || 'list') === k}" data-logtab="${k}">${icon(k === 'list' ? 'log' : 'chart')}${t('st_tab_' + k)}</button>`).join('')}</div>` : ''}
       ${S.logTab === 'stats' && cs.length ? statsHTML() : `
       <div class="stats4 card"><div><span class="num">${fmtN(cs.length)}</span><span>${t('catches')}</span></div><div><span class="num">${fmtN(pts)}</span><span>${t('total_pts')}</span></div><div><span class="num">Lv.${myLevel()}</span><span>${esc(lvInfo(S.me, myId()).title)}</span></div><div><span class="num">${fmtN(cs.filter(c => { const x = catchState(myId(), c); return x === 'review' || x === 'hold'; }).length)}</span><span>${t('st_review')}</span></div></div>

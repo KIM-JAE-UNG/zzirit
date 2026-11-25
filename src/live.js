@@ -113,6 +113,7 @@ function lvBuild(el) {
       <button class="lv-sbtn" id="lv-loc" aria-label="${esc(t('lv_locate'))}">${icon('locate')}</button>
       <button class="lv-sbtn" id="lv-net" aria-label="${esc(t('lv_net'))}">${icon('fish')}<b class="lv-nb num" id="lv-nb" hidden></b></button>
       <button class="lv-sbtn" id="lv-book" aria-label="${esc(t('lv_book'))}">${icon('book')}</button>
+      <button class="lv-sbtn lv-rd" id="lv-rd" data-rdopen aria-label="${esc(t('rd_title'))}">${icon('bolt')}<b class="lv-nb" id="lv-rdb" hidden>!</b></button>
       <button class="lv-sbtn" id="lv-dm" aria-label="${esc(t('dm_title'))}">${icon('target')}<b class="lv-nb num" id="lv-msb" hidden></b></button>
       <button class="lv-sbtn" id="lv-inv" aria-label="${esc(t('lv_inv'))}">${icon('user-plus')}</button>
       <button class="lv-sbtn" id="lv-emo-b" aria-label="${esc(t('emo_title'))}">${icon('smile')}</button>
@@ -150,6 +151,7 @@ function lvBuild(el) {
   $('#lv-ticker', el).addEventListener('click', e => { const b = e.target.closest('[data-clap]'); if (b) lvClap(b); });
   $('#lv-net', el).addEventListener('click', () => lvBook('net'));
   $('#lv-chips', el).addEventListener('click', e => { if (e.target.closest('[data-lwx]')) lwxInfo(); });
+  if (typeof rdLoad === 'function') rdLoad().then(() => rdPaint());
   $('#lv-snd', el).addEventListener('click', e => { LVS.on = !LVS.on; lsSet('liveSnd', LVS.on); e.currentTarget.setAttribute('aria-pressed', LVS.on); if (LVS.on) LVS.play('nib'); });
   $('#lv-sub', el).addEventListener('click', e => { const b = e.target.closest('[data-lv]'); if (b) lvSub(b.dataset.lv); });
   $('#lv-cover', el).addEventListener('click', e => { const b = e.target.closest('[data-lv]'); if (b) lvSub(b.dataset.lv); });
@@ -211,6 +213,7 @@ function lvCover(k) {
   else if (k === 'server') el.innerHTML = `<div class="lv-cbox">${mark}<h2>${t('lv_title')}</h2><p>${t(LV.err === 'need_update' ? 'zp_err_server' : 'lv_err')}</p><button class="btn btn-primary btn-lg" data-lv="retry">${t('lv_retry')}</button></div>`;
   else if (k === 'profile') el.innerHTML = `<div class="lv-cbox">${mark}<h2>${t('lv_title')}</h2><p>${t('lv_need_nick')}</p><button class="btn btn-primary btn-lg" data-act="onboard">${t('lv_make_nick')}</button></div>`;
   else if (k === 'intro') el.innerHTML = `<div class="lv-cbox lv-intro">${mark}
+      <div data-rdcover>${typeof rdCoverHTML === 'function' ? rdCoverHTML() : ''}</div>
       <h2>${t('lv_intro_h')}</h2>
       <ol class="lv-steps">
         <li>${icon('pin')}<span><b>${t('lv_in1_h')}</b>${t('lv_in1_p')}</span></li>

@@ -19,6 +19,7 @@ echo "== points, weekly board, lure shop: database"; node db/points.test.mjs | t
 echo "== 찌릿 라이브: database"; node db/live.test.mjs | tail -1; [ "${PIPESTATUS[0]}" = 0 ] || fail=1
 echo "== daily missions and the streak: database"; node db/daily.test.mjs | tail -1; [ "${PIPESTATUS[0]}" = 0 ] || fail=1
 echo "== fish-book sets and titles: database"; node db/sets.test.mjs | tail -1; [ "${PIPESTATUS[0]}" = 0 ] || fail=1
+echo "== legendary monster raid: database"; node db/raid.test.mjs | tail -1; [ "${PIPESTATUS[0]}" = 0 ] || fail=1
 node web/server.js > out-web-server.log 2>&1 & WS=$!
 node claude/server.js > out-claude-server.log 2>&1 & CS=$!
 trap 'kill $WS $CS 2>/dev/null; rm -f out-web-server.log out-claude-server.log' EXIT
@@ -36,6 +37,9 @@ echo "== live: chat, 찌릿 라이브, board, leaving"; node web/live.js > out-l
 kill $WS 2>/dev/null; sleep 0.3; node web/server.js > out-web-server.log 2>&1 & WS=$!
 for i in $(seq 1 30); do curl -s -o /dev/null http://127.0.0.1:8768/index.html && break; sleep 0.3; done
 echo "== points: prizes, the lure shop, the bank option"; node web/shop.js > out-shop.txt 2>&1; grep -E '✗|CRASH|PAGEERROR|ALL PASSED|FAILED' out-shop.txt; grep -q 'ALL PASSED' out-shop.txt || fail=1
-mkdir -p out && mv -f out-web.txt out-claude.txt out-phone.txt out-live.txt out-shop.txt out/ 2>/dev/null
+kill $WS 2>/dev/null; sleep 0.3; node web/server.js > out-web-server.log 2>&1 & WS=$!
+for i in $(seq 1 30); do curl -s -o /dev/null http://127.0.0.1:8768/index.html && break; sleep 0.3; done
+echo "== the legendary raid and the year in review"; node web/raid.js > out-raid.txt 2>&1; grep -E '✗|CRASH|PAGEERROR|ALL PASSED|FAILED' out-raid.txt; grep -q 'ALL PASSED' out-raid.txt || fail=1
+mkdir -p out && mv -f out-web.txt out-claude.txt out-phone.txt out-live.txt out-shop.txt out-raid.txt out/ 2>/dev/null
 [ $fail = 0 ] && echo "ALL CHECKS PASSED" || echo "SOME CHECKS FAILED (details in tests/out/)"
 exit $fail

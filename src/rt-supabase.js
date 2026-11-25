@@ -241,6 +241,9 @@
     setClaim: k => zpRpc('live_set_claim', { p_k: k }),
     wear: k => zpRpc('live_title_set', { p_k: k || '' }),
     titles: ids => zpRpc('live_titles', { p_accts: ids }),
+    // 0027: the legendary monster raid
+    raid: () => zpRpc('live_raid'),
+    raidHit: (id, q) => zpRpc('live_raid_hit', { p_id: id, p_q: q }),
     void: (wk, uid, on) => zpRpc('live_void', { p_wk: wk, p_acct: uid, p_void: on !== false })
   };
   window.APP_AUTH = { sb, session, acct, link, news, review, admin, ids, push, chat, dm, rt, account, board, zp, live: liveGame, error: () => authErr };

@@ -1970,6 +1970,137 @@ body[data-route="live"] #main { padding-left: 0; padding-right: 0; }
 .picker-map { position: relative; }
 @media (prefers-reduced-motion: reduce) { .map-wait .spin { animation-duration: 3s; } }
 
+/* ---- 전설의 괴어 레이드 (raid.js) ---- */
+.rd-card { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 18px; align-items: center; border-radius: 22px; padding: 22px; overflow: hidden; color: #E8EDF5;
+  background: radial-gradient(120% 140% at 100% 0%, #183A72 0%, var(--night-2) 45%, var(--night) 100%); border: 1px solid rgba(124,196,255,.14); }
+.rd-card.on { background: radial-gradient(120% 140% at 0% 0%, #1F56B8 0%, #0E2C68 40%, var(--night) 100%); border-color: rgba(124,196,255,.45); box-shadow: 0 0 0 1px rgba(124,196,255,.2), 0 18px 50px -18px rgba(57,137,210,.8); }
+.rd-card h2 { font-size: 24px; color: #fff; margin: 4px 0 6px; }
+.rd-c-art { position: relative; display: grid; place-items: center; min-height: 130px; }
+.rd-c-art img { width: 100%; max-width: 340px; height: auto; filter: drop-shadow(0 0 22px rgba(124,196,255,.55)); animation: rdSway 4s ease-in-out infinite; }
+.rd-c-art.wait img { filter: brightness(.15) drop-shadow(0 0 16px rgba(124,196,255,.45)); }
+.rd-c-art i { position: absolute; inset: auto 10% -6px; height: 14px; border-radius: 50%; background: radial-gradient(closest-side, rgba(124,196,255,.35), transparent); }
+@keyframes rdSway { 50% { transform: translate(6px, -6px) rotate(-2deg); } }
+@media (prefers-reduced-motion: reduce) { .rd-c-art img { animation: none; } }
+.rd-c-eye { display: flex; align-items: center; gap: 7px; font: 600 12.5px/1.2 var(--f-disp); letter-spacing: .06em; color: var(--spark); text-transform: uppercase; }
+.rd-c-eye b { font-variant-numeric: tabular-nums; color: #fff; }
+.rd-c-sub { color: rgba(232,237,245,.8); font-size: 14px; margin-bottom: 12px; }
+.rd-c-hp { height: 10px; border-radius: 99px; background: rgba(255,255,255,.12); overflow: hidden; margin-bottom: 14px; }
+.rd-c-hp i, .rd-hp i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #E3F3FF, var(--spark) 40%, var(--azure)); box-shadow: 0 0 12px rgba(124,196,255,.8); transition: width .35s; }
+.rd-pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--spark); box-shadow: 0 0 0 0 rgba(124,196,255,.7); animation: livedot 1.4s ease-out infinite; flex: none; }
+@media (max-width: 640px) { .rd-card { grid-template-columns: 1fr; padding: 18px; gap: 6px; } .rd-c-art { min-height: 0; } .rd-c-art img { max-width: 260px; } .rd-card h2 { font-size: 21px; } }
+.lv-sbtn.lv-rd.on { color: #050A13; background: var(--spark); border-color: transparent; box-shadow: 0 0 18px rgba(124,196,255,.8); animation: rdGlow 1.6s ease-in-out infinite; }
+@keyframes rdGlow { 50% { box-shadow: 0 0 4px rgba(124,196,255,.4); } }
+.rd-toast { pointer-events: auto; }
+.rd-toast .btn { margin-left: 4px; flex: none; }
+.rd { position: fixed; inset: 0; z-index: 90; color: #E8EDF5; background: #02060F; overflow: hidden; user-select: none; -webkit-user-select: none; touch-action: manipulation; }
+.rd-cv { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: crosshair; }
+.rd-head { position: absolute; inset: 0 0 auto; padding: max(14px, env(safe-area-inset-top, 0px)) 16px 0; display: flex; justify-content: center; pointer-events: none; }
+.rd-hd { width: min(560px, 100%); text-align: center; pointer-events: auto; }
+.rd-x { position: absolute; top: max(12px, env(safe-area-inset-top, 0px)); right: max(12px, env(safe-area-inset-right, 0px)); width: 42px; height: 42px; border-radius: 14px; display: grid; place-items: center; border: 1px solid rgba(160,205,255,.18); background: rgba(5,10,19,.6); color: #E3F3FF; cursor: pointer; pointer-events: auto; z-index: 2; }
+.rd-eye { display: inline-flex; align-items: center; gap: 7px; font: 600 12.5px/1.2 var(--f-disp); letter-spacing: .1em; text-transform: uppercase; color: var(--spark); }
+.rd-hd h2 { font-size: clamp(22px, 5vw, 30px); color: #fff; margin: 6px 0 10px; }
+.rd-hp { position: relative; height: 22px; border-radius: 99px; background: rgba(255,255,255,.1); border: 1px solid rgba(160,205,255,.25); overflow: hidden; }
+.rd-hp span { position: absolute; inset: 0; display: grid; place-items: center; font-size: 12.5px; font-weight: 700; color: #050A13; mix-blend-mode: normal; text-shadow: 0 0 6px rgba(227,243,255,.8); }
+.rd-meta { display: flex; justify-content: center; align-items: center; gap: 6px; margin-top: 8px; font-size: 13.5px; color: rgba(232,237,245,.85); font-variant-numeric: tabular-nums; }
+.rd-meta .ic { width: 15px; height: 15px; }
+.rd-top5 { position: absolute; left: max(12px, env(safe-area-inset-left, 0px)); top: 40%; list-style: none; margin: 0; padding: 8px; display: flex; flex-direction: column; gap: 3px; border-radius: 14px; background: rgba(5,10,19,.55); min-width: 160px; font-size: 13px; pointer-events: none; }
+.rd-top5:empty { display: none; }
+.rd-top5 li { display: grid; grid-template-columns: 18px 1fr auto; gap: 8px; align-items: center; padding: 2px 6px; border-radius: 8px; }
+.rd-top5 li.me { background: rgba(124,196,255,.2); }
+.rd-top5 li b { color: var(--spark); }
+.rd-top5 li span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 110px; }
+.rd-foot { position: absolute; inset: auto 0 0; padding: 0 16px max(22px, env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; align-items: center; gap: 8px; pointer-events: none; }
+.rd-hint { font-size: 13.5px; color: rgba(232,237,245,.8); text-align: center; }
+.rd-strike { pointer-events: auto; display: inline-flex; align-items: center; justify-content: center; gap: 10px; width: min(320px, 100%); height: 66px; border-radius: 22px; border: 2px solid transparent; cursor: pointer; font: 700 italic 26px/1 var(--f-disp); letter-spacing: .02em; color: #050A13;
+  background: linear-gradient(180deg, #F2FAFF, #9FD3FF) padding-box, linear-gradient(140deg, #fff, var(--azure)) border-box; box-shadow: 0 10px 30px -6px rgba(124,196,255,.8); transition: transform .08s; }
+.rd-strike .ic { width: 26px; height: 26px; }
+.rd-strike:active { transform: scale(.96); }
+.rd-strike:disabled { opacity: .4; cursor: default; }
+.rd-mine { font-size: 13px; color: var(--spark); min-height: 1em; }
+.rd-end { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; text-align: center; gap: 8px; padding: 0 20px max(36px, env(safe-area-inset-bottom, 0px)); background: linear-gradient(180deg, transparent 35%, rgba(2,6,15,.88) 70%); }
+.rd-end h3 { font-size: 22px; color: #fff; }
+.rd-e-eye { font: 700 13px/1 var(--f-disp); letter-spacing: .16em; color: var(--spark); }
+.rd-e-h { font: 800 italic clamp(40px, 11vw, 64px)/1 var(--f-disp) !important; letter-spacing: -.01em; background: linear-gradient(180deg, #fff, #9FD3FF); -webkit-background-clip: text; background-clip: text; color: transparent !important; filter: drop-shadow(0 0 18px rgba(124,196,255,.6)); }
+.rd-e-h.lost { background: linear-gradient(180deg, #C9D3E0, #627087); -webkit-background-clip: text; background-clip: text; filter: none; }
+.rd-e-sub { color: rgba(232,237,245,.85); max-width: 40ch; }
+.rd-e-mvp { display: inline-flex; gap: 6px; align-items: center; padding: 6px 14px; border-radius: 99px; background: rgba(124,196,255,.16); }
+.rd-e-pts { display: flex; flex-direction: column; align-items: center; }
+.rd-e-pts b { font: 700 italic 46px/1.1 var(--f-disp); color: var(--spark); }
+.rd-e-pts span { font-size: 13px; color: rgba(232,237,245,.8); }
+.rd-e-big .ic { width: 40px; height: 40px; color: var(--spark); }
+@media (max-width: 640px) { .rd-top5 { top: auto; bottom: 170px; left: 12px; min-width: 0; font-size: 12px; } .rd-top5 li span { max-width: 84px; } }
+
+/* ---- 나의 낚시 결산 (recap.js) ---- */
+.rc-card { position: relative; display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 16px; align-items: center; border-radius: 22px; padding: 22px; overflow: hidden; color: #fff;
+  background: linear-gradient(125deg, #3989D2 0%, #1E4FA8 38%, #10285E 70%, #050A13 100%); }
+.rc-card::after { content: ""; position: absolute; inset: -40% -10% auto auto; width: 280px; height: 280px; border-radius: 50%; background: radial-gradient(closest-side, rgba(227,243,255,.35), transparent); pointer-events: none; }
+.rc-card h2 { font-size: 24px; margin: 4px 0 4px; color: #fff; }
+.rc-c-eye { display: flex; align-items: center; gap: 6px; font: 600 12.5px/1.2 var(--f-disp); letter-spacing: .08em; text-transform: uppercase; color: #E3F3FF; }
+.rc-c-sub { color: rgba(255,255,255,.88); margin-bottom: 14px; }
+.rc-c-art { position: relative; height: 140px; }
+.rc-c-art b { position: absolute; right: 0; top: 0; font: 700 italic 72px/1 var(--f-disp); color: rgba(227,243,255,.22); letter-spacing: -.02em; }
+.rc-c-art img { position: absolute; width: 150px; height: auto; filter: drop-shadow(0 6px 14px rgba(0,0,0,.35)); }
+.rc-c-art .f0 { left: 4%; top: 36%; width: 170px; } .rc-c-art .f1 { right: 0; top: 46%; width: 130px; } .rc-c-art .f2 { left: 34%; top: 2%; width: 110px; opacity: .85; }
+@media (max-width: 640px) { .rc-card { grid-template-columns: 1fr; padding: 18px; } .rc-c-art { height: 110px; order: -1; } .rc-card h2 { font-size: 21px; } }
+.rc { position: fixed; inset: 0; z-index: 90; display: grid; place-items: center; background: rgba(2,6,15,.92); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+.rc-frame { position: relative; width: min(440px, 100vw); height: min(100dvh, 860px); overflow: hidden; color: #fff; background: var(--rc-bg); transition: background .6s; }
+@media (min-width: 480px) { .rc-frame { border-radius: 26px; box-shadow: 0 30px 80px rgba(0,0,0,.6); height: min(calc(100dvh - 40px), 860px); } }
+.rc[data-bg="1"] { --rc-bg: radial-gradient(130% 80% at 20% 0%, #2B6CD4 0%, #10285E 45%, #050A13 100%); }
+.rc[data-bg="2"] { --rc-bg: radial-gradient(120% 90% at 80% 10%, #3989D2 0%, #123A7A 50%, #06122A 100%); }
+.rc[data-bg="3"] { --rc-bg: linear-gradient(180deg, #0B2450 0%, #0A3C6E 55%, #062A4A 100%); }
+.rc[data-bg="4"] { --rc-bg: radial-gradient(110% 90% at 50% 30%, #1A5B8F 0%, #0B1730 70%); }
+.rc[data-bg="5"] { --rc-bg: linear-gradient(160deg, #E3F3FF 0%, #9FD3FF 40%, #3989D2 100%); color: #050A13; }
+.rc[data-bg="6"] { --rc-bg: radial-gradient(120% 90% at 50% 0%, #15294B 0%, #050A13 75%); }
+.rc[data-bg="7"] { --rc-bg: radial-gradient(130% 100% at 0% 100%, #1E66E5 0%, #0E2C68 45%, #050A13 100%); }
+.rc[data-bg="8"] { --rc-bg: conic-gradient(from 210deg at 50% 45%, #050A13, #1E4FA8, #7CC4FF, #1E4FA8, #050A13); }
+.rc[data-bg="5"] .rc-frame { color: #050A13; }
+.rc-bars-top { position: absolute; inset: max(10px, env(safe-area-inset-top, 0px)) 12px auto; display: flex; gap: 4px; z-index: 3; }
+.rc-bars-top i { flex: 1; height: 3px; border-radius: 3px; background: rgba(255,255,255,.3); overflow: hidden; }
+.rc-bars-top b { display: block; height: 100%; width: 0; background: #fff; }
+.rc[data-bg="5"] .rc-bars-top i { background: rgba(5,10,19,.2); } .rc[data-bg="5"] .rc-bars-top b { background: #050A13; }
+.rc-x { position: absolute; top: max(22px, calc(env(safe-area-inset-top, 0px) + 12px)); right: 12px; z-index: 4; width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; border: 0; background: rgba(0,0,0,.25); color: inherit; cursor: pointer; }
+.rc-nav { position: absolute; top: 70px; bottom: 120px; z-index: 2; width: 35%; border: 0; background: transparent; cursor: pointer; }
+.rc-nav.prev { left: 0; } .rc-nav.next { right: 0; width: 65%; }
+.rc-slide { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 80px 28px 60px; text-align: center; }
+.rc-in { display: flex; flex-direction: column; align-items: center; gap: 12px; width: 100%; animation: rcIn .6s cubic-bezier(.2,.8,.2,1) both; }
+.rc-in > * { animation: rcIn .7s cubic-bezier(.2,.8,.2,1) both; } .rc-in > *:nth-child(2) { animation-delay: .12s; } .rc-in > *:nth-child(3) { animation-delay: .24s; } .rc-in > *:nth-child(4) { animation-delay: .36s; } .rc-in > *:nth-child(5) { animation-delay: .48s; }
+@keyframes rcIn { from { opacity: 0; transform: translateY(18px) scale(.98); } }
+@media (prefers-reduced-motion: reduce) { .rc-in, .rc-in > * { animation: none; } }
+.rc-eye { font: 600 13px/1.2 var(--f-disp); letter-spacing: .14em; text-transform: uppercase; opacity: .85; }
+.rc-yr { font: 700 italic 120px/1 var(--f-disp) !important; letter-spacing: -.03em; background: linear-gradient(180deg, #fff, #7CC4FF); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.rc-big { font-size: 24px; font-weight: 700; line-height: 1.35; }
+.rc-sm { font-size: 13px; opacity: .75; }
+.rc-h { font-size: 30px; line-height: 1.2; }
+.rc-h.xl { font-size: 38px; }
+.rc-p { font-size: 16px; opacity: .9; max-width: 30ch; line-height: 1.55; }
+.rc-num { font: 700 italic 110px/1 var(--f-disp) !important; letter-spacing: -.02em; color: #E3F3FF; text-shadow: 0 0 30px rgba(124,196,255,.6); }
+.rc-num.sm { font-size: 72px !important; }
+.rc-num small { font-size: .38em; margin-left: 6px; }
+.rc-fish img { width: min(320px, 80vw); height: auto; filter: drop-shadow(0 0 26px rgba(124,196,255,.55)); animation: rdSway 4s ease-in-out infinite; }
+.rc-fish.sm img { width: min(260px, 70vw); }
+.rc-ico .ic { width: 64px; height: 64px; color: #7CC4FF; } .rc-ico.big .ic { width: 88px; height: 88px; color: #E3F3FF; filter: drop-shadow(0 0 20px rgba(124,196,255,.8)); }
+.rc-bars { display: grid; grid-template-columns: repeat(12, 1fr); gap: 5px; align-items: end; width: 100%; height: 180px; margin: 10px 0; }
+.rc-bars span { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; gap: 4px; }
+.rc-bars i { display: block; width: 100%; height: calc(4% + var(--v) * 96%); border-radius: 6px 6px 3px 3px; background: rgba(5,10,19,.28); transform-origin: bottom; animation: rcBar .8s cubic-bezier(.2,.8,.2,1) both; }
+.rc-bars span.on i { background: #050A13; }
+.rc-bars b { font-size: 11px; font-weight: 600; opacity: .75; }
+@keyframes rcBar { from { transform: scaleY(0); } }
+.rc-tag { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 99px; background: rgba(227,243,255,.16); font-weight: 600; }
+.rc-sum { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; }
+.rc-sum p { display: flex; flex-direction: column; align-items: flex-start; padding: 14px 16px; border-radius: 16px; background: rgba(227,243,255,.1); border: 1px solid rgba(227,243,255,.14); text-align: left; min-width: 0; }
+.rc-sum p.wide { grid-column: 1 / -1; }
+.rc-sum b { font-size: 30px; line-height: 1.1; } .rc-sum b.num { font: 700 italic 38px/1.05 var(--f-disp); color: #E3F3FF; }
+.rc-sum span { font-size: 13px; opacity: .8; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+.rc-cta { position: relative; z-index: 3; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 10px; }
+.rd-strip { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; padding: 12px 14px; margin-bottom: 14px; border-radius: 16px; cursor: pointer; color: #fff; border: 1px solid rgba(124,196,255,.5);
+  background: linear-gradient(120deg, #1F56B8, #0E2C68); box-shadow: 0 0 22px -6px rgba(124,196,255,.8); }
+.rd-strip span:nth-child(2) { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.rd-strip small { color: rgba(227,243,255,.8); font-size: 12.5px; }
+.rd-strip > .ic { color: var(--spark); width: 22px; height: 22px; }
+/* the slide sits above the tap areas but lets taps through, except on its own buttons */
+.rc-slide { z-index: 3; pointer-events: none; }
+.rc-slide a, .rc-slide button { pointer-events: auto; }
+
 </style>
 <div class="app">
   <aside class="rail">
@@ -3816,6 +3947,102 @@ Object.assign(T, {
   map_need_net: ['지도를 열려면 인터넷이 필요해요.', 'The map needs an internet connection.', '地図を開くにはインターネット接続が必要です。', '打开地图需要网络连接。'],
   wn_fast_h: ['더 빨리 열려요', 'Opens faster', 'すばやく開きます', '打开更快'],
   wn_fast_p: ['처음 화면에 필요 없는 지도 부품은 지도를 열 때만 받아요. 인터넷이 끊겨도 앱이 열리고, 이 기기에 있는 기록을 볼 수 있어요.', 'Map parts the first screen does not need now load only when you open a map. The app also opens with no connection and shows what is saved on this device.', '最初の画面に要らない地図の部品は、地図を開いたときだけ読み込みます。オフラインでもアプリが開き、この端末の記録を見られます。', '首屏用不到的地图组件只在打开地图时才加载。断网时也能打开应用，查看本机保存的记录。']
+});
+
+/* ===== 전설의 괴어 레이드 (raid.js) and 나의 낚시 결산 (recap.js). [ko, en, ja, zh] ===== */
+Object.assign(T, {
+  zp_r_raid: ['전설의 괴어 레이드 보상', 'Legendary raid reward', '伝説の怪魚レイド報酬', '传说怪鱼团战奖励'],
+  zp_r_raid_mvp: ['전설의 괴어 레이드 MVP', 'Legendary raid MVP', '伝説の怪魚レイドMVP', '传说怪鱼团战MVP'],
+  rd_card_p0: ['{spot}에 나타났어요. 아직 아무도 싸우지 않았어요. 첫 챔질의 주인공이 되어 보세요!', 'Spotted off {spot}. Nobody has struck yet — be the first!', '{spot}に現れました。まだ誰も戦っていません。最初のアワセを!', '出现在{spot}。还没有人出手，来当第一个扬竿的人吧！'],
+  rd_strip_p: ['위치 없이 어디서든 바로 참가할 수 있어요', 'Join right now from anywhere — no location needed', '位置情報なしでどこからでもすぐ参加できます', '无需定位，随时随地立即参加'],
+  rd_title: ['전설의 괴어 레이드', 'Legendary Monster Raid', '伝説の怪魚レイド', '传说怪鱼团战'],
+  rd_live: ['지금 출현', 'Live now', '出現中', '正在出现'],
+  rd_card_h: ['전설의 괴어 {fish} 출현!', 'A legendary {fish} has surfaced!', '伝説の怪魚 {fish} 出現!', '传说怪鱼 {fish} 出现了!'],
+  rd_card_p: ['{spot}에 나타났어요. 지금 {n}명이 함께 싸우는 중. 어디서든 참가할 수 있어요.', 'Spotted off {spot}. {n} anglers are fighting it right now — join from anywhere.', '{spot}に現れました。いま{n}人が一緒に戦っています。どこからでも参加できます。', '出现在{spot}。现在有{n}人正在一起战斗，在哪里都能参加。'],
+  rd_join: ['지금 참가', 'Join the fight', '今すぐ参加', '立即参加'],
+  rd_next: ['다음 출현까지', 'Next one in', '次の出現まで', '距离下次出现'],
+  rd_wait_h: ['괴어가 깊은 곳에서 잠들어 있어요', 'The monster is sleeping in the deep', '怪魚は深海で眠っています', '怪鱼正在深海沉睡'],
+  rd_wait_p: ['2시간마다 전설의 괴어가 나타나요. 모두 함께 힘을 모아 잡으면 포인트와 MVP 영광이!', 'Every two hours a legendary monster surfaces. Beat it together for points — and MVP glory.', '2時間ごとに伝説の怪魚が現れます。みんなで力を合わせて倒せばポイントとMVPの栄光が!', '每2小时出现一条传说怪鱼。大家齐心协力打败它，就能获得积分和MVP荣耀！'],
+  rd_last_won: ['지난 괴어 {fish}: {n}명이 처치! MVP는 {mvp}', 'Last time: {n} anglers beat the {fish}! MVP: {mvp}', '前回の{fish}: {n}人で撃破! MVPは{mvp}', '上次的{fish}：{n}人合力击败！MVP是{mvp}'],
+  rd_last_lost: ['지난 괴어 {fish}는 도망갔어요. 이번엔 꼭!', 'The last {fish} got away. Not this time!', '前回の{fish}は逃げました。今度こそ!', '上次的{fish}逃走了。这次一定要抓住！'],
+  rd_peek: ['둘러보기', 'Take a look', 'のぞいてみる', '看看'],
+  rd_toast: ['전설의 괴어 {fish}가 {spot}에 나타났어요!', 'A legendary {fish} surfaced off {spot}!', '伝説の怪魚{fish}が{spot}に出現!', '传说怪鱼{fish}出现在{spot}！'],
+  rd_board: ['피해 순위', 'Damage board', 'ダメージ順位', '伤害排名'],
+  rd_strike: ['챔질!', 'STRIKE!', 'アワセ!', '扬竿!'],
+  rd_name: ['괴어 {fish}', 'Monster {fish}', '怪魚 {fish}', '怪鱼 {fish}'],
+  rd_n: ['{n}명 참가', '{n} fighting', '{n}人参加', '{n}人参加'],
+  rd_hint: ['밖의 링이 가운데 원에 딱 겹칠 때 누르면 크리티컬! (스페이스 키도 돼요)', 'Strike when the ring meets the circle for a critical hit! (Space works too)', 'リングが中央の円に重なった瞬間でクリティカル!(スペースキーでも)', '外圈与中心圆重合的瞬间扬竿即可暴击！(也可按空格键)'],
+  rd_mine: ['내 피해 {d} · {r}위', 'My damage {d} · #{r}', '自分のダメージ {d} · {r}位', '我的伤害 {d} · 第{r}名'],
+  rd_first: ['첫 챔질로 싸움에 들어가요', 'Your first strike puts you in the fight', '最初のアワセで参戦します', '第一次扬竿即加入战斗'],
+  rd_wait_long: ['2시간마다 나타나 20분 동안 머물러요. 출현하면 앱 안에서 알려 드려요.', 'It surfaces every two hours and stays for 20 minutes. The app tells you when it appears.', '2時間ごとに現れ、20分間とどまります。出現したらアプリでお知らせします。', '每2小时出现一次，停留20分钟。出现时会在应用里通知你。'],
+  rd_won_eye: ['LEGENDARY RAID CLEAR', 'LEGENDARY RAID CLEAR', 'LEGENDARY RAID CLEAR', 'LEGENDARY RAID CLEAR'],
+  rd_won_h: ['괴어 처치!', 'Monster down!', '怪魚撃破!', '怪鱼被击败!'],
+  rd_won_p: ['{n}명이 힘을 모아 전설의 {fish}를 잡았어요.', '{n} anglers brought the legendary {fish} down together.', '{n}人が力を合わせて伝説の{fish}を仕留めました。', '{n}人齐心协力钓起了传说中的{fish}。'],
+  rd_mvp_me: ['내가 MVP! 도감에 올렸어요', "That's me! It's in my fish book", '自分がMVP! 図鑑に登録しました', '我是MVP！已收入图鉴'],
+  rd_won_late: ['이번엔 늦었어요. 다음 괴어는 함께 잡아요!', 'Too late this time — catch the next one with everyone!', '今回は間に合いませんでした。次はみんなで!', '这次晚了一步，下次一起来抓吧！'],
+  rd_share: ['레이드 자랑하기', 'Share the raid', 'レイドを自慢する', '分享团战'],
+  rd_lost_eye: ['IT GOT AWAY', 'IT GOT AWAY', 'IT GOT AWAY', 'IT GOT AWAY'],
+  rd_lost_h: ['도망갔어요…', 'It got away…', '逃げられた…', '逃走了…'],
+  rd_lost_p: ['전설의 {fish}가 깊은 곳으로 사라졌어요. 친구를 불러 다음엔 꼭 잡아요!', 'The legendary {fish} vanished into the deep. Bring friends next time!', '伝説の{fish}は深海へ消えました。次は友だちを誘って!', '传说中的{fish}消失在深海。下次叫上朋友一起抓！'],
+  rd_crit: ['크리티컬!', 'CRIT!', 'クリティカル!', '暴击!'],
+  rd_story_dmg: ['내 피해량 · {r}위', 'my damage · #{r}', '自分のダメージ · {r}位', '我的伤害 · 第{r}名'],
+  rd_story_text: ['찌릿 레이드에서 전설의 괴어 {fish}를 잡았어요! 다음 괴어는 같이 잡아요', 'We took down a legendary {fish} in a ZZIRIT raid! Join the next one', 'ZZIRITレイドで伝説の怪魚{fish}を倒しました! 次は一緒に', '在ZZIRIT团战中击败了传说怪鱼{fish}！下次一起来'],
+  rd_story_sub: ['스토리 크기 그림이에요. 친구에게 보내 다음 레이드에 불러요.', 'A story-sized picture. Send it to friends and bring them to the next raid.', 'ストーリーサイズの画像です。友だちに送って次のレイドに誘いましょう。', '快拍尺寸的图片。发给朋友，邀请他们参加下次团战。'],
+  rd_spot_jeju: ['제주 남쪽 바다', 'south of Jeju', '済州島の南の海', '济州岛南部海域'], rd_spot_dokdo: ['독도 앞바다', 'off Dokdo', '独島沖', '独岛近海'],
+  rd_spot_busan: ['부산 앞바다', 'off Busan', '釜山沖', '釜山近海'], rd_spot_yeosu: ['여수 바다', 'the Yeosu sea', '麗水の海', '丽水海域'],
+  rd_spot_ulleung: ['울릉도 바다', 'off Ulleungdo', '鬱陵島沖', '郁陵岛海域'], rd_spot_taean: ['태안 앞바다', 'off Taean', '泰安沖', '泰安近海'],
+  rd_spot_okinawa: ['오키나와 바다', 'off Okinawa', '沖縄の海', '冲绳海域'], rd_spot_tokyo: ['도쿄만', 'Tokyo Bay', '東京湾', '东京湾'],
+  rd_spot_hongkong: ['홍콩 바다', 'off Hong Kong', '香港の海', '香港海域'], rd_spot_hawaii: ['하와이 바다', 'off Hawaii', 'ハワイの海', '夏威夷海域'],
+  rd_spot_sydney: ['시드니 앞바다', 'off Sydney', 'シドニー沖', '悉尼近海'], rd_spot_florida: ['플로리다 키스', 'the Florida Keys', 'フロリダ・キーズ', '佛罗里达群岛'],
+
+  rc_title: ['{y} 나의 낚시 결산', 'My {y} in fishing', '{y} わたしの釣り総決算', '{y} 我的钓鱼年度总结'],
+  rc_eye: ['연말 결산', 'Year in review', '年末総決算', '年度回顾'],
+  rc_card_p: ['올해 {n}마리, {s}가지 어종. 당신의 한 해를 이야기로 보여 드릴게요.', '{n} fish and {s} species this year. Here is your year, told as a story.', '今年は{n}匹、{s}種。あなたの一年をストーリーでお見せします。', '今年钓了{n}条、{s}种鱼。用故事带你回顾这一年。'],
+  rc_card_empty: ['아직 올해 기록이 없어요. 첫 고기를 올리면 결산이 채워져요.', 'No catches yet this year. Log your first fish and your recap fills up.', '今年の記録はまだありません。最初の一匹で総決算が始まります。', '今年还没有记录。登记第一条鱼，年度总结就开始了。'],
+  rc_open: ['결산 보기', 'Watch my recap', '総決算を見る', '查看总结'],
+  rc_intro: ['{nick}님의 한 해 바다,<br>지금부터 돌아볼게요', "{nick}, let's look back<br>at your year on the water", '{nick}さんの一年の海を<br>振り返りましょう', '{nick}，一起回顾<br>你这一年的海'],
+  rc_tap: ['화면 오른쪽을 누르면 다음, 꾹 누르면 멈춰요', 'Tap the right side for next, hold to pause', '右側タップで次へ、長押しで一時停止', '点右侧下一页，长按暂停'],
+  rc_empty_h: ['올해의 첫 고기를 기다려요', 'Waiting for your first fish of the year', '今年最初の一匹を待っています', '在等今年的第一条鱼'],
+  rc_empty_p: ['사진으로 조과를 올리거나 찌릿 라이브에서 낚으면, 여기가 당신의 이야기로 채워져요.', 'Log a catch with a photo or land one in ZZIRIT Live, and this fills with your story.', '写真で釣果を登録するかZZIRITライブで釣ると、ここがあなたの物語で埋まります。', '用照片登记渔获或在ZZIRIT实况中钓鱼，这里就会写满你的故事。'],
+  rc_count_eye: ['{y}년, 당신이 낚은 물고기', 'Fish you landed in {y}', '{y}年、あなたが釣った魚', '{y}年你钓到的鱼'],
+  rc_count_unit: ['마리', 'fish', '匹', '条'],
+  rc_count_p: ['{s}가지 어종 · 사진 기록 {photo} · 라이브 {live}', '{s} species · {photo} logged · {live} in Live', '{s}種 · 写真記録{photo} · ライブ{live}', '{s}种鱼 · 照片记录{photo} · 实况{live}'],
+  rc_big_eye: ['올해 가장 큰 고기', 'Your biggest fish this year', '今年いちばん大きな魚', '今年最大的鱼'],
+  rc_fav_eye: ['올해의 단짝 물고기', 'Your fish of the year', '今年の相棒', '年度最佳搭档鱼'],
+  rc_fav_p: ['{n}번이나 만났어요. 바다가 맺어 준 인연이에요.', 'You met {n} times. The sea must want you two together.', '{n}回も出会いました。海が結んだ縁です。', '遇见了{n}次，这是大海牵的缘分。'],
+  rc_mo_eye: ['가장 바빴던 달', 'Your busiest month', 'いちばん忙しかった月', '最忙的月份'],
+  rc_mo_h: ['{m}의 바다가 가장 뜨거웠어요', '{m} was your hottest month', '{m}の海がいちばん熱かった', '{m}的海最火热'],
+  rc_mo_p: ['올해 {n}개월 동안 물가에 섰어요.', 'You were out on the water in {n} months this year.', '今年は{n}か月、水辺に立ちました。', '今年有{n}个月站在水边。'],
+  rc_hr_eye: ['당신이 낚시하는 시간', 'When you fish', 'あなたの釣りの時間', '你钓鱼的时间'],
+  rc_hr_0: ['해 뜨기 전 새벽형', 'A dawn angler', '夜明け前の朝まずめ派', '黎明型钓手'],
+  rc_hr_1: ['햇살 아래 낮 낚시형', 'A daylight angler', '日中の釣り派', '白天型钓手'],
+  rc_hr_2: ['노을 지는 저녁형', 'A sunset angler', '夕まずめ派', '黄昏型钓手'],
+  rc_hr_3: ['밤바다 야간형', 'A night angler', '夜釣り派', '夜钓型钓手'],
+  rc_hr_p: ['조과의 {p}%가 이 시간에 나왔어요.', '{p}% of your catches came at this time.', '釣果の{p}%がこの時間帯でした。', '{p}%的渔获出自这个时段。'],
+  rc_live_unit: ['종 라이브 도감', 'species in your Live book', '種のライブ図鑑', '种实况图鉴'],
+  rc_live_p: ['찌릿 라이브에서 {n}마리를 낚았어요.', 'You landed {n} fish in ZZIRIT Live.', 'ZZIRITライブで{n}匹釣りました。', '在ZZIRIT实况中钓到{n}条。'],
+  rc_legend: ['전설급 {n}종', '{n} legendary species', '伝説級{n}種', '传说级{n}种'],
+  rc_type_eye: ['올해의 당신은', 'This year, you were', '今年のあなたは', '今年的你是'],
+  rc_type_legend: ['전설 사냥꾼', 'The Legend Hunter', '伝説ハンター', '传说猎手'], rc_type_legend_p: ['아무나 만나지 못하는 전설의 물고기를 손에 넣었어요.', 'You held a fish most anglers only hear stories about.', '誰もが出会えるわけではない伝説の魚を手にしました。', '你钓到了大多数人只在传说里听过的鱼。'],
+  rc_type_giant: ['대물 헌터', 'The Giant Hunter', '大物ハンター', '巨物猎手'], rc_type_giant_p: ['평균보다 훨씬 큰 녀석을 끌어올렸어요. 손맛이 남다르죠.', 'You pulled up one far bigger than usual. You know the feeling.', '平均よりずっと大きな一匹を釣り上げました。', '你钓起了远超平均尺寸的大家伙。'],
+  rc_type_collector: ['도감 수집가', 'The Collector', '図鑑コレクター', '图鉴收藏家'], rc_type_collector_p: ['여러 바다의 다양한 물고기를 모았어요. 도감이 풍성해요.', 'So many different fish — your book is full of stories.', 'いろいろな魚を集めました。図鑑がにぎやかです。', '收集了各种各样的鱼，图鉴非常丰富。'],
+  rc_type_dawn: ['새벽의 낚시꾼', 'The Dawn Patrol', '夜明けの釣り人', '黎明钓手'], rc_type_dawn_p: ['모두 잠든 시간, 당신은 물가에 있었어요.', 'While everyone slept, you were by the water.', '皆が眠る時間、あなたは水辺にいました。', '在大家熟睡时，你已在水边。'],
+  rc_type_night: ['밤바다의 주인', 'The Night Owl', '夜の海の主', '夜海之主'], rc_type_night_p: ['캄캄한 밤바다가 당신의 무대였어요.', 'The dark sea was your stage.', '真っ暗な夜の海があなたの舞台でした。', '漆黑的夜海是你的舞台。'],
+  rc_type_steady: ['꾸준한 조사', 'The Regular', 'コツコツ釣り師', '坚持型钓手'], rc_type_steady_p: ['계절이 바뀌어도 꾸준히 물가에 섰어요.', 'Season after season, you kept showing up.', '季節が変わってもコツコツ水辺に立ちました。', '四季更替，你始终坚持站在水边。'],
+  rc_type_live: ['라이브 고수', 'The Live Pro', 'ライブの達人', '实况高手'], rc_type_live_p: ['찌릿 라이브의 진짜 바다를 누볐어요.', 'You owned the real map in ZZIRIT Live.', 'ZZIRITライブの本物の海を駆け回りました。', '你在ZZIRIT实况的真实海面上纵横驰骋。'],
+  rc_type_rookie: ['떠오르는 신인', 'The Rising Star', '期待の新人', '新星钓手'], rc_type_rookie_p: ['이제 막 시작했지만, 내년이 더 기대돼요.', "You've only just started — next year looks big.", '始めたばかり。来年がもっと楽しみです。', '刚刚起步，明年更值得期待。'],
+  rc_type_new: ['내년의 주인공', "Next year's star", '来年の主役', '明年的主角'], rc_type_new_p: ['첫 고기가 당신을 기다리고 있어요.', 'Your first fish is waiting for you.', '最初の一匹があなたを待っています。', '第一条鱼正在等你。'],
+  rc_sum_sp: ['가지 어종', 'species', '種', '种'],
+  rc_share: ['결산 카드 공유', 'Share my recap', '総決算カードを共有', '分享年度卡片'],
+  rc_again: ['처음부터', 'Watch again', '最初から', '重新看'],
+  rc_prev: ['이전', 'Previous', '前へ', '上一页'], rc_next: ['다음', 'Next', '次へ', '下一页'],
+  rc_story_text: ['나의 {y} 낚시 결산: {n}마리! 너의 한 해는?', 'My {y} in fishing: {n} fish! How was yours?', 'わたしの{y}釣り総決算: {n}匹! あなたは?', '我的{y}钓鱼总结：{n}条！你呢？'],
+  rc_story_sub: ['스토리 크기 그림이에요. 장소는 넣지 않았어요.', 'A story-sized picture, with no places on it.', 'ストーリーサイズの画像です。場所は入っていません。', '快拍尺寸的图片，不包含地点。'],
+
+  wn_raid_h: ['전설의 괴어 레이드', 'Legendary Monster Raid', '伝説の怪魚レイド', '传说怪鱼团战'],
+  wn_raid_p: ['2시간마다 거대한 전설의 괴어가 나타나요. 어디서든 모두 함께 챔질해 잡으면 포인트, MVP는 도감에!', 'Every two hours a giant legendary fish surfaces. Strike together from anywhere for points — the MVP gets it in their book!', '2時間ごとに巨大な伝説の怪魚が出現。どこからでもみんなでアワセて倒せばポイント、MVPは図鑑に!', '每2小时出现一条巨大的传说怪鱼。在哪里都能一起扬竿击败它，获得积分，MVP还能收入图鉴！'],
+  wn_recap_h: ['나의 낚시 결산', 'Your year in fishing', 'わたしの釣り総決算', '我的钓鱼年度总结'],
+  wn_recap_p: ['올해 낚은 고기·가장 큰 고기·단짝 물고기·나는 어떤 낚시꾼인지 이야기로 보고 카드로 자랑해요.', 'Your fish, your biggest, your fish of the year and what kind of angler you are — as a story, with a card to share.', '今年の釣果・いちばん大きな魚・相棒の魚・あなたのタイプをストーリーで見てカードで自慢。', '用故事回顾今年的渔获、最大的鱼、搭档鱼和你的钓手类型，并用卡片分享。']
 });
 
 /* ===== Tackle dictionaries: [ko, en, ja, zh] ===== */
@@ -7948,7 +8175,7 @@ function openShareCard(blob, name, text, opt) {
 }
 
 /* ===== What's new: shown once after a big update (website only; needs the matching server update) ===== */
-const WHATS_NEW = '2026-11-24a', WN_TS = Date.parse('2026-11-07T03:00:00Z'); // people who joined after this have nothing to catch up on
+const WHATS_NEW = '2026-11-25a', WN_TS = Date.parse('2026-11-07T03:00:00Z'); // people who joined after this have nothing to catch up on
 const BOOT_AT = Date.now();
 /* what each update brought, newest last; people see what came after the last one they saw (at most 6 lines) */
 const WN_ITEMS = [
@@ -7967,7 +8194,8 @@ const WN_ITEMS = [
   ['2026-11-21a', 'cloud', 'wn_lwx'],
   ['2026-11-22a', 'share', 'wn_story'],
   ['2026-11-23a', 'medal', 'wn_sets'],
-  ['2026-11-24a', 'bolt', 'wn_fast']
+  ['2026-11-24a', 'bolt', 'wn_fast'],
+  ['2026-11-25a', 'bolt', 'wn_raid'], ['2026-11-25a', 'sparkle', 'wn_recap']
 ];
 // the new look already says the fish were redrawn
 const WN_PART = { wn_fish: 'wn_look' };
@@ -8132,8 +8360,10 @@ VIEWS.home = {
         </div>
       </section>
 
+      ${raidCardHTML()}
       ${liveTeaserHTML()}
       ${msCardHTML()}
+      ${recapCardHTML()}
       ${wxCardHTML()}
       ${idTipHTML() || instTipHTML()}
       ${newsCardHTML()}
@@ -9063,7 +9293,7 @@ VIEWS.log = {
     el.innerHTML = `
     <div class="page log">
       <header class="page-head"><h1>${t('log_title')}</h1><p class="lede">${t('log_sub')}</p>
-        <div class="hero-cta"><a class="btn btn-primary" href="#scan">${icon('camera')}${t('mode_now')}</a><a class="btn btn-line" href="#past">${icon('clock')}${t('mode_past')}</a></div></header>
+        <div class="hero-cta"><a class="btn btn-primary" href="#scan">${icon('camera')}${t('mode_now')}</a><a class="btn btn-line" href="#past">${icon('clock')}${t('mode_past')}</a><button class="btn btn-line" data-rcopen>${icon('sparkle')}${t('rc_title', { y: rcYear() })}</button></div></header>
       ${cs.length ? `<div class="seg log-tabs" role="tablist">${['list', 'stats'].map(k => `<button role="tab" aria-pressed="${(S.logTab || 'list') === k}" data-logtab="${k}">${icon(k === 'list' ? 'log' : 'chart')}${t('st_tab_' + k)}</button>`).join('')}</div>` : ''}
       ${S.logTab === 'stats' && cs.length ? statsHTML() : `
       <div class="stats4 card"><div><span class="num">${fmtN(cs.length)}</span><span>${t('catches')}</span></div><div><span class="num">${fmtN(pts)}</span><span>${t('total_pts')}</span></div><div><span class="num">Lv.${myLevel()}</span><span>${esc(lvInfo(S.me, myId()).title)}</span></div><div><span class="num">${fmtN(cs.filter(c => { const x = catchState(myId(), c); return x === 'review' || x === 'hold'; }).length)}</span><span>${t('st_review')}</span></div></div>
@@ -11843,7 +12073,7 @@ const zlSpec = L => Array.isArray(L.spec) ? dict(L.spec) : L.spec;
 function zpNews() {
   const led = (ZP.st && ZP.st.led) || []; if (!led.length || !zpMine()) return;
   const top = Math.max(...led.map(x => +x.id || 0)), seen = lsGet('zpSeen', null);
-  const fresh = led.filter(x => +x.id > (+seen || 0) && x.d > 0 && x.r !== 'buy' && !/^(day|mis|visit|set):/.test(x.ref || '') && (seen != null || nowMs() - Date.parse(x.at) < 3 * DAY_MS));
+  const fresh = led.filter(x => +x.id > (+seen || 0) && x.d > 0 && x.r !== 'buy' && !/^(day|mis|visit|set|raid):/.test(x.ref || '') && (seen != null || nowMs() - Date.parse(x.at) < 3 * DAY_MS));
   lsSet('zpSeen', top);
   if (fresh.length) setTimeout(() => zpCelebrate(fresh), 700);
 }
@@ -11854,6 +12084,7 @@ function zpWhy(x) {
   if (/^day:/.test(x.ref || '')) return t('zp_r_live');
   if (/^visit:/.test(x.ref || '')) return t('zp_r_visit', { n: x.n });
   if (/^mis:/.test(x.ref || '')) return t('zp_r_mis');
+  if (/^raid:/.test(x.ref || '')) return t(x.n === 'raid mvp' ? 'zp_r_raid_mvp' : 'zp_r_raid');
   if (/^set:/.test(x.ref || '')) return t('zp_r_set', { s: lsName(String(x.ref).slice(4)) });
   if (x.r === 'prize') return t(live ? 'zp_r_prize_live' : 'zp_r_prize', { n: x.n, w: zpWeekName(wk) });
   if (x.r === 'join') return t('zp_r_join', { w: zpWeekName(wk) });
@@ -12547,6 +12778,7 @@ function lvBuild(el) {
       <button class="lv-sbtn" id="lv-loc" aria-label="${esc(t('lv_locate'))}">${icon('locate')}</button>
       <button class="lv-sbtn" id="lv-net" aria-label="${esc(t('lv_net'))}">${icon('fish')}<b class="lv-nb num" id="lv-nb" hidden></b></button>
       <button class="lv-sbtn" id="lv-book" aria-label="${esc(t('lv_book'))}">${icon('book')}</button>
+      <button class="lv-sbtn lv-rd" id="lv-rd" data-rdopen aria-label="${esc(t('rd_title'))}">${icon('bolt')}<b class="lv-nb" id="lv-rdb" hidden>!</b></button>
       <button class="lv-sbtn" id="lv-dm" aria-label="${esc(t('dm_title'))}">${icon('target')}<b class="lv-nb num" id="lv-msb" hidden></b></button>
       <button class="lv-sbtn" id="lv-inv" aria-label="${esc(t('lv_inv'))}">${icon('user-plus')}</button>
       <button class="lv-sbtn" id="lv-emo-b" aria-label="${esc(t('emo_title'))}">${icon('smile')}</button>
@@ -12584,6 +12816,7 @@ function lvBuild(el) {
   $('#lv-ticker', el).addEventListener('click', e => { const b = e.target.closest('[data-clap]'); if (b) lvClap(b); });
   $('#lv-net', el).addEventListener('click', () => lvBook('net'));
   $('#lv-chips', el).addEventListener('click', e => { if (e.target.closest('[data-lwx]')) lwxInfo(); });
+  if (typeof rdLoad === 'function') rdLoad().then(() => rdPaint());
   $('#lv-snd', el).addEventListener('click', e => { LVS.on = !LVS.on; lsSet('liveSnd', LVS.on); e.currentTarget.setAttribute('aria-pressed', LVS.on); if (LVS.on) LVS.play('nib'); });
   $('#lv-sub', el).addEventListener('click', e => { const b = e.target.closest('[data-lv]'); if (b) lvSub(b.dataset.lv); });
   $('#lv-cover', el).addEventListener('click', e => { const b = e.target.closest('[data-lv]'); if (b) lvSub(b.dataset.lv); });
@@ -12645,6 +12878,7 @@ function lvCover(k) {
   else if (k === 'server') el.innerHTML = `<div class="lv-cbox">${mark}<h2>${t('lv_title')}</h2><p>${t(LV.err === 'need_update' ? 'zp_err_server' : 'lv_err')}</p><button class="btn btn-primary btn-lg" data-lv="retry">${t('lv_retry')}</button></div>`;
   else if (k === 'profile') el.innerHTML = `<div class="lv-cbox">${mark}<h2>${t('lv_title')}</h2><p>${t('lv_need_nick')}</p><button class="btn btn-primary btn-lg" data-act="onboard">${t('lv_make_nick')}</button></div>`;
   else if (k === 'intro') el.innerHTML = `<div class="lv-cbox lv-intro">${mark}
+      <div data-rdcover>${typeof rdCoverHTML === 'function' ? rdCoverHTML() : ''}</div>
       <h2>${t('lv_intro_h')}</h2>
       <ol class="lv-steps">
         <li>${icon('pin')}<span><b>${t('lv_in1_h')}</b>${t('lv_in1_p')}</span></li>
@@ -13859,6 +14093,476 @@ document.addEventListener('click', e => {
   const c = e.target.closest('[data-lsclaim]'); if (c) { e.preventDefault(); lsClaim(c); return; }
   const w = e.target.closest('[data-lswear]'); if (w) { e.preventDefault(); lsWear(w); }
 });
+
+/* ===== 전설의 괴어 레이드: a giant legendary fish comes up every two hours for 20 minutes, and everyone fights it
+   together from anywhere. A ring closes in on its weak spot: strike when the ring meets the circle (the server decides
+   the damage from how well-timed it was). Everyone's strikes show up live (a realtime channel for the raid); the server
+   is asked again every few seconds for the true strength. Beaten in time: everyone gets points by share, the MVP more.
+   Website only (the server keeps the raid: 0027). ===== */
+const RD = { st: null, at: 0, skew: 0, p: null, err: null, el: null, room: null, roomId: null, raf: 0, fx: [], ph0: 0, busy: false, poll: 0, shake: 0, end: null, last: 0, seen: lsGet('rdSeen', 0) };
+const RD_RING = 1150; // ms for the ring to close
+const rdOn = () => typeof lvOn === 'function' && lvOn() && !!(APP_AUTH.live && APP_AUTH.live.raid) && !!(S.me && S.me.nick);
+const rdNow = () => Date.now() + RD.skew;
+const rdRaid = () => (RD.st && RD.st.raid) || null;
+const rdActive = (r = rdRaid()) => !!r && !r.beaten && rdNow() < r.ends && rdNow() >= r.starts;
+const rdSpot = k => t('rd_spot_' + k) || k;
+function rdClock(ms) {
+  ms = Math.max(0, ms); const s = Math.floor(ms / 1000), h = Math.floor(s / 3600), m = Math.floor(s / 60) % 60, x = s % 60;
+  return (h ? h + ':' + String(m).padStart(2, '0') : String(m)) + ':' + String(x).padStart(2, '0');
+}
+function rdLoad(force) {
+  if (!rdOn()) return Promise.resolve(null);
+  if (RD.p) return RD.p;
+  if (!force && RD.st && Date.now() - RD.at < 25000) return Promise.resolve(RD.st);
+  RD.p = APP_AUTH.live.raid().then(r => {
+    if (!r) return null;
+    const was = rdRaid();
+    RD.st = r; RD.at = Date.now(); RD.skew = (r.now || Date.now()) - Date.now(); RD.err = null;
+    // my own last strike may be newer than what the server sent a moment ago: keep the lower strength
+    if (was && r.raid && was.id === r.raid.id && !r.raid.beaten && was.hp < r.raid.hp && Date.now() - RD.last < 2500) r.raid.hp = was.hp;
+    rdPaint(); return r;
+  }).catch(e => { RD.err = (e && e.code) || 'err'; return null; }).finally(() => { RD.p = null; });
+  return RD.p;
+}
+
+/* --- the home card and the live button --- */
+function raidCardHTML() {
+  if (!rdOn()) return '';
+  if (!RD.st && !RD.p && !RD.err) rdLoad();
+  if (!RD.st) return '';
+  return `<section class="rd-card${rdActive() ? ' on' : ''}" data-rdcard aria-label="${esc(t('rd_title'))}">${rdCardBody()}</section>`;
+}
+function rdCardBody() {
+  const r = rdRaid(), st = RD.st, sp = r && SPI[r.sp];
+  if (rdActive(r) && sp) {
+    const pc = Math.round(100 * r.hp / Math.max(1, r.max));
+    return `<div class="rd-c-art" aria-hidden="true"><img src="${FD.thumb(sp, 360, 190)}" alt=""><i></i></div>
+      <div class="rd-c-txt">
+        <p class="rd-c-eye"><span class="rd-pulse"></span>${t('rd_live')} · <b data-rdcount="end">${rdClock(r.ends - rdNow())}</b></p>
+        <h2>${t('rd_card_h', { fish: esc(spName(sp)) })}</h2>
+        <p class="rd-c-sub">${t(r.n ? 'rd_card_p' : 'rd_card_p0', { spot: esc(rdSpot(r.spot)), n: r.n })}</p>
+        <div class="rd-c-hp" role="meter" aria-valuemin="0" aria-valuemax="${r.max}" aria-valuenow="${r.hp}" aria-label="HP"><i style="width:${pc}%"></i></div>
+        <button class="btn btn-light" data-rdopen>${icon('bolt')}${t('rd_join')}</button>
+      </div>`;
+  }
+  const l = st.last, lsp = l && SPI[l.sp];
+  return `<div class="rd-c-art wait" aria-hidden="true">${r && SPI[r.sp] ? `<img src="${FD.thumb(SPI[r.sp], 360, 190)}" alt="">` : `<img src="${FD.thumb(SPI.kue || SPI.kurodai, 360, 190)}" alt="">`}<i></i></div>
+    <div class="rd-c-txt">
+      <p class="rd-c-eye">${icon('clock')}${t('rd_next')} · <b data-rdcount="next">${rdClock(st.next - rdNow())}</b></p>
+      <h2>${t('rd_wait_h')}</h2>
+      <p class="rd-c-sub">${lsp ? (l.beaten ? t('rd_last_won', { fish: esc(spName(lsp)), mvp: esc(l.mvpNick || '?'), n: l.n }) : t('rd_last_lost', { fish: esc(spName(lsp)) })) : t('rd_wait_p')}</p>
+      <button class="btn btn-glass" data-rdopen>${icon('eye')}${t('rd_peek')}</button>
+    </div>`;
+}
+// a strip on the live map's first screen while a raid is on
+function rdCoverHTML() {
+  const r = rdRaid(), sp = r && SPI[r.sp]; if (!rdActive(r) || !sp) return '';
+  return `<button class="rd-strip" data-rdopen><span class="rd-pulse"></span><span><b>${t('rd_card_h', { fish: esc(spName(sp)) })}</b><small>${t('rd_strip_p')}</small></span>${icon('bolt')}</button>`;
+}
+function rdPaint() {
+  $$('[data-rdcover]').forEach(el => { el.innerHTML = rdCoverHTML(); });
+  $$('[data-rdcard]').forEach(el => { el.classList.toggle('on', rdActive()); el.innerHTML = rdCardBody(); });
+  if (S.route === 'home' && !$('[data-rdcard]') && RD.st) rerenderSoon();
+  const b = $('#lv-rdb'); if (b) b.hidden = !rdActive();
+  const lb = $('#lv-rd'); if (lb) lb.classList.toggle('on', rdActive());
+  if (RD.el) rdPanel();
+}
+// the countdowns, every second; a new raid (or the end of one) asks the server again
+setInterval(() => {
+  if (!RD.st) return;
+  const r = rdRaid(), now = rdNow();
+  $$('[data-rdcount]').forEach(n => { n.textContent = rdClock((n.dataset.rdcount === 'end' ? (r ? r.ends : 0) : RD.st.next) - now); });
+  if ((r && !r.beaten && now >= r.ends) || (!rdActive() && now >= RD.st.next)) { if (Date.now() - RD.at > 4000) rdLoad(true); }
+  else if (document.visibilityState === 'visible' && Date.now() - RD.at > (RD.el ? 3000 : 60000) && (S.route === 'home' || S.route === 'live' || RD.el)) rdLoad(true);
+  // once a raid is on: one note per raid (a toast with a button), so nobody misses it
+  if (rdActive(r) && RD.seen !== r.id && !RD.el && S.ready && !$('.modal-wrap.in')) { RD.seen = r.id; lsSet('rdSeen', r.id); rdToast(r); }
+}, 1000);
+function rdToast(r) {
+  const sp = SPI[r.sp]; if (!sp) return;
+  const root = $('#toast-root'); if (!root) return;
+  const el = document.createElement('div'); el.className = 'toast toast-info rd-toast'; el.setAttribute('role', 'status');
+  el.innerHTML = `${icon('bolt')}<span>${esc(t('rd_toast', { fish: spName(sp), spot: rdSpot(r.spot) }))}</span><button class="btn btn-sm btn-primary" data-rdopen>${t('rd_join')}</button>`;
+  root.appendChild(el); requestAnimationFrame(() => el.classList.add('in'));
+  setTimeout(() => { el.classList.remove('in'); setTimeout(() => el.remove(), 300); }, 9000);
+}
+
+/* --- the raid screen --- */
+function rdOpen() {
+  if (!rdOn()) { toast(t(S.me && S.me.nick ? 'lv_web_only' : 'dm_need_profile'), 'warn'); return; }
+  if (RD.el) return;
+  const el = document.createElement('div'); el.className = 'rd'; el.id = 'rd';
+  el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); el.setAttribute('aria-label', t('rd_title'));
+  el.innerHTML = `<canvas class="rd-cv" aria-hidden="true"></canvas>
+    <div class="rd-head"><button class="rd-x" data-rdclose aria-label="${esc(t('close'))}">${icon('x')}</button><div class="rd-hd"></div></div>
+    <ol class="rd-top5" aria-label="${esc(t('rd_board'))}"></ol>
+    <div class="rd-foot"><p class="rd-hint"></p><button class="rd-strike" data-rdstrike>${icon('bolt')}<span>${t('rd_strike')}</span></button><p class="rd-mine"></p></div>
+    <div class="rd-end" hidden></div>`;
+  document.body.appendChild(el); document.body.classList.add('has-modal');
+  RD.el = el; RD.end = null; RD.fx = []; RD.ph0 = performance.now();
+  el.addEventListener('click', e => {
+    if (e.target.closest('[data-rdclose]')) rdClose();
+    else if (e.target.closest('[data-rdstrike]')) rdStrike();
+    else if (e.target.closest('[data-rdshare]')) rdShare(e.target.closest('[data-rdshare]'));
+    else if (e.target.classList.contains('rd-cv')) rdStrike();
+  });
+  RD.key = e => { if (e.key === 'Escape') rdClose(); else if ((e.key === ' ' || e.key === 'Enter') && !e.target.closest('button')) { e.preventDefault(); rdStrike(); } };
+  document.addEventListener('keydown', RD.key);
+  rdPanel(); rdLoad(true); rdLoop();
+  setTimeout(() => { const b = $('.rd-strike', el); if (b && !b.disabled) b.focus(); }, 60);
+}
+function rdClose() {
+  if (!RD.el) return;
+  cancelAnimationFrame(RD.raf); document.removeEventListener('keydown', RD.key);
+  RD.el.remove(); RD.el = null; document.body.classList.remove('has-modal');
+  if (RD.room) { RD.room.leave(); RD.room = null; RD.roomId = null; }
+  rdPaint();
+}
+// join the raid's live channel (everyone's strikes as they happen)
+function rdJoin(r) {
+  if (!r || RD.roomId === r.id || !(APP_AUTH.rt && APP_AUTH.rt.room)) return;
+  if (RD.room) RD.room.leave();
+  RD.roomId = r.id;
+  RD.room = APP_AUTH.rt.room('raid-' + r.id, myId(), {
+    events: ['hit', 'won'],
+    msg(ev, p) {
+      const cur = rdRaid(); if (!cur || cur.id !== r.id) return;
+      if (ev === 'hit') {
+        const d = Math.max(0, Math.min(99, +p.d || 0)); if (!d) return;
+        if (+p.hp >= 0 && +p.hp < cur.hp) cur.hp = +p.hp;
+        if (+p.max > cur.max && +p.max < cur.max + 5000) cur.max = +p.max;
+        rdFx(String(p.n || t('lv_someone')).slice(0, 16) + ' −' + d, !!p.c, false);
+        rdPanel();
+      } else if (ev === 'won') rdLoad(true);
+    }
+  });
+}
+// how well-timed a strike is now: 1 when the ring meets the circle
+function rdQ(now = performance.now()) { const ph = ((now - RD.ph0) % RD_RING) / RD_RING; return Math.max(0, 1 - Math.abs(1 - ph) * 2.2) * (ph > .5 ? 1 : 0) || 0; }
+function rdStrike() {
+  const r = rdRaid(); if (!RD.el || !rdActive(r) || RD.busy) return;
+  const q = +rdQ().toFixed(3); RD.busy = true; RD.ph0 = performance.now(); RD.last = Date.now();
+  if (typeof LVS !== 'undefined') LVS.play('pull');
+  APP_AUTH.live.raidHit(r.id, q).then(x => {
+    if (!x) return;
+    if (x.err === 'fast') return;
+    if (x.err === 'no_profile') { toast(t('dm_need_profile'), 'warn'); return; }
+    if (x.err) { if (x.raid) RD.st.raid = x.raid; rdLoad(true); rdPanel(); return; }
+    r.hp = x.hp; r.max = x.max; r.me = Object.assign({}, r.me || {}, x.me);
+    rdFx('−' + x.dmg, x.crit, true);
+    if (x.crit) { RD.shake = 1; if (typeof LVS !== 'undefined') { LVS.play('snap'); LVS.buzz([25, 30, 25]); } } else if (typeof LVS !== 'undefined') LVS.buzz(15);
+    if (RD.room) RD.room.send('hit', { n: S.me.nick, d: x.dmg, c: !!x.crit, hp: x.hp, max: x.max });
+    if (x.beaten && x.raid) { RD.st.raid = x.raid; if (RD.room) RD.room.send('won', {}); if (typeof LVS !== 'undefined') LVS.play('rare'); if (typeof zpLoad === 'function') zpLoad(); }
+    rdPanel();
+  }).catch(e => { toast(t(e && e.code === 'need_update' ? 'zp_err_server' : 'lv_err'), 'warn'); }).finally(() => { RD.busy = false; });
+}
+function rdFx(txt, big, mine) {
+  const W = innerWidth, H = innerHeight;
+  RD.fx.push({ txt, big, mine, t0: performance.now(), x: W / 2 + (Math.random() - .5) * Math.min(W * .6, 360) + (mine ? 0 : 40), y: H * .42 + (Math.random() - .5) * 80 });
+  if (RD.fx.length > 30) RD.fx.shift();
+}
+// the words and numbers around the picture
+function rdPanel() {
+  const el = RD.el; if (!el) return;
+  const st = RD.st, r = rdRaid(), sp = r && SPI[r.sp], hd = $('.rd-hd', el), on = rdActive(r);
+  if (!st) { hd.innerHTML = `<p class="rd-eye">${t('rd_title')}</p><h2>${t('lv_loading')}</h2>`; $('.rd-strike', el).disabled = true; return; }
+  if (r && sp) {
+    const pc = Math.max(0, Math.min(100, 100 * r.hp / Math.max(1, r.max)));
+    hd.innerHTML = `<p class="rd-eye">${on ? `<span class="rd-pulse"></span>${t('rd_live')}` : t('rd_title')} · ${esc(rdSpot(r.spot))}</p>
+      <h2>${t('rd_name', { fish: esc(spName(sp)) })}</h2>
+      <div class="rd-hp" role="meter" aria-label="HP" aria-valuemin="0" aria-valuemax="${r.max}" aria-valuenow="${r.hp}"><i style="width:${pc}%"></i><span class="num">${fmtN(r.hp)} / ${fmtN(r.max)}</span></div>
+      <p class="rd-meta">${on ? `${icon('clock')}<b data-rdcount="end">${rdClock(r.ends - rdNow())}</b> · ` : ''}${icon('users')}${t('rd_n', { n: r.n })}</p>`;
+    rdJoin(on ? r : null);
+  } else {
+    hd.innerHTML = `<p class="rd-eye">${t('rd_title')}</p><h2>${t('rd_wait_h')}</h2>
+      <p class="rd-meta">${icon('clock')}${t('rd_next')} <b data-rdcount="next">${rdClock(st.next - rdNow())}</b></p>`;
+  }
+  const top = (r && r.top) || [];
+  $('.rd-top5', el).innerHTML = top.map((x, i) => `<li class="${x.a === myId() ? 'me' : ''}"><b class="num">${i + 1}</b><span>${esc(x.nick || t('lv_someone'))}</span><i class="num">${fmtN(x.d)}</i></li>`).join('');
+  const b = $('.rd-strike', el); b.disabled = !on;
+  $('.rd-hint', el).textContent = on ? t('rd_hint') : '';
+  const me = r && r.me;
+  $('.rd-mine', el).innerHTML = on ? (me ? t('rd_mine', { d: fmtN(me.d), r: me.rk || '-' }) : t('rd_first')) : '';
+  // the end: beaten, got away, or nothing on now
+  const end = $('.rd-end', el);
+  let k = !r ? 'wait' : r.beaten ? 'won' : rdNow() >= r.ends ? 'lost' : null;
+  if (!r && st.last && rdNow() - st.last.ends < 10 * 60e3) k = st.last.beaten ? 'won' : 'lost';
+  const rr = r || st.last;
+  if (k === RD.end && k !== 'won') return;
+  RD.end = k; end.hidden = !k; $('.rd-foot', el).hidden = !!k;
+  if (!k) return;
+  if (k === 'wait') { end.innerHTML = `<p class="rd-e-big">${icon('clock')}</p><h3>${t('rd_wait_h')}</h3><p>${t('rd_wait_long')}</p><button class="btn btn-line" data-rdclose>${t('close')}</button>`; return; }
+  const fsp = rr && SPI[rr.sp];
+  if (k === 'won') {
+    const mine = rr.me && rr.me.d > 0;
+    end.innerHTML = `<p class="rd-e-eye">${t('rd_won_eye')}</p><h3 class="rd-e-h">${t('rd_won_h')}</h3>
+      <p class="rd-e-sub">${t('rd_won_p', { fish: esc(fsp ? spName(fsp) : ''), n: rr.n })}</p>
+      <p class="rd-e-mvp">${icon('trophy')}MVP <b>${esc(rr.mvpNick || '?')}</b>${rr.mvp === myId() ? ` · ${t('rd_mvp_me')}` : ''}</p>
+      ${mine ? `<p class="rd-e-pts"><b class="num">+${fmtN(rr.pts || 0)}P</b><span>${t('rd_mine', { d: fmtN(rr.me.d), r: rr.me.rk })}</span></p>` : `<p class="rd-e-sub">${t('rd_won_late')}</p>`}
+      <div class="actions">${mine ? `<button class="btn btn-primary" data-rdshare>${icon('share')}${t('rd_share')}</button>` : ''}<button class="btn btn-glass" data-rdclose>${t('close')}</button></div>`;
+    if (mine && rr.pts == null) setTimeout(() => rdLoad(true), 1500);
+  } else {
+    end.innerHTML = `<p class="rd-e-eye">${t('rd_lost_eye')}</p><h3 class="rd-e-h lost">${t('rd_lost_h')}</h3>
+      <p class="rd-e-sub">${t('rd_lost_p', { fish: esc(fsp ? spName(fsp) : '') })}</p>
+      <p class="rd-meta">${icon('clock')}${t('rd_next')} <b data-rdcount="next">${rdClock(st.next - rdNow())}</b></p>
+      <div class="actions"><button class="btn btn-glass" data-rdclose>${t('close')}</button></div>`;
+  }
+}
+// the picture: the deep sea, the monster swaying, the ring on its weak spot, the line, the numbers
+function rdLoop() {
+  const el = RD.el; if (!el) return;
+  const cv = $('.rd-cv', el), dpr = Math.min(2, devicePixelRatio || 1), W = innerWidth, H = innerHeight;
+  if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
+  const g = cv.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const now = performance.now(), T = now / 1000, r = rdRaid(), sp = (r && SPI[r.sp]) || (RD.st && RD.st.last && SPI[RD.st.last.sp]) || SPI.kue, on = rdActive(r);
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const bg = g.createLinearGradient(0, 0, 0, H); bg.addColorStop(0, '#0B2450'); bg.addColorStop(.55, '#06122A'); bg.addColorStop(1, '#02060F');
+  g.fillStyle = bg; g.fillRect(0, 0, W, H);
+  // light from the surface
+  g.save(); g.globalCompositeOperation = 'lighter';
+  for (let i = 0; i < 5; i++) { const x = W * (.15 + i * .18) + Math.sin(T * .3 + i) * 30; const gr = g.createLinearGradient(x, 0, x + 80, H * .8); gr.addColorStop(0, 'rgba(124,196,255,.10)'); gr.addColorStop(1, 'rgba(124,196,255,0)'); g.fillStyle = gr; g.beginPath(); g.moveTo(x - 30, 0); g.lineTo(x + 50, 0); g.lineTo(x + 160, H * .8); g.lineTo(x + 20, H * .8); g.closePath(); g.fill(); }
+  g.restore();
+  // bubbles
+  for (let i = 0; i < 26; i++) { const s = (i * 97.3) % 1, x = (i * 0.137 % 1) * W, y = H - ((T * (18 + s * 30) + i * 61) % (H + 40)); g.beginPath(); g.arc(x + Math.sin(T + i) * 6, y, 1.5 + s * 3, 0, 6.3); g.strokeStyle = 'rgba(180,220,255,.25)'; g.stroke(); }
+  // the monster
+  const size = Math.min(W * .86, H * .62, 620), shake = RD.shake > 0 ? (RD.shake -= .06, RD.shake * 10) : 0;
+  const cx = W / 2 + (reduce ? 0 : Math.sin(T * .7) * W * .05) + (Math.random() - .5) * shake, cy = H * .46 + (reduce ? 0 : Math.sin(T * 1.1) * 10) + (Math.random() - .5) * shake;
+  const hpF = r && r.max ? r.hp / r.max : 1;
+  // its presence: slow rings of light around it
+  if (!reduce) { g.save(); g.globalCompositeOperation = 'lighter'; for (let i = 0; i < 3; i++) { const k = ((T * .35 + i / 3) % 1); g.beginPath(); g.ellipse(cx, cy, size * (.45 + k * .35), size * (.18 + k * .16), 0, 0, 6.3); g.strokeStyle = `rgba(124,196,255,${(1 - k) * (on ? .22 : .1)})`; g.lineWidth = 2; g.stroke(); } g.restore(); }
+  g.save();
+  g.shadowColor = on ? 'rgba(124,196,255,.65)' : 'rgba(124,196,255,.3)'; g.shadowBlur = 40;
+  if (!on && !(r && r.beaten)) g.globalAlpha = .55;
+  try { FD.draw(g, sp, cx, cy, size, { t: reduce ? 0 : T, still: reduce }); } catch (e) { }
+  g.restore();
+  // the eye glows harder as it weakens
+  if (on) { g.save(); g.globalCompositeOperation = 'lighter'; const ex = cx + size * .33, ey = cy - size * .02, gl = g.createRadialGradient(ex, ey, 0, ex, ey, 26 + (1 - hpF) * 20); gl.addColorStop(0, 'rgba(227,243,255,.9)'); gl.addColorStop(1, 'rgba(124,196,255,0)'); g.fillStyle = gl; g.beginPath(); g.arc(ex, ey, 46, 0, 6.3); g.fill(); g.restore(); }
+  // the line from the bottom to its mouth
+  const mx = cx + size * .44, my = cy + size * .04;
+  g.beginPath(); g.moveTo(W / 2, H + 10); g.quadraticCurveTo(W / 2 + Math.sin(T * 6) * (on ? 14 : 4), H * .75, mx, my);
+  g.strokeStyle = 'rgba(227,243,255,.8)'; g.lineWidth = 1.6; g.stroke();
+  // the weak spot and the ring closing in on it
+  if (on) {
+    const wx = cx + size * .06, wy = cy - size * .02, R0 = 26, ph = ((now - RD.ph0) % RD_RING) / RD_RING, rr = R0 + 90 * (1 - ph), q = rdQ(now);
+    g.beginPath(); g.arc(wx, wy, R0, 0, 6.3); g.lineWidth = 3; g.strokeStyle = 'rgba(227,243,255,.95)'; g.stroke();
+    g.beginPath(); g.arc(wx, wy, R0 * .35, 0, 6.3); g.fillStyle = q > .85 ? '#E3F3FF' : 'rgba(124,196,255,.7)'; g.fill();
+    g.beginPath(); g.arc(wx, wy, rr, 0, 6.3); g.lineWidth = q > .85 ? 6 : 3; g.strokeStyle = q > .85 ? 'rgba(227,243,255,1)' : `rgba(124,196,255,${.35 + ph * .55})`; g.shadowColor = '#7CC4FF'; g.shadowBlur = q > .85 ? 24 : 8; g.stroke(); g.shadowBlur = 0;
+  }
+  // the numbers flying up
+  RD.fx = RD.fx.filter(f => now - f.t0 < 1300);
+  for (const f of RD.fx) {
+    const a = (now - f.t0) / 1300; g.globalAlpha = 1 - a * a;
+    g.font = `italic 700 ${f.mine ? (f.big ? 54 : 36) : (f.big ? 26 : 18)}px "Chakra Petch", system-ui, sans-serif`; g.textAlign = 'center';
+    g.fillStyle = f.mine ? (f.big ? '#FFFFFF' : '#E3F3FF') : 'rgba(180,215,250,.9)'; g.shadowColor = '#7CC4FF'; g.shadowBlur = f.big ? 20 : 6;
+    g.fillText((f.big && f.mine ? t('rd_crit') + ' ' : '') + f.txt, f.x, f.y - a * 90); g.shadowBlur = 0;
+  }
+  g.globalAlpha = 1;
+  // beaten: sparks
+  if (r && r.beaten) { g.save(); g.globalCompositeOperation = 'lighter'; for (let i = 0; i < 40; i++) { const a = i * 2.4 + T * .6, d = ((T * 120 + i * 37) % 320); g.fillStyle = `rgba(227,243,255,${1 - d / 320})`; g.fillRect(W / 2 + Math.cos(a) * d, H * .42 + Math.sin(a) * d, 3, 3); } g.restore(); }
+  RD.raf = requestAnimationFrame(rdLoop);
+}
+
+/* --- a story-sized picture to show off the win (1080×1920, drawn here) --- */
+async function rdShare(btn) {
+  const r = (RD.st && (RD.st.raid || RD.st.last)); if (!r || !SPI[r.sp]) return;
+  if (btn) { if (btn.disabled) return; btn.disabled = true; }
+  try {
+    const sp = SPI[r.sp], W = 1080, H = 1920, P = 72;
+    const SANS = '"IBM Plex Sans KR", "IBM Plex Sans JP", "Noto Sans SC", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif', DISP = '"Chakra Petch", ' + SANS;
+    const cv = document.createElement('canvas'); cv.width = W; cv.height = H; const g = cv.getContext('2d');
+    const bg = g.createLinearGradient(0, 0, 0, H); bg.addColorStop(0, '#123A7A'); bg.addColorStop(.5, '#0B1730'); bg.addColorStop(1, '#050A13'); g.fillStyle = bg; g.fillRect(0, 0, W, H);
+    const gl = g.createRadialGradient(W / 2, 820, 0, W / 2, 820, 640); gl.addColorStop(0, 'rgba(124,196,255,.5)'); gl.addColorStop(1, 'rgba(124,196,255,0)'); g.fillStyle = gl; g.fillRect(0, 0, W, H);
+    g.textAlign = 'center'; g.fillStyle = '#7CC4FF'; g.font = `700 44px ${DISP}`; g.fillText('LEGENDARY RAID', W / 2, 220);
+    g.fillStyle = '#FFFFFF'; g.font = `800 96px ${SANS}`; g.fillText(fitText(g, t('rd_won_h'), W - P * 2), W / 2, 340);
+    g.save(); g.shadowColor = 'rgba(124,196,255,.8)'; g.shadowBlur = 60; FD.draw(g, sp, W / 2, 820, 900, { still: true }); g.restore();
+    g.fillStyle = '#FFFFFF'; g.font = `700 76px ${SANS}`; g.fillText(fitText(g, t('rd_name', { fish: spName(sp) }), W - P * 2), W / 2, 1250);
+    g.fillStyle = '#A9BBCF'; g.font = `500 40px ${SANS}`; g.fillText(fitText(g, `${rdSpot(r.spot)} · ${t('rd_n', { n: r.n })}`, W - P * 2), W / 2, 1320);
+    if (r.me) { g.fillStyle = '#7CC4FF'; g.font = `italic 700 170px ${DISP}`; g.fillText(fmtN(r.me.d), W / 2, 1540); g.fillStyle = '#E3F3FF'; g.font = `600 42px ${SANS}`; g.fillText(fitText(g, t('rd_story_dmg', { r: r.me.rk }) + (r.mvp === myId() ? ' · MVP' : ''), W - P * 2), W / 2, 1610); }
+    g.fillStyle = '#A9BBCF'; g.font = `500 36px ${SANS}`; g.fillText(fitText(g, `${S.me.nick || ''} · ${fmtDate(r.beaten || nowMs())}`, W - P * 2), W / 2, 1700);
+    g.fillStyle = 'rgba(255,255,255,.14)'; g.fillRect(P, H - 132, W - P * 2, 2);
+    g.textAlign = 'left'; g.fillStyle = '#FFFFFF'; g.font = `800 38px ${SANS}`; g.fillText(`${APP_NAME[0]} ${APP_NAME[1]}`, P, H - 72);
+    g.textAlign = 'right'; g.fillStyle = '#7F95AD'; g.font = `500 30px ${SANS}`; g.fillText(SITE_URL.replace(/^https?:\/\//, '').replace(/\/$/, ''), W - P, H - 72);
+    const blob = await new Promise(res => cv.toBlob(b => res(b), 'image/jpeg', .9));
+    await shareImage(blob, `zzirit-raid-${r.sp}.jpg`, t('rd_story_text', { fish: spName(sp) }), { tall: true, title: 'rd_share', sub: 'rd_story_sub' });
+  } catch (e) { console.warn(e); toast(t('share_fail'), 'warn'); }
+  finally { if (btn) btn.disabled = false; }
+}
+document.addEventListener('click', e => { const b = e.target.closest('[data-rdopen]'); if (b && !b.closest('#rd')) { e.preventDefault(); rdOpen(); } });
+
+/* ===== 나의 낚시 결산: the year told as a story (like the year-end recaps of music apps), from my own records only.
+   The photo log (catches registered this year that were not refused) and, on the website, the live fish book.
+   Full-screen slides that move on by themselves (tap right: next, left: back, hold: pause), the numbers count up, and
+   the last slide is a picture to share (1080×1920). Nothing leaves the device except what the person chooses to share,
+   and the picture holds no places. ===== */
+const RC = { el: null, i: 0, slides: [], d: null, t0: 0, raf: 0, hold: false, live: null };
+const RC_MS = 5200;
+const rcYear = () => new Date(nowMs()).getFullYear();
+function rcData(year = rcYear()) {
+  const cs = myCatches().filter(c => c && c.st !== 'no' && SPI[c.sp] && new Date(c.ts || c.at || 0).getFullYear() === year);
+  const by = {}, months = Array(12).fill(0), hours = [0, 0, 0, 0]; // dawn 4–8, day 8–16, evening 16–20, night
+  let big = null, bigRel = null;
+  for (const c of cs) {
+    by[c.sp] = (by[c.sp] || 0) + 1;
+    const d = new Date(c.ts || c.at); months[d.getMonth()]++;
+    const h = d.getHours(); hours[h >= 4 && h < 8 ? 0 : h >= 8 && h < 16 ? 1 : h >= 16 && h < 20 ? 2 : 3]++;
+    if (c.len && (!big || c.len > big.len)) big = c;
+    const typ = SPI[c.sp].L; if (c.len && typ && (!bigRel || c.len / typ > bigRel.r)) bigRel = { c, r: c.len / typ };
+  }
+  const dex = (RC.live && RC.live.dex) || [];
+  const liveN = dex.reduce((n, x) => n + (+x.n || 0), 0);
+  const allSp = new Set([...Object.keys(by), ...dex.map(x => x.sp).filter(id => SPI[id])]);
+  const fav = Object.entries(by).sort((a, b) => b[1] - a[1])[0] || null;
+  const legends = [...allSp].filter(id => SPI[id] && SPI[id].r >= 5);
+  let liveBig = null; for (const x of dex) if (SPI[x.sp] && (!liveBig || +x.best > +liveBig.best)) liveBig = x;
+  const busy = months.indexOf(Math.max(...months)), active = months.filter(Boolean).length, tot = cs.length + liveN;
+  const hi = hours.indexOf(Math.max(...hours)), share = cs.length ? hours[hi] / cs.length : 0;
+  // what kind of angler: the first that fits
+  const type = !tot ? 'new' : legends.length ? 'legend' : bigRel && bigRel.r >= 1.3 ? 'giant' : allSp.size >= 8 ? 'collector'
+    : cs.length >= 4 && share >= .4 && hi === 0 ? 'dawn' : cs.length >= 4 && share >= .4 && hi === 3 ? 'night' : active >= 4 ? 'steady' : liveN > cs.length ? 'live' : 'rookie';
+  return { year, cs, n: cs.length, liveN, tot, sp: allSp.size, by, fav, big, liveBig, months, busy, active, hours, hi, share, legends, dex: dex.length, type,
+    top3: Object.entries(by).sort((a, b) => b[1] - a[1]).slice(0, 3) };
+}
+// the live fish book (website): asked once when the story opens
+function rcLive() {
+  if (!(typeof lvOn === 'function' && lvOn() && S.me && S.me.nick)) return Promise.resolve(null);
+  if (typeof LV !== 'undefined' && LV.st && LV.st.dex) return Promise.resolve(RC.live = LV.st);
+  return Promise.race([APP_AUTH.live.state().then(s => (RC.live = s)), new Promise(r => setTimeout(() => r(null), 2500))]).catch(() => null);
+}
+
+/* --- the home card --- */
+function recapCardHTML() {
+  if (!S.me || !S.me.nick) return '';
+  const d = rcData(), y = d.year;
+  return `<section class="rc-card" aria-label="${esc(t('rc_title', { y }))}">
+    <div class="rc-c-txt"><p class="rc-c-eye">${icon('sparkle')}${t('rc_eye')}</p><h2>${t('rc_title', { y })}</h2>
+      <p class="rc-c-sub">${d.tot ? t('rc_card_p', { n: fmtN(d.tot), s: d.sp }) : t('rc_card_empty')}</p>
+      <button class="btn btn-light" data-rcopen>${icon('star')}${t('rc_open')}</button></div>
+    <div class="rc-c-art" aria-hidden="true"><b class="num">${y}</b>${d.top3.slice(0, 3).map(([id], i) => `<img class="f${i}" src="${FD.thumb(SPI[id], 200, 110)}" alt="">`).join('')}</div>
+  </section>`;
+}
+
+/* --- the story --- */
+function rcSlides(d) {
+  const nick = esc(S.me.nick || ''), y = d.year, sp = id => SPI[id] && esc(spName(SPI[id]));
+  const L = [];
+  L.push({ k: 'intro', bg: 1, html: `<p class="rc-eye">${APP_NAME[0]} ${APP_NAME[1]}</p><h2 class="rc-yr num">${y}</h2><p class="rc-big">${t('rc_intro', { nick })}</p><p class="rc-sm">${t('rc_tap')}</p>` });
+  if (!d.tot) {
+    L.push({ k: 'empty', bg: 2, html: `<p class="rc-eye">${t('rc_eye')}</p><h2 class="rc-h">${t('rc_empty_h')}</h2><p class="rc-p">${t('rc_empty_p')}</p>
+      <div class="rc-cta"><a class="btn btn-light" href="#scan" data-rcclose>${icon('scan')}${t('cta_scan')}</a>${typeof lvOn === 'function' && lvOn() ? `<a class="btn btn-glass" href="#live" data-rcclose>${icon('live')}${t('dm_go')}</a>` : ''}</div>` });
+    return L;
+  }
+  L.push({ k: 'count', bg: 2, html: `<p class="rc-eye">${t('rc_count_eye', { y })}</p><p class="rc-num num" data-rccount="${d.tot}">0</p><p class="rc-big">${t('rc_count_unit')}</p>
+    <p class="rc-p">${t('rc_count_p', { s: d.sp, photo: d.n, live: d.liveN })}</p>` });
+  const big = d.big ? { id: d.big.sp, cm: d.big.len, when: fmtDate(d.big.ts || d.big.at) } : d.liveBig ? { id: d.liveBig.sp, cm: +d.liveBig.best, when: t('lv_title') } : null;
+  if (big) L.push({ k: 'big', bg: 3, html: `<p class="rc-eye">${t('rc_big_eye')}</p><div class="rc-fish"><img src="${FD.thumb(SPI[big.id], 520, 286)}" alt=""></div>
+    <h2 class="rc-h">${sp(big.id)}</h2><p class="rc-num sm num"><span data-rccount="${Math.round(big.cm * 10)}" data-rcdiv="10">0</span><small>cm</small></p><p class="rc-sm">${esc(big.when)}</p>` });
+  if (d.fav && d.fav[1] >= 2) L.push({ k: 'fav', bg: 4, html: `<p class="rc-eye">${t('rc_fav_eye')}</p><div class="rc-fish sm"><img src="${FD.thumb(SPI[d.fav[0]], 420, 230)}" alt=""></div>
+    <h2 class="rc-h">${sp(d.fav[0])}</h2><p class="rc-p">${t('rc_fav_p', { n: d.fav[1] })}</p>` });
+  if (d.n >= 2) {
+    const mx = Math.max(1, ...d.months);
+    L.push({ k: 'months', bg: 5, html: `<p class="rc-eye">${t('rc_mo_eye')}</p><h2 class="rc-h">${t('rc_mo_h', { m: esc(monthName(d.busy)) })}</h2>
+      <div class="rc-bars" role="img" aria-label="${esc(d.months.map((v, i) => monthName(i) + ' ' + v).join(', '))}">${d.months.map((v, i) => `<span class="${i === d.busy ? 'on' : ''}" style="--v:${v / mx}"><i></i><b>${i + 1}</b></span>`).join('')}</div>
+      <p class="rc-p">${t('rc_mo_p', { n: d.active })}</p>` });
+    L.push({ k: 'hours', bg: 6, html: `<p class="rc-eye">${t('rc_hr_eye')}</p><p class="rc-ico">${icon(['sun', 'sun', 'moon', 'moon'][d.hi])}</p><h2 class="rc-h">${t('rc_hr_' + d.hi)}</h2>
+      <p class="rc-p">${t('rc_hr_p', { p: Math.round(d.share * 100) })}</p>` });
+  }
+  if (d.dex) L.push({ k: 'live', bg: 7, html: `<p class="rc-eye">${t('lv_title')}</p><p class="rc-num num" data-rccount="${d.dex}">0</p><p class="rc-big">${t('rc_live_unit')}</p>
+    <p class="rc-p">${t('rc_live_p', { n: d.liveN })}</p>${d.legends.length ? `<p class="rc-tag">${icon('star')}${t('rc_legend', { n: d.legends.length })}</p>` : ''}` });
+  L.push({ k: 'type', bg: 8, html: `<p class="rc-eye">${t('rc_type_eye')}</p><p class="rc-ico big">${icon(RC_TYPE_IC[d.type] || 'fish')}</p><h2 class="rc-h xl">${t('rc_type_' + d.type)}</h2><p class="rc-p">${t('rc_type_' + d.type + '_p')}</p>` });
+  L.push({ k: 'share', bg: 1, html: `<p class="rc-eye">${t('rc_eye')} · ${y}</p><div class="rc-sum">
+      <p><b class="num">${fmtN(d.tot)}</b><span>${t('rc_count_unit')}</span></p><p><b class="num">${d.sp}</b><span>${t('rc_sum_sp')}</span></p>
+      ${big ? `<p><b class="num">${fmtN(big.cm, 1)}</b><span>cm · ${sp(big.id)}</span></p>` : ''}<p class="wide"><b>${t('rc_type_' + d.type)}</b><span>${nick}</span></p></div>
+    <div class="rc-cta"><button class="btn btn-light" data-rcshare>${icon('share')}${t('rc_share')}</button><button class="btn btn-glass" data-rcagain>${icon('refresh')}${t('rc_again')}</button></div>` });
+  return L;
+}
+const RC_TYPE_IC = { legend: 'star', giant: 'trophy', collector: 'book', dawn: 'sun', night: 'moon', steady: 'flame', live: 'live', rookie: 'sparkle', new: 'fish' };
+async function rcOpen() {
+  if (RC.el) return;
+  if (!S.me || !S.me.nick) { if (typeof openOnboarding === 'function') openOnboarding(); return; }
+  await rcLive();
+  RC.d = rcData(); RC.slides = rcSlides(RC.d); RC.i = 0;
+  const el = document.createElement('div'); el.className = 'rc'; el.id = 'rc';
+  el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); el.setAttribute('aria-label', t('rc_title', { y: RC.d.year }));
+  el.innerHTML = `<div class="rc-frame"><div class="rc-bars-top">${RC.slides.map(() => '<i><b></b></i>').join('')}</div>
+    <button class="rc-x" data-rcclose aria-label="${esc(t('close'))}">${icon('x')}</button>
+    <div class="rc-slide" aria-live="polite"></div>
+    <button class="rc-nav prev" data-rcprev aria-label="${esc(t('rc_prev'))}"></button><button class="rc-nav next" data-rcnext aria-label="${esc(t('rc_next'))}"></button></div>`;
+  document.body.appendChild(el); document.body.classList.add('has-modal'); RC.el = el;
+  el.addEventListener('click', e => {
+    if (e.target.closest('[data-rcclose]')) { rcClose(); return; }
+    if (e.target.closest('[data-rcshare]')) { rcShare(e.target.closest('[data-rcshare]')); return; }
+    if (e.target.closest('[data-rcagain]')) { rcGo(0); return; }
+    if (e.target.closest('[data-rcprev]')) rcGo(RC.i - 1); else if (e.target.closest('[data-rcnext]')) rcGo(RC.i + 1);
+  });
+  const hold = on => { RC.hold = on; if (!on) RC.t0 = performance.now() - RC.el._p * RC_MS; };
+  el.addEventListener('pointerdown', e => { if (!e.target.closest('button,a')) hold(true); });
+  el.addEventListener('pointerup', () => hold(false)); el.addEventListener('pointercancel', () => hold(false));
+  RC.key = e => { if (e.key === 'Escape') rcClose(); else if (e.key === 'ArrowRight') rcGo(RC.i + 1); else if (e.key === 'ArrowLeft') rcGo(RC.i - 1); };
+  document.addEventListener('keydown', RC.key);
+  rcGo(0); rcTick();
+  setTimeout(() => { const b = $('.rc-x', el); if (b) b.focus(); }, 50);
+}
+function rcClose() {
+  if (!RC.el) return; cancelAnimationFrame(RC.raf); document.removeEventListener('keydown', RC.key);
+  RC.el.remove(); RC.el = null; document.body.classList.remove('has-modal');
+}
+function rcGo(i) {
+  if (!RC.el) return;
+  if (i < 0) i = 0; if (i >= RC.slides.length) { i = RC.slides.length - 1; }
+  RC.i = i; RC.t0 = performance.now(); RC.el._p = 0;
+  const s = RC.slides[i], box = $('.rc-slide', RC.el);
+  RC.el.dataset.bg = s.bg; RC.el.dataset.k = s.k;
+  box.innerHTML = `<div class="rc-in">${s.html}</div>`;
+  $$('.rc-bars-top i', RC.el).forEach((b, j) => { b.dataset.s = j < i ? 'done' : j === i ? 'on' : ''; $('b', b).style.width = j < i ? '100%' : '0%'; });
+  // the numbers count up
+  $$('[data-rccount]', box).forEach(n => {
+    const to = +n.dataset.rccount, div = +n.dataset.rcdiv || 1, t0 = performance.now(), dur = matchMedia('(prefers-reduced-motion: reduce)').matches ? 1 : 1100;
+    const step = () => { const a = Math.min(1, (performance.now() - t0) / dur), e = 1 - Math.pow(1 - a, 3); n.textContent = fmtN(Math.round(to * e) / div, div > 1 ? 1 : 0); if (a < 1 && RC.el) requestAnimationFrame(step); };
+    step();
+  });
+}
+function rcTick() {
+  if (!RC.el) return;
+  const last = RC.i >= RC.slides.length - 1;
+  if (!RC.hold && !last) {
+    const p = Math.min(1, (performance.now() - RC.t0) / RC_MS); RC.el._p = p;
+    const b = $$('.rc-bars-top i', RC.el)[RC.i]; if (b) $('b', b).style.width = (p * 100) + '%';
+    if (p >= 1) rcGo(RC.i + 1);
+  } else if (last) { const b = $$('.rc-bars-top i', RC.el)[RC.i]; if (b) $('b', b).style.width = '100%'; }
+  RC.raf = requestAnimationFrame(rcTick);
+}
+
+/* --- the picture to share: the year on one card, no places --- */
+async function rcBlob(d) {
+  const W = 1080, H = 1920, P = 80;
+  const SANS = '"IBM Plex Sans KR", "IBM Plex Sans JP", "Noto Sans SC", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif', DISP = '"Chakra Petch", ' + SANS;
+  try { await Promise.race([document.fonts.load(`italic 700 200px ${DISP}`, '0123456789'), new Promise(r => setTimeout(r, 2000))]); } catch (e) { }
+  const cv = document.createElement('canvas'); cv.width = W; cv.height = H; const g = cv.getContext('2d');
+  const bg = g.createLinearGradient(0, 0, W, H); bg.addColorStop(0, '#1E4FA8'); bg.addColorStop(.5, '#0B1730'); bg.addColorStop(1, '#050A13'); g.fillStyle = bg; g.fillRect(0, 0, W, H);
+  g.save(); g.globalAlpha = .1; g.fillStyle = '#7CC4FF'; g.font = `italic 700 520px ${DISP}`; g.textAlign = 'center'; g.fillText(String(d.year), W / 2 + 40, 620); g.restore();
+  g.textAlign = 'left'; g.fillStyle = '#7CC4FF'; g.font = `700 42px ${DISP}`; g.fillText(`${d.year} FISHING RECAP`, P, 200);
+  g.fillStyle = '#FFFFFF'; g.font = `800 84px ${SANS}`; g.fillText(fitText(g, t('rc_title', { y: d.year }), W - P * 2), P, 310);
+  g.fillStyle = '#A9BBCF'; g.font = `500 44px ${SANS}`; g.fillText(fitText(g, S.me.nick || '', W - P * 2), P, 380);
+  // three big numbers
+  const big = d.big ? { id: d.big.sp, cm: d.big.len } : d.liveBig ? { id: d.liveBig.sp, cm: +d.liveBig.best } : null;
+  const nums = [[fmtN(d.tot), t('rc_count_unit')], [String(d.sp), t('rc_sum_sp')], big ? [fmtN(big.cm, 1), 'cm'] : null].filter(Boolean);
+  nums.forEach(([v, u], i) => { const y = 600 + i * 210; g.fillStyle = '#7CC4FF'; g.font = `italic 700 170px ${DISP}`; g.fillText(v, P, y); const w = g.measureText(v).width; g.fillStyle = '#E3F3FF'; g.font = `600 48px ${SANS}`; g.fillText(fitText(g, u, W - P * 2 - w - 30), P + w + 26, y); });
+  if (big && SPI[big.id]) { g.save(); g.shadowColor = 'rgba(124,196,255,.7)'; g.shadowBlur = 40; FD.draw(g, SPI[big.id], W / 2, 1300, 760, { still: true }); g.restore(); }
+  // the kind of angler
+  g.fillStyle = 'rgba(124,196,255,.18)'; rrect(g, P, 1500, W - P * 2, 210, 36); g.fill();
+  g.fillStyle = '#A9BBCF'; g.font = `500 36px ${SANS}`; g.fillText(t('rc_type_eye'), P + 44, 1570);
+  g.fillStyle = '#FFFFFF'; g.font = `800 72px ${SANS}`; g.fillText(fitText(g, t('rc_type_' + d.type), W - P * 2 - 88), P + 44, 1660);
+  g.fillStyle = 'rgba(255,255,255,.14)'; g.fillRect(P, H - 132, W - P * 2, 2);
+  g.fillStyle = '#FFFFFF'; g.font = `800 38px ${SANS}`; g.fillText(`${APP_NAME[0]} ${APP_NAME[1]}`, P, H - 72);
+  g.textAlign = 'right'; g.fillStyle = '#7F95AD'; g.font = `500 30px ${SANS}`; g.fillText(SITE_URL.replace(/^https?:\/\//, '').replace(/\/$/, ''), W - P, H - 72);
+  return new Promise(res => cv.toBlob(b => res(b), 'image/jpeg', .9));
+}
+async function rcShare(btn) {
+  if (btn.disabled) return; btn.disabled = true;
+  try { const b = await rcBlob(RC.d); await shareImage(b, `zzirit-${RC.d.year}-recap.jpg`, t('rc_story_text', { y: RC.d.year, n: RC.d.tot }), { tall: true, title: 'rc_share', sub: 'rc_story_sub' }); }
+  catch (e) { console.warn(e); toast(t('share_fail'), 'warn'); }
+  finally { btn.disabled = false; }
+}
+document.addEventListener('click', e => { if (e.target.closest('[data-rcopen]')) { e.preventDefault(); rcOpen(); } });
 
 /* ===== A faster first screen, and a basic screen with no connection =====
    - The map library (Leaflet) is no longer part of the first load on the website: it comes only when a map is opened.

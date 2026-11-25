@@ -45,6 +45,7 @@ function zpAward(game, wk) {
   }
   return 1;
 }
+const lvRaid = () => LVS.raid || (LVS.raid = { cfg: { every: 120, dur: 0, base: 1500, add: 600, gap: 600, sp: null }, list: {}, hits: {} });
 const zpNick = me => { const a = T.anglers[me]; return !!(a && a.data && String(a.data.nick || '').trim()); };
 // 찌릿 라이브 (0019, 0021), the same rules as the database: schools, casts, strikes, landings, the fish book, the keepnet
 // and the fish market, the weekly bag.
@@ -371,6 +372,46 @@ http.createServer(async (req, res) => {
           missions: list.map(m => Object.assign({}, m, { n: Math.min(m.goal, lvMissionN(me, day, m.k)), got: got(m.k) })), all: 20, allGot: got('all'),
           until: Date.parse(day + 'T00:00:00+09:00') + 864e5, bal: (ZPS.wal[me] || { bal: 0 }).bal } });
       }
+      // 0027: the legendary monster raid (the same rules as the SQL; cfg via /__sb/live_cfg {raid: {...}})
+      if (q.name === 'live_raid' || q.name === 'live_raid_hit') {
+        const R = lvRaid(), rc = R.cfg, now = Date.now(), slotMs = rc.every * 60e3;
+        const nowR = () => {
+          const st = Math.floor(now / slotMs) * slotMs; if (!rc.dur || now >= st + rc.dur * 60e3) return null;
+          const id = st / 1000, slot = Math.floor(now / slotMs), sp = ['kue', 'ishidai', 'gt', 'tarpon', 'ishigakidai', 'hiramasa'][((slot * 5 + 1) % 6 + 6) % 6];
+          const spots = [['jeju', 33.2, 126.55], ['dokdo', 37.24, 131.87], ['busan', 35.05, 129.15], ['yeosu', 34.62, 127.8], ['ulleung', 37.5, 130.85], ['taean', 36.72, 126.05], ['okinawa', 26.4, 127.7], ['tokyo', 35.3, 139.8], ['hongkong', 22.2, 114.25], ['hawaii', 21.25, -157.85], ['sydney', -33.85, 151.3], ['florida', 24.55, -81.8]][((slot * 7 + 3) % 12 + 12) % 12];
+          return R.list[id] || (R.list[id] = { id, sp: rc.sp || sp, spot: spots[0], lat: spots[1], lon: spots[2], hp: rc.base, max: rc.base, starts: st, ends: st + rc.dur * 60e3, beaten: null, mvp: null });
+        };
+        const nick = a => (a && T.anglers[a] && T.anglers[a].data && T.anglers[a].data.nick) || null;
+        const js = r => {
+          const hs = Object.entries(R.hits[r.id] || {}).map(([a, h]) => Object.assign({ a }, h)).sort((x, y) => y.d - x.d || x.f - y.f), mi = hs.findIndex(h => h.a === me);
+          const led = ZPS.led.find(x => x.acct === me && x.r === 'prize' && x.ref === 'raid:' + r.id);
+          return { id: r.id, sp: r.sp, spot: r.spot, lat: r.lat, lon: r.lon, hp: Math.max(0, r.hp), max: r.max, starts: r.starts, ends: r.ends, beaten: r.beaten, mvp: r.mvp, mvpNick: nick(r.mvp), n: hs.length,
+            top: hs.slice(0, 5).map(h => ({ a: h.a, nick: nick(h.a), d: h.d })), me: mi >= 0 ? { d: hs[mi].d, hits: hs[mi].hits, crits: hs[mi].c, rk: mi + 1 } : null, pts: led ? led.d : null };
+        };
+        if (q.name === 'live_raid') {
+          const r = nowR(), last = Object.values(R.list).filter(x => x.ends <= now || x.beaten).sort((a, b) => b.id - a.id)[0];
+          return send({ data: { now, next: (Math.floor(now / slotMs) + 1) * slotMs, every: rc.every, dur: rc.dur, raid: r ? js(r) : null, last: last && (!r || last.id !== r.id) ? js(last) : null } });
+        }
+        if (!zpNick(me)) return send({ data: { err: 'no_profile' } });
+        nowR(); const r = R.list[A.p_id];
+        if (!r) return send({ data: { err: 'no_raid' } });
+        if (r.beaten) return send({ data: { err: 'beaten', raid: js(r) } });
+        if (now < r.starts || now >= r.ends) return send({ data: { err: 'over', raid: js(r) } });
+        const hm = R.hits[r.id] || (R.hits[r.id] = {});
+        let h = hm[me];
+        if (!h) { if (Object.keys(hm).length) { r.hp += rc.add; r.max += rc.add; } h = hm[me] = { d: 0, hits: 0, c: 0, f: now, at: 0 }; }
+        else if (now - h.at < rc.gap) return send({ data: { err: 'fast' } });
+        const qq = Math.max(0, Math.min(1, +A.p_q || 0)), crit = qq >= .85;
+        let dmg = 6 + Math.round(qq * 12) + Math.floor(Math.random() * 5); if (crit) dmg *= 2; dmg = Math.min(dmg, Math.max(0, r.hp));
+        h.d += dmg; h.hits++; h.c += crit ? 1 : 0; h.at = now; r.hp -= dmg;
+        if (r.hp <= 0) {
+          r.hp = 0; r.beaten = now; const hs = Object.entries(hm).filter(([, x]) => x.d > 0).sort((x, y) => y[1].d - x[1].d || x[1].f - y[1].f); r.mvp = hs[0] && hs[0][0];
+          const tot = hs.reduce((n, [, x]) => n + x.d, 0) || 1;
+          for (const [a, x] of hs) zpAdd(a, 30 + Math.round(120 * x.d / tot) + (a === r.mvp ? 50 : 0), 'prize', 'raid:' + r.id, a === r.mvp ? 'raid mvp' : 'raid');
+          if (r.mvp) { const dx = LVS.dex[r.mvp] || (LVS.dex[r.mvp] = {}); dx[r.sp] = dx[r.sp] || { n: 0, best: 0 }; dx[r.sp].n++; dx[r.sp].best = Math.max(dx[r.sp].best, 130); }
+        }
+        return send({ data: { ok: true, dmg, crit, hp: Math.max(0, r.hp), max: r.max, beaten: !!r.beaten, raid: r.beaten ? js(r) : null, me: { d: h.d, hits: h.hits } } });
+      }
       // 0026: fish-book sets and titles (the same lists and rules as the SQL; cfg.noSets plays a server without them)
       if (/^live_(sets|set_claim|title_set|titles)$/.test(q.name)) {
         if (C.noSets) return send({ error: { code: 'PGRST202', message: 'Could not find the function public.' + q.name + ' in the schema cache' } });
@@ -542,7 +583,7 @@ http.createServer(async (req, res) => {
   if (u.pathname === '/__sb/zp_seed') { const q = await body(req); const wk = q.wk || zpAddDays(zpWeek(), q.weeksAgo ? -7 * q.weeksAgo : 0); for (const r of q.rows || []) ZPS.scores['rx|' + wk + '|' + r.acct] = { game: 'rx', wk, acct: r.acct, score: r.score, best: r.best == null ? null : r.best, void: !!r.void, at: Date.now() - 864e5 * 9 + (r.order || 0) }; return send({ ok: true, wk }); }
   if (u.pathname === '/__sb/live_seed') { const q = await body(req); const wk = zpAddDays(zpWeek(), q.weeksAgo ? -7 * q.weeksAgo : 0); for (const r of q.rows || []) LVS.catches.push({ id: ++LVS.seq, acct: r.acct, sp: r.sp || 'kurodai', cm: r.cm || 40, tier: 4, big: false, score: r.score, pts: 12, onsite: true, anon: false, gx: 1, gy: 1, wk, at: Date.now() - 864e5 * 8 }); return send({ ok: true, wk }); }
   if (u.pathname === '/__sb/live_dex') { const q = await body(req); const dx = LVS.dex[q.acct] || (LVS.dex[q.acct] = {}); for (const sp of q.sps || []) dx[sp] = { n: 1, best: 30 }; return send({ ok: true }); }
-  if (u.pathname === '/__sb/live_cfg') { const q = await body(req); Object.assign(LVS.cfg, q.cfg || {}); if (q.weeksBack) for (const c of LVS.catches) c.wk = zpAddDays(c.wk, -7 * q.weeksBack); if (q.reset) { LVS.casts = {}; LVS.days = {}; LVS.catches = []; LVS.dex = {}; LVS.settled = {}; } if (q.streak) for (const [a, x] of Object.entries(q.streak)) LVS.streak[a] = x; return send({ cfg: LVS.cfg, n: LVS.catches.length, casts: LVS.casts }); }
+  if (u.pathname === '/__sb/live_cfg') { const q = await body(req); Object.assign(LVS.cfg, q.cfg || {}); if (q.raid) Object.assign(lvRaid().cfg, q.raid); if (q.raidReset) { lvRaid().list = {}; lvRaid().hits = {}; } if (q.raidHp != null) { for (const r of Object.values(lvRaid().list)) if (!r.beaten) r.hp = Math.min(r.hp, q.raidHp); } if (q.weeksBack) for (const c of LVS.catches) c.wk = zpAddDays(c.wk, -7 * q.weeksBack); if (q.reset) { LVS.casts = {}; LVS.days = {}; LVS.catches = []; LVS.dex = {}; LVS.settled = {}; } if (q.streak) for (const [a, x] of Object.entries(q.streak)) LVS.streak[a] = x; return send({ cfg: LVS.cfg, n: LVS.catches.length, casts: LVS.casts }); }
   if (u.pathname === '/__sb/feature') { for (const [k, v] of u.searchParams) FEATURES[k] = v === '1'; return send(FEATURES); }
   if (u.pathname === '/__sb/dump') return send({ T, admins: [...admins], links, STATS, PUSH, PUSHLOG, PUSHPREFS, logins: Object.keys(logins), MUTES, RTSTATS, ZPS, RT: Object.fromEntries(Object.entries(RT).map(([k, m]) => [k, [...m.values()].map(x => x.key)])) });
   if (u.pathname === '/__sb/config') { const q = await body(req); const g = T.admin_docs.config || (T.admin_docs.config = { id: 'config', data: {} }); g.data = Object.assign({}, g.data, q); push('admin_docs', 'UPDATE', g, { id: 'config' }); return send({ ok: true }); }
