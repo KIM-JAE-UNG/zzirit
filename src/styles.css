@@ -2010,7 +2010,7 @@ body[data-route="live"] #main { padding-left: 0; padding-right: 0; }
 .rd-strike:active { transform: scale(.96); }
 .rd-strike:disabled { opacity: .4; cursor: default; }
 .rd-mine { font-size: 13px; color: var(--spark); min-height: 1em; }
-.rd-end { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; text-align: center; gap: 8px; padding: 0 20px max(36px, env(safe-area-inset-bottom, 0px)); background: linear-gradient(180deg, transparent 35%, rgba(2,6,15,.88) 70%); }
+.rd-end { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; text-align: center; gap: 8px; padding: 0 20px max(36px, env(safe-area-inset-bottom, 0px)); background: linear-gradient(180deg, transparent 52%, rgba(2,6,15,.86) 76%); }
 .rd-end h3 { font-size: 22px; color: #fff; }
 .rd-e-eye { font: 700 13px/1 var(--f-disp); letter-spacing: .16em; color: var(--spark); }
 .rd-e-h { font: 800 italic clamp(40px, 11vw, 64px)/1 var(--f-disp) !important; letter-spacing: -.01em; background: linear-gradient(180deg, #fff, #9FD3FF); -webkit-background-clip: text; background-clip: text; color: transparent !important; filter: drop-shadow(0 0 18px rgba(124,196,255,.6)); }
@@ -2021,7 +2021,7 @@ body[data-route="live"] #main { padding-left: 0; padding-right: 0; }
 .rd-e-pts b { font: 700 italic 46px/1.1 var(--f-disp); color: var(--spark); }
 .rd-e-pts span { font-size: 13px; color: rgba(232,237,245,.8); }
 .rd-e-big .ic { width: 40px; height: 40px; color: var(--spark); }
-@media (max-width: 640px) { .rd-top5 { top: auto; bottom: 170px; left: 12px; min-width: 0; font-size: 12px; } .rd-top5 li span { max-width: 84px; } }
+@media (max-width: 640px) { .rd-top5 { top: 150px; bottom: auto; left: 10px; min-width: 0; font-size: 11.5px; padding: 6px; background: rgba(5,10,19,.45); } .rd-hint { font-size: 12px; line-height: 1.35; } .rd-top5 li span { max-width: 84px; } }
 
 /* ---- 나의 낚시 결산 (recap.js) ---- */
 .rc-card { position: relative; display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 16px; align-items: center; border-radius: 22px; padding: 22px; overflow: hidden; color: #fff;

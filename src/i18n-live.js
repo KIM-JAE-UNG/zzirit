@@ -375,6 +375,9 @@ Object.assign(T, {
   wn_raid_p: ['2시간마다 거대한 전설의 괴어가 나타나요. 어디서든 모두 함께 챔질해 잡으면 포인트, MVP는 도감에!', 'Every two hours a giant legendary fish surfaces. Strike together from anywhere for points — the MVP gets it in their book!', '2時間ごとに巨大な伝説の怪魚が出現。どこからでもみんなでアワセて倒せばポイント、MVPは図鑑に!', '每2小时出现一条巨大的传说怪鱼。在哪里都能一起扬竿击败它，获得积分，MVP还能收入图鉴！'],
   wn_recap_h: ['나의 낚시 결산', 'Your year in fishing', 'わたしの釣り総決算', '我的钓鱼年度总结'],
   wn_recap_p: ['올해 낚은 고기·가장 큰 고기·단짝 물고기·나는 어떤 낚시꾼인지 이야기로 보고 카드로 자랑해요.', 'Your fish, your biggest, your fish of the year and what kind of angler you are — as a story, with a card to share.', '今年の釣果・いちばん大きな魚・相棒の魚・あなたのタイプをストーリーで見てカードで自慢。', '用故事回顾今年的渔获、最大的鱼、搭档鱼和你的钓手类型，并用卡片分享。'],
+  rd_combo: ['합동 챔질 ×{n}!', 'TEAM STRIKE ×{n}!', '合同アワセ ×{n}!', '合力扬竿 ×{n}!'],
+  wn_crew_h: ['괴어 레이드 원정대', 'Raid crew', '怪魚レイド遠征隊', '怪鱼团战远征队'],
+  wn_crew_p: ['레이드에 들어오면 모두의 캐릭터가 배 위에 함께 서서 괴어와 싸워요. 함께 챔질하면 「합동 챔질」 콤보!', 'Everyone in a raid now stands together on the deck as their own character, lines out to the monster. Strike together for a TEAM STRIKE combo!', 'レイドに入るとみんなのキャラが甲板に並んで怪魚と戦います。一緒にアワセると「合同アワセ」コンボ!', '进入团战后，大家的角色会一起站在甲板上与怪鱼搏斗。一起扬竿触发「合力扬竿」连击！'],
   // 출조 플래너 (planner.js)
   pl_title: ['출조 플래너', 'Trip planner', '釣行プランナー', '出钓计划'],
   pl_h: ['이번 주, 언제 어디로 갈까?', 'When and where this week?', '今週はいつ、どこへ行く?', '这周什么时候去哪儿？'],

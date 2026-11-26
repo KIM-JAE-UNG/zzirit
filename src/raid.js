@@ -103,6 +103,7 @@ function rdOpen() {
     <div class="rd-end" hidden></div>`;
   document.body.appendChild(el); document.body.classList.add('has-modal');
   RD.el = el; RD.end = null; RD.fx = []; RD.ph0 = performance.now();
+  if (typeof rcReset === 'function') { rcReset(); rcSync({}); }
   el.addEventListener('click', e => {
     if (e.target.closest('[data-rdclose]')) rdClose();
     else if (e.target.closest('[data-rdstrike]')) rdStrike();
@@ -119,6 +120,7 @@ function rdClose() {
   cancelAnimationFrame(RD.raf); document.removeEventListener('keydown', RD.key);
   RD.el.remove(); RD.el = null; document.body.classList.remove('has-modal');
   if (RD.room) { RD.room.leave(); RD.room = null; RD.roomId = null; }
+  if (typeof rcReset === 'function') rcReset();
   rdPaint();
 }
 // join the raid's live channel (everyone's strikes as they happen)
@@ -128,13 +130,17 @@ function rdJoin(r) {
   RD.roomId = r.id;
   RD.room = APP_AUTH.rt.room('raid-' + r.id, myId(), {
     events: ['hit', 'won'],
+    // who stands on the deck (raidcrowd.js): a nickname and the character's looks
+    sync: st => { if (typeof rcSync === 'function') rcSync(st); },
+    status: x => { if (x === 'SUBSCRIBED' && RD.room && typeof rcMe === 'function') RD.room.track(rcMe()); },
     msg(ev, p) {
       const cur = rdRaid(); if (!cur || cur.id !== r.id) return;
       if (ev === 'hit') {
         const d = Math.max(0, Math.min(99, +p.d || 0)); if (!d) return;
         if (+p.hp >= 0 && +p.hp < cur.hp) cur.hp = +p.hp;
         if (+p.max > cur.max && +p.max < cur.max + 5000) cur.max = +p.max;
-        rdFx(String(p.n || t('lv_someone')).slice(0, 16) + ' −' + d, !!p.c, false);
+        if (typeof rcHit === 'function' && p.a) rcHit(String(p.a).slice(0, 64), d, !!p.c, String(p.n || '').slice(0, 16));
+        else rdFx(String(p.n || t('lv_someone')).slice(0, 16) + ' −' + d, !!p.c, false);
         rdPanel();
       } else if (ev === 'won') rdLoad(true);
     }
@@ -154,7 +160,8 @@ function rdStrike() {
     r.hp = x.hp; r.max = x.max; r.me = Object.assign({}, r.me || {}, x.me);
     rdFx('−' + x.dmg, x.crit, true);
     if (x.crit) { RD.shake = 1; if (typeof LVS !== 'undefined') { LVS.play('snap'); LVS.buzz([25, 30, 25]); } } else if (typeof LVS !== 'undefined') LVS.buzz(15);
-    if (RD.room) RD.room.send('hit', { n: S.me.nick, d: x.dmg, c: !!x.crit, hp: x.hp, max: x.max });
+    if (typeof rcHit === 'function') rcHit(myId(), x.dmg, x.crit, S.me.nick);
+    if (RD.room) RD.room.send('hit', { a: myId(), n: S.me.nick, d: x.dmg, c: !!x.crit, hp: x.hp, max: x.max });
     if (x.beaten && x.raid) { RD.st.raid = x.raid; if (RD.room) RD.room.send('won', {}); if (typeof LVS !== 'undefined') LVS.play('rare'); if (typeof zpLoad === 'function') zpLoad(); if (typeof rrLoad === 'function') setTimeout(() => rrLoad(true), 1200); }
     rdPanel();
   }).catch(e => { toast(t(e && e.code === 'need_update' ? 'zp_err_server' : 'lv_err'), 'warn'); }).finally(() => { RD.busy = false; });
@@ -229,7 +236,7 @@ function rdLoop() {
   for (let i = 0; i < 26; i++) { const s = (i * 97.3) % 1, x = (i * 0.137 % 1) * W, y = H - ((T * (18 + s * 30) + i * 61) % (H + 40)); g.beginPath(); g.arc(x + Math.sin(T + i) * 6, y, 1.5 + s * 3, 0, 6.3); g.strokeStyle = 'rgba(180,220,255,.25)'; g.stroke(); }
   // the monster
   const size = Math.min(W * .86, H * .62, 620), shake = RD.shake > 0 ? (RD.shake -= .06, RD.shake * 10) : 0;
-  const cx = W / 2 + (reduce ? 0 : Math.sin(T * .7) * W * .05) + (Math.random() - .5) * shake, cy = H * .46 + (reduce ? 0 : Math.sin(T * 1.1) * 10) + (Math.random() - .5) * shake;
+  const cx = W / 2 + (reduce ? 0 : Math.sin(T * .7) * W * .05) + (Math.random() - .5) * shake, cy = H * .40 + (reduce ? 0 : Math.sin(T * 1.1) * 10) + (Math.random() - .5) * shake;
   const hpF = r && r.max ? r.hp / r.max : 1;
   // its presence: slow rings of light around it
   if (!reduce) { g.save(); g.globalCompositeOperation = 'lighter'; for (let i = 0; i < 3; i++) { const k = ((T * .35 + i / 3) % 1); g.beginPath(); g.ellipse(cx, cy, size * (.45 + k * .35), size * (.18 + k * .16), 0, 0, 6.3); g.strokeStyle = `rgba(124,196,255,${(1 - k) * (on ? .22 : .1)})`; g.lineWidth = 2; g.stroke(); } g.restore(); }
@@ -240,10 +247,10 @@ function rdLoop() {
   g.restore();
   // the eye glows harder as it weakens
   if (on) { g.save(); g.globalCompositeOperation = 'lighter'; const ex = cx + size * .33, ey = cy - size * .02, gl = g.createRadialGradient(ex, ey, 0, ex, ey, 26 + (1 - hpF) * 20); gl.addColorStop(0, 'rgba(227,243,255,.9)'); gl.addColorStop(1, 'rgba(124,196,255,0)'); g.fillStyle = gl; g.beginPath(); g.arc(ex, ey, 46, 0, 6.3); g.fill(); g.restore(); }
-  // the line from the bottom to its mouth
+  // everyone on the deck, lines out to its mouth (raidcrowd.js)
   const mx = cx + size * .44, my = cy + size * .04;
-  g.beginPath(); g.moveTo(W / 2, H + 10); g.quadraticCurveTo(W / 2 + Math.sin(T * 6) * (on ? 14 : 4), H * .75, mx, my);
-  g.strokeStyle = 'rgba(227,243,255,.8)'; g.lineWidth = 1.6; g.stroke();
+  const rst = on ? 'on' : r && r.beaten ? 'won' : r && rdNow() >= r.ends ? 'lost' : 'wait';
+  if (typeof rcDraw === 'function') rcDraw(g, W, H, T, now, mx, my, rst);
   // the weak spot and the ring closing in on it
   if (on) {
     const wx = cx + size * .06, wy = cy - size * .02, R0 = 26, ph = ((now - RD.ph0) % RD_RING) / RD_RING, rr = R0 + 90 * (1 - ph), q = rdQ(now);

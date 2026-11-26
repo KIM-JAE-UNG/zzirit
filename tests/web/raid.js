@@ -72,6 +72,14 @@ async function until(fn, ms = 6000, step = 80) { const t0 = Date.now(); let v; w
     await until(() => A.evaluate(() => RD.st.raid.n === 2), 5000);
     ok(await A.$$eval('.rd-top5 li', ns => ns.length === 2 && ns.some(n => /폰레이더/.test(n.textContent))), 'the damage board lists both');
     await shot(A, 'r02_raid_pc'); await shot(B, 'r03_raid_phone');
+    // 레이드 원정대: both characters stand on the deck in both screens, with names; strikes together make a combo
+    ok(await until(() => A.evaluate(() => RCW.m.size === 2 && [...RCW.m.values()].some(m => m.n === '폰레이더') && [...RCW.m.values()].every(m => m.look)), 5000), 'A sees both anglers\' characters on the deck');
+    ok(await until(() => B.evaluate(() => RCW.m.size === 2 && [...RCW.m.values()].some(m => m.n === '괴어사냥꾼')), 5000), 'B sees them too');
+    await sleep(1600); // they walk in
+    await Promise.all([A.click('.rd-strike'), B.click('.rd-strike')]); await A.waitForTimeout(250);
+    ok(await until(() => A.evaluate(() => !!RCW.combo && RCW.combo.n >= 2), 3000), 'two anglers striking together: a team-strike combo');
+    ok(await A.evaluate(() => { const m = [...RCW.m.values()].find(x => x.n === '폰레이더'); return m && performance.now() - m.hit < 3000; }), 'the other angler\'s figure reacts to their strike');
+    await A.waitForTimeout(120); await shot(A, 'r02b_crew_combo_pc'); await shot(B, 'r03b_crew_phone');
     // too fast is refused by the server
     await post('/__sb/live_cfg', { raid: { gap: 60000 } });
     const before = await B.evaluate(() => RD.st.raid.me.hits);
