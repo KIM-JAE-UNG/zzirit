@@ -26,6 +26,30 @@ function rcSync(state) {
   }
   for (const m of RCW.m.values()) if (!seen.has(m.id)) m.gone = true;
 }
+/* 원정대 감정 표현: a wave, a bow, a dance on the deck; everyone in the raid sees it (only who and which move) */
+const RC_EMO_GAP = 2200;
+function rcEmo(id, k, nick) {
+  const e = typeof EMO_BY !== 'undefined' && EMO_BY[k]; if (!e) return false;
+  const now = performance.now(), m = RCW.m.get(id) || rcAdd(id, { n: nick }, now - 2000);
+  if (m.emo && now - m.emo.t0 < Math.min(RC_EMO_GAP, e.dur * 1000) * .9) return false; // too often: the last one plays on
+  m.emo = { k, t0: now, dur: e.dur };
+  if (id !== myId() && typeof LVS !== 'undefined') LVS.tone(1320, 1568, .12, .05, 'triangle');
+  return true;
+}
+// the moves I own (waving is free), as small buttons by the strike button
+function rdEmoBarHTML() {
+  if (typeof EMO === 'undefined') return '';
+  return `<div class="rd-emo" role="group" aria-label="${esc(t('rd_emo'))}">${EMO.map(e => { const own = emoOwns(e.id); return `<button class="rd-emob${own ? '' : ' lock'}" data-rdemo="${e.id}" aria-label="${esc(emoName(e.id) + (own ? '' : ' · ' + t('rd_emo_lock')))}" title="${esc(emoName(e.id))}"><img src="${emoArt(e.id)}" alt="">${own ? '' : icon('lock')}</button>`; }).join('')}</div>`;
+}
+function rdEmo(k) {
+  const e = typeof EMO_BY !== 'undefined' && EMO_BY[k]; if (!e) return;
+  if (!emoOwns(k)) { toast(t('rd_emo_lock_t', { name: emoName(k) }), 'info'); return; }
+  if (Date.now() - (RCW.emoAt || 0) < RC_EMO_GAP) return;
+  if (!rcEmo(myId(), k, S.me && S.me.nick)) return;
+  RCW.emoAt = Date.now();
+  if (typeof LVS !== 'undefined') LVS.buzz(12);
+  if (typeof RD !== 'undefined' && RD.room) RD.room.send('emo', { a: myId(), n: S.me && S.me.nick, k });
+}
 function rcReset() { RCW.m.clear(); RCW.combo = null; RCW.flash = 0; RCW.last = []; }
 // someone struck: rear back, flash the line, the damage over the head, maybe a combo
 function rcHit(id, dmg, crit, nick) {
@@ -69,17 +93,18 @@ function rcDraw(g, W, H, T, now, mx, my, st) {
     if (m.x == null) m.x = m.tx + (m.tx < W / 2 ? -W * .6 : W * .6);
     const walking = Math.abs(m.x - m.tx) > 2; m.x += (m.tx - m.x) * (reduce ? 1 : .08);
     const sinceHit = (now - m.hit) / 1000, yaw = Math.max(-38, Math.min(38, (mx - m.x) / W * 70));
-    let inp;
-    if (won) inp = m.id === mvpId ? { act: 'result', t: 1 + (T % 4), T } : { act: 'zzirit', t: (T + m.ph) % 3.6, T };
+    let inp; const em = m.emo && (now - m.emo.t0) / 1000 < m.emo.dur ? m.emo : null; if (m.emo && !em) m.emo = null;
+    if (em && !walking && st !== 'lost') inp = { act: em.k, t: (now - em.t0) / 1000, T };
+    else if (won) inp = m.id === mvpId ? { act: 'result', t: 1 + (T % 4), T } : { act: 'zzirit', t: (T + m.ph) % 3.6, T };
     else if (st === 'lost') inp = { act: 'lose', t: 1, T };
     else if (!on) inp = { act: 'wait', t: 1, T: T + m.ph, dip: 0 };
     else if (walking) inp = { act: 'walk', t: 1, T: T + m.ph, walk: 1 };
     else if (sinceHit < .22) inp = { act: 'hook', t: sinceHit, T };
     else inp = { act: 'fight', t: 1, T: T + m.ph, tension: .45 + .25 * Math.sin(T * 1.7 + m.ph) + (sinceHit < .8 ? .3 : 0), pull: sinceHit < .7, reel: sinceHit > .7 && Math.sin(T * .9 + m.ph) > 0, side: Math.sin(T * .6 + m.ph) * .5 };
     let tip = null;
-    try { tip = ANG.draw(g, { x: m.x, y: m.ty, k: m.k, yaw: won ? 180 : walking ? (m.tx > m.x ? 90 : -90) : yaw, bearing: 0, pitch: 62, look: m.look, mode: 'remote', noRing: true, in: inp, fish: won && m.id === mvpId && mvp ? { sp: SPI[mvp.sp] } : null }); } catch (e) { }
+    try { tip = ANG.draw(g, { x: m.x, y: m.ty, k: m.k, yaw: won || em ? 180 : walking ? (m.tx > m.x ? 90 : -90) : yaw, bearing: 0, pitch: 62, look: m.look, mode: 'remote', noRing: true, in: inp, fish: won && m.id === mvpId && mvp ? { sp: SPI[mvp.sp] } : null }); } catch (e) { }
     // the line to the monster (bright for a moment after a strike)
-    if (on && tip && !walking) {
+    if (on && tip && !walking && !em) {
       const f = Math.max(0, 1 - sinceHit / .35), sag = 30 + 20 * Math.sin(T * 2 + m.ph);
       g.beginPath(); g.moveTo(tip.x, tip.y); g.quadraticCurveTo((tip.x + mx) / 2, Math.min(tip.y, my) - sag * (1 - f), mx, my);
       g.strokeStyle = f > 0 ? `rgba(255,255,255,${.6 + .4 * f})` : (m.id === myId() ? 'rgba(227,243,255,.75)' : 'rgba(180,215,250,.38)');
@@ -92,6 +117,10 @@ function rcDraw(g, W, H, T, now, mx, my, st) {
     const label = (m.id === mvpId ? '♛ ' : '') + (m.n || t('lv_someone')), tw = g.measureText(label).width + 12;
     g.fillStyle = me ? 'rgba(124,196,255,.92)' : 'rgba(5,10,19,.62)'; g.beginPath(); g.roundRect ? g.roundRect(m.x - tw / 2, hy - 13, tw, 18, 9) : g.rect(m.x - tw / 2, hy - 13, tw, 18); g.fill();
     g.fillStyle = me ? '#050A13' : '#E3F3FF'; g.fillText(label, m.x, hy);
+    // the move's word in a bubble over the name
+    if (em) { const a = (now - em.t0) / 1000 / em.dur, say = t('emo_say_' + em.k); g.globalAlpha = Math.min(1, (1 - a) * 4, a * 8); g.font = `700 ${W < 640 ? 12 : 13.5}px "IBM Plex Sans KR", system-ui, sans-serif`; const bw = g.measureText(say).width + 18, by = hy - 44 - Math.min(1, a * 6) * 6;
+      g.fillStyle = '#E3F3FF'; g.beginPath(); g.roundRect ? g.roundRect(m.x - bw / 2, by - 15, bw, 24, 12) : g.rect(m.x - bw / 2, by - 15, bw, 24); g.fill(); g.beginPath(); g.moveTo(m.x - 5, by + 9); g.lineTo(m.x + 5, by + 9); g.lineTo(m.x, by + 15); g.fill();
+      g.fillStyle = '#050A13'; g.textAlign = 'center'; g.fillText(say, m.x, by + 2); g.globalAlpha = 1; }
     // the damage rising from the head
     m.pops = m.pops.filter(p => now - p.t0 < 1100);
     for (const p of m.pops) { const a = (now - p.t0) / 1100; g.globalAlpha = 1 - a * a; g.font = `italic 700 ${p.big ? (me ? 30 : 22) : (me ? 22 : 16)}px "Chakra Petch", system-ui, sans-serif`; g.fillStyle = p.big ? '#FFFFFF' : '#E3F3FF'; g.shadowColor = '#7CC4FF'; g.shadowBlur = p.big ? 16 : 6; g.fillText((p.big ? t('rd_crit') + ' ' : '') + p.txt, m.x, hy - 18 - a * 60); g.shadowBlur = 0; }

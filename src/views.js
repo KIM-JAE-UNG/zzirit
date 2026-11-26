@@ -305,7 +305,7 @@ function renderScanWork() {
       <div class="done-score"><span class="num">+${fmtN(c.sc || 0)}</span><span>pt</span>${statusChip(c.st, c.tr)}${c.st === 'ok' ? `<span class="lv-chip">+${fmtN(sc.xpGain || 0)} XP</span>` : `<span class="lv-chip lv-wait">${t('xp_after_review')}</span>`}</div>
       ${sc.lvUp ? `<div class="lvup">${icon('star')}<div><b>${t('lv_up', { n: sc.lvUp })}</b>${sc.unlocks && sc.unlocks.length ? `<p class="small">${t('unlock_line', { name: esc(sc.unlocks.map(id => dict(SHOPI[id].n)).slice(0, 4).join(', ')) })}</p>` : ''}</div><a class="btn btn-light btn-sm" href="#sea">${t('go_decorate')}</a></div>` : ''}
       ${trustHTML(sc.trust)}
-      <div class="actions"><button class="btn btn-primary" data-act="scan-reset">${icon('camera')}${t('scan_another')}</button><button class="btn btn-line" data-share="${esc(myId())}|${esc(c.id)}">${icon('share')}${t('share_btn')}</button><a class="btn btn-line" href="#rank">${icon('trophy')}${t('see_rank')}</a><a class="btn btn-line" href="#sea">${icon('sea')}${t('go_my_sea')}</a></div>
+      <div class="actions"><button class="btn btn-primary" data-act="scan-reset">${icon('camera')}${t('scan_another')}</button><button class="btn btn-line" data-share="${esc(myId())}|${esc(c.id)}">${icon('share')}${t('share_btn')}</button>${sp ? `<button class="btn btn-line" data-gycatch="${esc(myId())}|${esc(c.id)}">${icon('fish')}${t('gy_btn')}</button>` : ''}<a class="btn btn-line" href="#rank">${icon('trophy')}${t('see_rank')}</a><a class="btn btn-line" href="#sea">${icon('sea')}${t('go_my_sea')}</a></div>
     </div>`;
   }
 }
@@ -445,7 +445,7 @@ function registerFormHTML() {
   <form class="reg card" id="reg-form" novalidate>
     <h2>${t('reg_title')}</h2>
     <div class="row3">
-      <div class="field"><label for="rf-len">${t('reg_len')} <span class="req">*</span></label><div class="unit-in"><input id="rf-len" type="number" inputmode="decimal" min="1" max="600" step="0.1" required placeholder="${sp ? Math.round(sp.L) : 30}"><span>cm</span></div>${sp && sp.lg && sp.lg.min ? `<small class="muted">${t('lg_min_short', { n: sp.lg.min })}${sp.lg.nt === 'tachiuo' ? ' · ' + t('lg_anal') : ''}</small>` : ''}</div>
+      <div class="field"><label for="rf-len">${t('reg_len')} <span class="req">*</span></label><div class="unit-in"><input id="rf-len" type="number" inputmode="decimal" min="1" max="600" step="0.1" required placeholder="${sp ? Math.round(sp.L) : 30}"><span>cm</span></div>${sc.im ? `<button type="button" class="btn btn-line btn-sm mz-open" id="rf-measure">${icon('target')}${t('ms_btn')}</button>` : ''}${sp && sp.lg && sp.lg.min ? `<small class="muted">${t('lg_min_short', { n: sp.lg.min })}${sp.lg.nt === 'tachiuo' ? ' · ' + t('lg_anal') : ''}</small>` : ''}</div>
       <div class="field"><label for="rf-wt">${t('reg_wt')}</label><div class="unit-in"><input id="rf-wt" type="number" inputmode="decimal" min="0" max="900" step="0.01"><span>kg</span></div></div>
       <div class="field"><label for="rf-dt">${t('reg_dt')}</label><input id="rf-dt" type="datetime-local" value="${dt}" max="${new Date(nowMs() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16)}"><small class="muted" id="rf-dt-note"></small></div>
     </div>
@@ -467,6 +467,7 @@ function bindRegisterForm() {
   const sc = S.scan; const f = $('#reg-form'); if (!f) return;
   const updDt = () => { const v = $('#rf-dt').value; const ts = v ? new Date(v).getTime() : nowMs(); const old = sc.mode !== 'past' && ts < nowMs() - 3 * 86400000; const n = $('#rf-dt-note'); if (n) n.textContent = old ? t('reg_old_note2') : ''; };
   $('#rf-dt').addEventListener('input', updDt); updDt();
+  const msb = $('#rf-measure'); if (msb) msb.onclick = () => mzOpen(sc.im, cm => { const li = $('#rf-len'); li.value = cm; li.dispatchEvent(new Event('input', { bubbles: true })); li.classList.add('mz-filled'); setTimeout(() => li.classList.remove('mz-filled'), 1200); toast(t('ms_done', { n: fmtN(cm, 1) }), 'ok', 2200); setTimeout(() => li.focus({ preventScroll: true }), 50); });
   $('#rf-pick').onclick = () => { const h = GEO.HOME[homeRegion()]; openMapPicker(sc.lon != null ? [sc.lon, sc.lat] : h, pos => { sc.lon = pos[0]; sc.lat = pos[1]; sc.picked = true; const env = GEO.envAt(pos[0], pos[1]); $('#rf-loc').innerHTML = `${esc(env && env.water ? dict(GEO.seaOf(pos[0], pos[1]).n) : t('fresh_land'))} · <span class="mono">${GEO.fmtLL(pos[1], pos[0])}</span>`; }); };
   f.addEventListener('submit', async e => {
     e.preventDefault();

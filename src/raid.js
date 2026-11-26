@@ -99,7 +99,7 @@ function rdOpen() {
   el.innerHTML = `<canvas class="rd-cv" aria-hidden="true"></canvas>
     <div class="rd-head"><button class="rd-x" data-rdclose aria-label="${esc(t('close'))}">${icon('x')}</button><div class="rd-hd"></div>${APP_AUTH.live.raidRec ? `<button class="rd-recb" data-rropen>${icon('chart')}<span>${t('rr_btn')}</span><i class="rd-dot" data-rrdot hidden></i></button>` : ''}</div>
     <ol class="rd-top5" aria-label="${esc(t('rd_board'))}"></ol>
-    <div class="rd-foot"><p class="rd-hint"></p><button class="rd-strike" data-rdstrike>${icon('bolt')}<span>${t('rd_strike')}</span></button><p class="rd-mine"></p></div>
+    <div class="rd-foot"><p class="rd-hint"></p><button class="rd-strike" data-rdstrike>${icon('bolt')}<span>${t('rd_strike')}</span></button><p class="rd-mine"></p>${typeof rdEmoBarHTML === 'function' ? rdEmoBarHTML() : ''}</div>
     <div class="rd-end" hidden></div>`;
   document.body.appendChild(el); document.body.classList.add('has-modal');
   RD.el = el; RD.end = null; RD.fx = []; RD.ph0 = performance.now();
@@ -107,6 +107,7 @@ function rdOpen() {
   el.addEventListener('click', e => {
     if (e.target.closest('[data-rdclose]')) rdClose();
     else if (e.target.closest('[data-rdstrike]')) rdStrike();
+    else if (e.target.closest('[data-rdemo]')) rdEmo(e.target.closest('[data-rdemo]').dataset.rdemo);
     else if (e.target.closest('[data-rdshare]')) rdShare(e.target.closest('[data-rdshare]'));
     else if (e.target.classList.contains('rd-cv') && !$('.rd-rec:not([hidden])', el)) rdStrike();
   });
@@ -129,7 +130,7 @@ function rdJoin(r) {
   if (RD.room) RD.room.leave();
   RD.roomId = r.id;
   RD.room = APP_AUTH.rt.room('raid-' + r.id, myId(), {
-    events: ['hit', 'won'],
+    events: ['hit', 'won', 'emo'],
     // who stands on the deck (raidcrowd.js): a nickname and the character's looks
     sync: st => { if (typeof rcSync === 'function') rcSync(st); },
     status: x => { if (x === 'SUBSCRIBED' && RD.room && typeof rcMe === 'function') RD.room.track(rcMe()); },
@@ -142,7 +143,8 @@ function rdJoin(r) {
         if (typeof rcHit === 'function' && p.a) rcHit(String(p.a).slice(0, 64), d, !!p.c, String(p.n || '').slice(0, 16));
         else rdFx(String(p.n || t('lv_someone')).slice(0, 16) + ' −' + d, !!p.c, false);
         rdPanel();
-      } else if (ev === 'won') rdLoad(true);
+      } else if (ev === 'emo') { if (typeof rcEmo === 'function' && p.a && String(p.a) !== myId()) rcEmo(String(p.a).slice(0, 64), String(p.k || ''), String(p.n || '').slice(0, 16)); }
+      else if (ev === 'won') rdLoad(true);
     }
   });
 }

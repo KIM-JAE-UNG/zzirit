@@ -995,7 +995,7 @@ async function openCatch(uid, cid) {
           <div><dt>${t('trust')}</dt><dd><span class="trust-meter"><i style="width:${c.tr || 0}%"></i></span> ${c.tr ?? '—'}</dd></div>
         </dl>
         ${c.memo ? `<blockquote class="memo" id="cd-memo">${esc(c.memo)}</blockquote>${!mine && S.sample ? `<button class="btn btn-ghost btn-sm" id="cd-tr">${icon('globe')} ${t('translate')}</button>` : ''}` : ''}
-        <div class="actions split"><button class="btn btn-line btn-sm" data-share="${esc(uid)}|${esc(c.id)}">${icon('share')} ${t('share_btn')}</button>${mine && pointsOn() && c.lat != null ? `<button class="btn btn-line btn-sm" id="cd-pt">${icon('pin')} ${t('pt_from_catch')}</button>` : ''}${mine ? `<button class="btn btn-ghost btn-sm" id="cd-del">${icon('trash')} ${t('delete')}</button>` : ''}</div>
+        <div class="actions split"><button class="btn btn-line btn-sm" data-share="${esc(uid)}|${esc(c.id)}">${icon('share')} ${t('share_btn')}</button>${sp ? `<button class="btn btn-line btn-sm" data-gycatch="${esc(uid)}|${esc(c.id)}">${icon('fish')} ${t('gy_btn')}</button>` : ''}${mine && pointsOn() && c.lat != null ? `<button class="btn btn-line btn-sm" id="cd-pt">${icon('pin')} ${t('pt_from_catch')}</button>` : ''}${mine ? `<button class="btn btn-ghost btn-sm" id="cd-del">${icon('trash')} ${t('delete')}</button>` : ''}</div>
       </div>
     </article>`, { wide: true });
   store.getPhoto(uid, c.id).then(src => { if (src) { const ph = $('#cd-ph', w); if (ph) ph.innerHTML = `<img src="${src}" alt="${esc(nameOf(c.sp))}">`; } });
@@ -1190,7 +1190,7 @@ function openShareCard(blob, name, text, opt) {
 }
 
 /* ===== What's new: shown once after a big update (website only; needs the matching server update) ===== */
-const WHATS_NEW = '2026-11-26b', WN_TS = Date.parse('2026-11-07T03:00:00Z'); // people who joined after this have nothing to catch up on
+const WHATS_NEW = '2026-11-27a', WN_TS = Date.parse('2026-11-07T03:00:00Z'); // people who joined after this have nothing to catch up on
 const BOOT_AT = Date.now();
 /* what each update brought, newest last; people see what came after the last one they saw (at most 6 lines) */
 const WN_ITEMS = [
@@ -1212,7 +1212,8 @@ const WN_ITEMS = [
   ['2026-11-24a', 'bolt', 'wn_fast'],
   ['2026-11-25a', 'bolt', 'wn_raid'], ['2026-11-25a', 'sparkle', 'wn_recap'],
   ['2026-11-26a', 'sun', 'wn_plan'], ['2026-11-26a', 'medal', 'wn_rrec'],
-  ['2026-11-26b', 'users', 'wn_crew']
+  ['2026-11-26b', 'users', 'wn_crew'],
+  ['2026-11-27a', 'fish', 'wn_gy'], ['2026-11-27a', 'target', 'wn_ms'], ['2026-11-27a', 'smile', 'wn_rdemo']
 ];
 // the new look already says the fish were redrawn
 const WN_PART = { wn_fish: 'wn_look' };

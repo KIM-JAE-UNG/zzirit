@@ -163,6 +163,7 @@ document.addEventListener('click', e => {
   const inModal = tgt.closest('.modal-wrap');
   const ng = tgt.closest('.nav [data-navgrp]'); if (ng) { navToggle(ng.dataset.navgrp); return; }
   const cp = tgt.closest('[data-copy]'); if (cp) { e.preventDefault(); copyText(cp.dataset.copy, cp); return; }
+  const gy = tgt.closest('[data-gycatch]'); if (gy) { e.preventDefault(); const [u, cid] = [gy.dataset.gycatch.slice(0, gy.dataset.gycatch.indexOf('|')), gy.dataset.gycatch.slice(gy.dataset.gycatch.indexOf('|') + 1)]; const a = u === (S.uid || 'local') ? S.me : allAnglers().get(u); const c = a && (a.catches || []).find(x => x.id === cid); if (c) gyOpen(gyFromCatch(a, c)); return; }
   const sh = tgt.closest('[data-share]'); if (sh) { e.preventDefault(); const i = sh.dataset.share.indexOf('|'); shareCatch(sh.dataset.share.slice(0, i), sh.dataset.share.slice(i + 1), sh); return; }
   const fr = tgt.closest('[data-fr]'); if (fr) { const i = fr.dataset.fr.indexOf('|'); friendAction(fr.dataset.fr.slice(0, i), fr.dataset.fr.slice(i + 1), fr); return; }
   if (inModal) { const su = tgt.closest('[data-seauid]'); if (su) { closeModal(inModal); openSeaOf(su.dataset.seauid); return; } }

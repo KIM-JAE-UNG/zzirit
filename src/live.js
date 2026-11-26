@@ -395,6 +395,7 @@ function lvSub(k) {
   if (k === 'go-geo' || k === 'go-look') { lsSet('liveOk', true); lsSet('liveGeo', k === 'go-geo'); lvCover(''); if (k === 'go-geo') lvGeo(); if (lvInvGo()) return; lvHud(); lvRoom(); if (k === 'go-look') lvSub('remote'); return; }
   if (k === 'again') { $('#lv-res').hidden = true; LV.phase = 'idle'; lvHud(); return; }
   if (k === 'share') { lvShare(LV.res, $('#lv-res [data-lv="share"]')); return; }
+  if (k === 'gy') { const r = LV.res; if (r && typeof gyOpen === 'function') gyOpen({ sp: r.sp, cm: r.cm, ts: r._at, where: lvWhere(r._to), nick: S.me && S.me.nick }); return; }
   if (k === 'book') { $('#lv-res').hidden = true; LV.phase = 'idle'; lvHud(); lvBook(); return; }
   if (k === 'sellnow') { const r = LV.res; if (!r || LV.selling) return; lvSell([r.id]).then(x => { if (!x) return; $('#lv-res').hidden = true; LV.phase = 'idle'; lvHud(); }); return; }
   if (LV.phase !== 'idle') return;
@@ -506,6 +507,7 @@ function lvResult(r) {
   el.hidden = false; el.className = 'lv-res t' + r.tier;
   el.innerHTML = `<div class="lv-rcard" role="dialog" aria-label="${esc(spName(sp))}">
     <button class="lv-rshare" data-lv="share">${icon('share')}<span>${t('lv_story_btn')}</span></button>
+    <button class="lv-rshare lv-rgy" data-lv="gy">${icon('fish')}<span>${t('gy_btn')}</span></button>
     <p class="lv-rtier">${t(LV_TIERS[r.tier])}</p>
     <div class="lv-rfish tone-${sp.w}"><img src="${FD.thumb(sp, 520, 260)}" alt=""></div>
     <h2>${esc(spName(sp))}</h2>

@@ -58,7 +58,10 @@ const MC = () => ({ utc_offset_seconds: 32400, hourly: hourly({ wave_height: DAY
     const cells = await A.$$eval('.pl-grid tbody tr:first-child .pl-c', ns => ns.map(n => ({ n: +n.textContent.trim() || 0, cls: n.className })));
     ok(cells[1].cls.includes('lvl-bad') && cells[1].n <= 30, 'the stormy day says stay ashore ' + JSON.stringify(cells[1]));
     const top = Math.max(...cells.map(c => c.n));
-    ok(/lvl-(great|good)/.test(cells[4].cls) && cells[4].n >= 80 && cells[1].n === Math.min(...cells.map(c => c.n)), 'the calm, flat day scores high, the storm lowest ' + cells.map(c => c.n).join(','));
+    // the tide (the moon) and the season (a new month) change from day to day, so compare the days without them: the calm, flat day has the best weather
+    const tides = await A.evaluate(ds => ds.map(d => tideScore(TIDE.strength(TIDE.lunar(plDate(d)).age)) + seasonScore(PL.places[0].rg, plDate(d).getMonth())), DAYS);
+    const noTide = cells.map((c, i) => c.n - tides[i]);
+    ok(!/lvl-bad/.test(cells[4].cls) && noTide[4] === Math.max(...noTide) && cells[1].n === Math.min(...cells.map(c => c.n)), 'the calm, flat day scores best (without tide and season), the storm lowest ' + cells.map(c => c.n).join(',') + ' tide+season ' + tides.join(','));
     ok(await A.$eval('.pl-grid thead th:nth-child(2)', n => /오늘/.test(n.textContent)), 'the first day is today');
     const best = await A.$eval('.pl-pick.is-best', n => n.textContent);
     ok(/이번 주 최고의 날/.test(best) && new RegExp(top + '점').test(best), 'the best day stands out: ' + best.replace(/\s+/g, ' '));

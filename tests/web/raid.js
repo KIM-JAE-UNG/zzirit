@@ -80,6 +80,19 @@ async function until(fn, ms = 6000, step = 80) { const t0 = Date.now(); let v; w
     ok(await until(() => A.evaluate(() => !!RCW.combo && RCW.combo.n >= 2), 3000), 'two anglers striking together: a team-strike combo');
     ok(await A.evaluate(() => { const m = [...RCW.m.values()].find(x => x.n === '폰레이더'); return m && performance.now() - m.hit < 3000; }), 'the other angler\'s figure reacts to their strike');
     await A.waitForTimeout(120); await shot(A, 'r02b_crew_combo_pc'); await shot(B, 'r03b_crew_phone');
+    // 원정대 감정 표현: the moves I own are buttons by the strike button; a wave shows on both decks, a locked one does not send
+    ok(await A.$$eval('.rd-emo [data-rdemo]', ns => ns.length === 4 && !ns.find(n => n.dataset.rdemo === 'wave').classList.contains('lock') && ns.find(n => n.dataset.rdemo === 'zzirit').classList.contains('lock')), 'raid: the emote buttons (waving free, the others locked until bought)');
+    const eb = await B.$eval('.rd-emo', n => { const r = n.getBoundingClientRect(), s = document.querySelector('.rd-strike').getBoundingClientRect(); return r.right <= innerWidth && r.bottom < s.top && r.width <= 60; }).catch(() => false);
+    ok(eb, 'phone: the emote buttons fit on the right, clear of the strike button');
+    await B.click('[data-rdemo="wave"]'); await B.waitForTimeout(300);
+    ok(await B.evaluate(() => { const m = RCW.m.get(myId()); return !!(m && m.emo && m.emo.k === 'wave'); }), 'my own figure waves on my deck');
+    ok(await until(() => A.evaluate(() => { const m = [...RCW.m.values()].find(x => x.n === '폰레이더'); return !!(m && m.emo && m.emo.k === 'wave'); }), 3000), 'the other angler sees the wave on their deck');
+    await A.waitForTimeout(500); await shot(A, 'r02c_crew_wave_pc');
+    await B.click('[data-rdemo="zzirit"]'); await B.waitForTimeout(400);
+    ok(await B.evaluate(() => /낚시점/.test(document.querySelector('#toast-root').textContent)), 'a locked move points to the tackle shop');
+    ok(await A.evaluate(() => { const m = [...RCW.m.values()].find(x => x.n === '폰레이더'); return !(m && m.emo && m.emo.k === 'zzirit'); }), 'and is not sent');
+    ok(await A.evaluate(() => { rcEmo('stranger', 'fly', 'x'); const m = RCW.m.get('stranger'); return !m || !m.emo; }), 'an unknown move from someone is ignored');
+    await sleep(2400);
     // too fast is refused by the server
     await post('/__sb/live_cfg', { raid: { gap: 60000 } });
     const before = await B.evaluate(() => RD.st.raid.me.hits);

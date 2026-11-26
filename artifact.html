@@ -1994,9 +1994,9 @@ body[data-route="live"] #main { padding-left: 0; padding-right: 0; }
 .rd-toast .btn { margin-left: 4px; flex: none; }
 .rd { position: fixed; inset: 0; z-index: 90; color: #E8EDF5; background: #02060F; overflow: hidden; user-select: none; -webkit-user-select: none; touch-action: manipulation; }
 .rd-cv { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: crosshair; }
-.rd-head { position: absolute; inset: 0 0 auto; padding: max(14px, env(safe-area-inset-top, 0px)) 16px 0; display: flex; justify-content: center; pointer-events: none; }
+.rd-head { position: absolute; inset: 0 0 auto; padding: max(14px, env(safe-area-inset-top, 0px)) 16px 0; display: flex; justify-content: center; pointer-events: none; z-index: 3; }
 .rd-hd { width: min(560px, 100%); text-align: center; pointer-events: auto; }
-.rd-x { position: absolute; top: max(12px, env(safe-area-inset-top, 0px)); right: max(12px, env(safe-area-inset-right, 0px)); width: 42px; height: 42px; border-radius: 14px; display: grid; place-items: center; border: 1px solid rgba(160,205,255,.18); background: rgba(5,10,19,.6); color: #E3F3FF; cursor: pointer; pointer-events: auto; z-index: 2; }
+.rd-x { position: absolute; top: max(12px, env(safe-area-inset-top, 0px)); right: max(12px, env(safe-area-inset-right, 0px)); width: 42px; height: 42px; border-radius: 14px; display: grid; place-items: center; border: 1px solid rgba(160,205,255,.18); background: rgba(5,10,19,.6); color: #E3F3FF; cursor: pointer; pointer-events: auto; }
 .rd-eye { display: inline-flex; align-items: center; gap: 7px; font: 600 12.5px/1.2 var(--f-disp); letter-spacing: .1em; text-transform: uppercase; color: var(--spark); }
 .rd-hd h2 { font-size: clamp(22px, 5vw, 30px); color: #fff; margin: 6px 0 10px; }
 .rd-hp { position: relative; height: 22px; border-radius: 99px; background: rgba(255,255,255,.1); border: 1px solid rgba(160,205,255,.25); overflow: hidden; }
@@ -2177,7 +2177,7 @@ body[data-route="live"] #main { padding-left: 0; padding-right: 0; }
 @media (prefers-reduced-motion: reduce) { .pl-c, .pl-det { animation: none; } .pl-pick.is-best::after, .pl-c.best::before { animation: none; } }
 
 /* ===== 레이드 기록과 괴어 칭호 (raidrec.js) ===== */
-.rd-recb { position: absolute; top: max(12px, env(safe-area-inset-top, 0px)); left: max(12px, env(safe-area-inset-left, 0px)); height: 42px; padding: 0 12px; border-radius: 14px; display: inline-flex; align-items: center; gap: 6px; border: 1px solid rgba(160,205,255,.18); background: rgba(5,10,19,.6); color: #E3F3FF; font: 600 13.5px/1 var(--f-body); cursor: pointer; pointer-events: auto; z-index: 2; }
+.rd-recb { position: absolute; top: max(12px, env(safe-area-inset-top, 0px)); left: max(12px, env(safe-area-inset-left, 0px)); height: 42px; padding: 0 12px; border-radius: 14px; display: inline-flex; align-items: center; gap: 6px; border: 1px solid rgba(160,205,255,.18); background: rgba(5,10,19,.6); color: #E3F3FF; font: 600 13.5px/1 var(--f-body); cursor: pointer; pointer-events: auto; }
 .rd-recb .ic { width: 18px; height: 18px; color: var(--spark); }
 .rd-dot { position: absolute; top: 6px; right: 6px; width: 9px; height: 9px; border-radius: 50%; background: var(--spark); box-shadow: 0 0 0 2px #050A13, 0 0 10px var(--spark); animation: pl-glow 1.4s ease-in-out infinite; }
 .rd-rec { position: absolute; inset: 0; z-index: 5; display: flex; flex-direction: column; background: linear-gradient(180deg, rgba(11,36,80,.96), rgba(2,6,15,.98) 60%); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); opacity: 0; transform: translateY(16px); transition: opacity .22s, transform .22s; user-select: text; -webkit-user-select: text; }
@@ -2228,6 +2228,73 @@ body[data-route="live"] #main { padding-left: 0; padding-right: 0; }
   .rr-book { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .rr-list li { grid-template-columns: 44px 1fr auto; } .rr-l-s { grid-column: 2 / 4; justify-self: start; } .rr-l-f img { width: 44px; }
 }
+
+/* ---- 어탁 (gyotaku.js) ---- */
+.gy { text-align: center; }
+.gy h2 { margin: 2px 0 4px; }
+.gy .lede { margin: 0 auto 12px; max-width: 46ch; }
+.gy-stage { position: relative; width: min(100%, 420px); margin: 0 auto 12px; aspect-ratio: 1080 / 1350; border-radius: 10px; overflow: hidden; box-shadow: 0 14px 36px rgba(7,12,22,.28); background: #EFE8DA; perspective: 1100px; }
+.gy-cv { display: block; width: 100%; height: 100%; }
+.gy-paper { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; border: 0; cursor: grab; touch-action: none; color: #3B485D;
+  background: radial-gradient(120% 90% at 50% 40%, rgba(251,248,241,.9), rgba(237,229,212,.93)); transform-origin: 50% 0; transition: transform .25s, opacity .25s; box-shadow: inset 0 0 0 1px rgba(60,50,30,.08), inset 0 -30px 60px rgba(120,100,60,.08); font: inherit; }
+.gy-paper::before { content: ""; position: absolute; inset: 0; opacity: .5; background: repeating-linear-gradient(97deg, rgba(120,105,80,.05) 0 2px, transparent 2px 9px), repeating-linear-gradient(8deg, rgba(120,105,80,.04) 0 1px, transparent 1px 13px); pointer-events: none; }
+.gy-paper b { font: 700 20px var(--f-body); color: #0A1220; }
+.gy-paper small { font-size: 13px; color: #627087; }
+.gy-hand { display: grid; place-items: center; width: 54px; height: 54px; border-radius: 50%; background: #0B1730; color: var(--spark); animation: gyNudge 1.6s ease-in-out infinite; }
+.gy-hand .ic { width: 26px; height: 26px; transform: rotate(180deg); }
+.gy-paper:focus-visible { outline: 3px solid var(--accent); outline-offset: -6px; }
+.gy-paper.off { animation: gyPeel .95s cubic-bezier(.5,.05,.4,1) forwards; pointer-events: none; }
+.gy-paper.down { animation: gyDown .45s ease-out; }
+@keyframes gyPeel { 0% { transform: rotateX(0); box-shadow: 0 0 0 rgba(0,0,0,0); } 35% { transform: rotateX(-48deg) translateY(-2%); box-shadow: 0 40px 60px rgba(7,12,22,.35); } 100% { transform: rotateX(-110deg) translateY(-30%); opacity: 0; } }
+@keyframes gyDown { 0% { transform: rotateX(-70deg); opacity: .3; } 70% { transform: rotateX(4deg); } 100% { transform: none; } }
+@keyframes gyNudge { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+.gy-wait { position: absolute; inset: auto 0 10px; display: flex; justify-content: center; pointer-events: none; }
+.gy-wait i { width: 22px; height: 22px; border-radius: 50%; border: 3px solid rgba(30,102,229,.25); border-top-color: var(--accent); animation: spin .8s linear infinite; }
+.gy-ink { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 12px; }
+.gy-chip { display: inline-flex; align-items: center; gap: 7px; min-height: 40px; padding: 0 14px; border-radius: 99px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: 600 14px var(--f-body); cursor: pointer; }
+.gy-chip.on { border-color: var(--accent); background: var(--accent-soft); color: var(--accent-2); }
+.gy-chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.gy-dot { width: 16px; height: 16px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(0,0,0,.15); }
+.gy-dot.sumi { background: #161A22; } .gy-dot.ai { background: #14295A; } .gy-dot.gin { background: linear-gradient(135deg, #E3F3FF, #0D1B36 60%); }
+.gy .actions { justify-content: center; flex-wrap: wrap; }
+.lv-rgy { right: auto; left: 12px; }
+@media (prefers-reduced-motion: reduce) { .gy-paper.off { animation: none; opacity: 0; } .gy-hand { animation: none; } }
+
+/* ---- 사진으로 길이 재기 (measure.js) ---- */
+.mz-open { margin-top: 6px; }
+.mz-filled { animation: mzFill 1.2s ease-out; }
+@keyframes mzFill { 0% { box-shadow: 0 0 0 0 rgba(30,102,229,.6); background: var(--accent-soft); } 100% { box-shadow: 0 0 0 12px rgba(30,102,229,0); } }
+.mz { position: fixed; inset: 0; z-index: 120; display: grid; grid-template-rows: auto auto minmax(0, 1fr) auto; background: #050A13; color: #E8EDF5; }
+.mz-top { display: flex; align-items: center; gap: 12px; padding: max(12px, env(safe-area-inset-top, 0px)) 16px 6px; }
+.mz-top b { display: block; font-size: 17px; } .mz-top small { display: block; font-size: 12.5px; color: #AAB6C9; line-height: 1.4; }
+.mz-x { flex: none; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(160,205,255,.25); background: rgba(124,196,255,.1); color: #E3F3FF; cursor: pointer; }
+.mz-x .ic { width: 20px; height: 20px; }
+.mz-refs { display: flex; gap: 6px; padding: 4px 16px 8px; overflow-x: auto; scrollbar-width: none; align-items: center; }
+.mz-ref { flex: none; display: inline-flex; flex-direction: column; align-items: center; justify-content: center; min-height: 44px; padding: 4px 12px; border-radius: 12px; border: 1px solid rgba(160,205,255,.22); background: rgba(124,196,255,.06); color: #E3F3FF; font: 600 13px var(--f-body); cursor: pointer; line-height: 1.2; }
+.mz-ref small { font-size: 11px; color: #8E9BB0; font-weight: 500; }
+.mz-ref.on { background: #E3F3FF; color: #050A13; border-color: #E3F3FF; } .mz-ref.on small { color: #3B485D; }
+.mz-ref:focus-visible, .mz-x:focus-visible { outline: 2px solid var(--spark); outline-offset: 2px; }
+.mz-own { flex: none; display: inline-flex; align-items: center; gap: 4px; }
+.mz-own input { width: 74px; min-height: 40px; border-radius: 10px; border: 1px solid rgba(160,205,255,.35); background: #0B1730; color: #fff; padding: 0 8px; font: 600 15px var(--f-body); }
+.mz-stage { position: relative; min-height: 0; margin: 0 8px; border-radius: 14px; overflow: hidden; background: #02060F; }
+.mz-cv { position: absolute; inset: 0; touch-action: none; cursor: crosshair; }
+.mz-loupe { position: absolute; width: 120px; height: 120px; border-radius: 50%; box-shadow: 0 0 0 3px #E3F3FF, 0 10px 28px rgba(0,0,0,.6); pointer-events: none; }
+.mz-foot { padding: 10px 16px max(14px, env(safe-area-inset-bottom, 0px)); display: grid; gap: 6px; }
+.mz-legend { display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: #AAB6C9; margin: 0; }
+.mz-k { display: inline-block; width: 18px; height: 0; border-top: 3px dashed; margin-left: 6px; } .mz-k.ref { color: #E3F3FF; margin-left: 0; } .mz-k.fish { color: #7CC4FF; }
+.mz-out { margin: 0; display: flex; align-items: baseline; justify-content: center; gap: 4px; }
+.mz-out b { font: 700 italic 44px/1 var(--f-disp); color: var(--spark); } .mz-out span { font: 600 18px var(--f-disp); color: #AAB6C9; }
+.mz-tip { display: flex; gap: 6px; align-items: flex-start; margin: 0; font-size: 12.5px; color: #8E9BB0; line-height: 1.4; } .mz-tip .ic { flex: none; width: 15px; height: 15px; margin-top: 1px; }
+@media (min-width: 900px) { .mz { grid-template-columns: minmax(0, 1fr) 340px; grid-template-rows: auto auto minmax(0, 1fr); } .mz-top, .mz-refs { grid-column: 1 / -1; } .mz-stage { margin: 0 8px 16px 16px; } .mz-foot { align-content: center; padding-right: 24px; } }
+
+/* ---- 원정대 감정 표현 (raidcrowd.js) ---- */
+.rd-emo { position: fixed; right: 10px; top: 42%; display: flex; flex-direction: column; gap: 8px; pointer-events: auto; }
+.rd-emob { position: relative; width: 52px; height: 52px; padding: 0; border-radius: 16px; border: 1px solid rgba(160,205,255,.3); background: rgba(11,23,48,.72); cursor: pointer; overflow: hidden; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); transition: transform .08s; }
+.rd-emob img { position: absolute; left: 50%; top: 50%; width: 96px; height: 48px; transform: translate(-50%, -46%); object-fit: cover; pointer-events: none; }
+.rd-emob.lock img { opacity: .35; filter: grayscale(1); }
+.rd-emob .ic { position: absolute; right: 4px; bottom: 4px; width: 14px; height: 14px; color: #C9D3E0; }
+.rd-emob:active { transform: scale(.92); } .rd-emob:focus-visible { outline: 2px solid var(--spark); outline-offset: 2px; }
+@media (max-width: 640px) { .rd-emo { top: 150px; gap: 6px; } .rd-emob { width: 44px; height: 44px; border-radius: 13px; } }
 
 </style>
 <div class="app">
@@ -4222,6 +4289,52 @@ Object.assign(T, {
   wn_plan_p: ['7일 날씨·파도·물때·제철을 합쳐 이번 주 언제 어디로 갈지 골라 줘요. 친구에게 보내거나 달력에 넣어요.', 'Seven days of weather, waves, tide and season pick when and where to go — send it to a friend or add it to your calendar.', '7日間の天気・波・潮・旬から今週いつどこへ行くか選びます。友だちに送ったりカレンダーに入れたり。', '综合7天的天气、海浪、潮汐和季节，帮你选这周何时去哪儿钓。可发给朋友或加入日历。'],
   wn_rrec_h: ['레이드 기록과 괴어 칭호', 'Raid record and titles', 'レイド記録と称号', '团战记录与称号'],
   wn_rrec_p: ['레이드 화면의 「기록」에서 내 전적·괴어 도감을 보고, 괴어 사냥꾼·괴어 MVP·괴어 정복자 칭호를 모아요.', 'See your raid record and monster book under “Record” on the raid screen, and collect Monster hunter, Monster MVP and Monster conqueror titles.', 'レイド画面の「記録」で戦績と怪魚図鑑を見て、怪魚ハンター・怪魚MVP・怪魚の覇者の称号を集めよう。', '在团战页的「记录」查看战绩和怪鱼图鉴，收集怪鱼猎人、怪鱼MVP、怪鱼征服者称号。'],
+  /* 어탁 (gyotaku), 사진으로 길이 재기, 원정대 감정 표현 (2026-11-27) */
+  gy_word: ['어탁', 'Gyotaku', '魚拓', '鱼拓'],
+  gy_btn: ['어탁 만들기', 'Gyotaku print', '魚拓を作る', '做鱼拓'],
+  gy_h: ['나만의 어탁', 'Your gyotaku', '私の魚拓', '我的鱼拓'],
+  gy_sub: ['옛날 낚시꾼처럼 먹으로 고기를 종이에 찍었어요. 종이를 떼어 보세요.', 'Printed in ink on paper, the way anglers kept a fish long ago. Peel the paper off.', '昔の釣り人のように、墨で魚を紙に写しました。紙をはがしてみましょう。', '像从前的钓友一样，用墨把鱼拓在纸上。揭开纸看看吧。'],
+  gy_alt: ['{name} {len} 어탁', 'Gyotaku of a {name}, {len}', '{name} {len}の魚拓', '{name} {len}的鱼拓'],
+  gy_peel: ['종이 떼기', 'Peel the paper', '紙をはがす', '揭开纸'],
+  gy_peel_sub: ['누르거나 위로 당겨요', 'Tap it or pull it up', 'タップするか上に引っぱる', '点一下或向上拉'],
+  gy_ink: ['먹 색', 'Ink', '墨の色', '墨色'],
+  gy_st_sumi: ['먹', 'Sumi black', '墨', '墨黑'],
+  gy_st_ai: ['쪽빛', 'Indigo', '藍', '靛蓝'],
+  gy_st_gin: ['은빛 밤바다', 'Silver on night sea', '銀の夜の海', '银色夜海'],
+  gy_save: ['저장·자랑하기', 'Save & share', '保存・自慢する', '保存·晒一晒'],
+  gy_again: ['다시 찍기', 'Print again', 'もう一度刷る', '再拓一次'],
+  gy_by: ['낚은 사람 {nick}', 'Caught by {nick}', '釣った人 {nick}', '钓者 {nick}'],
+  gy_text: ['찌릿에서 {name} {len} 어탁을 만들었어요! 나도 해 보기 →', 'I made a gyotaku of my {name}, {len}, on ZZIRIT! Try it →', 'ZZIRITで{name} {len}の魚拓を作りました!やってみる →', '我在ZZIRIT给{name} {len}做了鱼拓！来试试 →'],
+  gy_share_sub: ['그림으로 저장해 친구에게 보내 보세요. 정확한 자리는 들어가지 않아요.', 'Save the picture and send it to friends. The exact spot is never included.', '画像で保存して友だちに送ってみましょう。正確な場所は入りません。', '保存成图片发给朋友吧。不会包含精确位置。'],
+  ms_btn: ['사진으로 재기', 'Measure in photo', '写真で測る', '用照片量'],
+  ms_h: ['사진으로 길이 재기', 'Measure from the photo', '写真で長さを測る', '用照片量长度'],
+  ms_sub: ['물건의 두 끝, 고기의 입과 꼬리 끝으로 점을 옮겨요', 'Move the dots to both ends of the object, then to the fish\'s mouth and tail', '物の両端、魚の口と尾の先に点を動かします', '把点移到物品两端，再移到鱼嘴和尾尖'],
+  ms_ref: ['고기 옆에 둔 물건', 'What lies next to the fish', '魚の横に置いた物', '鱼旁边放的物品'],
+  ms_r_card: ['카드 긴 쪽', 'Card, long side', 'カードの長い辺', '卡片长边'],
+  ms_r_w500: ['500원 동전', '₩500 coin', '500ウォン硬貨', '500韩元硬币'],
+  ms_r_w100: ['100원 동전', '₩100 coin', '100ウォン硬貨', '100韩元硬币'],
+  ms_r_usq: ['25센트 동전', 'Quarter (25¢)', '25セント硬貨', '25美分硬币'],
+  ms_r_y500: ['500엔 동전', '¥500 coin', '500円玉', '500日元硬币'],
+  ms_r_y100: ['100엔 동전', '¥100 coin', '100円玉', '100日元硬币'],
+  ms_r_cny1: ['1위안 동전', '1 yuan coin', '1元硬貨', '1元硬币'],
+  ms_r_own: ['다른 물건', 'Something else', 'ほかの物', '其他物品'],
+  ms_own_lbl: ['물건 길이(cm)', 'Its length (cm)', '物の長さ(cm)', '物品长度(cm)'],
+  ms_cv: ['사진. 점을 끌어서 옮겨요. 숫자 1~4로 점을 고르고 화살표로 옮길 수도 있어요.', 'The photo. Drag the dots. You can also pick a dot with 1–4 and move it with the arrow keys.', '写真。点をドラッグして動かします。1〜4で点を選び、矢印キーでも動かせます。', '照片。拖动圆点。也可以按1–4选点，用方向键移动。'],
+  ms_leg_ref: ['물건', 'Object', '物', '物品'],
+  ms_leg_fish: ['고기', 'Fish', '魚', '鱼'],
+  ms_tip: ['물건을 고기 바로 옆에 두고, 위에서 똑바로 찍으면 더 정확해요.', 'Most accurate with the object right beside the fish and the photo taken straight from above.', '物を魚のすぐ横に置き、真上からまっすぐ撮るとより正確です。', '物品紧挨着鱼、从正上方拍摄会更准确。'],
+  ms_use: ['이 길이 쓰기', 'Use this length', 'この長さを使う', '使用这个长度'],
+  ms_err: ['점을 다시 놓아 주세요', 'Place the dots again', '点を置き直してください', '请重新放置圆点'],
+  ms_done: ['{n}cm를 넣었어요', '{n} cm filled in', '{n}cmを入れました', '已填入{n}cm'],
+  rd_emo: ['원정대 감정 표현', 'Crew emotes', '遠征隊のエモート', '远征队表情'],
+  rd_emo_lock: ['낚시점에서 살 수 있어요', 'In the tackle shop', '釣具店で買えます', '可在渔具店购买'],
+  rd_emo_lock_t: ['「{name}」은 찌릿 낚시점에서 살 수 있어요', '"{name}" is in the ZZIRIT tackle shop', '「{name}」はZZIRIT釣具店で買えます', '「{name}」可在ZZIRIT渔具店购买'],
+  wn_gy_h: ['어탁 만들기', 'Gyotaku prints', '魚拓づくり', '做鱼拓'],
+  wn_gy_p: ['잡은 고기를 옛날처럼 먹으로 종이에 찍어요. 종이를 떼는 손맛, 먹·쪽빛·은빛 세 가지 색.', 'Print your catch in ink on paper, the old way. Peel the paper off; three inks to pick from.', '釣った魚を昔のように墨で紙に写します。紙をはがす手ごたえ、墨・藍・銀の三色。', '像从前一样把渔获用墨拓在纸上。亲手揭开纸，墨、靛蓝、银三种颜色。'],
+  wn_ms_h: ['사진으로 길이 재기', 'Measure in the photo', '写真で長さを測る', '用照片量长度'],
+  wn_ms_p: ['고기 옆에 카드나 동전을 두고 찍으면, 점 네 개로 길이를 재 줘요.', 'Put a card or a coin next to the fish: four dots on the photo give its length.', '魚の横にカードや硬貨を置いて撮れば、点4つで長さを測れます。', '在鱼旁边放卡片或硬币拍照，用四个点就能量出长度。'],
+  wn_rdemo_h: ['배 위에서 감정 표현', 'Emotes on the raid deck', 'レイドの船でエモート', '团战船上的表情'],
+  wn_rdemo_p: ['레이드 중에 손 흔들기·인사·춤을 누르면 원정대 모두에게 보여요.', 'Wave, bow or dance during a raid and the whole crew sees it.', 'レイド中に手を振る・あいさつ・ダンスをすると遠征隊のみんなに見えます。', '团战中挥手、问好、跳舞，全体远征队都能看到。'],
 });
 
 /* ===== Tackle dictionaries: [ko, en, ja, zh] ===== */
@@ -8159,7 +8272,7 @@ async function openCatch(uid, cid) {
           <div><dt>${t('trust')}</dt><dd><span class="trust-meter"><i style="width:${c.tr || 0}%"></i></span> ${c.tr ?? '—'}</dd></div>
         </dl>
         ${c.memo ? `<blockquote class="memo" id="cd-memo">${esc(c.memo)}</blockquote>${!mine && S.sample ? `<button class="btn btn-ghost btn-sm" id="cd-tr">${icon('globe')} ${t('translate')}</button>` : ''}` : ''}
-        <div class="actions split"><button class="btn btn-line btn-sm" data-share="${esc(uid)}|${esc(c.id)}">${icon('share')} ${t('share_btn')}</button>${mine && pointsOn() && c.lat != null ? `<button class="btn btn-line btn-sm" id="cd-pt">${icon('pin')} ${t('pt_from_catch')}</button>` : ''}${mine ? `<button class="btn btn-ghost btn-sm" id="cd-del">${icon('trash')} ${t('delete')}</button>` : ''}</div>
+        <div class="actions split"><button class="btn btn-line btn-sm" data-share="${esc(uid)}|${esc(c.id)}">${icon('share')} ${t('share_btn')}</button>${sp ? `<button class="btn btn-line btn-sm" data-gycatch="${esc(uid)}|${esc(c.id)}">${icon('fish')} ${t('gy_btn')}</button>` : ''}${mine && pointsOn() && c.lat != null ? `<button class="btn btn-line btn-sm" id="cd-pt">${icon('pin')} ${t('pt_from_catch')}</button>` : ''}${mine ? `<button class="btn btn-ghost btn-sm" id="cd-del">${icon('trash')} ${t('delete')}</button>` : ''}</div>
       </div>
     </article>`, { wide: true });
   store.getPhoto(uid, c.id).then(src => { if (src) { const ph = $('#cd-ph', w); if (ph) ph.innerHTML = `<img src="${src}" alt="${esc(nameOf(c.sp))}">`; } });
@@ -8354,7 +8467,7 @@ function openShareCard(blob, name, text, opt) {
 }
 
 /* ===== What's new: shown once after a big update (website only; needs the matching server update) ===== */
-const WHATS_NEW = '2026-11-26b', WN_TS = Date.parse('2026-11-07T03:00:00Z'); // people who joined after this have nothing to catch up on
+const WHATS_NEW = '2026-11-27a', WN_TS = Date.parse('2026-11-07T03:00:00Z'); // people who joined after this have nothing to catch up on
 const BOOT_AT = Date.now();
 /* what each update brought, newest last; people see what came after the last one they saw (at most 6 lines) */
 const WN_ITEMS = [
@@ -8376,7 +8489,8 @@ const WN_ITEMS = [
   ['2026-11-24a', 'bolt', 'wn_fast'],
   ['2026-11-25a', 'bolt', 'wn_raid'], ['2026-11-25a', 'sparkle', 'wn_recap'],
   ['2026-11-26a', 'sun', 'wn_plan'], ['2026-11-26a', 'medal', 'wn_rrec'],
-  ['2026-11-26b', 'users', 'wn_crew']
+  ['2026-11-26b', 'users', 'wn_crew'],
+  ['2026-11-27a', 'fish', 'wn_gy'], ['2026-11-27a', 'target', 'wn_ms'], ['2026-11-27a', 'smile', 'wn_rdemo']
 ];
 // the new look already says the fish were redrawn
 const WN_PART = { wn_fish: 'wn_look' };
@@ -8764,7 +8878,7 @@ function renderScanWork() {
       <div class="done-score"><span class="num">+${fmtN(c.sc || 0)}</span><span>pt</span>${statusChip(c.st, c.tr)}${c.st === 'ok' ? `<span class="lv-chip">+${fmtN(sc.xpGain || 0)} XP</span>` : `<span class="lv-chip lv-wait">${t('xp_after_review')}</span>`}</div>
       ${sc.lvUp ? `<div class="lvup">${icon('star')}<div><b>${t('lv_up', { n: sc.lvUp })}</b>${sc.unlocks && sc.unlocks.length ? `<p class="small">${t('unlock_line', { name: esc(sc.unlocks.map(id => dict(SHOPI[id].n)).slice(0, 4).join(', ')) })}</p>` : ''}</div><a class="btn btn-light btn-sm" href="#sea">${t('go_decorate')}</a></div>` : ''}
       ${trustHTML(sc.trust)}
-      <div class="actions"><button class="btn btn-primary" data-act="scan-reset">${icon('camera')}${t('scan_another')}</button><button class="btn btn-line" data-share="${esc(myId())}|${esc(c.id)}">${icon('share')}${t('share_btn')}</button><a class="btn btn-line" href="#rank">${icon('trophy')}${t('see_rank')}</a><a class="btn btn-line" href="#sea">${icon('sea')}${t('go_my_sea')}</a></div>
+      <div class="actions"><button class="btn btn-primary" data-act="scan-reset">${icon('camera')}${t('scan_another')}</button><button class="btn btn-line" data-share="${esc(myId())}|${esc(c.id)}">${icon('share')}${t('share_btn')}</button>${sp ? `<button class="btn btn-line" data-gycatch="${esc(myId())}|${esc(c.id)}">${icon('fish')}${t('gy_btn')}</button>` : ''}<a class="btn btn-line" href="#rank">${icon('trophy')}${t('see_rank')}</a><a class="btn btn-line" href="#sea">${icon('sea')}${t('go_my_sea')}</a></div>
     </div>`;
   }
 }
@@ -8904,7 +9018,7 @@ function registerFormHTML() {
   <form class="reg card" id="reg-form" novalidate>
     <h2>${t('reg_title')}</h2>
     <div class="row3">
-      <div class="field"><label for="rf-len">${t('reg_len')} <span class="req">*</span></label><div class="unit-in"><input id="rf-len" type="number" inputmode="decimal" min="1" max="600" step="0.1" required placeholder="${sp ? Math.round(sp.L) : 30}"><span>cm</span></div>${sp && sp.lg && sp.lg.min ? `<small class="muted">${t('lg_min_short', { n: sp.lg.min })}${sp.lg.nt === 'tachiuo' ? ' · ' + t('lg_anal') : ''}</small>` : ''}</div>
+      <div class="field"><label for="rf-len">${t('reg_len')} <span class="req">*</span></label><div class="unit-in"><input id="rf-len" type="number" inputmode="decimal" min="1" max="600" step="0.1" required placeholder="${sp ? Math.round(sp.L) : 30}"><span>cm</span></div>${sc.im ? `<button type="button" class="btn btn-line btn-sm mz-open" id="rf-measure">${icon('target')}${t('ms_btn')}</button>` : ''}${sp && sp.lg && sp.lg.min ? `<small class="muted">${t('lg_min_short', { n: sp.lg.min })}${sp.lg.nt === 'tachiuo' ? ' · ' + t('lg_anal') : ''}</small>` : ''}</div>
       <div class="field"><label for="rf-wt">${t('reg_wt')}</label><div class="unit-in"><input id="rf-wt" type="number" inputmode="decimal" min="0" max="900" step="0.01"><span>kg</span></div></div>
       <div class="field"><label for="rf-dt">${t('reg_dt')}</label><input id="rf-dt" type="datetime-local" value="${dt}" max="${new Date(nowMs() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16)}"><small class="muted" id="rf-dt-note"></small></div>
     </div>
@@ -8926,6 +9040,7 @@ function bindRegisterForm() {
   const sc = S.scan; const f = $('#reg-form'); if (!f) return;
   const updDt = () => { const v = $('#rf-dt').value; const ts = v ? new Date(v).getTime() : nowMs(); const old = sc.mode !== 'past' && ts < nowMs() - 3 * 86400000; const n = $('#rf-dt-note'); if (n) n.textContent = old ? t('reg_old_note2') : ''; };
   $('#rf-dt').addEventListener('input', updDt); updDt();
+  const msb = $('#rf-measure'); if (msb) msb.onclick = () => mzOpen(sc.im, cm => { const li = $('#rf-len'); li.value = cm; li.dispatchEvent(new Event('input', { bubbles: true })); li.classList.add('mz-filled'); setTimeout(() => li.classList.remove('mz-filled'), 1200); toast(t('ms_done', { n: fmtN(cm, 1) }), 'ok', 2200); setTimeout(() => li.focus({ preventScroll: true }), 50); });
   $('#rf-pick').onclick = () => { const h = GEO.HOME[homeRegion()]; openMapPicker(sc.lon != null ? [sc.lon, sc.lat] : h, pos => { sc.lon = pos[0]; sc.lat = pos[1]; sc.picked = true; const env = GEO.envAt(pos[0], pos[1]); $('#rf-loc').innerHTML = `${esc(env && env.water ? dict(GEO.seaOf(pos[0], pos[1]).n) : t('fresh_land'))} · <span class="mono">${GEO.fmtLL(pos[1], pos[0])}</span>`; }); };
   f.addEventListener('submit', async e => {
     e.preventDefault();
@@ -13243,6 +13358,7 @@ function lvSub(k) {
   if (k === 'go-geo' || k === 'go-look') { lsSet('liveOk', true); lsSet('liveGeo', k === 'go-geo'); lvCover(''); if (k === 'go-geo') lvGeo(); if (lvInvGo()) return; lvHud(); lvRoom(); if (k === 'go-look') lvSub('remote'); return; }
   if (k === 'again') { $('#lv-res').hidden = true; LV.phase = 'idle'; lvHud(); return; }
   if (k === 'share') { lvShare(LV.res, $('#lv-res [data-lv="share"]')); return; }
+  if (k === 'gy') { const r = LV.res; if (r && typeof gyOpen === 'function') gyOpen({ sp: r.sp, cm: r.cm, ts: r._at, where: lvWhere(r._to), nick: S.me && S.me.nick }); return; }
   if (k === 'book') { $('#lv-res').hidden = true; LV.phase = 'idle'; lvHud(); lvBook(); return; }
   if (k === 'sellnow') { const r = LV.res; if (!r || LV.selling) return; lvSell([r.id]).then(x => { if (!x) return; $('#lv-res').hidden = true; LV.phase = 'idle'; lvHud(); }); return; }
   if (LV.phase !== 'idle') return;
@@ -13354,6 +13470,7 @@ function lvResult(r) {
   el.hidden = false; el.className = 'lv-res t' + r.tier;
   el.innerHTML = `<div class="lv-rcard" role="dialog" aria-label="${esc(spName(sp))}">
     <button class="lv-rshare" data-lv="share">${icon('share')}<span>${t('lv_story_btn')}</span></button>
+    <button class="lv-rshare lv-rgy" data-lv="gy">${icon('fish')}<span>${t('gy_btn')}</span></button>
     <p class="lv-rtier">${t(LV_TIERS[r.tier])}</p>
     <div class="lv-rfish tone-${sp.w}"><img src="${FD.thumb(sp, 520, 260)}" alt=""></div>
     <h2>${esc(spName(sp))}</h2>
@@ -14378,7 +14495,7 @@ function rdOpen() {
   el.innerHTML = `<canvas class="rd-cv" aria-hidden="true"></canvas>
     <div class="rd-head"><button class="rd-x" data-rdclose aria-label="${esc(t('close'))}">${icon('x')}</button><div class="rd-hd"></div>${APP_AUTH.live.raidRec ? `<button class="rd-recb" data-rropen>${icon('chart')}<span>${t('rr_btn')}</span><i class="rd-dot" data-rrdot hidden></i></button>` : ''}</div>
     <ol class="rd-top5" aria-label="${esc(t('rd_board'))}"></ol>
-    <div class="rd-foot"><p class="rd-hint"></p><button class="rd-strike" data-rdstrike>${icon('bolt')}<span>${t('rd_strike')}</span></button><p class="rd-mine"></p></div>
+    <div class="rd-foot"><p class="rd-hint"></p><button class="rd-strike" data-rdstrike>${icon('bolt')}<span>${t('rd_strike')}</span></button><p class="rd-mine"></p>${typeof rdEmoBarHTML === 'function' ? rdEmoBarHTML() : ''}</div>
     <div class="rd-end" hidden></div>`;
   document.body.appendChild(el); document.body.classList.add('has-modal');
   RD.el = el; RD.end = null; RD.fx = []; RD.ph0 = performance.now();
@@ -14386,6 +14503,7 @@ function rdOpen() {
   el.addEventListener('click', e => {
     if (e.target.closest('[data-rdclose]')) rdClose();
     else if (e.target.closest('[data-rdstrike]')) rdStrike();
+    else if (e.target.closest('[data-rdemo]')) rdEmo(e.target.closest('[data-rdemo]').dataset.rdemo);
     else if (e.target.closest('[data-rdshare]')) rdShare(e.target.closest('[data-rdshare]'));
     else if (e.target.classList.contains('rd-cv') && !$('.rd-rec:not([hidden])', el)) rdStrike();
   });
@@ -14408,7 +14526,7 @@ function rdJoin(r) {
   if (RD.room) RD.room.leave();
   RD.roomId = r.id;
   RD.room = APP_AUTH.rt.room('raid-' + r.id, myId(), {
-    events: ['hit', 'won'],
+    events: ['hit', 'won', 'emo'],
     // who stands on the deck (raidcrowd.js): a nickname and the character's looks
     sync: st => { if (typeof rcSync === 'function') rcSync(st); },
     status: x => { if (x === 'SUBSCRIBED' && RD.room && typeof rcMe === 'function') RD.room.track(rcMe()); },
@@ -14421,7 +14539,8 @@ function rdJoin(r) {
         if (typeof rcHit === 'function' && p.a) rcHit(String(p.a).slice(0, 64), d, !!p.c, String(p.n || '').slice(0, 16));
         else rdFx(String(p.n || t('lv_someone')).slice(0, 16) + ' −' + d, !!p.c, false);
         rdPanel();
-      } else if (ev === 'won') rdLoad(true);
+      } else if (ev === 'emo') { if (typeof rcEmo === 'function' && p.a && String(p.a) !== myId()) rcEmo(String(p.a).slice(0, 64), String(p.k || ''), String(p.n || '').slice(0, 16)); }
+      else if (ev === 'won') rdLoad(true);
     }
   });
 }
@@ -14606,6 +14725,30 @@ function rcSync(state) {
   }
   for (const m of RCW.m.values()) if (!seen.has(m.id)) m.gone = true;
 }
+/* 원정대 감정 표현: a wave, a bow, a dance on the deck; everyone in the raid sees it (only who and which move) */
+const RC_EMO_GAP = 2200;
+function rcEmo(id, k, nick) {
+  const e = typeof EMO_BY !== 'undefined' && EMO_BY[k]; if (!e) return false;
+  const now = performance.now(), m = RCW.m.get(id) || rcAdd(id, { n: nick }, now - 2000);
+  if (m.emo && now - m.emo.t0 < Math.min(RC_EMO_GAP, e.dur * 1000) * .9) return false; // too often: the last one plays on
+  m.emo = { k, t0: now, dur: e.dur };
+  if (id !== myId() && typeof LVS !== 'undefined') LVS.tone(1320, 1568, .12, .05, 'triangle');
+  return true;
+}
+// the moves I own (waving is free), as small buttons by the strike button
+function rdEmoBarHTML() {
+  if (typeof EMO === 'undefined') return '';
+  return `<div class="rd-emo" role="group" aria-label="${esc(t('rd_emo'))}">${EMO.map(e => { const own = emoOwns(e.id); return `<button class="rd-emob${own ? '' : ' lock'}" data-rdemo="${e.id}" aria-label="${esc(emoName(e.id) + (own ? '' : ' · ' + t('rd_emo_lock')))}" title="${esc(emoName(e.id))}"><img src="${emoArt(e.id)}" alt="">${own ? '' : icon('lock')}</button>`; }).join('')}</div>`;
+}
+function rdEmo(k) {
+  const e = typeof EMO_BY !== 'undefined' && EMO_BY[k]; if (!e) return;
+  if (!emoOwns(k)) { toast(t('rd_emo_lock_t', { name: emoName(k) }), 'info'); return; }
+  if (Date.now() - (RCW.emoAt || 0) < RC_EMO_GAP) return;
+  if (!rcEmo(myId(), k, S.me && S.me.nick)) return;
+  RCW.emoAt = Date.now();
+  if (typeof LVS !== 'undefined') LVS.buzz(12);
+  if (typeof RD !== 'undefined' && RD.room) RD.room.send('emo', { a: myId(), n: S.me && S.me.nick, k });
+}
 function rcReset() { RCW.m.clear(); RCW.combo = null; RCW.flash = 0; RCW.last = []; }
 // someone struck: rear back, flash the line, the damage over the head, maybe a combo
 function rcHit(id, dmg, crit, nick) {
@@ -14649,17 +14792,18 @@ function rcDraw(g, W, H, T, now, mx, my, st) {
     if (m.x == null) m.x = m.tx + (m.tx < W / 2 ? -W * .6 : W * .6);
     const walking = Math.abs(m.x - m.tx) > 2; m.x += (m.tx - m.x) * (reduce ? 1 : .08);
     const sinceHit = (now - m.hit) / 1000, yaw = Math.max(-38, Math.min(38, (mx - m.x) / W * 70));
-    let inp;
-    if (won) inp = m.id === mvpId ? { act: 'result', t: 1 + (T % 4), T } : { act: 'zzirit', t: (T + m.ph) % 3.6, T };
+    let inp; const em = m.emo && (now - m.emo.t0) / 1000 < m.emo.dur ? m.emo : null; if (m.emo && !em) m.emo = null;
+    if (em && !walking && st !== 'lost') inp = { act: em.k, t: (now - em.t0) / 1000, T };
+    else if (won) inp = m.id === mvpId ? { act: 'result', t: 1 + (T % 4), T } : { act: 'zzirit', t: (T + m.ph) % 3.6, T };
     else if (st === 'lost') inp = { act: 'lose', t: 1, T };
     else if (!on) inp = { act: 'wait', t: 1, T: T + m.ph, dip: 0 };
     else if (walking) inp = { act: 'walk', t: 1, T: T + m.ph, walk: 1 };
     else if (sinceHit < .22) inp = { act: 'hook', t: sinceHit, T };
     else inp = { act: 'fight', t: 1, T: T + m.ph, tension: .45 + .25 * Math.sin(T * 1.7 + m.ph) + (sinceHit < .8 ? .3 : 0), pull: sinceHit < .7, reel: sinceHit > .7 && Math.sin(T * .9 + m.ph) > 0, side: Math.sin(T * .6 + m.ph) * .5 };
     let tip = null;
-    try { tip = ANG.draw(g, { x: m.x, y: m.ty, k: m.k, yaw: won ? 180 : walking ? (m.tx > m.x ? 90 : -90) : yaw, bearing: 0, pitch: 62, look: m.look, mode: 'remote', noRing: true, in: inp, fish: won && m.id === mvpId && mvp ? { sp: SPI[mvp.sp] } : null }); } catch (e) { }
+    try { tip = ANG.draw(g, { x: m.x, y: m.ty, k: m.k, yaw: won || em ? 180 : walking ? (m.tx > m.x ? 90 : -90) : yaw, bearing: 0, pitch: 62, look: m.look, mode: 'remote', noRing: true, in: inp, fish: won && m.id === mvpId && mvp ? { sp: SPI[mvp.sp] } : null }); } catch (e) { }
     // the line to the monster (bright for a moment after a strike)
-    if (on && tip && !walking) {
+    if (on && tip && !walking && !em) {
       const f = Math.max(0, 1 - sinceHit / .35), sag = 30 + 20 * Math.sin(T * 2 + m.ph);
       g.beginPath(); g.moveTo(tip.x, tip.y); g.quadraticCurveTo((tip.x + mx) / 2, Math.min(tip.y, my) - sag * (1 - f), mx, my);
       g.strokeStyle = f > 0 ? `rgba(255,255,255,${.6 + .4 * f})` : (m.id === myId() ? 'rgba(227,243,255,.75)' : 'rgba(180,215,250,.38)');
@@ -14672,6 +14816,10 @@ function rcDraw(g, W, H, T, now, mx, my, st) {
     const label = (m.id === mvpId ? '♛ ' : '') + (m.n || t('lv_someone')), tw = g.measureText(label).width + 12;
     g.fillStyle = me ? 'rgba(124,196,255,.92)' : 'rgba(5,10,19,.62)'; g.beginPath(); g.roundRect ? g.roundRect(m.x - tw / 2, hy - 13, tw, 18, 9) : g.rect(m.x - tw / 2, hy - 13, tw, 18); g.fill();
     g.fillStyle = me ? '#050A13' : '#E3F3FF'; g.fillText(label, m.x, hy);
+    // the move's word in a bubble over the name
+    if (em) { const a = (now - em.t0) / 1000 / em.dur, say = t('emo_say_' + em.k); g.globalAlpha = Math.min(1, (1 - a) * 4, a * 8); g.font = `700 ${W < 640 ? 12 : 13.5}px "IBM Plex Sans KR", system-ui, sans-serif`; const bw = g.measureText(say).width + 18, by = hy - 44 - Math.min(1, a * 6) * 6;
+      g.fillStyle = '#E3F3FF'; g.beginPath(); g.roundRect ? g.roundRect(m.x - bw / 2, by - 15, bw, 24, 12) : g.rect(m.x - bw / 2, by - 15, bw, 24); g.fill(); g.beginPath(); g.moveTo(m.x - 5, by + 9); g.lineTo(m.x + 5, by + 9); g.lineTo(m.x, by + 15); g.fill();
+      g.fillStyle = '#050A13'; g.textAlign = 'center'; g.fillText(say, m.x, by + 2); g.globalAlpha = 1; }
     // the damage rising from the head
     m.pops = m.pops.filter(p => now - p.t0 < 1100);
     for (const p of m.pops) { const a = (now - p.t0) / 1100; g.globalAlpha = 1 - a * a; g.font = `italic 700 ${p.big ? (me ? 30 : 22) : (me ? 22 : 16)}px "Chakra Petch", system-ui, sans-serif`; g.fillStyle = p.big ? '#FFFFFF' : '#E3F3FF'; g.shadowColor = '#7CC4FF'; g.shadowBlur = p.big ? 16 : 6; g.fillText((p.big ? t('rd_crit') + ' ' : '') + p.txt, m.x, hy - 18 - a * 60); g.shadowBlur = 0; }
@@ -15164,6 +15312,298 @@ async function rcShare(btn) {
 }
 document.addEventListener('click', e => { if (e.target.closest('[data-rcopen]')) { e.preventDefault(); rcOpen(); } });
 
+/* ===== 어탁 (gyotaku): the catch printed in ink on paper, the old way anglers kept a fish. Made on this device from the
+   species drawing and the length the angler registered — the photo is not needed and nothing is sent anywhere.
+   The paper lies over the print first; tap (or pull it up) to peel it off. Three inks: 먹 (sumi black), 쪽빛 (indigo),
+   은빛 밤바다 (silver ink on the night-sea paper). The brush letters come from Google Fonts when they can (Nanum Brush
+   Script, Yuji Syuku, Ma Shan Zheng); without them a plain serif. The place is the sea or the region at most. ===== */
+const GY = { el: null, o: null, ink: new Map(), style: lsGet('gyStyle', 'sumi'), blob: null, peeled: false };
+const GY_ST = {
+  sumi: { paper: ['#F5F0E6', '#E8DFCD'], ink: [16, 20, 28], text: '#161A22', sub: '#5B5F66', seal: '#A8222B', fib: 'rgba(120,105,80,' },
+  ai: { paper: ['#F3F1EA', '#E2DED2'], ink: [20, 44, 98], text: '#14295A', sub: '#56607A', seal: '#A8222B', fib: 'rgba(90,100,130,' },
+  gin: { paper: ['#0D1B36', '#050A13'], ink: [214, 228, 244], text: '#E3F3FF', sub: '#8FA3BF', seal: '#B3262E', fib: 'rgba(124,196,255,' }
+};
+const GY_W = 1080, GY_H = 1350;
+const GY_FONT = { ko: 'Nanum Brush Script', en: 'Nanum Brush Script', ja: 'Yuji Syuku', zh: 'Ma Shan Zheng' };
+const gyLang = () => ['ko', 'en', 'ja', 'zh'][S.li] || 'ko';
+const gyBrush = () => `"${GY_FONT[gyLang()]}", "Nanum Myeongjo", "Noto Serif KR", "Noto Serif JP", "Noto Serif SC", serif`;
+// the brush letters: asked once, only when an 어탁 is opened; a page that cannot reach Google Fonts uses a serif
+let _gyFontP = null;
+function gyFonts(text) {
+  if (!_gyFontP) {
+    _gyFontP = new Promise(res => {
+      try {
+        const fam = [...new Set(Object.values(GY_FONT))].map(f => 'family=' + f.replace(/ /g, '+')).join('&');
+        const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'https://fonts.googleapis.com/css2?' + fam + '&display=swap';
+        l.onload = () => res(true); l.onerror = () => res(false); document.head.appendChild(l);
+      } catch (e) { res(false); }
+      setTimeout(() => res(false), 2500);
+    });
+  }
+  return _gyFontP.then(okk => okk ? Promise.race([document.fonts.load(`80px "${GY_FONT[gyLang()]}"`, text || '어탁'), new Promise(r => setTimeout(r, 1800))]).catch(() => null) : null);
+}
+// a small steady noise (the paper's fibres and the dry brush look the same every time for the same fish)
+function gyRand(seed) { let s = seed >>> 0 || 1; return () => { s ^= s << 13; s ^= s >>> 17; s ^= s << 5; return ((s >>> 0) % 100000) / 100000; }; }
+function gyImg(src) { return new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = src; }); }
+
+/* the fish in ink: the drawing's shape becomes the inked area; its light and dark become the pressed texture
+   (scales, fin rays, the eye), then dry-brush gaps and the paper's grain */
+async function gyInk(sp, style) {
+  const key = sp.id + '|' + style; if (GY.ink.has(key)) return GY.ink.get(key);
+  const W = 960, H = 960, img = await gyImg(FD.thumb(sp, W, H));
+  const cv = document.createElement('canvas'); cv.width = W; cv.height = H; const g = cv.getContext('2d');
+  g.drawImage(img, 0, 0, W, H);
+  const id = g.getImageData(0, 0, W, H), d = id.data, N = W * H, lum = new Float32Array(N), a = new Float32Array(N);
+  for (let i = 0; i < N; i++) { const k = i * 4; a[i] = d[k + 3] / 255; lum[i] = (.3 * d[k] + .59 * d[k + 1] + .11 * d[k + 2]) / 255; }
+  // a blurred copy (box blur, rows then columns) for the fine detail
+  const blur = new Float32Array(N), tmp = new Float32Array(N), R = 5;
+  for (let y = 0; y < H; y++) { let s = 0; for (let x = -R; x <= R; x++) s += lum[y * W + Math.min(W - 1, Math.max(0, x))]; for (let x = 0; x < W; x++) { tmp[y * W + x] = s / (2 * R + 1); s += lum[y * W + Math.min(W - 1, x + R + 1)] - lum[y * W + Math.max(0, x - R)]; } }
+  for (let x = 0; x < W; x++) { let s = 0; for (let y = -R; y <= R; y++) s += tmp[Math.min(H - 1, Math.max(0, y)) * W + x]; for (let y = 0; y < H; y++) { blur[y * W + x] = s / (2 * R + 1); s += tmp[Math.min(H - 1, y + R + 1) * W + x] - tmp[Math.max(0, y - R) * W + x]; } }
+  const rnd = gyRand(FD.hashStr ? FD.hashStr(sp.id) : 7), st = GY_ST[style] || GY_ST.sumi;
+  const scaly = !['eel', 'ribbon', 'octopus', 'squid', 'cuttle', 'ray', 'crab', 'shrimp'].includes(sp.sh), ss = 13;
+  // the grain: a coarse random field, smoothed, that makes the ink pool and thin like a real rubbing
+  const GW = Math.ceil(W / 8) + 2, GH = Math.ceil(H / 8) + 2, grain = new Float32Array(GW * GH); for (let i = 0; i < grain.length; i++) grain[i] = rnd();
+  const gr = (x, y) => { const gx = x / 8, gy = y / 8, x0 = gx | 0, y0 = gy | 0, fx = gx - x0, fy = gy - y0, q = (i, j) => grain[(y0 + j) * GW + x0 + i]; return (q(0, 0) * (1 - fx) + q(1, 0) * fx) * (1 - fy) + (q(0, 1) * (1 - fx) + q(1, 1) * fx) * fy; };
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const i = y * W + x, k = i * 4, al = a[i];
+    if (al < .4) { d[k + 3] = 0; continue; }
+    const hp = lum[i] - blur[i];
+    let v = .96 - (lum[i] - .45) * .4 - hp * 3.2;
+    if (scaly) { const row = Math.floor(y / ss), ox = row % 2 ? ss / 2 : 0, cx = Math.floor((x + ox) / ss) * ss - ox + ss / 2, cy = row * ss, r = Math.hypot(x - cx, y - cy); if (r > ss * .55 && r < ss * .72 && y > cy) v -= .16; }
+    v *= .72 + .42 * gr(x, y);
+    if (rnd() < .05 * (1 - v)) v *= .35; // dry-brush gaps
+    v = Math.max(0, Math.min(1, v)) * Math.min(1, (al - .4) / .25);
+    d[k] = st.ink[0]; d[k + 1] = st.ink[1]; d[k + 2] = st.ink[2]; d[k + 3] = Math.round(v * 235);
+  }
+  g.putImageData(id, 0, 0);
+  // only the fish: cut the empty paper around it so it can be laid out as large as fits
+  let x0 = W, y0 = H, x1 = 0, y1 = 0;
+  for (let y = 0; y < H; y += 2) for (let x = 0; x < W; x += 2) if (d[(y * W + x) * 4 + 3] > 20) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+  if (x1 <= x0 || y1 <= y0) { x0 = 0; y0 = 0; x1 = W - 1; y1 = H - 1; }
+  const cw = x1 - x0 + 2, ch = y1 - y0 + 2, cc = document.createElement('canvas'); cc.width = cw; cc.height = ch; cc.getContext('2d').drawImage(cv, x0, y0, cw, ch, 0, 0, cw, ch);
+  const out = { cv: cc, W: cw, H: ch };
+  if (GY.ink.size > 8) GY.ink.clear(); GY.ink.set(key, out); return out;
+}
+// vertical letters (Korean, Japanese, Chinese), one under another; Latin goes across
+function gyVert(g, s, x, y, size, maxH) {
+  const ch = [...s], step = Math.min(size * 1.02, maxH / Math.max(1, ch.length)); g.font = `${step / 1.02}px ${gyBrush()}`; g.textAlign = 'center'; g.textBaseline = 'top';
+  ch.forEach((c, i) => g.fillText(c, x, y + i * step)); return y + ch.length * step;
+}
+function gySeal(g0, x, y, s, txt, color, round, rnd) {
+  // drawn on its own small canvas, so the worn spots only take ink off the stamp, not off the paper
+  const cv = document.createElement('canvas'); cv.width = cv.height = Math.ceil(s * 1.4); const g = cv.getContext('2d');
+  g.save(); g.translate(cv.width / 2, cv.height / 2); g.rotate(-.04 + rnd() * .08);
+  g.fillStyle = color; g.globalAlpha = .9;
+  g.beginPath(); if (round) g.arc(0, 0, s / 2, 0, 6.2832); else g.rect(-s / 2, -s / 2, s, s); g.fill();
+  g.globalCompositeOperation = 'destination-out'; g.fillStyle = '#000';
+  const ch = [...txt].slice(0, 4), n = ch.length, fs = n <= 1 ? s * .62 : s * .4;
+  g.font = `${fs}px ${gyBrush()}`; g.textAlign = 'center'; g.textBaseline = 'middle';
+  if (n <= 1) g.fillText(ch[0] || '', 0, s * .03);
+  else if (n === 2) { g.fillText(ch[0], 0, -s * .2); g.fillText(ch[1], 0, s * .22); }
+  else ch.forEach((c, i) => g.fillText(c, (i < 2 ? s * .2 : -s * .2), (i % 2 ? s * .22 : -s * .2)));
+  // a worn edge, as a stamp pressed by hand
+  for (let i = 0; i < 70; i++) { const an = rnd() * 6.2832, r = s * (.36 + rnd() * .2); g.beginPath(); g.arc(Math.cos(an) * r, Math.sin(an) * r, 1 + rnd() * 3, 0, 6.2832); g.fill(); }
+  g.restore(); g0.drawImage(cv, x - cv.width / 2, y - cv.height / 2);
+}
+async function gyDraw(o, style) {
+  const st = GY_ST[style] || GY_ST.sumi, sp = SPI[o.sp];
+  const name = spName(sp), cm = (+o.cm || 0), lenTxt = fmtN(cm, 1) + 'cm';
+  await gyFonts(name + lenTxt + (o.nick || '') + t('gy_word') + APP_NAME[0] + '0123456789.');
+  const cv = document.createElement('canvas'); cv.width = GY_W; cv.height = GY_H; const g = cv.getContext('2d');
+  const rnd = gyRand((FD.hashStr ? FD.hashStr(o.sp + '|' + cm + '|' + (o.ts || 0)) : 11));
+  // the paper: a soft wash, long fibres and a few flecks
+  const bg = g.createLinearGradient(0, 0, GY_W * .3, GY_H); bg.addColorStop(0, st.paper[0]); bg.addColorStop(1, st.paper[1]); g.fillStyle = bg; g.fillRect(0, 0, GY_W, GY_H);
+  for (let i = 0; i < 900; i++) { const x = rnd() * GY_W, y = rnd() * GY_H, l = 6 + rnd() * 30, an = rnd() * 6.28; g.strokeStyle = st.fib + (.05 + rnd() * .1) + ')'; g.lineWidth = .6 + rnd(); g.beginPath(); g.moveTo(x, y); g.quadraticCurveTo(x + Math.cos(an) * l / 2 + rnd() * 6, y + Math.sin(an) * l / 2, x + Math.cos(an) * l, y + Math.sin(an) * l); g.stroke(); }
+  const vg = g.createRadialGradient(GY_W / 2, GY_H * .45, GY_W * .3, GY_W / 2, GY_H * .45, GY_W * .9); vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, style === 'gin' ? 'rgba(0,0,0,.35)' : 'rgba(90,70,40,.12)'); g.fillStyle = vg; g.fillRect(0, 0, GY_W, GY_H);
+  // the fish, pressed a little crooked as by hand
+  const ink = await gyInk(sp, style), k = Math.min(900 / ink.W, 560 / ink.H), fw = ink.W * k, fh = ink.H * k, fx = (GY_W - fw) / 2 - 20, fy = 600 - fh / 2;
+  g.save(); g.translate(fx + fw / 2, fy + fh / 2); g.rotate(-.035); g.drawImage(ink.cv, -fw / 2, -fh / 2, fw, fh); g.restore();
+  // the ruler under it: the registered length across the fish's width
+  const ry = Math.max(fy + fh + 44, 800), rx0 = fx, rx1 = fx + fw;
+  g.strokeStyle = st.text; g.globalAlpha = .7; g.lineWidth = 3; g.beginPath(); g.moveTo(rx0, ry); g.lineTo(rx1, ry); g.stroke();
+  const ticks = Math.max(2, Math.min(60, Math.round(cm))), major = cm > 60 ? 10 : 5;
+  for (let i = 0; i <= ticks; i++) { const x = rx0 + (rx1 - rx0) * i / ticks, big = i % major === 0 || i === ticks; g.lineWidth = big ? 2.5 : 1.2; g.beginPath(); g.moveTo(x, ry); g.lineTo(x, ry - (big ? 18 : 9)); g.stroke(); }
+  g.globalAlpha = 1;
+  // the words: the name in brush letters down the right side (across in English), the length, the day, the place, the angler
+  g.fillStyle = st.text;
+  const vert = S.li !== 1;
+  if (vert) { gyVert(g, name, GY_W - 110, 60, 118, 250); }
+  else { g.font = `120px ${gyBrush()}`; g.textAlign = 'left'; g.textBaseline = 'alphabetic'; g.fillText(name.length > 16 ? name.slice(0, 16) + '…' : name, 70, 200); }
+  g.font = `110px ${gyBrush()}`; g.textAlign = 'center'; g.textBaseline = 'alphabetic'; g.fillText(lenTxt, GY_W / 2, ry + 140);
+  const day = o.ts ? new Date(o.ts) : new Date(nowMs()), ds = `${day.getFullYear()}. ${day.getMonth() + 1}. ${day.getDate()}.`;
+  g.textAlign = 'left'; g.fillStyle = st.sub; g.font = `600 30px "IBM Plex Sans KR", "IBM Plex Sans JP", "Noto Sans SC", system-ui, sans-serif`;
+  const lines = [ds + (o.where ? '  ·  ' + o.where : ''), o.nick ? t('gy_by', { nick: o.nick }) : ''].filter(Boolean);
+  lines.forEach((l, i) => g.fillText(l.length > 40 ? l.slice(0, 40) + '…' : l, 70, GY_H - 150 + i * 46));
+  if (vert) { g.fillStyle = st.sub; g.font = `40px ${gyBrush()}`; g.textAlign = 'left'; g.fillText(t('gy_word'), 70, 110); }
+  else { g.fillStyle = st.sub; g.font = `600 26px "Chakra Petch", system-ui, sans-serif`; g.textAlign = 'left'; g.fillText(t('gy_word').toUpperCase(), 72, 92); }
+  // two seals: the app's square one, the angler's round one
+  gySeal(g, GY_W - 140, GY_H - 160, 120, APP_NAME[0].slice(0, 2), st.seal, false, rnd);
+  if (o.nick) gySeal(g, GY_W - 270, GY_H - 150, 84, [...o.nick][0], st.seal, true, rnd);
+  g.fillStyle = st.sub; g.globalAlpha = .7; g.font = `500 22px "IBM Plex Sans KR", system-ui, sans-serif`; g.textAlign = 'left'; g.fillText(SITE_URL.replace(/^https?:\/\//, '').replace(/\/$/, ''), 70, GY_H - 40); g.globalAlpha = 1;
+  return cv;
+}
+
+/* --- the screen: the paper over the print, peel it, pick the ink, keep it --- */
+async function gyOpen(o) {
+  const sp = o && SPI[o.sp]; if (!sp || !(+o.cm > 0)) return;
+  GY.o = o; GY.peeled = false; GY.blob = null;
+  const w = openModal(`<div class="gy" data-gy-root>
+    <p class="eyebrow">${icon('fish')} ${t('gy_word')}</p>
+    <h2>${t('gy_h')}</h2>
+    <p class="lede">${t('gy_sub')}</p>
+    <div class="gy-stage"><canvas class="gy-cv" width="${GY_W}" height="${GY_H}" aria-label="${esc(t('gy_alt', { name: spName(sp), len: fmtN(+o.cm, 1) + 'cm' }))}" role="img"></canvas>
+      <button class="gy-paper" data-gypeel aria-label="${esc(t('gy_peel'))}"><span class="gy-hand">${icon('chev')}</span><b>${t('gy_peel')}</b><small>${t('gy_peel_sub')}</small></button>
+      <div class="gy-wait" hidden><i></i></div></div>
+    <div class="gy-ink" role="radiogroup" aria-label="${esc(t('gy_ink'))}">${Object.keys(GY_ST).map(k => `<button role="radio" class="gy-chip${k === GY.style ? ' on' : ''}" aria-checked="${k === GY.style}" data-gyst="${k}"><i class="gy-dot ${k}"></i>${t('gy_st_' + k)}</button>`).join('')}</div>
+    <div class="actions"><button class="btn btn-primary" data-gysave disabled>${icon('share')}${t('gy_save')}</button><button class="btn btn-line" data-gyagain disabled>${icon('refresh')}${t('gy_again')}</button></div>
+  </div>`, { wide: true, label: t('gy_h'), onClose: () => { GY.el = null; } });
+  GY.el = w;
+  const paper = $('.gy-paper', w);
+  // pulling the paper up works as well as a tap
+  let y0 = null;
+  paper.addEventListener('pointerdown', e => { y0 = e.clientY; try { paper.setPointerCapture(e.pointerId); } catch (er) { } });
+  paper.addEventListener('pointermove', e => { if (y0 == null || GY.peeled) return; const dy = Math.min(0, e.clientY - y0); paper.style.transform = `perspective(900px) rotateX(${Math.max(-60, dy / 3)}deg)`; if (dy < -90) gyPeel(); });
+  paper.addEventListener('pointerup', () => { y0 = null; if (!GY.peeled) paper.style.transform = ''; });
+  w.addEventListener('click', e => {
+    if (e.target.closest('[data-gypeel]')) gyPeel();
+    const s = e.target.closest('[data-gyst]'); if (s) gyStyle(s.dataset.gyst);
+    if (e.target.closest('[data-gyagain]')) gyAgain();
+    const sv = e.target.closest('[data-gysave]'); if (sv) gySave(sv);
+  });
+  await gyRender();
+}
+async function gyRender() {
+  const w = GY.el; if (!w) return;
+  const wait = $('.gy-wait', w); if (wait) wait.hidden = false;
+  try {
+    const cv = await gyDraw(GY.o, GY.style), out = $('.gy-cv', w); if (!out || GY.el !== w) return;
+    out.getContext('2d').drawImage(cv, 0, 0);
+    GY.blob = await new Promise(r => cv.toBlob(b => r(b), 'image/jpeg', .9));
+  } catch (e) { console.warn(e); toast(t('share_fail'), 'warn'); }
+  if (wait) wait.hidden = true;
+  if (GY.peeled) $$('[data-gysave],[data-gyagain]', w).forEach(b => { b.disabled = !GY.blob; });
+}
+function gyPeel() {
+  const w = GY.el; if (!w || GY.peeled) return;
+  GY.peeled = true; const p = $('.gy-paper', w); p.style.transform = ''; p.classList.add('off');
+  setTimeout(() => { if (p.isConnected) p.hidden = true; }, 950);
+  if (typeof LVS !== 'undefined') { LVS.noise(.5, .08, 1200); LVS.noise(.25, .05, 3000, .25); setTimeout(() => LVS.play('land'), 650); LVS.buzz([20, 40, 60]); }
+  $$('[data-gysave],[data-gyagain]', w).forEach(b => { b.disabled = !GY.blob; });
+  const sv = $('[data-gysave]', w); if (sv && !sv.disabled) setTimeout(() => sv.focus({ preventScroll: true }), 900);
+}
+function gyAgain() {
+  const w = GY.el; if (!w) return; const p = $('.gy-paper', w);
+  GY.peeled = false; p.hidden = false; p.classList.remove('off'); p.classList.add('down'); setTimeout(() => p.classList.remove('down'), 500);
+  if (typeof LVS !== 'undefined') { LVS.tone(120, 70, .25, .14, 'sine'); LVS.buzz(40); }
+  $$('[data-gysave],[data-gyagain]', w).forEach(b => { b.disabled = true; });
+  setTimeout(() => { const pp = $('.gy-paper', w); if (pp) pp.focus({ preventScroll: true }); }, 60);
+}
+async function gyStyle(k) {
+  if (!GY_ST[k] || !GY.el) return; GY.style = k; lsSet('gyStyle', k);
+  $$('[data-gyst]', GY.el).forEach(b => { const on = b.dataset.gyst === k; b.classList.toggle('on', on); b.setAttribute('aria-checked', on); });
+  await gyRender();
+}
+async function gySave(btn) {
+  if (!GY.blob || btn.disabled) return; btn.disabled = true;
+  try {
+    const o = GY.o, name = `zzirit-gyotaku-${o.sp}-${Math.round(o.cm)}cm.jpg`;
+    await shareImage(GY.blob, name, t('gy_text', { name: spName(SPI[o.sp]), len: fmtN(+o.cm, 1) + 'cm' }), { title: 'gy_h', sub: 'gy_share_sub' });
+  } catch (e) { toast(t('share_fail'), 'warn'); }
+  finally { btn.disabled = false; }
+}
+// what an 어탁 needs from a registered catch (the place is the sea or the region, never the point)
+function gyFromCatch(a, c) {
+  let where = ''; try { where = c.sea ? dict(GEO.seaOf(c.lon, c.lat).n) : (c.rg ? regionName(c.rg) : ''); } catch (e) { }
+  return { sp: c.sp, cm: c.len, ts: c.ts, where, nick: a && a.nick };
+}
+
+/* ===== 사진으로 길이 재기: put something everyone has (a card, a coin) next to the fish, take the photo, then drag
+   two dots to the ends of that thing and two to the fish's mouth and tail. The fish's length comes from the ratio.
+   All on this device, on the photo already chosen for the catch; the photo goes nowhere else. A loupe shows what is
+   under the finger while a dot is dragged. ===== */
+const MZ_REF = [
+  { id: 'card', mm: 85.6, li: [0, 1, 2, 3] }, // a bank or transit card, the long side (ISO/IEC 7810 ID-1)
+  { id: 'w500', mm: 26.5, li: [0] }, { id: 'w100', mm: 24, li: [0] },
+  { id: 'usq', mm: 24.26, li: [1] }, { id: 'y500', mm: 26.5, li: [2] }, { id: 'y100', mm: 22.6, li: [2] }, { id: 'cny1', mm: 25, li: [3] },
+  { id: 'own', mm: 0, li: [0, 1, 2, 3] }
+];
+const MZ = { el: null, im: null, cb: null, ref: 'card', own: 30, p: null, drag: -1, fit: null, raf: 0 };
+// the fish length in cm from the four dots (image pixels) and the thing's size in mm
+function mzLen(p, refMm) { const rp = Math.hypot(p[1][0] - p[0][0], p[1][1] - p[0][1]), fp = Math.hypot(p[3][0] - p[2][0], p[3][1] - p[2][1]); if (!(rp > 4) || !(refMm > 0)) return 0; return Math.round(fp / rp * refMm) / 10; }
+function mzRefMm() { const r = MZ_REF.find(x => x.id === MZ.ref) || MZ_REF[0]; return r.id === 'own' ? (+MZ.own || 0) * 10 : r.mm; }
+function mzOpen(im, cb) {
+  if (!im || MZ.el) return;
+  const W = im.naturalWidth || im.width, H = im.naturalHeight || im.height;
+  MZ.im = im; MZ.cb = cb; MZ.drag = -1;
+    // where the dots start: the thing low on the left, the fish across the middle
+  MZ.p = [[W * .12, H * .82], [W * .32, H * .82], [W * .2, H * .5], [W * .8, H * .5]];
+  const refs = MZ_REF.filter(r => r.li.includes(S.li)); MZ.ref = lsGet('mzRef', 'card'); if (!refs.some(r => r.id === MZ.ref)) MZ.ref = 'card';
+  const el = document.createElement('div'); el.className = 'mz'; el.id = 'mz';
+  el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); el.setAttribute('aria-label', t('ms_h'));
+  el.innerHTML = `<div class="mz-top"><button class="mz-x" data-mzclose aria-label="${esc(t('close'))}">${icon('x')}</button><div><b>${t('ms_h')}</b><small>${t('ms_sub')}</small></div></div>
+    <div class="mz-refs" role="radiogroup" aria-label="${esc(t('ms_ref'))}">${refs.map(r => `<button role="radio" class="mz-ref${r.id === MZ.ref ? ' on' : ''}" aria-checked="${r.id === MZ.ref}" data-mzref="${r.id}">${t('ms_r_' + r.id)}${r.mm ? `<small>${fmtN(r.mm / 10, 2)}cm</small>` : ''}</button>`).join('')}
+      <label class="mz-own"${MZ.ref === 'own' ? '' : ' hidden'}><input type="number" inputmode="decimal" min="1" max="200" step="0.1" value="${MZ.own}" data-mzown aria-label="${esc(t('ms_own_lbl'))}"><span>cm</span></label></div>
+    <div class="mz-stage"><canvas class="mz-cv" aria-label="${esc(t('ms_cv'))}"></canvas><canvas class="mz-loupe" width="240" height="240" hidden aria-hidden="true"></canvas></div>
+    <div class="mz-foot"><p class="mz-legend"><span class="mz-k ref"></span>${t('ms_leg_ref')}<span class="mz-k fish"></span>${t('ms_leg_fish')}</p>
+      <p class="mz-out" aria-live="polite"><b class="num" data-mzout>—</b><span>cm</span></p>
+      <p class="mz-tip">${icon('info')}${t('ms_tip')}</p>
+      <button class="btn btn-primary btn-lg btn-block" data-mzuse>${icon('check')}${t('ms_use')}</button></div>`;
+  document.body.appendChild(el); document.body.classList.add('has-modal'); MZ.el = el;
+  const cv = $('.mz-cv', el);
+  el.addEventListener('click', e => {
+    if (e.target.closest('[data-mzclose]')) mzClose();
+    const r = e.target.closest('[data-mzref]'); if (r) { MZ.ref = r.dataset.mzref; lsSet('mzRef', MZ.ref); $$('[data-mzref]', el).forEach(b => { const on = b === r; b.classList.toggle('on', on); b.setAttribute('aria-checked', on); }); $('.mz-own', el).hidden = MZ.ref !== 'own'; if (MZ.ref === 'own') $('[data-mzown]', el).focus(); mzDraw(); }
+    if (e.target.closest('[data-mzuse]')) { const cm = mzLen(MZ.p, mzRefMm()); if (!(cm > 0 && cm <= 600)) { toast(t('ms_err'), 'warn'); return; } const f = MZ.cb; mzClose(); if (f) f(cm); }
+  });
+  $('[data-mzown]', el).addEventListener('input', e => { MZ.own = parseFloat(e.target.value) || 0; mzDraw(); });
+  const at = e => { const b = cv.getBoundingClientRect(), f = MZ.fit; return [(e.clientX - b.left - f.ox) / f.s, (e.clientY - b.top - f.oy) / f.s]; };
+  cv.addEventListener('pointerdown', e => {
+    const q = at(e), f = MZ.fit, hit = MZ.p.map((p, i) => [Math.hypot(p[0] - q[0], p[1] - q[1]) * f.s, i]).sort((a, b) => a[0] - b[0])[0];
+    if (hit[0] > 44) return; MZ.drag = hit[1]; e.preventDefault(); try { cv.setPointerCapture(e.pointerId); } catch (er) { }
+    if (typeof LVS !== 'undefined') LVS.buzz(8); mzDraw();
+  });
+  cv.addEventListener('pointermove', e => { if (MZ.drag < 0) return; const q = at(e); MZ.p[MZ.drag] = [Math.max(0, Math.min(W, q[0])), Math.max(0, Math.min(H, q[1]))]; mzDraw(e); });
+  const up = () => { if (MZ.drag < 0) return; MZ.drag = -1; $('.mz-loupe', el).hidden = true; mzDraw(); };
+  cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
+  // the keyboard: Tab to a dot is not possible on a canvas, so arrows move the last dot touched (1 = thing, 3 = fish)
+  MZ.kd = 3; MZ.key = e => { if (e.key === 'Escape') { mzClose(); return; } if (/^[1-4]$/.test(e.key)) { MZ.kd = +e.key - 1; return; } const d = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] }[e.key]; if (d && !e.target.closest('input')) { e.preventDefault(); const s = (e.shiftKey ? 10 : 2) / MZ.fit.s; MZ.p[MZ.kd] = [MZ.p[MZ.kd][0] + d[0] * s, MZ.p[MZ.kd][1] + d[1] * s]; mzDraw(); } };
+  document.addEventListener('keydown', MZ.key);
+  MZ.rs = () => mzDraw(); addEventListener('resize', MZ.rs);
+  requestAnimationFrame(() => mzDraw());
+  setTimeout(() => { const b = $('.mz-ref.on', el); if (b) b.focus(); }, 60);
+}
+function mzClose() { if (!MZ.el) return; document.removeEventListener('keydown', MZ.key); removeEventListener('resize', MZ.rs); MZ.el.remove(); MZ.el = null; if (!$('.modal-wrap.in')) document.body.classList.remove('has-modal'); }
+function mzDraw(ev) {
+  const el = MZ.el; if (!el) return;
+  const cv = $('.mz-cv', el), st = $('.mz-stage', el), im = MZ.im, W = im.naturalWidth || im.width, H = im.naturalHeight || im.height;
+  const bw = st.clientWidth, bh = st.clientHeight, dpr = Math.min(2, devicePixelRatio || 1);
+  if (cv.width !== Math.round(bw * dpr) || cv.height !== Math.round(bh * dpr)) { cv.width = Math.round(bw * dpr); cv.height = Math.round(bh * dpr); cv.style.width = bw + 'px'; cv.style.height = bh + 'px'; }
+  const s = Math.min(bw / W, bh / H), ox = (bw - W * s) / 2, oy = (bh - H * s) / 2; MZ.fit = { s, ox, oy };
+  const g = cv.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, bw, bh);
+  g.drawImage(im, ox, oy, W * s, H * s);
+  const P = MZ.p.map(p => [ox + p[0] * s, oy + p[1] * s]);
+  const seg = (a, b, col, label) => {
+    g.lineWidth = 3; g.strokeStyle = 'rgba(5,10,19,.55)'; g.beginPath(); g.moveTo(a[0], a[1]); g.lineTo(b[0], b[1]); g.stroke();
+    g.lineWidth = 2; g.strokeStyle = col; g.setLineDash([7, 5]); g.beginPath(); g.moveTo(a[0], a[1]); g.lineTo(b[0], b[1]); g.stroke(); g.setLineDash([]);
+    for (const q of [a, b]) { g.beginPath(); g.arc(q[0], q[1], 13, 0, 6.2832); g.fillStyle = 'rgba(5,10,19,.35)'; g.fill(); g.lineWidth = 3; g.strokeStyle = col; g.stroke(); g.beginPath(); g.arc(q[0], q[1], 2.5, 0, 6.2832); g.fillStyle = col; g.fill(); }
+    const mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2; g.font = '700 13px "IBM Plex Sans KR", system-ui, sans-serif'; const tw = g.measureText(label).width + 14;
+    g.fillStyle = col; g.beginPath(); g.roundRect ? g.roundRect(mx - tw / 2, my - 30, tw, 22, 11) : g.rect(mx - tw / 2, my - 30, tw, 22); g.fill(); g.fillStyle = '#050A13'; g.textAlign = 'center'; g.fillText(label, mx, my - 14);
+  };
+  const cm = mzLen(MZ.p, mzRefMm());
+  seg(P[0], P[1], '#E3F3FF', t('ms_leg_ref')); seg(P[2], P[3], '#7CC4FF', cm ? fmtN(cm, 1) + 'cm' : t('ms_leg_fish'));
+  $('[data-mzout]', el).textContent = cm ? fmtN(cm, 1) : '—';
+  // the loupe: 2.5× what is under the finger, above the finger so it is not hidden
+  const lp = $('.mz-loupe', el);
+  if (MZ.drag >= 0) {
+    const q = MZ.p[MZ.drag], c = P[MZ.drag], L = 120, z = 2.5, lg = lp.getContext('2d');
+    lp.hidden = false; lg.clearRect(0, 0, 240, 240); lg.save(); lg.beginPath(); lg.arc(120, 120, 118, 0, 6.2832); lg.clip();
+    lg.fillStyle = '#050A13'; lg.fillRect(0, 0, 240, 240);
+    const sw = 240 / (z * s); lg.drawImage(im, q[0] - sw / 2, q[1] - sw / 2, sw, sw, 0, 0, 240, 240);
+    lg.strokeStyle = MZ.drag < 2 ? '#E3F3FF' : '#7CC4FF'; lg.lineWidth = 2; lg.beginPath(); lg.moveTo(120, 96); lg.lineTo(120, 144); lg.moveTo(96, 120); lg.lineTo(144, 120); lg.stroke(); lg.restore();
+    const top = c[1] - L - 70 < 0 ? c[1] + 40 : c[1] - L - 70; lp.style.left = Math.max(4, Math.min(bw - L - 4, c[0] - L / 2)) + 'px'; lp.style.top = top + 'px';
+  }
+}
+
 /* ===== A faster first screen, and a basic screen with no connection =====
    - The map library (Leaflet) is no longer part of the first load on the website: it comes only when a map is opened.
    - The service worker (sw.js) keeps a copy of the few libraries the page needs (sign-in library, fonts, map library),
@@ -15417,6 +15857,7 @@ document.addEventListener('click', e => {
   const inModal = tgt.closest('.modal-wrap');
   const ng = tgt.closest('.nav [data-navgrp]'); if (ng) { navToggle(ng.dataset.navgrp); return; }
   const cp = tgt.closest('[data-copy]'); if (cp) { e.preventDefault(); copyText(cp.dataset.copy, cp); return; }
+  const gy = tgt.closest('[data-gycatch]'); if (gy) { e.preventDefault(); const [u, cid] = [gy.dataset.gycatch.slice(0, gy.dataset.gycatch.indexOf('|')), gy.dataset.gycatch.slice(gy.dataset.gycatch.indexOf('|') + 1)]; const a = u === (S.uid || 'local') ? S.me : allAnglers().get(u); const c = a && (a.catches || []).find(x => x.id === cid); if (c) gyOpen(gyFromCatch(a, c)); return; }
   const sh = tgt.closest('[data-share]'); if (sh) { e.preventDefault(); const i = sh.dataset.share.indexOf('|'); shareCatch(sh.dataset.share.slice(0, i), sh.dataset.share.slice(i + 1), sh); return; }
   const fr = tgt.closest('[data-fr]'); if (fr) { const i = fr.dataset.fr.indexOf('|'); friendAction(fr.dataset.fr.slice(0, i), fr.dataset.fr.slice(i + 1), fr); return; }
   if (inModal) { const su = tgt.closest('[data-seauid]'); if (su) { closeModal(inModal); openSeaOf(su.dataset.seauid); return; } }
