@@ -43,6 +43,8 @@ const raid = uid => rpc(uid, `select public.live_raid() r`);
 const hit = (uid, id, qq) => rpc(uid, `select public.live_raid_hit($1, $2) r`, [id, qq]);
 const bal = async uid => +((await q(`select bal from public.zp_wallets where acct = $1`, [uid])).rows[0] || { bal: 0 }).bal;
 const cfg = s => q(`update private.raid_cfg set ${s} where id = 1`);
+// strikes long ago (so the next one is not a 합동 챔질)
+const apart = () => q(`update private.live_raid_hits set last_at = clock_timestamp() - interval '10 seconds'`);
 // one raid a day (from 00:00 UTC) that lasts until a few minutes from now, so one is surely on while the checks run
 const onNow = async () => { const d = new Date(), m = d.getUTCHours() * 60 + d.getUTCMinutes(); await cfg(`every_min = 1440, dur_min = ${Math.min(1440, m + 10)}, gap_ms = 0, base_hp = 100, add_hp = 50`); };
 
@@ -78,8 +80,10 @@ const onNow = async () => { const d = new Date(), m = d.getUTCHours() * 60 + d.g
   check((await hit(A, 999, 1)).err === 'no_raid', 'an unknown raid is refused');
   const a1 = await hit(A, id, 0);
   check(a1.ok && a1.dmg >= 6 && a1.dmg <= 10 && !a1.crit && a1.max === 100 && a1.hp === 100 - a1.dmg, 'a poorly timed strike: small damage, the first one fights it at base strength ' + J(a1));
+  await apart();
   const b1 = await hit(B, id, 1);
-  check(b1.ok && b1.crit && b1.dmg >= 36 && b1.dmg <= 44 && b1.max === 150, 'a perfect strike doubles; a second angler makes it stronger (+50) ' + J(b1));
+  check(b1.ok && b1.combo === 1 && b1.bonus === 0 && b1.crit && b1.dmg >= 36 && b1.dmg <= 44 && b1.max === 150, 'a perfect strike doubles; a second angler makes it stronger (+50) ' + J(b1));
+  await apart();
   const big = await hit(A, id, 99);
   check(big.dmg <= 44, 'the phone cannot claim more than a perfect strike');
   await cfg(`gap_ms = 60000`);
@@ -105,6 +109,46 @@ const onNow = async () => { const d = new Date(), m = d.getUTCHours() * 60 + d.g
   check((await hit(A, id, 1)).err === 'beaten' && await bal(A) === b0, 'a beaten raid takes no more strikes and pays once');
   await q(`select private.raid_win($1)`, [id]);
   check((await q(`select count(*)::int n from public.zp_ledger where ref = $1`, ['raid:' + id])).rows[0].n === 2, 'paying out twice does nothing');
+}
+
+// ---------- 0029 합동 챔질: strikes together do more, counted by the server ----------
+{
+  await q(`delete from private.live_raids`); await q(`delete from public.zp_ledger where ref like 'raid:%'`);
+  await cfg(`base_hp = 100000, add_hp = 0, gap_ms = 0`);
+  const C = '66666666-6666-6666-6666-666666666666', F = '77777777-7777-7777-7777-777777777777', G = '88888888-8888-8888-8888-888888888888';
+  await q(`insert into auth.users values ($1),($2),($3)`, [C, F, G]);
+  await q(`insert into public.anglers (id, data) values ($1, $2), ($3, $4), ($5, $6)`, [C, J({ nick: 'Cat', catches: [] }), F, J({ nick: 'Fay', catches: [] }), G, J({ nick: 'Gus', catches: [] })]);
+  const id = (await raid(A)).raid.id;
+  const s1 = await hit(A, id, .5);
+  check(s1.ok && s1.combo === 1 && s1.bonus === 0, 'alone: no team bonus ' + J(s1));
+  const s2 = await hit(A, id, .5);
+  check(s2.combo === 1 && s2.bonus === 0, 'my own strikes in a row are not a team strike');
+  const s3 = await hit(C, id, .5);
+  check(s3.combo === 2 && s3.bonus >= 3 && s3.bonus <= 4 && s3.dmg >= 15 && s3.dmg <= 20, 'one other struck just now: ×2 and 25% more ' + J(s3));
+  const s4 = await hit(F, id, 0);
+  check(s4.combo === 3 && s4.bonus === Math.round((s4.dmg - s4.bonus) * .5), 'two others: ×3 and 50% more ' + J(s4));
+  const s5 = await hit(G, id, 1);
+  check(s5.combo === 4 && s5.crit && s5.bonus === Math.round((s5.dmg - s5.bonus) * .75), 'three others: ×4 and 75% more, on top of a perfect strike ' + J(s5));
+  const s6 = await hit(E, id, 1);
+  check(s6.combo === 4, 'a linked phone is the same person (Ann struck already): still ×4 ' + J(s6));
+  await q(`insert into auth.users values ('99999999-9999-9999-9999-999999999999')`);
+  await q(`insert into public.anglers (id, data) values ('99999999-9999-9999-9999-999999999999', $1)`, [J({ nick: 'Hal', catches: [] })]);
+  await q(`update private.raid_cfg set add_hp = 0`);
+  const s7 = await hit('99999999-9999-9999-9999-999999999999', id, 0);
+  check(s7.combo === 5 && s7.bonus === Math.round((s7.dmg - s7.bonus) * 1), 'four others: ×5 and double (the most) ' + J(s7));
+  await apart();
+  const s8 = await hit(C, id, .5);
+  check(s8.combo === 1 && s8.bonus === 0, 'strikes more than 1.6 seconds ago do not count');
+  const me = (await raid(C)).raid.me;
+  check(me && me.d === s3.dmg + s8.dmg, 'the bonus is part of my damage on the board');
+  // a joined raid where only zero-hit rows exist does not count as a team strike
+  await apart(); await q(`update private.live_raid_hits set hits = 0, last_at = clock_timestamp() where acct = $1`, [F]);
+  check((await hit(G, id, .5)).combo === 1, 'only real strikes count');
+  // nearly beaten: the bonus never takes more than is left
+  await q(`update private.live_raids set hp = 30 where id = $1`, [id]);
+  await apart(); const c0 = await hit(C, id, 0);
+  const left = 30 - c0.dmg, last = await hit(A, id, 1);
+  check(c0.combo === 1 && last.combo === 2 && last.dmg === left && last.bonus <= last.dmg && last.beaten, 'nearly beaten: the bonus never takes more than is left ' + J(last));
 }
 
 // ---------- the one that got away ----------

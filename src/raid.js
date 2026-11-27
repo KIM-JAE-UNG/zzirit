@@ -161,9 +161,15 @@ function rdStrike() {
     if (x.err) { if (x.raid) RD.st.raid = x.raid; rdLoad(true); rdPanel(); return; }
     r.hp = x.hp; r.max = x.max; r.me = Object.assign({}, r.me || {}, x.me);
     rdFx('−' + x.dmg, x.crit, true);
+    // 합동 챔질 counted by the server (0029): the extra damage and how many struck together
+    if (x.combo > 1 && x.bonus > 0) {
+      if (RD.bonusId !== r.id) { RD.bonus = 0; RD.bonusId = r.id; } RD.bonus += x.bonus;
+      setTimeout(() => rdFx(t('rd_cbonus', { n: x.combo, b: x.bonus }), true, true), 140);
+      if (typeof LVS !== 'undefined') { LVS.play('coin'); LVS.buzz([15, 25, 15, 25, 30]); }
+    }
     if (x.crit) { RD.shake = 1; if (typeof LVS !== 'undefined') { LVS.play('snap'); LVS.buzz([25, 30, 25]); } } else if (typeof LVS !== 'undefined') LVS.buzz(15);
     if (typeof rcHit === 'function') rcHit(myId(), x.dmg, x.crit, S.me.nick);
-    if (RD.room) RD.room.send('hit', { a: myId(), n: S.me.nick, d: x.dmg, c: !!x.crit, hp: x.hp, max: x.max });
+    if (RD.room) RD.room.send('hit', { a: myId(), n: S.me.nick, d: x.dmg, c: !!x.crit, hp: x.hp, max: x.max, x: Math.max(0, Math.min(5, +x.combo || 0)) });
     if (x.beaten && x.raid) { RD.st.raid = x.raid; if (RD.room) RD.room.send('won', {}); if (typeof LVS !== 'undefined') LVS.play('rare'); if (typeof zpLoad === 'function') zpLoad(); if (typeof rrLoad === 'function') setTimeout(() => rrLoad(true), 1200); }
     rdPanel();
   }).catch(e => { toast(t(e && e.code === 'need_update' ? 'zp_err_server' : 'lv_err'), 'warn'); }).finally(() => { RD.busy = false; });
@@ -194,7 +200,7 @@ function rdPanel() {
   const b = $('.rd-strike', el); b.disabled = !on;
   $('.rd-hint', el).textContent = on ? t('rd_hint') : '';
   const me = r && r.me;
-  $('.rd-mine', el).innerHTML = on ? (me ? t('rd_mine', { d: fmtN(me.d), r: me.rk || '-' }) : t('rd_first')) : '';
+  $('.rd-mine', el).innerHTML = on ? (me ? t('rd_mine', { d: fmtN(me.d), r: me.rk || '-' }) + (RD.bonus && RD.bonusId === r.id ? ` <span class="rd-bonus" data-rdbonus>${icon('users')}${t('rd_bonus_tot', { b: fmtN(RD.bonus) })}</span>` : '') : t('rd_first')) : '';
   // the end: beaten, got away, or nothing on now
   const end = $('.rd-end', el);
   let k = !r ? 'wait' : r.beaten ? 'won' : rdNow() >= r.ends ? 'lost' : null;

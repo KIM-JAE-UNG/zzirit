@@ -411,7 +411,7 @@ const AI_NOFISH = { fish_visible: false, candidates: [], other_en: '', other_sci
   await W.waitForTimeout(600); await W.reload(); await W.waitForTimeout(5500);
   ok(!!(await W.$('.wn')), 'an earlier member sees what changed');
   ok(!!(await W.$('#wn-id')), 'update notes offer to create a login ID');
-  ok(await W.$eval('.wn', n => n.querySelectorAll('.wn-list li').length <= 6 && /어탁 만들기/.test(n.textContent) && /사진으로 길이 재기/.test(n.textContent) && /배 위에서 감정 표현/.test(n.textContent) && /괴어 레이드 원정대/.test(n.textContent) && /출조 플래너/.test(n.textContent) && !/레이드 기록과 괴어 칭호/.test(n.textContent) && !/전설의 괴어 레이드/.test(n.textContent) && !/나의 낚시 결산/.test(n.textContent) && !/더 빨리 열려요/.test(n.textContent) && !/도감 세트와 칭호/.test(n.textContent) && !/잡은 고기 자랑 카드/.test(n.textContent) && !/캐릭터 감정 표현/.test(n.textContent) && !/오늘의 미션/.test(n.textContent) && !/실제처럼/.test(n.textContent) && !/미니게임:|갯바위 공원 개장/.test(n.textContent)), 'update notes list the newest features (at most 6 lines)');
+  ok(await W.$eval('.wn', n => n.querySelectorAll('.wn-list li').length <= 6 && /어탁 만들기/.test(n.textContent) && /사진으로 길이 재기/.test(n.textContent) && /배 위에서 감정 표현/.test(n.textContent) && !/괴어 레이드 원정대/.test(n.textContent) && /나의 낚시 여행/.test(n.textContent) && /합동 챔질 보너스/.test(n.textContent) && !/출조 플래너/.test(n.textContent) && !/레이드 기록과 괴어 칭호/.test(n.textContent) && !/전설의 괴어 레이드/.test(n.textContent) && !/나의 낚시 결산/.test(n.textContent) && !/더 빨리 열려요/.test(n.textContent) && !/도감 세트와 칭호/.test(n.textContent) && !/잡은 고기 자랑 카드/.test(n.textContent) && !/캐릭터 감정 표현/.test(n.textContent) && !/오늘의 미션/.test(n.textContent) && !/실제처럼/.test(n.textContent) && !/미니게임:|갯바위 공원 개장/.test(n.textContent)), 'update notes list the newest features (at most 6 lines)');
   ok(await W.$eval('.wn', n => !/초기화/.test(n.textContent)), 'update notes do not claim a reset that the server has not done');
   await shot(W, 'q04_whatsnew');
   await W.click('#wn-ok'); await W.waitForTimeout(400); await W.reload(); await W.waitForTimeout(5000);
@@ -422,13 +422,14 @@ const AI_NOFISH = { fish_visible: false, candidates: [], other_en: '', other_sci
     const r = await W.$eval('.wn', (n, [w, x]) => n.querySelectorAll('.wn-list li').length === w.length && w.every(k => n.textContent.includes(k)) && x.every(k => !n.textContent.includes(k)), [want, not]).catch(() => false);
     await W.click('#wn-ok').catch(() => null); await W.waitForTimeout(300); return r;
   };
-  const WN6 = ['배 위에서 감정 표현', '사진으로 길이 재기', '어탁 만들기', '괴어 레이드 원정대', '출조 플래너', '레이드 기록과 괴어 칭호'];
+  const WN6 = ['합동 챔질 보너스', '나의 낚시 여행', '배 위에서 감정 표현', '사진으로 길이 재기', '어탁 만들기', '괴어 레이드 원정대'];
   for (const seen of ['2026-11-07b', '2026-11-12a', '2026-11-13a', '2026-11-17a', '2026-11-18a', '2026-11-19a', '2026-11-20a', '2026-11-21a', '2026-11-22a', '2026-11-23a', '2026-11-24a'])
-    ok(await wnSeen(seen, WN6, ['전설의 괴어 레이드', '나의 낚시 결산', '더 빨리 열려요', '잡은 고기 자랑 카드', '도감 세트와 칭호']), 'after ' + seen + ': the six newest (the 어탁, measuring and the deck emotes first)');
-  ok(await wnSeen('2026-11-26a', WN6.slice(0, 4), ['출조 플래너']), 'after 11-26: the raid crew and today\'s three');
-  ok(await wnSeen('2026-11-26b', WN6.slice(0, 3), ['괴어 레이드 원정대']), 'after 11-26b: only today\'s three');
+    ok(await wnSeen(seen, WN6, ['전설의 괴어 레이드', '나의 낚시 결산', '더 빨리 열려요', '잡은 고기 자랑 카드', '도감 세트와 칭호', '출조 플래너']), 'after ' + seen + ': the six newest (the journey and the team bonus first)');
+  ok(await wnSeen('2026-11-26a', WN6, ['출조 플래너']), 'after 11-26: the raid crew, 11-27 and today\'s two');
+  ok(await wnSeen('2026-11-26b', WN6.slice(0, 5), ['괴어 레이드 원정대']), 'after 11-26b: 11-27 and today');
+  ok(await wnSeen('2026-11-27a', WN6.slice(0, 2), ['어탁 만들기']), 'after 11-27: only today\'s two');
   await W.evaluate(() => openWhatsNew('someid', '2026-11-25a')); await W.waitForTimeout(500);
-  ok(await W.$eval('.wn', n => n.querySelectorAll('.wn-list li').length === 6 && /원정대/.test(n.textContent) && /출조 플래너/.test(n.textContent) && /달력/.test(n.textContent) && /레이드 기록과 괴어 칭호/.test(n.textContent) && /어탁/.test(n.textContent) && !/2시간마다/.test(n.textContent)).catch(() => false), 'after 11-25: the raid crew, the planner, the raid record and today\'s three');
+  ok(await W.$eval('.wn', n => n.querySelectorAll('.wn-list li').length === 6 && /원정대/.test(n.textContent) && /나의 낚시 여행/.test(n.textContent) && /어탁/.test(n.textContent) && !/출조 플래너/.test(n.textContent) && !/2시간마다/.test(n.textContent)).catch(() => false), 'after 11-25: the newest six (the journey, the 어탁, the raid crew)');
   await shot(W, 'q05_whatsnew_raid');
   await W.click('#wn-ok'); await W.waitForTimeout(400);
   // photo cache: a second visit doesn't download the same photos again

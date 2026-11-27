@@ -402,7 +402,11 @@ http.createServer(async (req, res) => {
         if (!h) { if (Object.keys(hm).length) { r.hp += rc.add; r.max += rc.add; } h = hm[me] = { d: 0, hits: 0, c: 0, f: now, at: 0 }; }
         else if (now - h.at < rc.gap) return send({ data: { err: 'fast' } });
         const qq = Math.max(0, Math.min(1, +A.p_q || 0)), crit = qq >= .85;
-        let dmg = 6 + Math.round(qq * 12) + Math.floor(Math.random() * 5); if (crit) dmg *= 2; dmg = Math.min(dmg, Math.max(0, r.hp));
+        let dmg = 6 + Math.round(qq * 12) + Math.floor(Math.random() * 5); if (crit) dmg *= 2;
+        // 0029 합동 챔질: others who struck in the last 1.6 s add 25% each (up to four)
+        const combo = Math.min(4, Object.entries(hm).filter(([a, x]) => a !== me && x.hits > 0 && now - x.at <= 1600).length) + 1;
+        let bonus = combo > 1 && !rc.noCombo ? Math.round(dmg * .25 * (combo - 1)) : 0;
+        dmg = Math.min(dmg + bonus, Math.max(0, r.hp)); bonus = Math.min(bonus, dmg);
         h.d += dmg; h.hits++; h.c += crit ? 1 : 0; h.at = now; r.hp -= dmg;
         if (r.hp <= 0) {
           r.hp = 0; r.beaten = now; const hs = Object.entries(hm).filter(([, x]) => x.d > 0).sort((x, y) => y[1].d - x[1].d || x[1].f - y[1].f); r.mvp = hs[0] && hs[0][0];
@@ -410,7 +414,7 @@ http.createServer(async (req, res) => {
           for (const [a, x] of hs) zpAdd(a, 30 + Math.round(120 * x.d / tot) + (a === r.mvp ? 50 : 0), 'prize', 'raid:' + r.id, a === r.mvp ? 'raid mvp' : 'raid');
           if (r.mvp) { const dx = LVS.dex[r.mvp] || (LVS.dex[r.mvp] = {}); dx[r.sp] = dx[r.sp] || { n: 0, best: 0 }; dx[r.sp].n++; dx[r.sp].best = Math.max(dx[r.sp].best, 130); }
         }
-        return send({ data: { ok: true, dmg, crit, hp: Math.max(0, r.hp), max: r.max, beaten: !!r.beaten, raid: r.beaten ? js(r) : null, me: { d: h.d, hits: h.hits } } });
+        return send({ data: { ok: true, dmg, crit, ...(rc.noCombo ? {} : { combo, bonus }), hp: Math.max(0, r.hp), max: r.max, beaten: !!r.beaten, raid: r.beaten ? js(r) : null, me: { d: h.d, hits: h.hits } } });
       }
       // 0028: my raid record and the raid titles (the same counting as the SQL; cfg.noRaidRec plays a server without it)
       if (q.name === 'live_raid_record' || q.name === 'live_raid_title_claim') {

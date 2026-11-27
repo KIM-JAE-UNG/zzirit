@@ -79,6 +79,9 @@ async function until(fn, ms = 6000, step = 80) { const t0 = Date.now(); let v; w
     await Promise.all([A.click('.rd-strike'), B.click('.rd-strike')]); await A.waitForTimeout(250);
     ok(await until(() => A.evaluate(() => !!RCW.combo && RCW.combo.n >= 2), 3000), 'two anglers striking together: a team-strike combo');
     ok(await A.evaluate(() => { const m = [...RCW.m.values()].find(x => x.n === '폰레이더'); return m && performance.now() - m.hit < 3000; }), 'the other angler\'s figure reacts to their strike');
+    // 0029: the server counts the team strike too — the one who struck second does more and sees the bonus
+    ok(await until(async () => (await A.evaluate(() => (RD.bonus || 0) > 0 && RD.fx.some(f => /합동 ×2 \+\d+/.test(f.txt)))) || (await B.evaluate(() => (RD.bonus || 0) > 0 && RD.fx.some(f => /합동 ×2 \+\d+/.test(f.txt)))), 3000), 'team strike: the server adds the bonus and the second striker sees 「합동 ×2 +N」');
+    ok(await until(async () => (await A.$('.rd-mine .rd-bonus')) || (await B.$('.rd-mine .rd-bonus')), 3000), 'the team bonus adds up under my damage');
     await A.waitForTimeout(120); await shot(A, 'r02b_crew_combo_pc'); await shot(B, 'r03b_crew_phone');
     // 원정대 감정 표현: the moves I own are buttons by the strike button; a wave shows on both decks, a locked one does not send
     ok(await A.$$eval('.rd-emo [data-rdemo]', ns => ns.length === 4 && !ns.find(n => n.dataset.rdemo === 'wave').classList.contains('lock') && ns.find(n => n.dataset.rdemo === 'zzirit').classList.contains('lock')), 'raid: the emote buttons (waving free, the others locked until bought)');

@@ -47,6 +47,9 @@ echo "== the week planner"; node web/planner.js > out-planner.txt 2>&1; grep -E 
 kill $WS 2>/dev/null; sleep 0.3; node web/server.js > out-web-server.log 2>&1 & WS=$!
 for i in $(seq 1 30); do curl -s -o /dev/null http://127.0.0.1:8768/index.html && break; sleep 0.3; done
 echo "== gyotaku and measuring in the photo"; node web/gyotaku.js > out-gyotaku.txt 2>&1; grep -E '✗|CRASH|PAGEERROR|ALL PASSED|FAILED' out-gyotaku.txt; grep -q 'ALL PASSED' out-gyotaku.txt || fail=1
-mkdir -p out && mv -f out-web.txt out-claude.txt out-phone.txt out-live.txt out-shop.txt out-raid.txt out-planner.txt out-gyotaku.txt out/ 2>/dev/null
+kill $WS 2>/dev/null; sleep 0.3; node web/server.js > out-web-server.log 2>&1 & WS=$!
+for i in $(seq 1 30); do curl -s -o /dev/null http://127.0.0.1:8768/index.html && break; sleep 0.3; done
+echo "== my fishing journey on the map"; node web/journey.js > out-journey.txt 2>&1; grep -E '✗|CRASH|PAGEERROR|ALL PASSED|FAILED' out-journey.txt; grep -q 'ALL PASSED' out-journey.txt || fail=1
+mkdir -p out && mv -f out-web.txt out-claude.txt out-phone.txt out-live.txt out-shop.txt out-raid.txt out-planner.txt out-gyotaku.txt out-journey.txt out/ 2>/dev/null
 [ $fail = 0 ] && echo "ALL CHECKS PASSED" || echo "SOME CHECKS FAILED (details in tests/out/)"
 exit $fail

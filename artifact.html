@@ -2296,6 +2296,87 @@ body[data-route="live"] #main { padding-left: 0; padding-right: 0; }
 .rd-emob:active { transform: scale(.92); } .rd-emob:focus-visible { outline: 2px solid var(--spark); outline-offset: 2px; }
 @media (max-width: 640px) { .rd-emo { top: 150px; gap: 6px; } .rd-emob { width: 44px; height: 44px; border-radius: 13px; } }
 
+/* ===== 나의 낚시 여행 (journey.js): my catches played back on the map ===== */
+.jn-card { position: relative; display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 16px; align-items: center; border-radius: 22px; padding: 20px 22px; margin-bottom: 16px; overflow: hidden; color: #fff;
+  background: radial-gradient(120% 140% at 100% 0%, #1E4FA8 0%, #0E2C68 42%, #050A13 100%); }
+.jn-card h2 { font-size: 22px; margin: 4px 0; color: #fff; }
+.jn-c-eye { display: flex; align-items: center; gap: 6px; font: 600 12.5px/1.2 var(--f-disp); letter-spacing: .08em; text-transform: uppercase; color: #BFE4FF; }
+.jn-c-eye .ic { width: 15px; height: 15px; }
+.jn-c-sub { color: rgba(255,255,255,.86); margin-bottom: 12px; }
+.jn-c-art { width: 100%; height: 120px; filter: drop-shadow(0 0 6px rgba(124,196,255,.55)); }
+.jn-c-art path { stroke-dashoffset: 0; animation: jn-dash 6s linear infinite; }
+@keyframes jn-dash { to { stroke-dashoffset: -55; } }
+@media (max-width: 640px) { .jn-card { grid-template-columns: 1fr; padding: 18px; } .jn-c-art { height: 90px; order: -1; } }
+
+.jn { position: fixed; inset: 0; z-index: 92; background: #050A13; color: #fff; overflow: hidden; }
+.jn-map { position: absolute; inset: 0; background: #071226; }
+.jn-map .leaflet-container, .jn .leaflet-container { background: #071226; }
+.jn-shade { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(180deg, rgba(5,10,19,.85) 0%, rgba(5,10,19,0) 22%, rgba(5,10,19,0) 58%, rgba(5,10,19,.92) 100%); z-index: 401; }
+.jn-top { position: absolute; z-index: 410; left: 0; right: 0; top: 0; padding: max(14px, env(safe-area-inset-top)) 16px 0; display: grid; grid-template-columns: 1fr auto; gap: 8px 12px; align-items: start; }
+.jn-eye { display: flex; align-items: center; gap: 6px; font: 600 12px/1.2 var(--f-disp); letter-spacing: .1em; text-transform: uppercase; color: #7CC4FF; margin: 0; }
+.jn-eye .ic { width: 14px; height: 14px; }
+.jn-top h2 { margin: 2px 0 0; font-size: 22px; color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,.6); }
+.jn-x { width: 44px; height: 44px; border-radius: 50%; border: 1px solid rgba(255,255,255,.22); background: rgba(5,10,19,.55); color: #fff; display: grid; place-items: center; cursor: pointer; }
+.jn-x .ic { width: 20px; height: 20px; }
+.jn-years { grid-column: 1 / -1; display: flex; gap: 6px; flex-wrap: wrap; }
+.jn-years .chip { background: rgba(5,10,19,.55); color: #E3F3FF; border-color: rgba(124,196,255,.35); }
+.jn-years .chip[aria-pressed="true"] { background: #7CC4FF; color: #050A13; border-color: #7CC4FF; }
+.jn-pop { position: absolute; z-index: 410; left: 50%; top: 46%; transform: translate(-50%, -100%); width: min(360px, calc(100vw - 32px)); pointer-events: none; margin-top: -34px; }
+.jn-p-in { display: grid; grid-template-columns: 96px 1fr; gap: 12px; align-items: center; padding: 12px 14px; border-radius: 18px; background: rgba(8,20,44,.88); border: 1px solid color-mix(in srgb, var(--c) 60%, transparent);
+  box-shadow: 0 12px 34px rgba(0,0,0,.5), 0 0 24px color-mix(in srgb, var(--c) 30%, transparent); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); animation: jn-pop .45s cubic-bezier(.2,1.4,.4,1) both; }
+.jn-p-in img { width: 96px; height: auto; filter: drop-shadow(0 4px 10px rgba(0,0,0,.4)); }
+.jn-p-in h3 { margin: 2px 0; font-size: 19px; color: #fff; }
+.jn-p-eye { margin: 0; font: 600 12.5px/1.3 var(--f-disp); color: var(--c); }
+.jn-p-len { margin: 0; display: flex; gap: 8px; align-items: baseline; color: #A9BBCF; font-size: 13px; }
+.jn-p-len b { font: 700 italic 20px/1 var(--f-disp); color: #fff; }
+.jn-tags { display: flex; gap: 6px; flex-wrap: wrap; margin: 6px 0 0; }
+.jn-tag { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 999px; font-size: 12px; font-weight: 700; background: rgba(124,196,255,.18); color: #BFE4FF; }
+.jn-tag .ic { width: 13px; height: 13px; }
+.jn-tag.new { background: #9BE7D8; color: #062A2A; } .jn-tag.best { background: #FFFFFF; color: #0B1730; } .jn-tag.far { background: rgba(185,167,255,.25); color: #E4DCFF; }
+@keyframes jn-pop { from { opacity: 0; transform: translateY(18px) scale(.9); } }
+.jn-cur { pointer-events: none; }
+.jn-ping { position: relative; display: block; width: 44px; height: 44px; }
+.jn-ping i, .jn-ping b { position: absolute; left: 50%; top: 50%; border-radius: 50%; transform: translate(-50%, -50%); }
+.jn-ping i { width: 16px; height: 16px; background: var(--c); border: 3px solid #fff; box-shadow: 0 0 18px var(--c); }
+.jn-ping b { width: 16px; height: 16px; border: 2px solid var(--c); animation: jn-ring 1.4s ease-out infinite; }
+@keyframes jn-ring { to { width: 70px; height: 70px; opacity: 0; } }
+.jn-bar { position: absolute; z-index: 410; left: 0; right: 0; bottom: 0; padding: 0 16px max(14px, env(safe-area-inset-bottom)); display: grid; gap: 10px; max-width: 720px; margin: 0 auto; }
+.jn-now { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.jn-date { font: 700 italic 30px/1 var(--f-disp); color: #fff; text-shadow: 0 2px 12px rgba(0,0,0,.6); }
+.jn-step { font: 600 14px/1 var(--f-disp); color: #A9BBCF; }
+.jn-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+.jn-stats div { padding: 8px 6px; border-radius: 14px; background: rgba(8,20,44,.72); border: 1px solid rgba(124,196,255,.2); text-align: center; }
+.jn-stats b { display: block; font: 700 italic 22px/1.1 var(--f-disp); color: #7CC4FF; }
+.jn-stats b.bump { animation: jn-bump .5s ease-out; }
+@keyframes jn-bump { 30% { transform: scale(1.3); color: #fff; } }
+.jn-stats span { font-size: 12px; color: #C9D7E6; }
+.jn-ctl { display: grid; grid-template-columns: auto 1fr auto auto; gap: 10px; align-items: center; }
+.jn-play { width: 52px; height: 52px; border-radius: 50%; border: 0; background: #7CC4FF; color: #050A13; display: grid; place-items: center; cursor: pointer; box-shadow: 0 0 22px rgba(124,196,255,.55); }
+.jn-play .ic { width: 24px; height: 24px; }
+.jn-sp, .jn-sh { min-width: 44px; height: 44px; border-radius: 14px; border: 1px solid rgba(124,196,255,.35); background: rgba(8,20,44,.72); color: #E3F3FF; font: 700 15px/1 var(--f-disp); display: grid; place-items: center; cursor: pointer; }
+.jn-sh .ic { width: 20px; height: 20px; }
+#jn-range { width: 100%; accent-color: #7CC4FF; height: 28px; }
+.jn-play:focus-visible, .jn-sp:focus-visible, .jn-sh:focus-visible, .jn-x:focus-visible, #jn-range:focus-visible { outline: 3px solid #E3F3FF; outline-offset: 2px; }
+.jn-end, .jn-empty { position: absolute; z-index: 420; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(400px, calc(100vw - 32px)); padding: 22px; border-radius: 24px; text-align: center;
+  background: rgba(8,20,44,.92); border: 1px solid rgba(124,196,255,.3); box-shadow: 0 24px 60px rgba(0,0,0,.6); animation: jn-pop .5s ease-out both; }
+.jn-end[hidden], .jn-empty[hidden], .jn-bar[hidden] { display: none; }
+.jn-e-eye { margin: 0; font: 600 12.5px/1.2 var(--f-disp); letter-spacing: .08em; text-transform: uppercase; color: #7CC4FF; }
+.jn-end h3, .jn-empty h3 { margin: 6px 0 14px; font-size: 22px; color: #fff; }
+.jn-empty p { color: #C9D7E6; }
+.jn-e-ic .ic { width: 40px; height: 40px; color: #7CC4FF; }
+.jn-e-sum { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+.jn-e-sum p { margin: 0; padding: 10px; border-radius: 14px; background: rgba(124,196,255,.12); display: grid; gap: 2px; }
+.jn-e-sum b { font: 700 italic 24px/1.1 var(--f-disp); color: #fff; }
+.jn-e-sum span { font-size: 12.5px; color: #A9BBCF; }
+.jn-end .actions, .jn-empty .actions { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+@media (max-width: 480px) { .jn-top h2 { font-size: 19px; } .jn-date { font-size: 24px; } .jn-stats b { font-size: 19px; } .jn-p-in { grid-template-columns: 76px 1fr; } .jn-p-in img { width: 76px; } .jn-pop { top: 44%; } }
+@media (prefers-reduced-motion: reduce) { .jn-ping b, .jn-c-art path { animation: none; } .jn-p-in, .jn-end, .jn-stats b.bump { animation: none; } }
+/* 합동 챔질 bonus on the raid (0029) */
+.rd-bonus { display: inline-flex; align-items: center; gap: 4px; margin-left: 6px; padding: 2px 8px; border-radius: 999px; background: rgba(124,196,255,.2); color: #BFE4FF; font-size: 12px; font-weight: 700; }
+.rd-bonus .ic { width: 13px; height: 13px; }
+.jn-note { grid-column: 1 / -1; margin: 0; font-size: 12.5px; color: #A9BBCF; text-shadow: 0 1px 6px rgba(0,0,0,.8); }
+.jn-note[hidden] { display: none; }
+
 </style>
 <div class="app">
   <aside class="rail">
@@ -2447,6 +2528,8 @@ body[data-route="live"] #main { padding-left: 0; padding-right: 0; }
   <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
   <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/></symbol>
   <symbol id="i-stop" viewBox="0 0 24 24"><rect x="6.5" y="6.5" width="11" height="11" rx="2"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-pause" viewBox="0 0 24 24"><rect x="6.5" y="5.5" width="4" height="13" rx="1" fill="currentColor" stroke="none"/><rect x="13.5" y="5.5" width="4" height="13" rx="1" fill="currentColor" stroke="none"/></symbol>
   <symbol id="i-dot" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="currentColor"/></symbol>
   <symbol id="i-dots" viewBox="0 0 24 24"><circle cx="5.5" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="18.5" cy="12" r="1.6" fill="currentColor"/></symbol>
   <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.2 2"/></symbol>
@@ -4335,6 +4418,44 @@ Object.assign(T, {
   wn_ms_p: ['고기 옆에 카드나 동전을 두고 찍으면, 점 네 개로 길이를 재 줘요.', 'Put a card or a coin next to the fish: four dots on the photo give its length.', '魚の横にカードや硬貨を置いて撮れば、点4つで長さを測れます。', '在鱼旁边放卡片或硬币拍照，用四个点就能量出长度。'],
   wn_rdemo_h: ['배 위에서 감정 표현', 'Emotes on the raid deck', 'レイドの船でエモート', '团战船上的表情'],
   wn_rdemo_p: ['레이드 중에 손 흔들기·인사·춤을 누르면 원정대 모두에게 보여요.', 'Wave, bow or dance during a raid and the whole crew sees it.', 'レイド中に手を振る・あいさつ・ダンスをすると遠征隊のみんなに見えます。', '团战中挥手、问好、跳舞，全体远征队都能看到。'],
+  // 나의 낚시 여행 (journey.js)
+  jn_title: ['나의 낚시 여행', 'My fishing journey', '私の釣り旅', '我的钓鱼之旅'],
+  jn_eye: ['지도로 다시 보기', 'Replay on the map', '地図で振り返る', '在地图上重温'],
+  jn_card_h: ['{y}년, 지도 위의 내 조과', 'My {y} catches on the map', '{y}年、地図の上の釣果', '{y}年，地图上的渔获'],
+  jn_card_p: ['{n}마리 · {p}곳 · {km}km. 잡은 순서대로 지도 위를 다시 날아가요.', '{n} fish · {p} places · {km} km. Fly over the map in the order you caught them.', '{n}匹・{p}か所・{km}km。釣った順に地図の上をもう一度飛びます。', '{n}条 · {p}处 · {km}公里。按钓到的顺序在地图上重新飞一遍。'],
+  jn_open: ['여행 재생', 'Play the journey', '旅を再生', '播放旅程'],
+  jn_year: ['연도', 'Year', '年', '年份'],
+  jn_all: ['전체', 'All', 'すべて', '全部'],
+  jn_st_n: ['마리', 'fish', '匹', '条'],
+  jn_st_sp: ['어종', 'kinds', '魚種', '鱼种'],
+  jn_st_places: ['곳', 'places', 'か所', '处'],
+  jn_st_km: ['km 이동', 'km travelled', 'km 移動', '公里'],
+  jn_play: ['재생', 'Play', '再生', '播放'],
+  jn_pause: ['멈춤', 'Pause', '一時停止', '暂停'],
+  jn_scrub: ['날짜 고르기', 'Pick a day', '日付を選ぶ', '选择日期'],
+  jn_speed: ['빠르기', 'Speed', '速さ', '速度'],
+  jn_share: ['그림으로 자랑', 'Share as a picture', '画像で自慢', '分享图片'],
+  jn_share_sub: ['지도와 장소는 들어가지 않아요. 날짜 순서로 놓인 점만 보여요.', 'No map and no places: only dots, by the day of each fish.', '地図や場所は入りません。日付順に並んだ点だけです。', '不含地图和地点，只按日期排列的圆点。'],
+  jn_share_text: ['올해 {p}곳에서 {n}마리 낚았어요 🎣', 'I caught {n} fish in {p} places this year 🎣', '今年は{p}か所で{n}匹釣りました 🎣', '今年在{p}个地方钓到了{n}条 🎣'],
+  jn_stops: ['{n}곳의 기록', '{n} catches', '{n}件の記録', '{n}条记录'],
+  jn_new: ['첫 만남', 'First one', '初めての魚', '第一次'],
+  jn_best: ['내 최고 기록', 'My best', '自己ベスト', '个人最佳'],
+  jn_far: ['{km}km 날아옴', 'Flew {km} km', '{km}km 移動', '飞了{km}公里'],
+  jn_end_eye: ['{y} 여행 끝', 'End of {y}', '{y} の旅おわり', '{y} 旅程结束'],
+  jn_end_h: ['{p}곳에서 {n}마리를 만났어요', '{n} fish in {p} places', '{p}か所で{n}匹に出会いました', '在{p}个地方遇见了{n}条鱼'],
+  jn_end_km: ['km 이동', 'km travelled', 'km 移動', '公里'],
+  jn_end_rg: ['가장 많이 간 곳', 'Where I went most', 'いちばん通った所', '去得最多'],
+  jn_again: ['다시 보기', 'Watch again', 'もう一度', '再看一遍'],
+  jn_empty_h: ['아직 지도에 놓을 조과가 없어요', 'No catches with a place yet', 'まだ地図に置ける釣果がありません', '还没有带位置的渔获'],
+  jn_empty_p: ['사진에 위치가 있거나, 등록할 때 지도에서 자리를 고르면 여기에 나와요. 자리는 이 기기에서만 보여요.', 'Photos with a location, or a place picked on the map when you register, show up here. Places stay on this device.', '写真に位置があるか、登録時に地図で場所を選ぶとここに出ます。場所はこの端末でだけ見えます。', '照片带位置，或登记时在地图上选了地点，就会出现在这里。地点只在本机显示。'],
+  jn_noloc: ['자리가 없는 조과 {n}마리는 빼고 보여 줘요', '{n} catches without a place are left out', '場所のない釣果 {n}匹は除いています', '已略过{n}条没有位置的渔获'],
+  // 합동 챔질 counted by the server (0029)
+  rd_cbonus: ['합동 ×{n} +{b}', 'TEAM ×{n} +{b}', '合同 ×{n} +{b}', '合力 ×{n} +{b}'],
+  rd_bonus_tot: ['합동 보너스 +{b}', 'Team bonus +{b}', '合同ボーナス +{b}', '合力加成 +{b}'],
+  wn_jn_h: ['나의 낚시 여행', 'My fishing journey', '私の釣り旅', '我的钓鱼之旅'],
+  wn_jn_p: ['내 조과를 잡은 순서대로 지도 위에서 다시 날아가며 봐요. 자리는 내 기기에서만 보여요.', 'Replay your catches on the map in the order you caught them. Places stay on your device.', '釣果を釣った順に地図の上でもう一度たどれます。場所は自分の端末だけ。', '按钓到的顺序在地图上重温渔获。地点只在你的设备上显示。'],
+  wn_rcb_h: ['합동 챔질 보너스', 'Team strike bonus', '合同アワセボーナス', '合力扬竿加成'],
+  wn_rcb_p: ['레이드에서 다른 사람과 1.6초 안에 같이 챔질하면 한 사람마다 피해가 25% 더 들어가요(최대 2배).', 'Strike within 1.6 s of others in a raid: +25% damage for each of them (up to double).', 'レイドで他の人と1.6秒以内に一緒にアワセると、一人ごとにダメージ25%アップ(最大2倍)。', '团战中与他人在1.6秒内一起扬竿，每多一人伤害+25%（最多2倍）。'],
 });
 
 /* ===== Tackle dictionaries: [ko, en, ja, zh] ===== */
@@ -8467,7 +8588,7 @@ function openShareCard(blob, name, text, opt) {
 }
 
 /* ===== What's new: shown once after a big update (website only; needs the matching server update) ===== */
-const WHATS_NEW = '2026-11-27a', WN_TS = Date.parse('2026-11-07T03:00:00Z'); // people who joined after this have nothing to catch up on
+const WHATS_NEW = '2026-11-28a', WN_TS = Date.parse('2026-11-07T03:00:00Z'); // people who joined after this have nothing to catch up on
 const BOOT_AT = Date.now();
 /* what each update brought, newest last; people see what came after the last one they saw (at most 6 lines) */
 const WN_ITEMS = [
@@ -8490,7 +8611,8 @@ const WN_ITEMS = [
   ['2026-11-25a', 'bolt', 'wn_raid'], ['2026-11-25a', 'sparkle', 'wn_recap'],
   ['2026-11-26a', 'sun', 'wn_plan'], ['2026-11-26a', 'medal', 'wn_rrec'],
   ['2026-11-26b', 'users', 'wn_crew'],
-  ['2026-11-27a', 'fish', 'wn_gy'], ['2026-11-27a', 'target', 'wn_ms'], ['2026-11-27a', 'smile', 'wn_rdemo']
+  ['2026-11-27a', 'fish', 'wn_gy'], ['2026-11-27a', 'target', 'wn_ms'], ['2026-11-27a', 'smile', 'wn_rdemo'],
+  ['2026-11-28a', 'map', 'wn_jn'], ['2026-11-28a', 'users', 'wn_rcb']
 ];
 // the new look already says the fish were redrawn
 const WN_PART = { wn_fish: 'wn_look' };
@@ -9589,9 +9711,9 @@ VIEWS.log = {
     el.innerHTML = `
     <div class="page log">
       <header class="page-head"><h1>${t('log_title')}</h1><p class="lede">${t('log_sub')}</p>
-        <div class="hero-cta"><a class="btn btn-primary" href="#scan">${icon('camera')}${t('mode_now')}</a><a class="btn btn-line" href="#past">${icon('clock')}${t('mode_past')}</a><button class="btn btn-line" data-rcopen>${icon('sparkle')}${t('rc_title', { y: rcYear() })}</button></div></header>
+        <div class="hero-cta"><a class="btn btn-primary" href="#scan">${icon('camera')}${t('mode_now')}</a><a class="btn btn-line" href="#past">${icon('clock')}${t('mode_past')}</a><button class="btn btn-line" data-rcopen>${icon('sparkle')}${t('rc_title', { y: rcYear() })}</button>${jnAll().length ? `<button class="btn btn-line" data-jnopen>${icon('map')}${t('jn_title')}</button>` : ''}</div></header>
       ${cs.length ? `<div class="seg log-tabs" role="tablist">${['list', 'stats'].map(k => `<button role="tab" aria-pressed="${(S.logTab || 'list') === k}" data-logtab="${k}">${icon(k === 'list' ? 'log' : 'chart')}${t('st_tab_' + k)}</button>`).join('')}</div>` : ''}
-      ${S.logTab === 'stats' && cs.length ? statsHTML() : `
+      ${S.logTab === 'stats' && cs.length ? jnCardHTML() + statsHTML() : `
       <div class="stats4 card"><div><span class="num">${fmtN(cs.length)}</span><span>${t('catches')}</span></div><div><span class="num">${fmtN(pts)}</span><span>${t('total_pts')}</span></div><div><span class="num">Lv.${myLevel()}</span><span>${esc(lvInfo(S.me, myId()).title)}</span></div><div><span class="num">${fmtN(cs.filter(c => { const x = catchState(myId(), c); return x === 'review' || x === 'hold'; }).length)}</span><span>${t('st_review')}</span></div></div>
       ${cs.length ? VIEWS.sea.catchesHTML(cs, null) : `<div class="empty card big"><div class="empty-art"><img src="${FD.thumb(SPI.kurodai, 260, 140)}" alt=""></div><h2>${t('log_empty')}</h2><p class="muted">${t('log_empty_sub')}</p><a class="btn btn-primary" href="#scan">${t('cta_scan')}</a></div>`}`}
       ${S.myOrders.length ? `<section class="card"><h2 class="h3">${icon('heart')}${t('orders_title')}</h2><ul class="orders">${S.myOrders.slice().reverse().map(o => `<li><span>${esc(o.kind === 'item' ? dict(SHOPI[o.ref]?.n) || o.ref : o.kind === 'past' ? t('ord_past_old') : t('donate_title'))}</span><span class="num">${fmtN(o.amt)}${t('won')}</span><span class="mono small">${esc(o.code)}</span><span class="chip ${({ no: 'chip-closed', ok: 'chip-ok', wait: 'chip-wait' })[orderState(o)]}">${t('ord_' + orderState(o))}</span></li>`).join('')}</ul><p class="hint">${t('orders_note')}</p></section>` : ''}
@@ -14557,9 +14679,15 @@ function rdStrike() {
     if (x.err) { if (x.raid) RD.st.raid = x.raid; rdLoad(true); rdPanel(); return; }
     r.hp = x.hp; r.max = x.max; r.me = Object.assign({}, r.me || {}, x.me);
     rdFx('−' + x.dmg, x.crit, true);
+    // 합동 챔질 counted by the server (0029): the extra damage and how many struck together
+    if (x.combo > 1 && x.bonus > 0) {
+      if (RD.bonusId !== r.id) { RD.bonus = 0; RD.bonusId = r.id; } RD.bonus += x.bonus;
+      setTimeout(() => rdFx(t('rd_cbonus', { n: x.combo, b: x.bonus }), true, true), 140);
+      if (typeof LVS !== 'undefined') { LVS.play('coin'); LVS.buzz([15, 25, 15, 25, 30]); }
+    }
     if (x.crit) { RD.shake = 1; if (typeof LVS !== 'undefined') { LVS.play('snap'); LVS.buzz([25, 30, 25]); } } else if (typeof LVS !== 'undefined') LVS.buzz(15);
     if (typeof rcHit === 'function') rcHit(myId(), x.dmg, x.crit, S.me.nick);
-    if (RD.room) RD.room.send('hit', { a: myId(), n: S.me.nick, d: x.dmg, c: !!x.crit, hp: x.hp, max: x.max });
+    if (RD.room) RD.room.send('hit', { a: myId(), n: S.me.nick, d: x.dmg, c: !!x.crit, hp: x.hp, max: x.max, x: Math.max(0, Math.min(5, +x.combo || 0)) });
     if (x.beaten && x.raid) { RD.st.raid = x.raid; if (RD.room) RD.room.send('won', {}); if (typeof LVS !== 'undefined') LVS.play('rare'); if (typeof zpLoad === 'function') zpLoad(); if (typeof rrLoad === 'function') setTimeout(() => rrLoad(true), 1200); }
     rdPanel();
   }).catch(e => { toast(t(e && e.code === 'need_update' ? 'zp_err_server' : 'lv_err'), 'warn'); }).finally(() => { RD.busy = false; });
@@ -14590,7 +14718,7 @@ function rdPanel() {
   const b = $('.rd-strike', el); b.disabled = !on;
   $('.rd-hint', el).textContent = on ? t('rd_hint') : '';
   const me = r && r.me;
-  $('.rd-mine', el).innerHTML = on ? (me ? t('rd_mine', { d: fmtN(me.d), r: me.rk || '-' }) : t('rd_first')) : '';
+  $('.rd-mine', el).innerHTML = on ? (me ? t('rd_mine', { d: fmtN(me.d), r: me.rk || '-' }) + (RD.bonus && RD.bonusId === r.id ? ` <span class="rd-bonus" data-rdbonus>${icon('users')}${t('rd_bonus_tot', { b: fmtN(RD.bonus) })}</span>` : '') : t('rd_first')) : '';
   // the end: beaten, got away, or nothing on now
   const end = $('.rd-end', el);
   let k = !r ? 'wait' : r.beaten ? 'won' : rdNow() >= r.ends ? 'lost' : null;
@@ -15311,6 +15439,283 @@ async function rcShare(btn) {
   finally { btn.disabled = false; }
 }
 document.addEventListener('click', e => { if (e.target.closest('[data-rcopen]')) { e.preventDefault(); rcOpen(); } });
+
+/* ===== 나의 낚시 여행 (my fishing journey): my catches played back on the map, in the order I caught them.
+   The camera flies from one place to the next, a line grows between them, each fish pops up with its date, size and
+   what was special (a new kind, my best of that kind), and the numbers add up as it goes (fish, kinds, places, km).
+   Play / pause, faster, drag the bar to any day; space, arrows and Escape on a keyboard.
+   Everything comes from my own records on this device and stays here: the map is only on my screen. The picture to
+   share has no map and no places at all, only the year drawn as a ring of dots (one per fish, by its day). ===== */
+const JN = { el: null, map: null, d: null, i: -1, play: false, speed: 1, t0: 0, raf: 0, yr: null, key: null, ly: null, endT: 0 };
+const JN_STEP = 2300;
+const JN_SPEEDS = [1, 2, 4];
+// the season's colour of a dot (no orange: mint, sky, lavender, frost)
+const JN_SEA = ['#E6F1FF', '#E6F1FF', '#9BE7D8', '#9BE7D8', '#9BE7D8', '#4FC3F7', '#4FC3F7', '#4FC3F7', '#B9A7FF', '#B9A7FF', '#B9A7FF', '#E6F1FF'];
+const jnTs = c => +(c.ts || c.at || 0);
+function jnKm(a, b) {
+  const R = 6371, r = Math.PI / 180, dLa = (b.lat - a.lat) * r, dLo = (b.lon - a.lon) * r;
+  const h = Math.sin(dLa / 2) ** 2 + Math.cos(a.lat * r) * Math.cos(b.lat * r) * Math.sin(dLo / 2) ** 2;
+  return 2 * R * Math.asin(Math.min(1, Math.sqrt(h)));
+}
+// my catches that have a place, oldest first (the refused ones are left out, as in the statistics)
+function jnAll() {
+  return statCatches().filter(c => c && SPI[c.sp] && jnTs(c) && c.lat != null && c.lon != null && Number.isFinite(+c.lat) && Number.isFinite(+c.lon)
+    && Math.abs(+c.lat) <= 90 && Math.abs(+c.lon) <= 180 && !(+c.lat === 0 && +c.lon === 0))
+    .map(c => ({ c, lat: +c.lat, lon: +c.lon, ts: jnTs(c) })).sort((a, b) => a.ts - b.ts);
+}
+function jnYears() { return [...new Set(jnAll().map(p => new Date(p.ts).getFullYear()))].sort((a, b) => b - a); }
+// the journey for a year ('all' for every year): each stop with what had added up by then
+function jnData(yr) {
+  const inYr = ts => yr === 'all' || new Date(ts).getFullYear() === yr;
+  const pts = jnAll().filter(p => inYr(p.ts));
+  const noLoc = statCatches().filter(c => c && SPI[c.sp] && jnTs(c) && inYr(jnTs(c))).length - pts.length;
+  const seen = new Set(), best = {}, places = new Set();
+  let km = 0, far = null;
+  pts.forEach((p, i) => {
+    const c = p.c;
+    p.isNew = !seen.has(c.sp); seen.add(c.sp);
+    p.isBest = !p.isNew && c.len > 0 && c.len > (best[c.sp] || 0);
+    if (c.len > 0) best[c.sp] = Math.max(best[c.sp] || 0, c.len);
+    const leg = i ? jnKm(pts[i - 1], p) : 0; km += leg; p.leg = leg;
+    if (leg > 0 && (!far || leg > far.leg)) far = p;
+    places.add(Math.round(p.lat * 20) + ',' + Math.round(p.lon * 20)); // about 5 km a place
+    p.n = i + 1; p.sp = seen.size; p.places = places.size; p.km = km;
+  });
+  let big = null; for (const p of pts) { const L = SPI[p.c.sp].L, r = p.c.len && L ? p.c.len / L : 0; if (r && (!big || r > big.r)) big = { p, r }; }
+  const rg = {}; for (const p of pts) if (p.c.rg) rg[p.c.rg] = (rg[p.c.rg] || 0) + 1;
+  const topRg = Object.entries(rg).sort((a, b) => b[1] - a[1])[0];
+  return { yr, pts, noLoc: Math.max(0, noLoc), n: pts.length, sp: seen.size, places: places.size, km, far, big: big && big.p, topRg: topRg ? topRg[0] : null };
+}
+const jnKmTxt = km => km >= 100 ? fmtN(Math.round(km)) : fmtN(Math.round(km * 10) / 10, 1);
+const jnDate = ts => fmtDate(ts, { year: 'numeric', month: 'short', day: 'numeric' });
+
+/* --- the card on 내 조과 (my own screen, so a small sketch of the route is fine) --- */
+function jnCardHTML() {
+  const all = jnAll(); if (!all.length) return '';
+  const yrs = jnYears(), yr = yrs[0], d = jnData(yr);
+  // fitted into a 100×60 box in the middle of the sketch (kept in proportion)
+  const xs = d.pts.map(p => p.lon), ys = d.pts.map(p => p.lat);
+  const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+  const k = Math.min(100 / Math.max(.02, x1 - x0), 60 / Math.max(.02, y1 - y0));
+  const P = d.pts.map(p => [60 + (p.lon - (x0 + x1) / 2) * k, 40 - (p.lat - (y0 + y1) / 2) * k]);
+  const path = P.map((q, i) => (i ? 'L' : 'M') + q[0].toFixed(1) + ' ' + q[1].toFixed(1)).join(' ');
+  return `<section class="jn-card" aria-label="${esc(t('jn_title'))}">
+    <div class="jn-c-txt"><p class="jn-c-eye">${icon('map')}${t('jn_eye')}</p><h2>${t('jn_card_h', { y: yr })}</h2>
+      <p class="jn-c-sub">${t('jn_card_p', { n: fmtN(d.n), p: fmtN(d.places), km: jnKmTxt(d.km) })}</p>
+      <button class="btn btn-light" data-jnopen="${yr}">${icon('play')}${t('jn_open')}</button></div>
+    <svg class="jn-c-art" viewBox="0 0 120 80" aria-hidden="true"><path d="${path}" fill="none" stroke="#7CC4FF" stroke-width="1.2" stroke-dasharray="3 2.5" stroke-linecap="round" opacity=".85"/>
+      ${P.map((q, i) => `<circle cx="${q[0].toFixed(1)}" cy="${q[1].toFixed(1)}" r="${i === P.length - 1 ? 3.2 : 2}" fill="${JN_SEA[new Date(d.pts[i].ts).getMonth()]}"/>`).join('')}</svg>
+  </section>`;
+}
+
+/* --- the player --- */
+async function jnOpen(yr) {
+  if (JN.el) return;
+  const yrs = jnYears();
+  yr = yr === 'all' ? 'all' : +yr || yrs[0] || new Date(nowMs()).getFullYear();
+  const el = document.createElement('div'); el.className = 'jn'; el.id = 'jn';
+  el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); el.setAttribute('aria-label', t('jn_title'));
+  el.innerHTML = `<div class="jn-map" id="jn-map"></div><div class="jn-shade" aria-hidden="true"></div>
+    <header class="jn-top"><div class="jn-ttl"><p class="jn-eye">${icon('map')}${t('jn_eye')}</p><h2>${t('jn_title')}</h2></div>
+      <button class="jn-x" data-jnclose aria-label="${esc(t('close'))}">${icon('x')}</button>
+      <div class="jn-years" role="group" aria-label="${esc(t('jn_year'))}"></div><p class="jn-note" hidden></p></header>
+    <div class="jn-pop" aria-live="polite"></div>
+    <footer class="jn-bar">
+      <div class="jn-now"><b class="jn-date num" id="jn-date">—</b><span class="jn-step num" id="jn-step"></span></div>
+      <div class="jn-stats">${['n', 'sp', 'places', 'km'].map(k => `<div><b class="num" data-jnst="${k}">0</b><span>${t('jn_st_' + k)}</span></div>`).join('')}</div>
+      <div class="jn-ctl"><button class="jn-play" data-jnplay aria-label="${esc(t('jn_play'))}">${icon('play')}</button>
+        <input type="range" id="jn-range" min="0" max="0" value="0" step="1" aria-label="${esc(t('jn_scrub'))}">
+        <button class="jn-sp num" data-jnspeed aria-label="${esc(t('jn_speed'))}">1×</button>
+        <button class="jn-sh" data-jnshare aria-label="${esc(t('jn_share'))}">${icon('share')}</button></div>
+    </footer>
+    <div class="jn-end" hidden></div>
+    <div class="jn-empty" hidden></div>`;
+  document.body.appendChild(el); document.body.classList.add('has-modal'); JN.el = el;
+  el.addEventListener('click', e => {
+    const tg = e.target;
+    if (tg.closest('[data-jnclose]')) { jnClose(); return; }
+    if (tg.closest('[data-jnplay]')) { jnToggle(); return; }
+    if (tg.closest('[data-jnspeed]')) { JN.speed = JN_SPEEDS[(JN_SPEEDS.indexOf(JN.speed) + 1) % JN_SPEEDS.length]; $('[data-jnspeed]', el).textContent = JN.speed + '×'; return; }
+    if (tg.closest('[data-jnshare]')) { jnShare(tg.closest('[data-jnshare]')); return; }
+    if (tg.closest('[data-jnagain]')) { jnGo(0, true); jnToggle(true); return; }
+    const y = tg.closest('[data-jnyr]'); if (y) { jnLoad(y.dataset.jnyr === 'all' ? 'all' : +y.dataset.jnyr); return; }
+  });
+  const rg = $('#jn-range', el);
+  rg.addEventListener('input', () => { jnToggle(false); jnGo(+rg.value, false); });
+  JN.key = e => {
+    if (!JN.el) return;
+    if (e.key === 'Escape') { e.preventDefault(); jnClose(); }
+    else if (e.key === ' ' && !e.target.closest('button,input')) { e.preventDefault(); jnToggle(); }
+    else if ((e.key === 'ArrowRight' || e.key === 'ArrowLeft') && e.target !== rg) { e.preventDefault(); jnToggle(false); jnGo(JN.i + (e.key === 'ArrowRight' ? 1 : -1), true); }
+  };
+  document.addEventListener('keydown', JN.key);
+  setTimeout(() => { const b = $('.jn-x', el); if (b) b.focus(); }, 50);
+  if (!yrs.length) { jnEmpty(); return; }
+  const box = $('#jn-map', el);
+  const build = () => {
+    if (!JN.el) return;
+    const L = window.L; box.innerHTML = '';
+    const map = L.map(box, { zoomControl: false, attributionControl: false, worldCopyJump: true, minZoom: 2, maxZoom: 11, zoomSnap: .25, fadeAnimation: false });
+    map.setView([35.5, 128], 6);
+    try { const LY = MAPX.makeLayers(L); new LY.Sat({ night: true }).addTo(map); new LY.Vec({ toggles: () => ({ night: true, coast: true, fresh: true, bathy: true }) }).addTo(map); } catch (e) { console.warn(e); }
+    JN.map = map; JN.ly = { glow: L.polyline([], { color: '#7CC4FF', weight: 9, opacity: .18, interactive: false }).addTo(map), line: L.polyline([], { color: '#BFE4FF', weight: 2.4, opacity: .95, dashArray: '6 7', interactive: false }).addTo(map), dots: L.layerGroup().addTo(map), cur: null };
+    map.on('dragstart zoomstart', e => { if (e && e.originalEvent) jnToggle(false); });
+    jnLoad(yr);
+    setTimeout(() => map.invalidateSize(), 60);
+  };
+  if (window.L && window.L.map) build(); else mapWait(box, build);
+}
+function jnEmpty() {
+  const e = $('.jn-empty', JN.el); e.hidden = false; $('.jn-bar', JN.el).hidden = true;
+  e.innerHTML = `<p class="jn-e-ic">${icon('pin')}</p><h3>${t('jn_empty_h')}</h3><p>${t('jn_empty_p')}</p>
+    <div class="actions"><a class="btn btn-primary" href="#scan" data-jnclose>${icon('camera')}${t('cta_scan')}</a><button class="btn btn-glass" data-jnclose>${t('close')}</button></div>`;
+}
+function jnLoad(yr) {
+  if (!JN.el || !JN.map) return;
+  JN.yr = yr; JN.d = jnData(yr);
+  const yrs = jnYears();
+  $('.jn-years', JN.el).innerHTML = (yrs.length > 1 ? [...yrs, 'all'] : yrs).map(y => `<button class="chip chip-tab" data-jnyr="${y}" aria-pressed="${String(y) === String(yr)}">${y === 'all' ? t('jn_all') : y}</button>`).join('');
+  const rg = $('#jn-range', JN.el); rg.max = Math.max(0, JN.d.n - 1); rg.value = 0;
+  $('.jn-end', JN.el).hidden = true;
+  // the whole year first, for a moment, then off it goes
+  const b = window.L.latLngBounds(JN.d.pts.map(p => [p.lat, p.lon]));
+  try { JN.map.fitBounds(b.pad(.35), { maxZoom: 8, animate: false }); } catch (e) { }
+  JN.i = -1; jnGo(-1, false);
+  const nt = $('.jn-note', JN.el); nt.hidden = !JN.d.noLoc; nt.textContent = JN.d.noLoc ? t('jn_noloc', { n: JN.d.noLoc }) : '';
+  clearTimeout(JN.startT); JN.startT = setTimeout(() => { if (JN.el && JN.i < 0) { jnGo(0, true); jnToggle(true); } }, 900);
+  if (!JN.raf) JN.raf = requestAnimationFrame(jnTick);
+}
+const jnCalm = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+// stop i: everything up to it drawn; fly there when asked
+function jnGo(i, fly) {
+  const d = JN.d; if (!JN.el || !d || !JN.map) return;
+  if (i >= d.n) { jnEnd(); return; }
+  i = Math.max(-1, Math.min(d.n - 1, i));
+  const prev = JN.i; JN.i = i; JN.t0 = performance.now();
+  $('.jn-end', JN.el).hidden = true;
+  const L = window.L, ly = JN.ly;
+  ly.dots.clearLayers();
+  for (let k = 0; k < i; k++) { const p = d.pts[k]; ly.dots.addLayer(L.circleMarker([p.lat, p.lon], { radius: p.isNew ? 5 : 4, color: '#0B1730', weight: 1.5, fillColor: JN_SEA[new Date(p.ts).getMonth()], fillOpacity: .95, interactive: false })); }
+  const pre = d.pts.slice(0, Math.max(0, i)).map(p => [p.lat, p.lon]);
+  ly.line.setLatLngs(pre); ly.glow.setLatLngs(pre);
+  if (ly.cur) { ly.cur.remove(); ly.cur = null; }
+  const pop = $('.jn-pop', JN.el);
+  $('#jn-range', JN.el).value = Math.max(0, i);
+  if (i < 0) { pop.innerHTML = ''; jnNums(null); $('#jn-date', JN.el).textContent = JN.yr === 'all' ? t('jn_all') : String(JN.yr); $('#jn-step', JN.el).textContent = t('jn_stops', { n: d.n }); return; }
+  const p = d.pts[i], c = p.c, sp = SPI[c.sp], mo = new Date(p.ts).getMonth();
+  ly.cur = L.marker([p.lat, p.lon], { icon: L.divIcon({ className: 'jn-cur', html: `<span class="jn-ping" style="--c:${JN_SEA[mo]}"><i></i><b></b></span>`, iconSize: [44, 44], iconAnchor: [22, 22] }), interactive: false, keyboard: false }).addTo(JN.map);
+  if (fly) {
+    const far = prev >= 0 && d.pts[prev] ? jnKm(d.pts[prev], p) : 999, z = Math.max(JN.map.getZoom(), 8.5);
+    if (jnCalm()) JN.map.setView([p.lat, p.lon], 9, { animate: false });
+    else if (far > 30) JN.map.flyTo([p.lat, p.lon], 9, { duration: Math.min(1.4, Math.max(.6, JN_STEP / JN.speed / 1000 * .5)) });
+    else JN.map.setView([p.lat, p.lon], Math.min(10, z), { animate: true, duration: .5 });
+  } else JN.map.setView([p.lat, p.lon], Math.max(8.5, Math.min(10, JN.map.getZoom())), { animate: false });
+  const tags = [p.isNew ? `<span class="jn-tag new">${icon('sparkle')}${t('jn_new')}</span>` : '', p.isBest ? `<span class="jn-tag best">${icon('trophy')}${t('jn_best')}</span>` : '', p === d.far && p.leg > 30 ? `<span class="jn-tag far">${icon('globe')}${t('jn_far', { km: jnKmTxt(p.leg) })}</span>` : ''].join('');
+  pop.innerHTML = `<div class="jn-p-in" style="--c:${JN_SEA[mo]}"><img src="${FD.thumb(sp, 180, 100)}" alt="">
+    <div><p class="jn-p-eye num">${esc(jnDate(p.ts))}${c.rg ? ' · ' + esc(regionName(c.rg)) : ''}</p><h3>${esc(nameOf(c.sp))}</h3>
+    <p class="jn-p-len">${c.len ? `<b class="num">${lenFmt(c.len)}</b>` : ''}${c.bait ? `<span>${esc(String(c.bait).slice(0, 24))}</span>` : ''}</p>${tags ? `<p class="jn-tags">${tags}</p>` : ''}</div></div>`;
+  $('#jn-date', JN.el).textContent = jnDate(p.ts);
+  $('#jn-step', JN.el).textContent = `${i + 1} / ${d.n}`;
+  jnNums(p);
+  if (fly && typeof LVS !== 'undefined') { LVS.play(p.isNew ? 'coin' : 'plop'); if (p.isBest) setTimeout(() => LVS.play('bite'), 260); LVS.buzz(p.isNew || p.isBest ? [12, 30, 12] : 10); }
+}
+function jnNums(p) {
+  const v = { n: p ? p.n : 0, sp: p ? p.sp : 0, places: p ? p.places : 0, km: p ? p.km : 0 };
+  for (const k in v) { const n = $(`[data-jnst="${k}"]`, JN.el); if (!n) continue; const s = k === 'km' ? jnKmTxt(v[k]) : fmtN(v[k]); if (n.textContent !== s) { n.textContent = s; n.classList.remove('bump'); void n.offsetWidth; n.classList.add('bump'); } }
+}
+function jnToggle(on) {
+  if (!JN.el || !JN.d) return;
+  JN.play = on == null ? !JN.play : !!on;
+  if (JN.play && (JN.i >= JN.d.n - 1 || !$('.jn-end', JN.el).hidden)) { jnGo(0, true); }
+  JN.t0 = performance.now();
+  const b = $('[data-jnplay]', JN.el); if (b) { b.innerHTML = icon(JN.play ? 'pause' : 'play'); b.setAttribute('aria-label', t(JN.play ? 'jn_pause' : 'jn_play')); b.setAttribute('aria-pressed', String(JN.play)); }
+}
+// each frame: the line grows from the last stop to this one, and on to the next stop when it is time
+function jnTick() {
+  if (!JN.el) { JN.raf = 0; return; }
+  const d = JN.d, now = performance.now(), dur = JN_STEP / JN.speed;
+  if (d && JN.map && JN.i >= 1) {
+    const a = d.pts[JN.i - 1], b = d.pts[JN.i], f = Math.min(1, (now - JN.t0) / (dur * .5)), e = 1 - Math.pow(1 - f, 3);
+    const ll = d.pts.slice(0, JN.i).map(p => [p.lat, p.lon]); ll.push([a.lat + (b.lat - a.lat) * e, a.lon + (b.lon - a.lon) * e]);
+    if (f < 1 || JN.ly.line.getLatLngs().length !== ll.length || !JN._full) { JN.ly.line.setLatLngs(ll); JN.ly.glow.setLatLngs(ll); JN._full = f >= 1; }
+  }
+  if (JN.play && d && now - JN.t0 >= dur) { JN._full = false; jnGo(JN.i + 1, true); }
+  JN.raf = requestAnimationFrame(jnTick);
+}
+function jnEnd() {
+  const d = JN.d; if (!d || !JN.el) return;
+  jnToggle(false);
+  const L = window.L;
+  // the whole route at once, every fish a dot
+  JN.ly.dots.clearLayers();
+  for (const p of d.pts) JN.ly.dots.addLayer(L.circleMarker([p.lat, p.lon], { radius: p.isNew ? 5 : 4, color: '#0B1730', weight: 1.5, fillColor: JN_SEA[new Date(p.ts).getMonth()], fillOpacity: .95, interactive: false }));
+  JN.ly.line.setLatLngs(d.pts.map(p => [p.lat, p.lon])); JN.ly.glow.setLatLngs(d.pts.map(p => [p.lat, p.lon]));
+  if (JN.ly.cur) { JN.ly.cur.remove(); JN.ly.cur = null; }
+  try { JN.map.flyToBounds(L.latLngBounds(d.pts.map(p => [p.lat, p.lon])).pad(.3), { maxZoom: 9, duration: jnCalm() ? 0 : 1 }); } catch (e) { }
+  $('.jn-pop', JN.el).innerHTML = '';
+  const big = d.big;
+  const e = $('.jn-end', JN.el); e.hidden = false;
+  e.innerHTML = `<p class="jn-e-eye">${t('jn_end_eye', { y: d.yr === 'all' ? t('jn_all') : d.yr })}</p>
+    <h3>${t('jn_end_h', { p: fmtN(d.places), n: fmtN(d.n) })}</h3>
+    <div class="jn-e-sum"><p><b class="num">${jnKmTxt(d.km)}</b><span>${t('jn_end_km')}</span></p><p><b class="num">${fmtN(d.sp)}</b><span>${t('jn_st_sp')}</span></p>
+      ${big ? `<p><b class="num">${lenFmt(big.c.len)}</b><span>${esc(nameOf(big.c.sp))}</span></p>` : ''}${d.topRg ? `<p><b>${esc(regionName(d.topRg))}</b><span>${t('jn_end_rg')}</span></p>` : ''}</div>
+    <div class="actions"><button class="btn btn-light" data-jnshare>${icon('share')}${t('jn_share')}</button><button class="btn btn-glass" data-jnagain>${icon('refresh')}${t('jn_again')}</button></div>`;
+  $('#jn-step', JN.el).textContent = t('jn_stops', { n: d.n });
+  if (typeof LVS !== 'undefined') LVS.play('land');
+}
+function jnClose() {
+  if (!JN.el) return;
+  cancelAnimationFrame(JN.raf); JN.raf = 0; clearTimeout(JN.startT);
+  document.removeEventListener('keydown', JN.key);
+  try { if (JN.map) JN.map.remove(); } catch (e) { }
+  JN.el.remove(); JN.el = null; JN.map = null; JN.ly = null; JN.play = false; JN.i = -1;
+  if (!$('.modal-wrap.in') && !$('.rc')) document.body.classList.remove('has-modal');
+}
+
+/* --- the picture to share: the year as a ring of dots (one per fish, at its day), no map, no places --- */
+async function jnBlob(d) {
+  const W = 1080, H = 1350, P = 80, cx = W / 2, cy = 700, R0 = 180, R1 = 340;
+  const SANS = '"IBM Plex Sans KR", "IBM Plex Sans JP", "Noto Sans SC", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif', DISP = '"Chakra Petch", ' + SANS;
+  try { await Promise.race([document.fonts.load(`italic 700 200px ${DISP}`, '0123456789'), new Promise(r => setTimeout(r, 2000))]); } catch (e) { }
+  const cv = document.createElement('canvas'); cv.width = W; cv.height = H; const g = cv.getContext('2d');
+  const bg = g.createRadialGradient(cx, cy, 60, cx, cy, 900); bg.addColorStop(0, '#173A7A'); bg.addColorStop(.55, '#0B1730'); bg.addColorStop(1, '#050A13'); g.fillStyle = bg; g.fillRect(0, 0, W, H);
+  // a few stars
+  const rnd = FD.seeded(FD.hashStr(String(d.yr) + d.n)); g.fillStyle = '#FFFFFF';
+  for (let i = 0; i < 90; i++) { g.globalAlpha = .1 + rnd() * .35; g.beginPath(); g.arc(rnd() * W, rnd() * H, rnd() * 1.8 + .3, 0, Math.PI * 2); g.fill(); } g.globalAlpha = 1;
+  g.textAlign = 'left'; g.fillStyle = '#7CC4FF'; g.font = `700 40px ${DISP}`; g.fillText(`${d.yr === 'all' ? 'ALL TIME' : d.yr} FISHING JOURNEY`, P, 130);
+  g.fillStyle = '#FFFFFF'; g.font = `800 66px ${SANS}`; g.fillText(fitText(g, t('jn_title'), W - P * 2), P, 210);
+  g.fillStyle = '#A9BBCF'; g.font = `500 38px ${SANS}`; g.fillText(fitText(g, (S.me && S.me.nick) || '', W - P * 2), P, 266);
+  // the ring: twelve months around, the fish as dots by their day (when in the year, never where)
+  const t0 = d.yr === 'all' ? (d.pts[0] ? d.pts[0].ts : 0) : new Date(d.yr, 0, 1).getTime(), t1 = d.yr === 'all' ? Math.max(t0 + 864e5, d.pts.length ? d.pts[d.pts.length - 1].ts : 0) : new Date(d.yr + 1, 0, 1).getTime();
+  const ang = ts => -Math.PI / 2 + (ts - t0) / (t1 - t0) * Math.PI * 2;
+  g.strokeStyle = 'rgba(124,196,255,.22)'; g.lineWidth = 2; g.beginPath(); g.arc(cx, cy, R1 + 26, 0, Math.PI * 2); g.stroke();
+  g.strokeStyle = 'rgba(124,196,255,.1)'; g.beginPath(); g.arc(cx, cy, R0 - 20, 0, Math.PI * 2); g.stroke();
+  if (d.yr !== 'all') for (let m = 0; m < 12; m++) {
+    const a = ang(new Date(d.yr, m, 1).getTime()); g.strokeStyle = 'rgba(124,196,255,.35)'; g.beginPath(); g.moveTo(cx + Math.cos(a) * (R1 + 16), cy + Math.sin(a) * (R1 + 16)); g.lineTo(cx + Math.cos(a) * (R1 + 36), cy + Math.sin(a) * (R1 + 36)); g.stroke();
+    const am = ang(new Date(d.yr, m, 15).getTime()); g.fillStyle = '#7F95AD'; g.font = `600 26px ${DISP}`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(String(m + 1), cx + Math.cos(am) * (R1 + 62), cy + Math.sin(am) * (R1 + 62));
+  }
+  g.textBaseline = 'alphabetic';
+  const pos = d.pts.map((p, i) => { const L = SPI[p.c.sp].L, r = p.c.len && L ? Math.min(1.6, p.c.len / L) / 1.6 : .5, a = ang(p.ts), rr = R0 + (R1 - R0) * (.15 + .85 * r) + ((i * 37) % 9 - 4) * 3; return [cx + Math.cos(a) * rr, cy + Math.sin(a) * rr, p]; });
+  g.strokeStyle = 'rgba(191,228,255,.35)'; g.lineWidth = 2; g.setLineDash([8, 9]); g.beginPath(); pos.forEach(([x, y], i) => i ? g.lineTo(x, y) : g.moveTo(x, y)); g.stroke(); g.setLineDash([]);
+  for (const [x, y, p] of pos) { const col = JN_SEA[new Date(p.ts).getMonth()]; g.save(); g.shadowColor = col; g.shadowBlur = 22; g.fillStyle = col; g.beginPath(); g.arc(x, y, p.isNew ? 11 : 8, 0, Math.PI * 2); g.fill(); g.restore(); if (p.isBest || p === d.big) { g.strokeStyle = '#FFFFFF'; g.lineWidth = 3; g.beginPath(); g.arc(x, y, 17, 0, Math.PI * 2); g.stroke(); } }
+  g.textAlign = 'center'; g.fillStyle = '#FFFFFF'; g.font = `italic 700 150px ${DISP}`; g.fillText(fmtN(d.n), cx, cy + 30);
+  g.fillStyle = '#BFE4FF'; g.font = `600 38px ${SANS}`; g.fillText(fitText(g, t('jn_st_n'), 300), cx, cy + 90);
+  // the numbers under it
+  const cells = [[fmtN(d.places), t('jn_st_places')], [jnKmTxt(d.km), t('jn_st_km')], [fmtN(d.sp), t('jn_st_sp')]];
+  const cw = (W - P * 2) / cells.length;
+  cells.forEach(([v, u], i) => { const x = P + cw * i + cw / 2; g.fillStyle = '#7CC4FF'; g.font = `italic 700 92px ${DISP}`; g.fillText(v, x, 1188); g.fillStyle = '#E3F3FF'; g.font = `600 34px ${SANS}`; g.fillText(fitText(g, u, cw - 20), x, 1232); });
+  g.textAlign = 'left'; g.fillStyle = 'rgba(255,255,255,.14)'; g.fillRect(P, H - 86, W - P * 2, 2);
+  g.fillStyle = '#FFFFFF'; g.font = `800 36px ${SANS}`; g.fillText(`${APP_NAME[0]} ${APP_NAME[1]}`, P, H - 38);
+  g.textAlign = 'right'; g.fillStyle = '#7F95AD'; g.font = `500 28px ${SANS}`; g.fillText(SITE_URL.replace(/^https?:\/\//, '').replace(/\/$/, ''), W - P, H - 38);
+  return new Promise(res => cv.toBlob(b => res(b), 'image/jpeg', .9));
+}
+async function jnShare(btn) {
+  if (!JN.d || btn.disabled) return; btn.disabled = true; jnToggle(false);
+  try { const b = await jnBlob(JN.d); await shareImage(b, `zzirit-${JN.d.yr}-journey.jpg`, t('jn_share_text', { n: JN.d.n, p: JN.d.places }), { title: 'jn_share', sub: 'jn_share_sub' }); }
+  catch (e) { console.warn(e); toast(t('share_fail'), 'warn'); }
+  finally { btn.disabled = false; }
+}
+document.addEventListener('click', e => { const b = e.target.closest('[data-jnopen]'); if (b) { e.preventDefault(); jnOpen(b.dataset.jnopen || null); } });
 
 /* ===== 어탁 (gyotaku): the catch printed in ink on paper, the old way anglers kept a fish. Made on this device from the
    species drawing and the length the angler registered — the photo is not needed and nothing is sent anywhere.
