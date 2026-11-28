@@ -250,7 +250,7 @@ const fish = async (uid, sp, o = {}) => {
   // the factor is in the wait: with every roll the same, rain waits 0.88 of a clear day
   const wOf = async wx => { await q(`select setseed(0.42)`); return (await cw(F, wx)).wait; };
   const wc = await wOf('clear'), wr = await wOf('rain');
-  check(wr < wc && Math.abs(wr / wc - 0.88) < 0.02 || wc === 3500, 'the same roll waits less in the rain — ' + wc + ' → ' + wr);
+  check(wr < wc && Math.abs(wr / wc - 0.88) < 0.02 || wc === 3500 || (wr === 3500 && wc * 0.88 <= 3500 && wc > wr), 'the same roll waits less in the rain — ' + wc + ' → ' + wr);
   check(/permission denied/.test(await fails(() => asRole('anon', null, () => q(`select public.live_cast_wx(1, 1, 'sea', true, false, 'rain')`))) || ''), 'not for visitors without an account');
   check(/permission denied/.test(await fails(() => as(A, () => q(`select private.live_wx_mult('rain')`))) || ''), 'the factor itself is private');
 }

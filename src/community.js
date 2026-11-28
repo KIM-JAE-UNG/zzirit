@@ -263,12 +263,14 @@ VIEWS.teams = {
       <header class="page-head"><h1>${t('tm_title')}</h1><p class="lede">${t('tm_sub')}</p></header>
       ${shared ? '' : `<p class="note">${icon('info')} ${t('bd_local_note')}</p>`}
       ${myCard}
+      <div data-tfteam>${typeof tfTeamCardHTML === 'function' ? tfTeamCardHTML() : ''}</div>
       <section class="tm-sec">
         <div class="sec-head"><h2 class="h3">${icon('trophy')}${t('tm_list')}</h2><input class="search tm-search" id="tm-q" type="search" placeholder="${esc(t('tm_search'))}" value="${esc(S.tmQ)}" autocomplete="off"></div>
         ${list.length ? `<ul class="tm-list card">${list.map(x => teamRow(x, mine && mine.ok ? mine.id : null)).join('')}</ul>` : `<div class="empty card">${icon('flag', 'big')}<p class="muted">${t(q ? 'bd_none_found' : 'tm_rank_empty')}</p></div>`}
       </section>
       <p class="hint">${icon('info')} ${t('tm_rules', { max: TEAM_MAX })}</p>
     </div>`;
+    if (typeof tfLoad === 'function') tfLoad().then(() => { const h = $('[data-tfteam]', el); if (h && h.isConnected) h.innerHTML = tfTeamCardHTML(); });
     const qi = $('#tm-q', el);
     qi.addEventListener('input', debounce(() => { S.tmQ = qi.value; const ul = $('.tm-sec', el); const q2 = S.tmQ.trim().toLowerCase(); const l2 = teamIndex().ranked.filter(x => !q2 || (x.t.name + ' ' + x.t.tag).toLowerCase().includes(q2)); const mm = teamOf(myId()); ul.querySelector('.tm-list, .empty').outerHTML = l2.length ? `<ul class="tm-list card">${l2.map(x => teamRow(x, mm && mm.ok ? mm.id : null)).join('')}</ul>` : `<div class="empty card">${icon('flag', 'big')}<p class="muted">${t('bd_none_found')}</p></div>`; }, 180));
   }

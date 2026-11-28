@@ -1190,7 +1190,7 @@ function openShareCard(blob, name, text, opt) {
 }
 
 /* ===== What's new: shown once after a big update (website only; needs the matching server update) ===== */
-const WHATS_NEW = '2026-11-28a', WN_TS = Date.parse('2026-11-07T03:00:00Z'); // people who joined after this have nothing to catch up on
+const WHATS_NEW = '2026-11-29a', WN_TS = Date.parse('2026-11-07T03:00:00Z'); // people who joined after this have nothing to catch up on
 const BOOT_AT = Date.now();
 /* what each update brought, newest last; people see what came after the last one they saw (at most 6 lines) */
 const WN_ITEMS = [
@@ -1214,7 +1214,8 @@ const WN_ITEMS = [
   ['2026-11-26a', 'sun', 'wn_plan'], ['2026-11-26a', 'medal', 'wn_rrec'],
   ['2026-11-26b', 'users', 'wn_crew'],
   ['2026-11-27a', 'fish', 'wn_gy'], ['2026-11-27a', 'target', 'wn_ms'], ['2026-11-27a', 'smile', 'wn_rdemo'],
-  ['2026-11-28a', 'map', 'wn_jn'], ['2026-11-28a', 'users', 'wn_rcb']
+  ['2026-11-28a', 'map', 'wn_jn'], ['2026-11-28a', 'users', 'wn_rcb'],
+  ['2026-11-29a', 'flag', 'wn_tf'], ['2026-11-29a', 'users', 'wn_club']
 ];
 // the new look already says the fish were redrawn
 const WN_PART = { wn_fish: 'wn_look' };
@@ -1223,8 +1224,10 @@ function maybeWhatsNew(tries = 0) {
   if (!S.ready || $('.modal-wrap.in')) { setTimeout(() => maybeWhatsNew(tries + 1), 4000); return; }
   // a first visit gets the welcome dialog instead, and someone who joined after the update has nothing to catch up on
   if (!S.me || !S.me.nick || (S.me.joined && S.me.joined >= Math.min(WN_TS, BOOT_AT))) { lsSet('wn', WHATS_NEW); return; }
-  myLoginId().then(id => {
-    if (S.idOff || lsGet('wn', '') === WHATS_NEW) return; // the server update isn't in yet: try again next visit
+  // today's notes need the sea turf on the server (0030): until it is there, wait for a later visit
+  const srv = typeof tfOn === 'function' && tfOn() ? tfLoad(true).then(() => !TF.off) : Promise.resolve(true);
+  Promise.all([myLoginId(), srv]).then(([id, ready]) => {
+    if (S.idOff || !ready || TF.off || lsGet('wn', '') === WHATS_NEW) return; // the server update isn't in yet: try again next visit
     if ($('.modal-wrap.in')) { setTimeout(() => maybeWhatsNew(tries + 1), 4000); return; }
     const seen = lsGet('wn', '') || ''; lsSet('wn', WHATS_NEW); openWhatsNew(id, seen);
   });

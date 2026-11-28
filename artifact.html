@@ -2377,6 +2377,94 @@ body[data-route="live"] #main { padding-left: 0; padding-right: 0; }
 .jn-note { grid-column: 1 / -1; margin: 0; font-size: 12.5px; color: #A9BBCF; text-shadow: 0 1px 6px rgba(0,0,0,.8); }
 .jn-note[hidden] { display: none; }
 
+/* ===== 바다 땅따먹기 · 동호회 대항전 ===== */
+.lv-tfb { color: #7CC4FF; }
+.lv.tf-on .lv-bottom, .lv.tf-on .lv-fx, .lv.tf-on .lv-ticker, .lv.tf-on .lv-fight, .lv.tf-on .lv-emo { display: none; }
+.lv.tf-on .lv-tfb { background: #7CC4FF; color: var(--night); border-color: #E3F3FF; box-shadow: 0 0 18px rgba(124,196,255,.6); }
+.lv.tf-on .lv-side > :not(.lv-tfb):not(#lv-loc) { display: none; }
+.tf-panel { position: absolute; z-index: 6; left: 12px; bottom: 24px; width: min(360px, calc(100% - 24px)); max-height: min(58%, 520px); overflow: auto; overscroll-behavior: contain;
+  padding: 14px 14px 12px; border-radius: 20px; color: #E3F3FF; background: linear-gradient(180deg, rgba(11,23,48,.92), rgba(5,10,19,.94)); border: 1px solid rgba(160,205,255,.2); box-shadow: 0 16px 50px rgba(0,0,0,.45); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); animation: tfup .35s cubic-bezier(.2,1.2,.3,1) both; }
+@keyframes tfup { from { transform: translateY(24px); opacity: 0; } }
+.tf-head { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.tf-head h2 { display: flex; align-items: center; gap: 6px; margin: 0; font-size: 18px; font-weight: 800; letter-spacing: -.01em; color: #fff; }
+.tf-head h2 .ic { width: 19px; height: 19px; color: #7CC4FF; }
+.tf-left { margin-left: auto; display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: #A9BBCF; white-space: nowrap; }
+.tf-left .ic { width: 13px; height: 13px; }
+.tf-x { display: grid; place-items: center; width: 30px; height: 30px; border: 0; border-radius: 10px; color: #E3F3FF; background: rgba(160,205,255,.1); cursor: pointer; flex: none; }
+.tf-x .ic { width: 16px; height: 16px; }
+.tf-seg.seg { display: grid; grid-template-columns: 1fr 1fr; width: 100%; background: rgba(160,205,255,.08); border-color: rgba(160,205,255,.16); margin-bottom: 12px; }
+.tf-seg.seg button { color: #C9D3E0; } .tf-seg.seg button[aria-selected="true"] { background: #7CC4FF; color: var(--night); }
+.tf-big { display: flex; align-items: center; gap: 10px; margin: 2px 0 12px; font-size: 14px; color: #C9D3E0; }
+.tf-big b { font-size: 40px; line-height: 1; color: var(--c, #7CC4FF); text-shadow: 0 0 22px rgba(124,196,255,.45); }
+.tf-big em { font-style: normal; color: #fff; font-weight: 700; }
+.tf-big .btn { margin-left: auto; }
+.tf-claim { display: flex; align-items: center; gap: 8px; width: 100%; margin: 0 0 12px; padding: 11px 12px; border-radius: 14px; border: 1px solid rgba(227,243,255,.5); color: var(--night); background: linear-gradient(120deg, #7CC4FF, #E3F3FF); font-weight: 700; font-size: 14px; cursor: pointer; animation: tfglow 1.8s ease-in-out infinite; text-align: left; }
+.tf-claim b { margin-left: auto; font-size: 17px; } .tf-claim .ic { width: 18px; height: 18px; }
+@keyframes tfglow { 50% { box-shadow: 0 0 22px rgba(124,196,255,.7); } }
+.tf-news { list-style: none; margin: 0 0 12px; padding: 0; display: grid; gap: 6px; }
+.tf-news li { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 12px; background: rgba(160,205,255,.07); font-size: 13px; line-height: 1.35; }
+.tf-news li > i { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 9px; flex: none; color: #7CC4FF; background: rgba(124,196,255,.14); }
+.tf-news li.lost > i { color: #E3F3FF; background: rgba(88,102,216,.5); }
+.tf-news li.new { box-shadow: inset 0 0 0 1px rgba(124,196,255,.6); }
+.tf-news li .ic { width: 15px; height: 15px; } .tf-news li span { flex: 1; min-width: 0; } .tf-news .btn { flex: none; }
+.tf-h { margin: 4px 0 6px; font-size: 13px; font-weight: 700; color: #A9BBCF; }
+.tf-board { list-style: none; margin: 0 0 10px; padding: 0; display: grid; gap: 2px; }
+.tf-board li { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 10px; font-size: 14px; }
+.tf-board li.me { background: rgba(124,196,255,.14); }
+.tf-board li > b { width: 18px; text-align: center; color: #7CC4FF; font-size: 13px; }
+.tf-board li > .avatar { flex: none !important; }
+.tf-board li > span:not(.avatar) { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tf-board li small { color: #8E9BB0; font-size: 11px; } .tf-board li em { font-style: normal; color: #E3F3FF; font-size: 13px; }
+.tf-dot { display: inline-block; width: 12px; height: 12px; border-radius: 4px; background: var(--c, #58657E); box-shadow: 0 0 0 2px rgba(5,10,19,.6); flex: none; }
+.tf-empty, .tf-wait { font-size: 13px; color: #A9BBCF; margin: 4px 0 10px; display: flex; align-items: center; gap: 8px; }
+.tf-how { margin: 6px 0 0; font-size: 12px; line-height: 1.5; color: #8E9BB0; }
+.tf-card { position: absolute; z-index: 7; right: 12px; top: 76px; width: min(290px, calc(100% - 76px)); padding: 14px; border-radius: 18px; color: #E3F3FF; background: rgba(11,23,48,.94); border: 1px solid rgba(160,205,255,.24); box-shadow: 0 14px 40px rgba(0,0,0,.45); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); }
+.lv.tf-on .tf-card { right: 64px; }
+.tf-card.pop { animation: tfpop .3s cubic-bezier(.2,1.4,.3,1) both; }
+@keyframes tfpop { from { transform: scale(.9); opacity: 0; } }
+.tf-card .tf-x { position: absolute; top: 10px; right: 10px; }
+.tf-cn { display: flex; align-items: center; gap: 6px; margin: 0 34px 10px 0; font-weight: 800; font-size: 16px; color: #fff; }
+.tf-cn .ic { width: 16px; height: 16px; color: #7CC4FF; flex: none; }
+.tf-own { display: flex; align-items: center; gap: 8px; margin: 0 0 8px; font-size: 15px; --c: #5866D8; }
+.tf-own.me { --c: #7CC4FF; } .tf-own .tf-dot { background: var(--c); } .tf-own span { margin-left: auto; font-size: 18px; color: var(--c); }
+.tf-vs { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 8px; font-size: 12px; color: #A9BBCF; margin-bottom: 8px; }
+.tf-vs .ms-bar { height: 8px; } .tf-vs b { color: #7CC4FF; font-size: 14px; }
+.tf-say { margin: 0 0 12px; font-size: 13px; line-height: 1.45; color: #C9D3E0; }
+.tf-rem { display: block; margin-top: 6px; text-align: center; font-size: 11.5px; color: #8E9BB0; }
+.tf-mk { position: relative; display: flex; flex-direction: column; align-items: center; padding: 0; border: 0; background: none; cursor: pointer; transform-origin: 50% 100%; animation: tfflag .5s cubic-bezier(.2,1.5,.3,1) both; }
+@keyframes tfflag { from { transform: translateY(14px) scale(.4); opacity: 0; } }
+.tf-mk .tf-fl svg { display: block; width: 26px; height: 31px; filter: drop-shadow(0 2px 4px rgba(0,0,0,.5)); }
+.tf-mk.mine .tf-fl svg { width: 32px; height: 38px; filter: drop-shadow(0 0 8px rgba(124,196,255,.9)); }
+.tf-mk.mine .tf-fl path:nth-child(2) { animation: tfwave 1.6s ease-in-out infinite; transform-origin: 8px 13px; }
+@keyframes tfwave { 50% { transform: skewY(-6deg) scaleX(.92); } }
+.tf-nm { order: -1; display: inline-flex; align-items: center; gap: 4px; max-width: 120px; margin-bottom: 2px; padding: 2px 7px; border-radius: 8px; font: 700 11px/1.3 var(--f-sans, "IBM Plex Sans KR", sans-serif); color: #E3F3FF; background: rgba(5,10,19,.78); border: 1px solid rgba(160,205,255,.2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tf-nm b { color: #7CC4FF; font-size: 10.5px; }
+.tf-mk.mine .tf-nm { background: #7CC4FF; color: var(--night); border-color: #E3F3FF; } .tf-mk.mine .tf-nm b { color: var(--night-2); }
+.tf-win { position: absolute; z-index: 9; inset: 0; display: grid; place-items: center; padding: 16px; background: radial-gradient(circle at 50% 42%, rgba(57,137,210,.35), rgba(5,10,19,.55) 70%); animation: lvfade .25s ease both; }
+.tf-win.out { animation: tfout .4s ease both; } @keyframes tfout { to { opacity: 0; } }
+.tf-win-in { position: relative; width: min(320px, 100%); padding: 26px 20px 18px; border-radius: 24px; text-align: center; color: #fff; background: linear-gradient(180deg, #10285E, #0B1730); border: 1px solid rgba(160,205,255,.35); box-shadow: 0 0 60px rgba(124,196,255,.4); animation: tfpop .45s cubic-bezier(.2,1.5,.3,1) both; overflow: hidden; }
+.tf-rays { position: absolute; left: 50%; top: 58px; width: 420px; height: 420px; margin: -210px 0 0 -210px; background: repeating-conic-gradient(from 0deg, rgba(124,196,255,.22) 0 10deg, transparent 10deg 24deg); border-radius: 50%; animation: tfspin 9s linear infinite; pointer-events: none; -webkit-mask: radial-gradient(circle, #000 20%, transparent 68%); mask: radial-gradient(circle, #000 20%, transparent 68%); }
+@keyframes tfspin { to { transform: rotate(360deg); } }
+.tf-wflag { position: relative; display: block; margin: 0 auto 6px; width: 72px; animation: tfrise .8s .1s cubic-bezier(.2,1.4,.3,1) both; }
+.tf-wflag svg { width: 72px; height: 86px; filter: drop-shadow(0 0 14px rgba(124,196,255,.9)); }
+@keyframes tfrise { from { transform: translateY(40px) scale(.5); opacity: 0; } }
+.tf-win-k { position: relative; margin: 0; font: italic 700 34px/1.1 var(--f-disp); letter-spacing: -.01em; color: #fff; text-shadow: 0 0 18px rgba(124,196,255,.9); }
+.tf-win-in h3 { position: relative; margin: 6px 0 4px; font-size: 20px; font-weight: 800; color: #7CC4FF; }
+.tf-win-s { position: relative; margin: 0 0 14px; font-size: 13px; color: #C9D3E0; }
+.tf-win-in .btn { position: relative; }
+.tf-tcard { margin: 0 0 16px; padding: 16px; }
+.tf-tc-h { display: flex; align-items: center; gap: 8px; } .tf-tc-h h2 { margin: 0; display: flex; align-items: center; gap: 6px; } .tf-tc-h .btn { margin-left: auto; }
+.tf-tcard .tf-board li { font-size: 14px; } .tf-tcard .tf-board li > b { color: var(--azure); } .tf-tcard .tf-board li em { color: inherit; } .tf-tcard .tf-board li.me { background: var(--surface-2); }
+.tf-tc-me { display: flex; align-items: center; gap: 8px; margin: 10px 0; font-size: 15px; } .tf-tc-me .tf-dot { background: var(--c); } .tf-tc-me span { margin-left: auto; color: var(--muted, #8E9BB0); font-size: 13px; }
+.tf-tcard .tf-empty { color: var(--muted, #8E9BB0); }
+@media (max-width: 560px) {
+  .tf-panel { left: 8px; right: 8px; width: auto; bottom: 22px; max-height: 44%; padding: 12px; }
+  .lv.tf-sel .tf-panel { max-height: 112px; overflow: hidden; }
+  .tf-card { padding: 12px; } .tf-cn { font-size: 15px; margin-bottom: 6px; } .tf-say { margin-bottom: 8px; }
+  .lv.tf-on .tf-card { right: 60px; left: 8px; width: auto; top: 70px; }
+  .tf-big b { font-size: 34px; }
+}
+
 </style>
 <div class="app">
   <aside class="rail">
@@ -4456,6 +4544,60 @@ Object.assign(T, {
   wn_jn_p: ['내 조과를 잡은 순서대로 지도 위에서 다시 날아가며 봐요. 자리는 내 기기에서만 보여요.', 'Replay your catches on the map in the order you caught them. Places stay on your device.', '釣果を釣った順に地図の上でもう一度たどれます。場所は自分の端末だけ。', '按钓到的顺序在地图上重温渔获。地点只在你的设备上显示。'],
   wn_rcb_h: ['합동 챔질 보너스', 'Team strike bonus', '合同アワセボーナス', '合力扬竿加成'],
   wn_rcb_p: ['레이드에서 다른 사람과 1.6초 안에 같이 챔질하면 한 사람마다 피해가 25% 더 들어가요(최대 2배).', 'Strike within 1.6 s of others in a raid: +25% damage for each of them (up to double).', 'レイドで他の人と1.6秒以内に一緒にアワセると、一人ごとにダメージ25%アップ(最大2倍)。', '团战中与他人在1.6秒内一起扬竿，每多一人伤害+25%（最多2倍）。'],
+  // 0030 바다 땅따먹기 · 동호회 대항전
+  tf_title: ['바다 땅따먹기', 'Sea Turf', '海の陣取り', '海域争夺'],
+  tf_tab_me: ['내 땅', 'Mine', '自分の陣地', '我的领地'],
+  tf_tab_club: ['동호회 대항전', 'Club war', '同好会対抗戦', '钓友会对抗'],
+  tf_hidden: ['숨은 낚시꾼', 'Hidden angler', '匿名の釣り人', '匿名钓手'],
+  tf_me: ['나', 'Me', '自分', '我'],
+  tf_off: ['{p} 앞바다', 'Off {p}', '{p}沖', '{p}近海'],
+  tf_sq: ['이름 없는 바다', 'Open water', '名もない海', '无名海域'],
+  tf_left_d: ['{d}일 {h}시간 남음', '{d}d {h}h left', '残り{d}日{h}時間', '剩{d}天{h}小时'],
+  tf_left_h: ['{h}시간 남음', '{h}h left', '残り{h}時間', '剩{h}小时'],
+  tf_win_k: ['바다 점령!', 'Sea taken!', '海を占領！', '占领海域！'],
+  tf_win_from: ['{n}님에게서 빼앗았어요', 'Taken from {n}', '{n}さんから奪いました', '从{n}手中夺来'],
+  tf_win_new: ['처음 깃발을 꽂았어요', 'First flag planted', '最初の旗を立てました', '插下了第一面旗'],
+  tf_win_more: ['{n}곳', '{n} seas', '{n}か所', '{n}处'],
+  tf_see: ['내 땅 보기', 'See my turf', '陣地を見る', '查看领地'],
+  tf_busy: ['고기를 다 낚은 뒤에 열 수 있어요', 'Finish this fish first', 'この魚を釣り終えてから開けます', '先把这条鱼钓上来'],
+  tf_free: ['아직 주인이 없는 바다예요. 한 마리만 낚아도 내 땅!', 'Nobody holds this sea yet. One fish makes it yours!', 'まだ誰の海でもありません。1匹で自分の陣地！', '这片海还没有主人。钓一条就归你！'],
+  tf_mine: ['내 바다', 'My sea', '自分の海', '我的海域'],
+  tf_mine_keep: ['다른 낚시꾼도 노리고 있어요. 계속 낚아서 지키세요!', 'Others are after it — keep fishing to hold it!', 'ほかの釣り人も狙っています。釣り続けて守ろう！', '别人也在盯着，继续钓鱼守住它！'],
+  tf_mine_alone: ['아직 나 혼자예요. 이번 주가 끝날 때까지 지키면 보상!', 'Only you so far. Hold it to the end of the week for a reward!', 'まだ自分だけ。週末まで守れば報酬！', '目前只有你。守到周末就有奖励！'],
+  tf_my_power: ['내 힘', 'My power', '自分の力', '我的实力'],
+  tf_need: ['{n}점 더 낚으면 내 땅이 돼요', '{n} more points takes it', 'あと{n}点で自分の陣地に', '再钓{n}分就归你'],
+  tf_club_ours: ['우리 동호회의 바다예요!', 'Our club holds this sea!', 'うちの同好会の海です！', '这是我们钓友会的海域！'],
+  tf_club_theirs: ['동호회 사람들의 점수를 모두 합쳐서 겨뤄요.', 'Clubs add up all their members\' points here.', '同好会のメンバー全員の点数を合わせて競います。', '钓友会合计所有成员的分数来比拼。'],
+  tf_club_free: ['아직 어느 동호회의 바다도 아니에요.', 'No club holds this sea yet.', 'まだどの同好会の海でもありません。', '还没有钓友会占领这里。'],
+  tf_fish: ['여기서 낚시하기', 'Fish here', 'ここで釣る', '在这里钓鱼'],
+  tf_fish_keep: ['여기서 더 낚기', 'Fish here more', 'ここでもっと釣る', '在这里继续钓'],
+  tf_remote: ['멀리서 던지기 오늘 {n}번 남음', '{n} remote casts left today', '遠投 今日あと{n}回', '今天还能远投{n}次'],
+  tf_claim: ['지난주 내 바다 {n}곳 보상', 'Last week: {n} seas held', '先週の海 {n}か所の報酬', '上周守住{n}处海域奖励'],
+  tf_claimed: ['지난주 바다 {n}곳 보상 +{p}P', 'Last week\'s {n} seas: +{p}P', '先週の海{n}か所 +{p}P', '上周{n}处海域 +{p}P'],
+  tf_claim_done: ['이미 받았어요', 'Already claimed', 'もう受け取りました', '已经领过了'],
+  tf_my_n: ['곳이 내 바다', 'seas are mine', 'か所が自分の海', '处海域属于我'],
+  tf_rank: ['{n}위', '#{n}', '{n}位', '第{n}名'],
+  tf_log_won: ['{n}님에게서 {p}를 빼앗았어요', 'Took {p} from {n}', '{n}さんから{p}を奪った', '从{n}手中夺下{p}'],
+  tf_log_new: ['{p}에 처음 깃발을 꽂았어요', 'Planted the first flag off {p}', '{p}に最初の旗', '在{p}插下第一面旗'],
+  tf_log_lost: ['{n}님이 {p}를 빼앗아 갔어요', '{n} took {p}', '{n}さんが{p}を奪った', '{n}夺走了{p}'],
+  tf_back: ['되찾기', 'Take back', '取り返す', '夺回'],
+  tf_lords: ['이번 주 바다의 주인', 'Lords of the sea this week', '今週の海の主', '本周海域霸主'],
+  tf_lords_empty: ['아직 아무도 깃발을 꽂지 않았어요. 첫 주인이 되어 보세요!', 'No flags yet — be the first!', 'まだ誰も旗を立てていません。最初の主に！', '还没有人插旗，来当第一个吧！'],
+  tf_n_sq: ['{n}곳', '{n} seas', '{n}か所', '{n}处'],
+  tf_how: ['바다를 약 10km 칸으로 나눠요. 이번 주 그 칸에서 낚은 고기 점수를 모두 더해 가장 많은 사람이 주인이에요. 월요일에 새로 시작하고, 지난주에 지킨 칸마다 10P(최대 100P). 이름은 칸 단위로만 보이고, 「내 찌 숨기기」를 켜면 이름 대신 숨은 낚시꾼으로 보여요.', 'The sea is cut into ~10 km squares. Add up the points of every fish you land in a square this week; the most points owns it. It starts again on Monday, and every square you held last week pays 10P (up to 100P). Names show only per square; with 「Hide my float」 on you show as a hidden angler.', '海を約10kmのマスに分けます。今週そのマスで釣った魚の点数の合計がいちばん多い人が主。月曜に新しく始まり、先週守ったマスごとに10P（最大100P）。名前はマス単位でだけ見え、「自分のウキを隠す」をオンにすると匿名の釣り人として表示されます。', '把海分成约10公里的格子。本周在格子里钓到的鱼分数加起来最多的人就是主人。每周一重新开始，上周守住的每格10P（最多100P）。名字只按格子显示，开启「隐藏我的浮漂」则显示为匿名钓手。'],
+  tf_how_club: ['동호회 사람들의 점수를 칸마다 모두 합쳐서, 가장 많은 동호회가 그 바다를 가져요. 같이 낚을수록 땅이 넓어져요!', 'Each square goes to the club whose members together have the most points there. Fish together, grow together!', 'マスごとに同好会メンバーの点数を合計し、いちばん多い同好会がその海を取ります。一緒に釣るほど陣地が広がる！', '每格合计钓友会成员的分数，最多的钓友会拿下这片海。一起钓，领地越大！'],
+  tf_club_n: ['곳 · {t}', 'seas · {t}', 'か所 · {t}', '处 · {t}'],
+  tf_club_none: ['동호회에 들어가면 함께 땅을 모아요', 'Join a club to win seas together', '同好会に入ると一緒に陣地を集められます', '加入钓友会一起争夺海域'],
+  tf_club_join: ['동호회 찾기', 'Find a club', '同好会を探す', '寻找钓友会'],
+  tf_clubs: ['동호회 순위', 'Club ranking', '同好会ランキング', '钓友会排名'],
+  tf_clubs_empty: ['아직 바다를 가진 동호회가 없어요', 'No club holds a sea yet', 'まだ海を持つ同好会はありません', '还没有钓友会占领海域'],
+  tf_war: ['이번 주 동호회 대항전', 'This week\'s club war', '今週の同好会対抗戦', '本周钓友会对抗'],
+  tf_war_sub: ['찌릿 라이브에서 낚은 점수로 바다를 나눠 가져요. 동호회 사람들의 점수를 합쳐 겨뤄요.', 'Points from 찌릿 Live split the sea between clubs — members add up together.', 'ZZIRITライブの点数で海を取り合います。メンバーの点数を合わせて競います。', '用ZZIRIT直播的分数瓜分海域，成员分数合计比拼。'],
+  tf_war_go: ['지도 보기', 'Open the map', '地図を見る', '查看地图'],
+  wn_tf_h: ['바다 땅따먹기', 'Sea Turf', '海の陣取り', '海域争夺'],
+  wn_tf_p: ['라이브에서 낚은 점수로 10km 바다 칸의 주인이 돼요. 누가 빼앗으면 알려 주고, 「되찾기」로 바로 가요. 지난주 지킨 칸마다 10P.', 'Your live catches make you lord of 10 km squares of sea. You hear when someone takes one — and can take it back. 10P for every square held last week.', 'ライブの点数で10kmの海のマスの主に。奪われたら知らせ、「取り返す」ですぐ行けます。先週守ったマスごとに10P。', '用直播钓到的分数成为10公里海域的主人。被夺走时会通知你，可立刻「夺回」。上周守住的每格10P。'],
+  wn_club_h: ['동호회 대항전', 'Club war', '同好会対抗戦', '钓友会对抗'],
+  wn_club_p: ['동호회 사람들의 점수를 합쳐 바다를 나눠 가져요. 지도에 동호회 색 깃발이 서요.', 'Club members add up their points to win seas — the map flies each club\'s colours.', '同好会メンバーの点数を合わせて海を取り合い、地図に同好会の色の旗が立ちます。', '钓友会成员合计分数争夺海域，地图上插满各会颜色的旗帜。'],
 });
 
 /* ===== Tackle dictionaries: [ko, en, ja, zh] ===== */
@@ -8588,7 +8730,7 @@ function openShareCard(blob, name, text, opt) {
 }
 
 /* ===== What's new: shown once after a big update (website only; needs the matching server update) ===== */
-const WHATS_NEW = '2026-11-28a', WN_TS = Date.parse('2026-11-07T03:00:00Z'); // people who joined after this have nothing to catch up on
+const WHATS_NEW = '2026-11-29a', WN_TS = Date.parse('2026-11-07T03:00:00Z'); // people who joined after this have nothing to catch up on
 const BOOT_AT = Date.now();
 /* what each update brought, newest last; people see what came after the last one they saw (at most 6 lines) */
 const WN_ITEMS = [
@@ -8612,7 +8754,8 @@ const WN_ITEMS = [
   ['2026-11-26a', 'sun', 'wn_plan'], ['2026-11-26a', 'medal', 'wn_rrec'],
   ['2026-11-26b', 'users', 'wn_crew'],
   ['2026-11-27a', 'fish', 'wn_gy'], ['2026-11-27a', 'target', 'wn_ms'], ['2026-11-27a', 'smile', 'wn_rdemo'],
-  ['2026-11-28a', 'map', 'wn_jn'], ['2026-11-28a', 'users', 'wn_rcb']
+  ['2026-11-28a', 'map', 'wn_jn'], ['2026-11-28a', 'users', 'wn_rcb'],
+  ['2026-11-29a', 'flag', 'wn_tf'], ['2026-11-29a', 'users', 'wn_club']
 ];
 // the new look already says the fish were redrawn
 const WN_PART = { wn_fish: 'wn_look' };
@@ -8621,8 +8764,10 @@ function maybeWhatsNew(tries = 0) {
   if (!S.ready || $('.modal-wrap.in')) { setTimeout(() => maybeWhatsNew(tries + 1), 4000); return; }
   // a first visit gets the welcome dialog instead, and someone who joined after the update has nothing to catch up on
   if (!S.me || !S.me.nick || (S.me.joined && S.me.joined >= Math.min(WN_TS, BOOT_AT))) { lsSet('wn', WHATS_NEW); return; }
-  myLoginId().then(id => {
-    if (S.idOff || lsGet('wn', '') === WHATS_NEW) return; // the server update isn't in yet: try again next visit
+  // today's notes need the sea turf on the server (0030): until it is there, wait for a later visit
+  const srv = typeof tfOn === 'function' && tfOn() ? tfLoad(true).then(() => !TF.off) : Promise.resolve(true);
+  Promise.all([myLoginId(), srv]).then(([id, ready]) => {
+    if (S.idOff || !ready || TF.off || lsGet('wn', '') === WHATS_NEW) return; // the server update isn't in yet: try again next visit
     if ($('.modal-wrap.in')) { setTimeout(() => maybeWhatsNew(tries + 1), 4000); return; }
     const seen = lsGet('wn', '') || ''; lsSet('wn', WHATS_NEW); openWhatsNew(id, seen);
   });
@@ -11211,12 +11356,14 @@ VIEWS.teams = {
       <header class="page-head"><h1>${t('tm_title')}</h1><p class="lede">${t('tm_sub')}</p></header>
       ${shared ? '' : `<p class="note">${icon('info')} ${t('bd_local_note')}</p>`}
       ${myCard}
+      <div data-tfteam>${typeof tfTeamCardHTML === 'function' ? tfTeamCardHTML() : ''}</div>
       <section class="tm-sec">
         <div class="sec-head"><h2 class="h3">${icon('trophy')}${t('tm_list')}</h2><input class="search tm-search" id="tm-q" type="search" placeholder="${esc(t('tm_search'))}" value="${esc(S.tmQ)}" autocomplete="off"></div>
         ${list.length ? `<ul class="tm-list card">${list.map(x => teamRow(x, mine && mine.ok ? mine.id : null)).join('')}</ul>` : `<div class="empty card">${icon('flag', 'big')}<p class="muted">${t(q ? 'bd_none_found' : 'tm_rank_empty')}</p></div>`}
       </section>
       <p class="hint">${icon('info')} ${t('tm_rules', { max: TEAM_MAX })}</p>
     </div>`;
+    if (typeof tfLoad === 'function') tfLoad().then(() => { const h = $('[data-tfteam]', el); if (h && h.isConnected) h.innerHTML = tfTeamCardHTML(); });
     const qi = $('#tm-q', el);
     qi.addEventListener('input', debounce(() => { S.tmQ = qi.value; const ul = $('.tm-sec', el); const q2 = S.tmQ.trim().toLowerCase(); const l2 = teamIndex().ranked.filter(x => !q2 || (x.t.name + ' ' + x.t.tag).toLowerCase().includes(q2)); const mm = teamOf(myId()); ul.querySelector('.tm-list, .empty').outerHTML = l2.length ? `<ul class="tm-list card">${l2.map(x => teamRow(x, mm && mm.ok ? mm.id : null)).join('')}</ul>` : `<div class="empty card">${icon('flag', 'big')}<p class="muted">${t('bd_none_found')}</p></div>`; }, 180));
   }
@@ -13199,6 +13346,7 @@ function lvBuild(el) {
       <button class="lv-sbtn" id="lv-net" aria-label="${esc(t('lv_net'))}">${icon('fish')}<b class="lv-nb num" id="lv-nb" hidden></b></button>
       <button class="lv-sbtn" id="lv-book" aria-label="${esc(t('lv_book'))}">${icon('book')}</button>
       <button class="lv-sbtn lv-rd" id="lv-rd" data-rdopen aria-label="${esc(t('rd_title'))}">${icon('bolt')}<b class="lv-nb" id="lv-rdb" hidden>!</b></button>
+      <button class="lv-sbtn lv-tfb" id="lv-tf" aria-label="${esc(t('tf_title'))}" hidden>${icon('flag')}<b class="lv-nb num" data-tfdot hidden></b></button>
       <button class="lv-sbtn" id="lv-dm" aria-label="${esc(t('dm_title'))}">${icon('target')}<b class="lv-nb num" id="lv-msb" hidden></b></button>
       <button class="lv-sbtn" id="lv-inv" aria-label="${esc(t('lv_inv'))}">${icon('user-plus')}</button>
       <button class="lv-sbtn" id="lv-emo-b" aria-label="${esc(t('emo_title'))}">${icon('smile')}</button>
@@ -13217,6 +13365,8 @@ function lvBuild(el) {
       <button class="lv-main" id="lv-main"><svg class="lv-ring" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="46"/><circle cx="50" cy="50" r="46" id="lv-arc"/></svg><span id="lv-mtxt"></span></button>
       <div class="lv-sub" id="lv-sub"></div>
     </div>
+    <div class="tf-panel" id="tf-panel" hidden></div>
+    <div class="tf-card" id="tf-card" hidden></div>
     <div class="lv-res" id="lv-res" hidden></div>
     <div class="lv-cover" id="lv-cover"></div>
     <div class="lv-attr"><a href="https://openfreemap.org" target="_blank" rel="noopener">OpenFreeMap</a> © <a href="https://www.openmaptiles.org/" target="_blank" rel="noopener">OpenMapTiles</a> Data from <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a></div>
@@ -13235,6 +13385,8 @@ function lvBuild(el) {
   $('#lv-emo', el).addEventListener('click', e => { const b = e.target.closest('[data-emo-go]'); if (b) emoGo(b.dataset.emoGo); });
   $('#lv-ticker', el).addEventListener('click', e => { const b = e.target.closest('[data-clap]'); if (b) lvClap(b); });
   $('#lv-net', el).addEventListener('click', () => lvBook('net'));
+  $('#lv-tf', el).addEventListener('click', () => (TF.on ? tfClose() : tfOpen()));
+  $('#tf-panel', el).addEventListener('click', tfClick); $('#tf-card', el).addEventListener('click', tfClick);
   $('#lv-chips', el).addEventListener('click', e => { if (e.target.closest('[data-lwx]')) lwxInfo(); });
   if (typeof rdLoad === 'function') rdLoad().then(() => rdPaint());
   $('#lv-snd', el).addEventListener('click', e => { LVS.on = !LVS.on; lsSet('liveSnd', LVS.on); e.currentTarget.setAttribute('aria-pressed', LVS.on); if (LVS.on) LVS.play('nib'); });
@@ -13270,15 +13422,17 @@ function lvStart() {
   lvCover('');
   if (lsGet('liveGeo', true)) lvGeo();
   lvInvGo(); lvHud(); lvRoom(); msLoad();
+  tfLoad().then(() => { tfBadge(); if (TF.want) { TF.want = false; tfOpen(); } });
 }
 function lvResume() {
   if (LV.map) setTimeout(() => { try { LV.map.resize(); } catch (e) { } lvSize(); }, 60);
   if (LV.ready && $('#lv-cover') && !$('#lv-cover').dataset.k) { if (lsGet('liveGeo', true) && lsGet('liveOk', false)) lvGeo(); lvInvGo(); lvRoom(); }
   else if (LV.ready) lvStart();
-  lvLoad(); lvHud();
+  lvLoad(); lvHud(); tfLoad().then(() => { if (TF.want && LV.ready && !($('#lv-cover') && $('#lv-cover').dataset.k)) { TF.want = false; tfOpen(); } });
   cancelAnimationFrame(LV.raf); LV.lastT = 0; LV.raf = requestAnimationFrame(lvFrame);
 }
 function lvPause() {
+  if (TF.on) { TF.cam = null; tfClose(); }
   cancelAnimationFrame(LV.raf); LV.raf = 0; LV.hold = false;
   if (LV.watch != null) { try { navigator.geolocation.clearWatch(LV.watch); } catch (e) { } LV.watch = null; }
   if (LV.phase === 'fight' && LV.k) { APP_AUTH.live.land(LV.k.token, LV.k.sp || '', false).catch(() => null); }
@@ -13422,6 +13576,7 @@ function lvSchoolsShow() { LV.schools = (LV.schAll || []).filter(s => LMAP.water
 /* --- taps on the map: where to stand, where to cast --- */
 function lvTap(lng, lat) {
   const eb = $('#lv-emo'); if (eb && !eb.hidden) { eb.hidden = true; return; }
+  if (TF.on) return tfTap(lng, lat);
   if (LV.phase !== 'idle' || !LV.ready || ($('#lv-cover') && $('#lv-cover').dataset.k)) return;
   if (LV.map.getZoom() < 14.5) { LV.map.easeTo({ center: [lng, lat], zoom: 16.4 }); return; }
   const p = { lng, lat }, kind = LMAP.waterAt(LV.water, lng, lat), R = lvReach();
@@ -13583,7 +13738,7 @@ function lvLand() {
     LV.res = r; LV.phase = 'result'; LV.target = null; LVS.play(r.tier >= 4 || r.big ? 'rare' : 'land'); LVS.buzz(r.tier >= 4 ? [60, 40, 60, 40, 160] : [50, 40, 90]);
     lvFx('splash', k.to, 1.2); clearTimeout(LV.resT); LV.resT = setTimeout(() => { if (LV.phase === 'result' && LV.res === r) lvResult(r); }, 1150);
     if (!LV.anon && LV.room) LV.room.send('catch', { u: myId(), n: S.me.nick, sp: r.sp, cm: r.cm, tier: r.tier, big: r.big, x: +k.to.lng.toFixed(5), y: +k.to.lat.toFixed(5), on: k.site ? 1 : 0 });
-    LV.k = null; LV.f = null; lvTrack(); lvLoad(true); lvHud(); msLoad(true); if (typeof lsAfterLand === 'function') lsAfterLand(r.sp);
+    LV.k = null; LV.f = null; lvTrack(); lvLoad(true); lvHud(); msLoad(true); if (typeof lsAfterLand === 'function') lsAfterLand(r.sp); tfAfterLand();
   }).catch(() => { LV.busy = false; lvEnd('lv_err', 'miss'); }), waitMs);
 }
 function lvResult(r) {
@@ -15062,6 +15217,246 @@ document.addEventListener('click', e => {
   const c = e.target.closest('[data-rrclaim]'); if (c) { e.stopPropagation(); rrClaim(c); return; }
   const w = e.target.closest('[data-rrwear]'); if (w) { e.stopPropagation(); rrWear(w); }
 }, true);
+
+/* ===== 바다 땅따먹기 & 동호회 대항전: the water of the world in squares of 0.1° (about 10 km). Every fish landed in 찌릿 라이브
+   adds its score to my power in that square for the week; the most power owns it, until someone lands more. Clubs own a
+   square with their members' power together. The server counts it all (0030) and says who took what from whom.
+   In the live screen the flag button flies the camera up over the sea: the squares stand up as blocks (mine sky-blue,
+   others indigo, a club's in its colour), flags carry the owners' names, a tap on a square says how much power it takes.
+   Taking a square sets off a flag; losing one shows on the button and in the panel with a 「되찾기」. Last week's squares
+   pay once (10P each, at most 100). Names show at the square at most; fishing unnamed keeps the name hidden. Website only. ===== */
+const TF = { on: false, view: 'me', me: null, cells: [], teams: {}, marks: [], off: false, busy: false, at: 0, cam: null, sel: null, p: null, want: false, places: null, fetchT: 0, mineN: null };
+const TF_D = 0.1;
+const tfOn = () => typeof lvOn === 'function' && lvOn() && !!APP_AUTH.live.turfMe && !TF.off;
+const tfOf = (lng, lat) => [Math.floor(lng / TF_D + 1e-9), Math.floor(lat / TF_D + 1e-9)];
+const tfMid = (x, y) => ({ lng: (x + .5) * TF_D, lat: (y + .5) * TF_D });
+const tfSeen = () => Object.assign({ w: 0, l: 0 }, lsGet('tfSeen', null) || {});
+function tfNick(a) { if (!a) return t('tf_hidden'); if (a === myId()) return (S.me && S.me.nick) || t('tf_me'); return lvNick(a); }
+// a square's name: the nearest town (from the app's own list) within ~45 km, else the sea
+function tfName(x, y) {
+  const c = tfMid(x, y), li = Math.max(0, ['ko', 'en', 'ja', 'zh'].indexOf(S.lang));
+  let best = null, bd = 0.42 * 0.42;
+  for (const p of TF.places || []) { const dx = (p[0] - c.lng) * Math.cos(c.lat * Math.PI / 180), dy = p[1] - c.lat, d = dx * dx + dy * dy; if (d < bd) { bd = d; best = p; } }
+  if (best) return t('tf_off', { p: [best[5], best[4], best[6], best[7]][li] || best[4] });
+  try { return dict(GEO.seaOf(c.lng, c.lat).n) || t('tf_sq'); } catch (e) { return t('tf_sq'); }
+}
+function tfPlaces() { if (TF.places) return Promise.resolve(TF.places); return fetch('geo/places.json').then(r => r.json()).then(j => { TF.places = Array.isArray(j) ? j : []; return TF.places; }).catch(() => { TF.places = []; return []; }); }
+function tfLeft(ms) { const h = Math.max(0, Math.floor(ms / 3600e3)); return h >= 24 ? t('tf_left_d', { d: Math.floor(h / 24), h: h % 24 }) : t('tf_left_h', { h: Math.max(1, h) }); }
+
+/* --- my week (the news, the badge, the celebration) --- */
+function tfLoad(force) {
+  if (!tfOn()) return Promise.resolve(null);
+  if (TF.p) return TF.p;
+  if (!force && TF.me && nowMs() - TF.at < 20e3) return Promise.resolve(TF.me);
+  TF.p = APP_AUTH.live.turfMe().then(r => {
+    if (!r || r.err || !Array.isArray(r.log)) return null;
+    const first = !TF.me; TF.me = r; TF.at = nowMs();
+    const sn = tfSeen(), wonMax = Math.max(0, ...r.log.filter(g => g.k === 'won').map(g => g.id)), lostMax = Math.max(0, ...r.log.filter(g => g.k === 'lost').map(g => g.id));
+    if (!lsGet('tfSeen', null)) lsSet('tfSeen', { w: wonMax, l: lostMax }); // the first look: nothing old to celebrate
+    else if (!first || force) {
+      const fresh = r.log.filter(g => g.k === 'won' && g.id > sn.w).sort((a, b) => a.id - b.id);
+      if (fresh.length) { lsSet('tfSeen', Object.assign(tfSeen(), { w: wonMax })); tfWin(fresh); }
+    }
+    tfPanel(); if (TF.on) lsSet('tfSeen', Object.assign(tfSeen(), { l: Math.max(tfSeen().l, lostMax) }));
+    tfBadge();
+    return r;
+  }).catch(e => { if (e && (e.code === 'need_update' || e.code === 'not_granted')) { TF.off = true; tfBadge(); } return null; }).finally(() => { TF.p = null; });
+  return TF.p;
+}
+const tfLost = () => (TF.me ? TF.me.log.filter(g => g.k === 'lost' && g.id > tfSeen().l) : []);
+const tfClaimable = () => !!(TF.me && TF.me.last && TF.me.last.n > 0 && !TF.me.last.got);
+function tfBadge() {
+  const b = $('#lv-tf'); if (b) b.hidden = !tfOn();
+  const n = tfLost().length + (tfClaimable() ? 1 : 0);
+  $$('[data-tfdot]').forEach(d => { d.hidden = !n || TF.on; d.textContent = n > 9 ? '9+' : String(n || ''); });
+}
+// after a landed fish: did it take a square?
+function tfAfterLand() { if (tfOn()) setTimeout(() => tfLoad(true).then(() => { if (TF.on) tfFetch(); }), 400); }
+
+/* --- the celebration: a flag goes up --- */
+function tfWin(list) {
+  const g = list[list.length - 1], host = $('#lv'); if (!host || !g) return;
+  tfPlaces().then(() => {
+    const from = g.who ? t('tf_win_from', { n: tfNick(g.who) }) : t('tf_win_new');
+    let el = $('.tf-win', host); if (el) el.remove();
+    el = document.createElement('div'); el.className = 'tf-win'; el.setAttribute('role', 'status');
+    el.innerHTML = `<div class="tf-win-in"><span class="tf-rays" aria-hidden="true"></span><span class="tf-wflag" aria-hidden="true">${tfFlagSVG('#7CC4FF')}</span>
+      <p class="tf-win-k">${t('tf_win_k')}</p><h3>${esc(tfName(g.x, g.y))}</h3><p class="tf-win-s">${esc(from)}${list.length > 1 ? ' · ' + esc(t('tf_win_more', { n: list.length })) : ''}</p>
+      <button class="btn btn-primary btn-sm" data-tfgo="1">${icon('flag')}${t('tf_see')}</button></div>`;
+    host.appendChild(el);
+    el.addEventListener('click', e => { if (e.target.closest('[data-tfgo]')) { el.remove(); tfOpen(g.x, g.y); } else el.remove(); });
+    if (typeof LVS !== 'undefined') { LVS.ac(); [392, 523, 659, 784, 1047].forEach((f, i) => LVS.tone(f, f, .26, .12, 'triangle', i * .1)); LVS.noise(.35, .08, 300, .02); LVS.buzz([30, 50, 30, 50, 180]); }
+    setTimeout(() => { if (el.isConnected) el.classList.add('out'); setTimeout(() => el.remove(), 400); }, 5200);
+  });
+}
+const tfFlagSVG = c => `<svg viewBox="0 0 40 48" width="40" height="48"><path d="M6 46V4" stroke="#E3F3FF" stroke-width="3" stroke-linecap="round"/><path d="M8 5h24l-5 8 5 8H8z" fill="${c}" stroke="#0B1730" stroke-width="1.5" stroke-linejoin="round"/><path d="M17 8l-3 6h4l-2 5" stroke="#0B1730" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
+/* --- the war map --- */
+function tfOpen(fx, fy) {
+  if (!tfOn() || !LV.map || !LV.ready) { TF.want = true; return; }
+  if (LV.phase !== 'idle' && LV.phase !== 'result') { lvSay(t('tf_busy')); return; }
+  const m = LV.map, c = m.getCenter();
+  if (!TF.on) TF.cam = { center: [c.lng, c.lat], zoom: m.getZoom(), pitch: m.getPitch(), bearing: m.getBearing() };
+  TF.on = true; TF.sel = null; $('#lv').classList.add('tf-on'); $('#lv-res').hidden = true; if (LV.phase === 'result') { LV.phase = 'idle'; }
+  const to = fx != null ? tfMid(fx, fy) : (LV.stand || LV.pos || { lng: c.lng, lat: c.lat });
+  m.easeTo({ center: [to.lng, to.lat], zoom: LV.w && LV.w < 600 ? 8.4 : 8.9, pitch: 52, bearing: -12, duration: 1400 });
+  if (fx != null) TF.sel = [fx, fy];
+  tfPanel(); tfBadge(); tfPlaces().then(() => tfPanel());
+  m.once('moveend', () => { tfFetch(); if (TF.sel) tfCard(); });
+  if (!TF.mv) { TF.mv = true; m.on('moveend', () => { if (TF.on) { clearTimeout(TF.fetchT); TF.fetchT = setTimeout(tfFetch, 250); } }); m.on('styledata', () => { if (TF.on) setTimeout(tfPaint, 50); }); }
+  tfLoad(true);
+  // the news was seen
+  if (TF.me) lsSet('tfSeen', Object.assign(tfSeen(), { l: Math.max(tfSeen().l, ...TF.me.log.map(g => g.id)) }));
+}
+function tfClose(go) {
+  if (!TF.on) return;
+  TF.on = false; TF.sel = null; $('#lv').classList.remove('tf-on', 'tf-sel');
+  tfMarks([]); const m = LV.map;
+  try { if (m.getLayer('tf-top')) m.removeLayer('tf-top'); if (m.getLayer('tf-box')) m.removeLayer('tf-box'); if (m.getSource('tf')) m.removeSource('tf'); } catch (e) { }
+  const p = $('#tf-panel'); if (p) p.hidden = true; const cd = $('#tf-card'); if (cd) cd.hidden = true;
+  if (go) { const c = tfMid(go[0], go[1]); LV.mode = 'remote'; LV.stand = null; LV.target = null; LV.wantSite = false; lvMe(); lvCoast(c); lvHud(); }
+  else if (TF.cam) m.easeTo(Object.assign({ duration: 1100 }, TF.cam));
+  tfBadge(); lvHud();
+}
+function tfBox() {
+  const m = LV.map, b = m.getBounds(), c = m.getCenter(), [cx, cy] = tfOf(c.lng, c.lat);
+  let [x0, y0] = tfOf(b.getWest(), b.getSouth()), [x1, y1] = tfOf(b.getEast(), b.getNorth());
+  x0 = Math.max(x0, cx - 30); x1 = Math.min(x1, cx + 30); y0 = Math.max(y0, cy - 30); y1 = Math.min(y1, cy + 30);
+  return [x0, y0, Math.max(x0, x1), Math.max(y0, y1)];
+}
+function tfFetch() {
+  if (!TF.on || TF.busy) return;
+  TF.busy = true; const box = tfBox();
+  APP_AUTH.live.turf(...box).then(r => {
+    if (!r || !Array.isArray(r.cells)) return;
+    TF.cells = r.cells; TF.teams = Object.assign(TF.teams, r.teams || {}); TF.ends = r.ends; TF.now = r.now; TF.box = box;
+    tfPaint(); if (TF.sel) tfCard();
+  }).catch(e => { if (e && e.code === 'need_update') { TF.off = true; tfClose(); } }).finally(() => { TF.busy = false; });
+}
+const TF_COL = { me: '#7CC4FF', other: '#5866D8', hide: '#58657E' };
+function tfColor(c) {
+  if (TF.view === 'club') { const tm = c.t && TF.teams[c.t]; return tm ? tm.color : null; }
+  return c.me ? TF_COL.me : c.a ? TF_COL.other : TF_COL.hide;
+}
+function tfPaint() {
+  if (!TF.on || !LV.map) return;
+  const m = LV.map, feats = [];
+  for (const c of TF.cells) {
+    const col = tfColor(c); if (!col) continue;
+    const pw = TF.view === 'club' ? c.tp : c.p, x = c.x * TF_D, y = c.y * TF_D, e = .006;
+    feats.push({ type: 'Feature', properties: { col, h: Math.round(Math.min(14000, 900 + Math.sqrt(pw || 0) * 420)), me: TF.view === 'club' ? (TF.me && TF.me.team && c.t === TF.me.team.id ? 1 : 0) : c.me ? 1 : 0, k: c.x + ',' + c.y },
+      geometry: { type: 'Polygon', coordinates: [[[x + e, y + e], [x + TF_D - e, y + e], [x + TF_D - e, y + TF_D - e], [x + e, y + TF_D - e], [x + e, y + e]]] } });
+  }
+  const data = { type: 'FeatureCollection', features: feats }; TF.feats = feats;
+  try {
+    if (m.getSource('tf')) m.getSource('tf').setData(data);
+    else {
+      m.addSource('tf', { type: 'geojson', data });
+      m.addLayer({ id: 'tf-box', type: 'fill-extrusion', source: 'tf', paint: { 'fill-extrusion-color': ['get', 'col'], 'fill-extrusion-height': ['get', 'h'], 'fill-extrusion-base': 0, 'fill-extrusion-opacity': .78, 'fill-extrusion-vertical-gradient': true } });
+      m.addLayer({ id: 'tf-top', type: 'line', source: 'tf', paint: { 'line-color': ['case', ['==', ['get', 'me'], 1], '#E3F3FF', 'rgba(227,243,255,.35)'], 'line-width': ['case', ['==', ['get', 'me'], 1], 2, 1] } });
+    }
+  } catch (e) { }
+  // flags with names: the strongest squares in sight
+  const list = TF.cells.filter(c => tfColor(c)).sort((a, b) => (b.me - a.me) || ((TF.view === 'club' ? b.tp : b.p) - (TF.view === 'club' ? a.tp : a.p))).slice(0, 36);
+  tfMarks(list);
+}
+function tfMarks(list) {
+  const keep = new Map(); for (const mk of TF.marks) keep.set(mk.k, mk);
+  const want = new Set(list.map(c => c.x + ',' + c.y + TF.view));
+  for (const mk of TF.marks) if (!want.has(mk.k)) { try { mk.m.remove(); } catch (e) { } keep.delete(mk.k); }
+  if (!window.maplibregl) { TF.marks = []; return; }
+  TF.marks = list.map(c => {
+    const k = c.x + ',' + c.y + TF.view; let mk = keep.get(k);
+    const club = TF.view === 'club', tm = club && TF.teams[c.t], col = tfColor(c), mine = club ? !!(TF.me && TF.me.team && c.t === TF.me.team.id) : c.me;
+    const label = club ? `${esc(tm ? (tm.emoji || '') + ' ' + (tm.tag || tm.name) : '?')}` : esc(tfNick(c.a));
+    const html = `<span class="tf-fl" style="--c:${esc(col)}">${tfFlagSVG(col)}</span><span class="tf-nm">${label}<b class="num">${fmtN(club ? c.tp : c.p)}</b></span>`;
+    if (!mk) {
+      const el = document.createElement('button'); el.type = 'button'; el.className = 'tf-mk';
+      el.addEventListener('click', e => { e.stopPropagation(); TF.sel = [c.x, c.y]; tfCard(); });
+      mk = { k, el, m: new maplibregl.Marker({ element: el, anchor: 'bottom' }).setLngLat([(c.x + .5) * TF_D, (c.y + .5) * TF_D]).addTo(LV.map) };
+    }
+    mk.el.classList.toggle('mine', !!mine); mk.el.setAttribute('aria-label', tfName(c.x, c.y)); mk.el.innerHTML = html;
+    return mk;
+  });
+}
+function tfTap(lng, lat) { TF.sel = tfOf(lng, lat); tfCard(); }
+// one square: who holds it, how much it takes
+function tfCard() {
+  const el = $('#tf-card'); if (!el || !TF.sel) return;
+  const [x, y] = TF.sel, c = TF.cells.find(q => q.x === x && q.y === y), club = TF.view === 'club';
+  const mp = c ? c.mp : 0, op = c ? c.p : 0, pc = op ? Math.min(100, Math.round(100 * mp / op)) : 0;
+  let body;
+  if (club) {
+    const tm = c && c.t && TF.teams[c.t], my = TF.me && TF.me.team;
+    body = tm ? `<p class="tf-own" style="--c:${esc(tm.color)}"><i class="tf-dot"></i><b>${esc((tm.emoji || '') + ' ' + tm.name)}</b><span class="num">${fmtN(c.tp)}</span></p>
+      <p class="tf-say">${my && my.id === tm.id ? t('tf_club_ours') : t('tf_club_theirs')}</p>` : `<p class="tf-say">${t('tf_club_free')}</p>`;
+  } else if (!c) body = `<p class="tf-say">${t('tf_free')}</p>`;
+  else if (c.me) body = `<p class="tf-own me"><i class="tf-dot"></i><b>${t('tf_mine')}</b><span class="num">${fmtN(c.p)}</span></p><p class="tf-say">${t(c.c > 1 ? 'tf_mine_keep' : 'tf_mine_alone')}</p>`;
+  else body = `<p class="tf-own"><i class="tf-dot"></i><b>${esc(tfNick(c.a))}</b><span class="num">${fmtN(c.p)}</span></p>
+      <div class="tf-vs"><span>${t('tf_my_power')}</span><span class="ms-bar"><i style="width:${pc}%"></i></span><b class="num">${fmtN(mp)}</b></div>
+      <p class="tf-say">${t('tf_need', { n: fmtN(op - mp + 1) })}</p>`;
+  el.hidden = false; $('#lv').classList.add('tf-sel');
+  el.innerHTML = `<button class="tf-x" data-tfx="card" aria-label="${esc(t('close'))}">${icon('close')}</button>
+    <p class="tf-cn">${icon('flag')}<span>${esc(tfName(x, y))}</span></p>${body}
+    <button class="btn btn-primary btn-block" data-tffish="${x},${y}">${icon('live')}${t(c && c.me && !club ? 'tf_fish_keep' : 'tf_fish')}</button>
+    <small class="tf-rem">${t('tf_remote', { n: lvLeft() })}</small>`;
+  el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop');
+}
+function tfPanelHTML() {
+  const r = TF.me, club = TF.view === 'club';
+  const tabs = `<div class="seg tf-seg" role="tablist">${[['me', 'tf_tab_me'], ['club', 'tf_tab_club']].map(([k, l]) => `<button role="tab" aria-selected="${TF.view === k}" data-tfview="${k}">${t(l)}</button>`).join('')}</div>`;
+  const left = TF.ends || (r && r.ends), now = TF.now || (r && r.now) || nowMs();
+  const head = `<div class="tf-head"><h2>${icon('flag')}${t('tf_title')}</h2>${left ? `<span class="tf-left">${icon('clock')}${esc(tfLeft(left - now))}</span>` : ''}<button class="tf-x" data-tfx="panel" aria-label="${esc(t('close'))}">${icon('close')}</button></div>`;
+  if (!r) return head + tabs + `<p class="tf-wait"><span class="pl-spin"></span>${t('lv_loading')}</p>`;
+  const claim = tfClaimable() ? `<button class="tf-claim" data-tfclaim="1">${icon('coin')}<span>${t('tf_claim', { n: r.last.n })}</span><b class="num">+${r.last.pts}P</b></button>` : '';
+  const lost = tfLost();
+  const news = r.log.slice(0, 4).map(g => `<li class="${g.k}${g.k === 'lost' && lost.some(q => q.id === g.id) ? ' new' : ''}"><i>${icon(g.k === 'won' ? 'flag' : 'bolt')}</i><span>${esc(t(g.k === 'won' ? (g.who ? 'tf_log_won' : 'tf_log_new') : 'tf_log_lost', { n: tfNick(g.who), p: tfName(g.x, g.y) }))}</span>${g.k === 'lost' ? `<button class="btn btn-sm btn-glass" data-tfat="${g.x},${g.y}">${t('tf_back')}</button>` : ''}</li>`).join('');
+  if (club) {
+    const my = r.team;
+    const me = my ? `<p class="tf-big" style="--c:${esc(my.color)}"><b class="num">${fmtN(my.n)}</b><span>${t('tf_club_n', { t: (my.emoji || '') + ' ' + my.name })}${my.rk ? ` · <em>${t('tf_rank', { n: my.rk })}</em>` : ''}</span></p>`
+      : `<p class="tf-big"><span>${t('tf_club_none')}</span><a class="btn btn-sm btn-glass" href="#teams">${icon('users')}${t('tf_club_join')}</a></p>`;
+    const rows = r.clubs.map(c => `<li class="${my && c.id === my.id ? 'me' : ''}"><b class="num">${c.rk}</b><i class="tf-dot" style="--c:${esc(c.color)}"></i><span>${esc((c.emoji || '') + ' ' + c.name)}${c.tag ? ` <small>${esc(c.tag)}</small>` : ''}</span><em class="num">${t('tf_n_sq', { n: fmtN(c.n) })}</em></li>`).join('');
+    return head + tabs + me + `<h3 class="tf-h">${t('tf_clubs')}</h3>` + (rows ? `<ol class="tf-board">${rows}</ol>` : `<p class="tf-empty">${t('tf_clubs_empty')}</p>`) + `<p class="tf-how">${t('tf_how_club')}</p>`;
+  }
+  const rows = r.lords.map(l => `<li class="${l.a === myId() ? 'me' : ''}"><b class="num">${l.rk}</b>${l.a ? avatar(anglerOf(l.a), 24) : `<i class="tf-dot"></i>`}<span>${esc(tfNick(l.a))}</span><em class="num">${t('tf_n_sq', { n: fmtN(l.n) })}</em></li>`).join('');
+  return head + tabs + claim + `<p class="tf-big"><b class="num">${fmtN(r.n)}</b><span>${t('tf_my_n')}${r.rk ? ` · <em>${t('tf_rank', { n: r.rk })}</em>` : ''}</span></p>`
+    + (news ? `<ul class="tf-news">${news}</ul>` : '')
+    + `<h3 class="tf-h">${t('tf_lords')}</h3>` + (rows ? `<ol class="tf-board">${rows}</ol>` : `<p class="tf-empty">${t('tf_lords_empty')}</p>`)
+    + `<p class="tf-how">${t('tf_how')}</p>`;
+}
+function tfPanel() {
+  const p = $('#tf-panel'); if (!p) return;
+  if (!TF.on) { p.hidden = true; return; }
+  p.hidden = false; p.innerHTML = tfPanelHTML();
+}
+function tfClaim(btn) {
+  if (btn.disabled) return; btn.disabled = true;
+  APP_AUTH.live.turfClaim().then(r => {
+    if (!r || r.err) { toast(t(r && r.err === 'no_profile' ? 'ls_need_profile' : r && r.err === 'already' ? 'tf_claim_done' : 'lv_err'), 'warn'); return tfLoad(true); }
+    LVS.play('coin'); LVS.buzz([20, 40, 20]); toast(t('tf_claimed', { n: r.n, p: r.pts }), 'ok', 4200);
+    if (TF.me) TF.me.last.got = true; if (LV.st) LV.st.bal = r.bal; if (typeof msBal === 'function') msBal(r.bal);
+    tfPanel(); tfBadge();
+  }).catch(() => toast(t('lv_err'), 'warn')).finally(() => { btn.disabled = false; });
+}
+function tfClick(e) {
+  const b = e.target.closest('[data-tfview],[data-tfx],[data-tffish],[data-tfat],[data-tfclaim]'); if (!b) return;
+  if (b.dataset.tfview) { TF.view = b.dataset.tfview; tfPanel(); tfPaint(); if (TF.sel) tfCard(); tfFetch(); tfLoad(true); }
+  else if (b.dataset.tfx === 'card') { $('#tf-card').hidden = true; TF.sel = null; $('#lv').classList.remove('tf-sel'); }
+  else if (b.dataset.tfx) tfClose();
+  else if (b.dataset.tffish) tfClose(b.dataset.tffish.split(',').map(Number));
+  else if (b.dataset.tfat) { const [x, y] = b.dataset.tfat.split(',').map(Number); TF.sel = [x, y]; const c = tfMid(x, y); LV.map.easeTo({ center: [c.lng, c.lat], zoom: Math.max(8, LV.map.getZoom()), duration: 900 }); tfCard(); }
+  else if (b.dataset.tfclaim) tfClaim(b);
+}
+// the team page: this week's club war in one card
+function tfTeamCardHTML() {
+  if (!tfOn() || !TF.me) return '';
+  const my = TF.me.team, top = TF.me.clubs.slice(0, 3);
+  return `<section class="tf-tcard card"><div class="tf-tc-h"><h2 class="h3">${icon('flag')}${t('tf_war')}</h2><a class="btn btn-sm btn-primary" href="#live" data-tfwant="1">${t('tf_war_go')}</a></div>
+    <p class="muted small">${t('tf_war_sub')}</p>
+    ${my ? `<p class="tf-tc-me" style="--c:${esc(my.color)}"><i class="tf-dot"></i><b>${esc((my.emoji || '') + ' ' + my.name)}</b><span>${t('tf_n_sq', { n: fmtN(my.n) })}${my.rk ? ' · ' + t('tf_rank', { n: my.rk }) : ''}</span></p>` : ''}
+    ${top.length ? `<ol class="tf-board">${top.map(c => `<li class="${my && c.id === my.id ? 'me' : ''}"><b class="num">${c.rk}</b><i class="tf-dot" style="--c:${esc(c.color)}"></i><span>${esc((c.emoji || '') + ' ' + c.name)}</span><em class="num">${t('tf_n_sq', { n: fmtN(c.n) })}</em></li>`).join('')}</ol>` : `<p class="tf-empty">${t('tf_clubs_empty')}</p>`}</section>`;
+}
+document.addEventListener('click', e => { if (e.target.closest('[data-tfwant]')) { TF.want = true; TF.view = 'club'; } });
 
 /* ===== 출조 플래너 (the week planner): when and where to go this week. Seven days of wind, waves, rain, the tide and the
    fish in season, for the home sea and my saved fishing points, as one grid of scores (the same score as "today's

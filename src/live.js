@@ -114,6 +114,7 @@ function lvBuild(el) {
       <button class="lv-sbtn" id="lv-net" aria-label="${esc(t('lv_net'))}">${icon('fish')}<b class="lv-nb num" id="lv-nb" hidden></b></button>
       <button class="lv-sbtn" id="lv-book" aria-label="${esc(t('lv_book'))}">${icon('book')}</button>
       <button class="lv-sbtn lv-rd" id="lv-rd" data-rdopen aria-label="${esc(t('rd_title'))}">${icon('bolt')}<b class="lv-nb" id="lv-rdb" hidden>!</b></button>
+      <button class="lv-sbtn lv-tfb" id="lv-tf" aria-label="${esc(t('tf_title'))}" hidden>${icon('flag')}<b class="lv-nb num" data-tfdot hidden></b></button>
       <button class="lv-sbtn" id="lv-dm" aria-label="${esc(t('dm_title'))}">${icon('target')}<b class="lv-nb num" id="lv-msb" hidden></b></button>
       <button class="lv-sbtn" id="lv-inv" aria-label="${esc(t('lv_inv'))}">${icon('user-plus')}</button>
       <button class="lv-sbtn" id="lv-emo-b" aria-label="${esc(t('emo_title'))}">${icon('smile')}</button>
@@ -132,6 +133,8 @@ function lvBuild(el) {
       <button class="lv-main" id="lv-main"><svg class="lv-ring" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="46"/><circle cx="50" cy="50" r="46" id="lv-arc"/></svg><span id="lv-mtxt"></span></button>
       <div class="lv-sub" id="lv-sub"></div>
     </div>
+    <div class="tf-panel" id="tf-panel" hidden></div>
+    <div class="tf-card" id="tf-card" hidden></div>
     <div class="lv-res" id="lv-res" hidden></div>
     <div class="lv-cover" id="lv-cover"></div>
     <div class="lv-attr"><a href="https://openfreemap.org" target="_blank" rel="noopener">OpenFreeMap</a> © <a href="https://www.openmaptiles.org/" target="_blank" rel="noopener">OpenMapTiles</a> Data from <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a></div>
@@ -150,6 +153,8 @@ function lvBuild(el) {
   $('#lv-emo', el).addEventListener('click', e => { const b = e.target.closest('[data-emo-go]'); if (b) emoGo(b.dataset.emoGo); });
   $('#lv-ticker', el).addEventListener('click', e => { const b = e.target.closest('[data-clap]'); if (b) lvClap(b); });
   $('#lv-net', el).addEventListener('click', () => lvBook('net'));
+  $('#lv-tf', el).addEventListener('click', () => (TF.on ? tfClose() : tfOpen()));
+  $('#tf-panel', el).addEventListener('click', tfClick); $('#tf-card', el).addEventListener('click', tfClick);
   $('#lv-chips', el).addEventListener('click', e => { if (e.target.closest('[data-lwx]')) lwxInfo(); });
   if (typeof rdLoad === 'function') rdLoad().then(() => rdPaint());
   $('#lv-snd', el).addEventListener('click', e => { LVS.on = !LVS.on; lsSet('liveSnd', LVS.on); e.currentTarget.setAttribute('aria-pressed', LVS.on); if (LVS.on) LVS.play('nib'); });
@@ -185,15 +190,17 @@ function lvStart() {
   lvCover('');
   if (lsGet('liveGeo', true)) lvGeo();
   lvInvGo(); lvHud(); lvRoom(); msLoad();
+  tfLoad().then(() => { tfBadge(); if (TF.want) { TF.want = false; tfOpen(); } });
 }
 function lvResume() {
   if (LV.map) setTimeout(() => { try { LV.map.resize(); } catch (e) { } lvSize(); }, 60);
   if (LV.ready && $('#lv-cover') && !$('#lv-cover').dataset.k) { if (lsGet('liveGeo', true) && lsGet('liveOk', false)) lvGeo(); lvInvGo(); lvRoom(); }
   else if (LV.ready) lvStart();
-  lvLoad(); lvHud();
+  lvLoad(); lvHud(); tfLoad().then(() => { if (TF.want && LV.ready && !($('#lv-cover') && $('#lv-cover').dataset.k)) { TF.want = false; tfOpen(); } });
   cancelAnimationFrame(LV.raf); LV.lastT = 0; LV.raf = requestAnimationFrame(lvFrame);
 }
 function lvPause() {
+  if (TF.on) { TF.cam = null; tfClose(); }
   cancelAnimationFrame(LV.raf); LV.raf = 0; LV.hold = false;
   if (LV.watch != null) { try { navigator.geolocation.clearWatch(LV.watch); } catch (e) { } LV.watch = null; }
   if (LV.phase === 'fight' && LV.k) { APP_AUTH.live.land(LV.k.token, LV.k.sp || '', false).catch(() => null); }
@@ -337,6 +344,7 @@ function lvSchoolsShow() { LV.schools = (LV.schAll || []).filter(s => LMAP.water
 /* --- taps on the map: where to stand, where to cast --- */
 function lvTap(lng, lat) {
   const eb = $('#lv-emo'); if (eb && !eb.hidden) { eb.hidden = true; return; }
+  if (TF.on) return tfTap(lng, lat);
   if (LV.phase !== 'idle' || !LV.ready || ($('#lv-cover') && $('#lv-cover').dataset.k)) return;
   if (LV.map.getZoom() < 14.5) { LV.map.easeTo({ center: [lng, lat], zoom: 16.4 }); return; }
   const p = { lng, lat }, kind = LMAP.waterAt(LV.water, lng, lat), R = lvReach();
@@ -498,7 +506,7 @@ function lvLand() {
     LV.res = r; LV.phase = 'result'; LV.target = null; LVS.play(r.tier >= 4 || r.big ? 'rare' : 'land'); LVS.buzz(r.tier >= 4 ? [60, 40, 60, 40, 160] : [50, 40, 90]);
     lvFx('splash', k.to, 1.2); clearTimeout(LV.resT); LV.resT = setTimeout(() => { if (LV.phase === 'result' && LV.res === r) lvResult(r); }, 1150);
     if (!LV.anon && LV.room) LV.room.send('catch', { u: myId(), n: S.me.nick, sp: r.sp, cm: r.cm, tier: r.tier, big: r.big, x: +k.to.lng.toFixed(5), y: +k.to.lat.toFixed(5), on: k.site ? 1 : 0 });
-    LV.k = null; LV.f = null; lvTrack(); lvLoad(true); lvHud(); msLoad(true); if (typeof lsAfterLand === 'function') lsAfterLand(r.sp);
+    LV.k = null; LV.f = null; lvTrack(); lvLoad(true); lvHud(); msLoad(true); if (typeof lsAfterLand === 'function') lsAfterLand(r.sp); tfAfterLand();
   }).catch(() => { LV.busy = false; lvEnd('lv_err', 'miss'); }), waitMs);
 }
 function lvResult(r) {

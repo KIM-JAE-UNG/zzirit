@@ -71,6 +71,41 @@ function lvAward(wk) {
   if (wk >= zpWeek() || LVS.settled[wk]) return; LVS.settled[wk] = true;
   for (const x of lvBoard(wk)) if (x.r <= 3) { zpAdd(x.a, [300, 200, 100][x.r - 1], 'prize', 'live:' + wk, String(x.r)); if (x.r === 1) (ZPS.owned[x.a] = ZPS.owned[x.a] || []).includes('gold') || ZPS.owned[x.a].push('gold'); }
 }
+// 0030 바다 땅따먹기 and 동호회 대항전 (the same rules as the SQL): the week's catches replayed in order — power per 10 km square
+// (floor(g / 10)), the most power owns it (a tie keeps who was first), every change of hands written down, clubs by members together
+function lvTurf(wk) {
+  const P = {}, own = {}, log = [];
+  for (const c of LVS.catches.filter(c => c.wk === wk).sort((a, b) => a.id - b.id)) {
+    const x = Math.floor(c.gx / 10), y = Math.floor(c.gy / 10), k = x + ',' + y, m = P[k] || (P[k] = {});
+    const r = m[c.acct] || (m[c.acct] = { p: 0, anon: false, at: 0, n: 0 }); r.p += Math.max(0, c.score); r.anon = r.anon || !!c.anon; r.at = c.id; r.n++;
+    const o = own[k]; if (!o) { own[k] = c.acct; log.push({ id: c.id, x, y, won: c.acct, lost: null, at: c.at }); continue; }
+    const best = Object.entries(m).sort((a, b) => b[1].p - a[1].p || a[1].at - b[1].at)[0];
+    if (best[0] !== o && best[1].p > ((m[o] || {}).p || 0)) { own[k] = best[0]; log.push({ id: c.id, x, y, won: best[0], lost: o, at: c.at }); }
+  }
+  const cells = [];
+  for (const [k, m] of Object.entries(P)) {
+    const rows = Object.entries(m).filter(([a, r]) => r.p > 0 && !LVS.void[wk + a]).sort((a, b) => b[1].p - a[1].p || a[1].at - b[1].at);
+    if (!rows.length) continue; const [x, y] = k.split(',').map(Number);
+    cells.push({ x, y, a: rows[0][0], p: rows[0][1].p, anon: rows[0][1].anon, c: rows.length, m });
+  }
+  return { cells, log, P };
+}
+function lvTeams() {
+  const of = {};
+  for (const [id, tm] of Object.entries(T.teams)) if (tm.data && String(tm.data.name || '') !== '') of[id] = id;
+  for (const [id, a] of Object.entries(T.anglers)) { const tid = a.data && a.data.team && a.data.team.id, tm = tid && T.teams[tid]; if (!tm || !tm.data || !String(tm.data.name || '') || id === tid) continue; const d = tm.data; if (d.ban && d.ban[id]) continue; if (d.open === true || (d.members && d.members[id])) of[id] = tid; }
+  return of;
+}
+const lvTeamCard = tid => { const d = (T.teams[tid] || {}).data || {}; return { id: tid, name: String(d.name || '').slice(0, 24), tag: String(d.tag || '').slice(0, 6), emoji: String(d.emoji || '').slice(0, 4), color: /^#[0-9A-Fa-f]{6}$/.test(d.color || '') ? d.color : '#0B6E8E' }; };
+function lvTeamTurf(wk, P) {
+  const of = lvTeams(), out = {};
+  for (const [k, m] of Object.entries(P)) {
+    const by = {}; for (const [a, r] of Object.entries(m)) { const tid = of[a]; if (!tid || r.p <= 0 || LVS.void[wk + a]) continue; const b = by[tid] || (by[tid] = { p: 0, at: 1e15 }); b.p += r.p; b.at = Math.min(b.at, r.at); }
+    const best = Object.entries(by).sort((a, b) => b[1].p - a[1].p || a[1].at - b[1].at)[0]; if (best) out[k] = { t: best[0], tp: best[1].p };
+  }
+  return out;
+}
+const lvTurfEnds = () => Date.parse(zpAddDays(zpWeek(), 7) + 'T00:00:00+09:00');
 const MS_DEF = { fish3: [3, 10], fish6: [6, 20], rare: [1, 20], big: [1, 20], sell: [3, 10], free: [1, 10], remote: [1, 10], sea: [2, 15], fresh: [2, 15] };
 function lvMissions(acct, day) {
   let ks = LVS.cfg.missions;
@@ -416,6 +451,36 @@ http.createServer(async (req, res) => {
         }
         return send({ data: { ok: true, dmg, crit, ...(rc.noCombo ? {} : { combo, bonus }), hp: Math.max(0, r.hp), max: r.max, beaten: !!r.beaten, raid: r.beaten ? js(r) : null, me: { d: h.d, hits: h.hits } } });
       }
+      // 0030: 바다 땅따먹기 (cfg.noTurf plays a server without it)
+      if (q.name === 'live_turf' || q.name === 'live_turf_me' || q.name === 'live_turf_claim') {
+        if (C.noTurf) return send({ error: { code: 'PGRST202', message: 'Could not find the function public.' + q.name + ' in the schema cache' } });
+        const last = zpAddDays(wk, -7), lastN = lvTurf(last).cells.filter(c => c.a === me).length;
+        if (q.name === 'live_turf_claim') {
+          if (!zpNick(me)) return send({ data: { err: 'no_profile' } });
+          if (!lastN) return send({ data: { err: 'none' } });
+          const pts = Math.min(100, lastN * 10); if (!zpAdd(me, pts, 'prize', 'turf:' + last, lastN + ' seas')) return send({ data: { err: 'already' } });
+          return send({ data: { ok: true, n: lastN, pts, bal: ZPS.wal[me].bal } });
+        }
+        const TF = lvTurf(wk), TT = lvTeamTurf(wk, TF.P), now = Date.now();
+        if (q.name === 'live_turf') {
+          if ([A.p_x0, A.p_y0, A.p_x1, A.p_y1].some(v => !Number.isInteger(v)) || A.p_x1 < A.p_x0 || A.p_y1 < A.p_y0 || (A.p_x1 - A.p_x0 + 1) * (A.p_y1 - A.p_y0 + 1) > 4000) return err('bad_input');
+          const inb = (x, y) => x >= A.p_x0 && x <= A.p_x1 && y >= A.p_y0 && y <= A.p_y1, teams = {};
+          const cells = TF.cells.filter(c => inb(c.x, c.y)).map(c => { const tt = TT[c.x + ',' + c.y]; if (tt) teams[tt.t] = lvTeamCard(tt.t); return { x: c.x, y: c.y, a: c.anon && c.a !== me ? null : c.a, p: c.p, me: c.a === me, mp: (c.m[me] || {}).p || 0, c: c.c, t: tt ? tt.t : null, tp: tt ? tt.tp : null }; });
+          return send({ data: { wk, ends: lvTurfEnds(), now, cells, teams } });
+        }
+        const lordsBy = {}; for (const c of TF.cells) { const l = lordsBy[c.a] || (lordsBy[c.a] = { a: c.a, n: 0, p: 0, anon: false }); l.n++; l.p += c.p; l.anon = l.anon || c.anon; }
+        const lords = Object.values(lordsBy).sort((a, b) => b.n - a.n || b.p - a.p); lords.forEach((l, i) => { l.rk = i && lords[i - 1].n === l.n && lords[i - 1].p === l.p ? lords[i - 1].rk : i + 1; });
+        const clubsBy = {}; for (const tt of Object.values(TT)) { const c = clubsBy[tt.t] || (clubsBy[tt.t] = { t: tt.t, n: 0, p: 0 }); c.n++; c.p += tt.tp; }
+        const clubs = Object.values(clubsBy).sort((a, b) => b.n - a.n || b.p - a.p); clubs.forEach((c, i) => { c.rk = i && clubs[i - 1].n === c.n && clubs[i - 1].p === c.p ? clubs[i - 1].rk : i + 1; });
+        const myTid = lvTeams()[me], mineL = lordsBy[me], club = c => Object.assign(lvTeamCard(c.t), { n: c.n, p: c.p, rk: c.rk });
+        const anonAt = (g, a) => !!(((TF.P[g.x + ',' + g.y] || {})[a] || {}).anon);
+        return send({ data: { wk, ends: lvTurfEnds(), now, n: mineL ? mineL.n : 0, rk: mineL ? mineL.rk : null, lords_n: lords.length,
+          cells: TF.cells.filter(c => c.a === me).sort((a, b) => b.p - a.p).slice(0, 60).map(c => [c.x, c.y, c.p]),
+          lords: lords.slice(0, 10).map(l => ({ a: l.anon && l.a !== me ? null : l.a, n: l.n, p: l.p, rk: l.rk })),
+          clubs: clubs.slice(0, 10).map(club), team: myTid ? (clubsBy[myTid] ? club(clubsBy[myTid]) : Object.assign(lvTeamCard(myTid), { n: 0, p: 0, rk: null })) : null, clubs_n: clubs.length,
+          log: TF.log.filter(g => g.won === me || g.lost === me).reverse().slice(0, 20).map(g => ({ id: g.id, x: g.x, y: g.y, k: g.won === me ? 'won' : 'lost', who: g.won === me ? (g.lost && !anonAt(g, g.lost) ? g.lost : null) : (anonAt(g, g.won) ? null : g.won), at: g.at })),
+          last: { wk: last, n: lastN, pts: Math.min(100, lastN * 10), got: ZPS.led.some(x => x.acct === me && x.r === 'prize' && x.ref === 'turf:' + last) }, bal: (ZPS.wal[me] || { bal: 0 }).bal } });
+      }
       // 0028: my raid record and the raid titles (the same counting as the SQL; cfg.noRaidRec plays a server without it)
       if (q.name === 'live_raid_record' || q.name === 'live_raid_title_claim') {
         if (C.noRaidRec) return send({ error: { code: 'PGRST202', message: 'Could not find the function public.' + q.name + ' in the schema cache' } });
@@ -610,7 +675,7 @@ http.createServer(async (req, res) => {
     return send({ ver, events: events.filter(e => e.ver > since && (e.eventType === 'DELETE' || !['points', 'reviews', 'dm', 'chat'].includes(e.table) || visible(e.table, e.new, who))) });
   }
   if (u.pathname === '/__sb/zp_seed') { const q = await body(req); const wk = q.wk || zpAddDays(zpWeek(), q.weeksAgo ? -7 * q.weeksAgo : 0); for (const r of q.rows || []) ZPS.scores['rx|' + wk + '|' + r.acct] = { game: 'rx', wk, acct: r.acct, score: r.score, best: r.best == null ? null : r.best, void: !!r.void, at: Date.now() - 864e5 * 9 + (r.order || 0) }; return send({ ok: true, wk }); }
-  if (u.pathname === '/__sb/live_seed') { const q = await body(req); const wk = zpAddDays(zpWeek(), q.weeksAgo ? -7 * q.weeksAgo : 0); for (const r of q.rows || []) LVS.catches.push({ id: ++LVS.seq, acct: r.acct, sp: r.sp || 'kurodai', cm: r.cm || 40, tier: 4, big: false, score: r.score, pts: 12, onsite: true, anon: false, gx: 1, gy: 1, wk, at: Date.now() - 864e5 * 8 }); return send({ ok: true, wk }); }
+  if (u.pathname === '/__sb/live_seed') { const q = await body(req); const wk = zpAddDays(zpWeek(), q.weeksAgo ? -7 * q.weeksAgo : 0); for (const r of q.rows || []) LVS.catches.push({ id: ++LVS.seq, acct: r.acct, sp: r.sp || 'kurodai', cm: r.cm || 40, tier: 4, big: false, score: r.score, pts: 12, onsite: true, anon: !!r.anon, gx: r.gx != null ? r.gx : 1, gy: r.gy != null ? r.gy : 1, wk, at: r.now ? Date.now() : Date.now() - 864e5 * 8 }); return send({ ok: true, wk }); }
   if (u.pathname === '/__sb/live_dex') { const q = await body(req); const dx = LVS.dex[q.acct] || (LVS.dex[q.acct] = {}); for (const sp of q.sps || []) dx[sp] = { n: 1, best: 30 }; return send({ ok: true }); }
   if (u.pathname === '/__sb/live_cfg') { const q = await body(req); Object.assign(LVS.cfg, q.cfg || {}); if (q.raid) Object.assign(lvRaid().cfg, q.raid); if (q.raidReset) { lvRaid().list = {}; lvRaid().hits = {}; } if (q.raidHp != null) { for (const r of Object.values(lvRaid().list)) if (!r.beaten) r.hp = Math.min(r.hp, q.raidHp); } if (q.weeksBack) for (const c of LVS.catches) c.wk = zpAddDays(c.wk, -7 * q.weeksBack); if (q.reset) { LVS.casts = {}; LVS.days = {}; LVS.catches = []; LVS.dex = {}; LVS.settled = {}; } if (q.streak) for (const [a, x] of Object.entries(q.streak)) LVS.streak[a] = x; return send({ cfg: LVS.cfg, n: LVS.catches.length, casts: LVS.casts }); }
   if (u.pathname === '/__sb/feature') { for (const [k, v] of u.searchParams) FEATURES[k] = v === '1'; return send(FEATURES); }

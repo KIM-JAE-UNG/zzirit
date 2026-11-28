@@ -247,6 +247,10 @@
     // 0028: my raid record and the raid titles
     raidRec: () => zpRpc('live_raid_record'),
     raidTitle: k => zpRpc('live_raid_title_claim', { p_k: k }),
+    // 0030: 바다 땅따먹기 and 동호회 대항전
+    turf: (x0, y0, x1, y1) => zpRpc('live_turf', { p_x0: x0, p_y0: y0, p_x1: x1, p_y1: y1 }),
+    turfMe: () => zpRpc('live_turf_me'),
+    turfClaim: () => zpRpc('live_turf_claim'),
     void: (wk, uid, on) => zpRpc('live_void', { p_wk: wk, p_acct: uid, p_void: on !== false })
   };
   window.APP_AUTH = { sb, session, acct, link, news, review, admin, ids, push, chat, dm, rt, account, board, zp, live: liveGame, error: () => authErr };
